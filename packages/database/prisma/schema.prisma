@@ -1,0 +1,578 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserStatus {
+  ACTIVE
+  BLOCKED
+  DELETION_REQUESTED
+  DELETED
+}
+
+model User {
+  id            String    @id @default(uuid()) @db.Uuid
+  email         String?   @unique @db.VarChar(255)
+  phone         String?   @unique @db.VarChar(30)
+  authProvider  String    @map("auth_provider") @db.VarChar(50)
+  status        UserStatus @default(ACTIVE)
+  lastLoginAt   DateTime? @map("last_login_at") @db.Timestamp(6)
+  createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt     DateTime  @updatedAt @map("updated_at") @db.Timestamp(6)
+  deletedAt     DateTime? @map("deleted_at") @db.Timestamp(6)
+
+  identities    PersonIdentity[]
+  membershipsApproved Membership[] @relation("MembershipApprover")
+  eventsCreated Event[]
+  checkIns      CheckIn[]
+  consents      Consent[]
+  privacySetting PrivacySetting?
+  auditLogs     AuditLog[]
+
+  @@map("users")
+}
+
+model PersonIdentity {
+  id            String    @id @default(uuid()) @db.Uuid
+  userId        String    @map("user_id") @db.Uuid
+  fullName      String    @map("full_name") @db.VarChar(150)
+  displayName   String?   @map("display_name") @db.VarChar(150)
+  avatarUrl     String?   @map("avatar_url") @db.Text
+  title         String?   @db.VarChar(150)
+  bio           String?   @db.Text
+  phone         String?   @db.VarChar(30)
+  email         String?   @db.VarChar(255)
+  website       String?   @db.VarChar(500)
+  createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt     DateTime  @updatedAt @map("updated_at") @db.Timestamp(6)
+  deletedAt     DateTime? @map("deleted_at") @db.Timestamp(6)
+
+  user          User      @relation(fields: [userId], references: [id])
+  socialLinks   IdentitySocialLink[]
+  businesses    PersonBusiness[]
+  memberships   Membership[]
+  accessCards   AccessCard[]
+  eventRegistrations EventRegistration[]
+  checkIns      CheckIn[]
+  connectionsRequested Connection[] @relation("Requester")
+  connectionsReceived  Connection[] @relation("Receiver")
+  connectionNotes ConnectionNote[]
+  tags          Tag[]
+  leads         Lead[]
+  followUps     FollowUp[]
+
+  @@index([userId])
+  @@map("person_identities")
+}
+
+model IdentitySocialLink {
+  id            String    @id @default(uuid()) @db.Uuid
+  identityId    String    @map("identity_id") @db.Uuid
+  platform      String    @db.VarChar(50)
+  url           String    @db.VarChar(500)
+  isPublic      Boolean   @default(true) @map("is_public")
+  sortOrder     Int?      @map("sort_order")
+  createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamp(6)
+
+  identity      PersonIdentity @relation(fields: [identityId], references: [id])
+
+  @@index([identityId, sortOrder])
+  @@map("identity_social_links")
+}
+
+enum VerificationStatus {
+  UNVERIFIED
+  PENDING
+  VERIFIED
+  REJECTED
+}
+
+model Business {
+  id            String    @id @default(uuid()) @db.Uuid
+  legalName     String    @map("legal_name") @db.VarChar(255)
+  displayName   String?   @map("display_name") @db.VarChar(255)
+  logoUrl       String?   @map("logo_url") @db.Text
+  taxCode       String?   @unique @map("tax_code") @db.VarChar(30)
+  industry      String?   @db.VarChar(150)
+  website       String?   @db.VarChar(500)
+  description   String?   @db.Text
+  primaryPhone  String?   @map("primary_phone") @db.VarChar(30)
+  primaryEmail  String?   @map("primary_email") @db.VarChar(255)
+  address       String?   @db.Text
+  verificationStatus VerificationStatus @default(UNVERIFIED) @map("verification_status")
+  verifiedAt    DateTime? @map("verified_at") @db.Timestamp(6)
+  createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt     DateTime  @updatedAt @map("updated_at") @db.Timestamp(6)
+  deletedAt     DateTime? @map("deleted_at") @db.Timestamp(6)
+
+  persons       PersonBusiness[]
+
+  @@map("businesses")
+}
+
+enum PersonBusinessStatus {
+  ACTIVE
+  INACTIVE
+}
+
+model PersonBusiness {
+  id            String    @id @default(uuid()) @db.Uuid
+  personIdentityId String @map("person_identity_id") @db.Uuid
+  businessId    String    @map("business_id") @db.Uuid
+  position      String?   @db.VarChar(150)
+  department    String?   @db.VarChar(150)
+  relationType  String    @map("relation_type") @db.VarChar(50)
+  isPrimary     Boolean   @default(false) @map("is_primary")
+  startDate     DateTime? @map("start_date") @db.Date
+  endDate       DateTime? @map("end_end") @db.Date
+  status        PersonBusinessStatus @default(ACTIVE)
+  createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt     DateTime  @updatedAt @map("updated_at") @db.Timestamp(6)
+
+  personIdentity PersonIdentity @relation(fields: [personIdentityId], references: [id])
+  business       Business       @relation(fields: [businessId], references: [id])
+
+  @@index([personIdentityId])
+  @@index([businessId])
+  @@index([personIdentityId, isPrimary])
+  @@map("person_businesses")
+}
+
+enum OrganizationStatus {
+  ACTIVE
+  INACTIVE
+}
+
+model Organization {
+  id            String    @id @default(uuid()) @db.Uuid
+  name          String    @db.VarChar(255)
+  slug          String    @unique @db.VarChar(255)
+  logoUrl       String?   @map("logo_url") @db.Text
+  coverUrl      String?   @map("cover_url") @db.Text
+  description   String?   @db.Text
+  website       String?   @db.VarChar(500)
+  industry      String?   @db.VarChar(150)
+  status        OrganizationStatus @default(ACTIVE)
+  createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt     DateTime  @updatedAt @map("updated_at") @db.Timestamp(6)
+  deletedAt     DateTime? @map("deleted_at") @db.Timestamp(6)
+
+  roles         OrganizationRole[]
+  memberships   Membership[]
+  events        Event[]
+
+  @@map("organizations")
+}
+
+model OrganizationRole {
+  id            String    @id @default(uuid()) @db.Uuid
+  organizationId String   @map("organization_id") @db.Uuid
+  name          String    @db.VarChar(100)
+  description   String?   @db.Text
+  createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt     DateTime  @updatedAt @map("updated_at") @db.Timestamp(6)
+
+  organization  Organization @relation(fields: [organizationId], references: [id])
+  memberships   Membership[]
+
+  @@unique([organizationId, name])
+  @@map("organization_roles")
+}
+
+enum MembershipStatus {
+  PENDING
+  ACTIVE
+  SUSPENDED
+  EXPIRED
+  CANCELLED
+}
+
+model Membership {
+  id            String    @id @default(uuid()) @db.Uuid
+  organizationId String   @map("organization_id") @db.Uuid
+  personIdentityId String @map("person_identity_id") @db.Uuid
+  membershipType String?  @map("membership_type") @db.VarChar(100)
+  roleId        String?   @map("role_id") @db.Uuid
+  status        MembershipStatus @default(PENDING)
+  joinedAt      DateTime  @default(now()) @map("joined_at") @db.Timestamp(6)
+  expiresAt     DateTime? @map("expires_at") @db.Timestamp(6)
+  approvedAt    DateTime? @map("approved_at") @db.Timestamp(6)
+  approvedBy    String?   @map("approved_by") @db.Uuid
+  createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt     DateTime  @updatedAt @map("updated_at") @db.Timestamp(6)
+  deletedAt     DateTime? @map("deleted_at") @db.Timestamp(6)
+
+  organization  Organization @relation(fields: [organizationId], references: [id])
+  personIdentity PersonIdentity @relation(fields: [personIdentityId], references: [id])
+  role          OrganizationRole? @relation(fields: [roleId], references: [id])
+  approver      User?     @relation("MembershipApprover", fields: [approvedBy], references: [id])
+
+  @@index([organizationId])
+  @@index([personIdentityId])
+  @@map("memberships")
+}
+
+enum CardStatus {
+  ACTIVE
+  REVOKED
+  REPLACED
+}
+
+model AccessCard {
+  id            String    @id @default(uuid()) @db.Uuid
+  personIdentityId String @map("person_identity_id") @db.Uuid
+  cardUid       String    @unique @map("card_uid") @db.VarChar(255)
+  cardType      String    @map("card_type") @db.VarChar(50)
+  nfcIdentifier String?   @unique @map("nfc_identifier") @db.VarChar(255)
+  dynamicUrl    String    @unique @map("dynamic_url") @db.VarChar(500)
+  qrValue       String    @unique @map("qr_value") @db.VarChar(500)
+  status        CardStatus @default(ACTIVE)
+  issuedAt      DateTime  @default(now()) @map("issued_at") @db.Timestamp(6)
+  revokedAt     DateTime? @map("revoked_at") @db.Timestamp(6)
+  lastUsedAt    DateTime? @map("last_used_at") @db.Timestamp(6)
+  createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamp(6)
+
+  personIdentity PersonIdentity @relation(fields: [personIdentityId], references: [id])
+
+  @@map("access_cards")
+}
+
+enum EventStatus {
+  DRAFT
+  PUBLISHED
+  ONGOING
+  COMPLETED
+  CANCELLED
+}
+
+model Event {
+  id            String    @id @default(uuid()) @db.Uuid
+  organizationId String   @map("organization_id") @db.Uuid
+  name          String    @db.VarChar(255)
+  slug          String    @unique @db.VarChar(255)
+  description   String?   @db.Text
+  bannerUrl     String?   @map("banner_url") @db.Text
+  startAt       DateTime  @map("start_at") @db.Timestamp(6)
+  endAt         DateTime  @map("end_at") @db.Timestamp(6)
+  locationName  String?   @map("location_name") @db.VarChar(255)
+  address       String?   @db.Text
+  registrationOpenAt DateTime? @map("registration_open_at") @db.Timestamp(6)
+  registrationCloseAt DateTime? @map("registration_close_at") @db.Timestamp(6)
+  capacity      Int?
+  status        EventStatus @default(DRAFT)
+  createdBy     String    @map("created_by") @db.Uuid
+  createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt     DateTime  @updatedAt @map("updated_at") @db.Timestamp(6)
+
+  organization  Organization @relation(fields: [organizationId], references: [id])
+  creator       User      @relation(fields: [createdBy], references: [id])
+  registrations EventRegistration[]
+  checkIns      CheckIn[]
+  connectionContexts ConnectionContext[]
+
+  @@index([organizationId])
+  @@index([startAt])
+  @@map("events")
+}
+
+enum RegistrationStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  ATTENDED
+}
+
+model EventRegistration {
+  id            String    @id @default(uuid()) @db.Uuid
+  eventId       String    @map("event_id") @db.Uuid
+  personIdentityId String @map("person_identity_id") @db.Uuid
+  registrationStatus RegistrationStatus @default(PENDING) @map("registration_status")
+  registeredAt  DateTime  @default(now()) @map("registered_at") @db.Timestamp(6)
+  ticketType    String?   @map("ticket_type") @db.VarChar(100)
+  invitationCode String?  @map("invitation_code") @db.VarChar(100)
+  source        String?   @db.VarChar(100)
+  createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt     DateTime  @updatedAt @map("updated_at") @db.Timestamp(6)
+
+  event         Event     @relation(fields: [eventId], references: [id])
+  personIdentity PersonIdentity @relation(fields: [personIdentityId], references: [id])
+  checkIns      CheckIn[]
+
+  @@unique([eventId, personIdentityId])
+  @@map("event_registrations")
+}
+
+enum CheckInMethod {
+  NFC
+  QR
+  MANUAL
+}
+
+model CheckIn {
+  id            String    @id @default(uuid()) @db.Uuid
+  eventId       String    @map("event_id") @db.Uuid
+  registrationId String   @map("registration_id") @db.Uuid
+  personIdentityId String @map("person_identity_id") @db.Uuid
+  method        CheckInMethod
+  checkedInAt   DateTime  @default(now()) @map("checked_in_at") @db.Timestamp(6)
+  operatorUserId String?  @map("operator_user_id") @db.Uuid
+  stationId     String?   @map("station_id") @db.Uuid
+  metadata      Json?
+  createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamp(6)
+
+  event         Event     @relation(fields: [eventId], references: [id])
+  registration  EventRegistration @relation(fields: [registrationId], references: [id])
+  personIdentity PersonIdentity @relation(fields: [personIdentityId], references: [id])
+  operator      User?     @relation(fields: [operatorUserId], references: [id])
+
+  @@unique([eventId, personIdentityId])
+  @@index([checkedInAt])
+  @@map("check_ins")
+}
+
+enum ConnectionStatus {
+  PENDING
+  CONNECTED
+  BLOCKED
+}
+
+model Connection {
+  id            String    @id @default(uuid()) @db.Uuid
+  requesterIdentityId String @map("requester_identity_id") @db.Uuid
+  receiverIdentityId String @map("receiver_identity_id") @db.Uuid
+  status        ConnectionStatus @default(PENDING)
+  connectedAt   DateTime? @map("connected_at") @db.Timestamp(6)
+  createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt     DateTime  @updatedAt @map("updated_at") @db.Timestamp(6)
+
+  requester     PersonIdentity @relation("Requester", fields: [requesterIdentityId], references: [id])
+  receiver      PersonIdentity @relation("Receiver", fields: [receiverIdentityId], references: [id])
+  contexts      ConnectionContext[]
+  notes         ConnectionNote[]
+  tags          ConnectionTag[]
+  leads         Lead[]
+  followUps     FollowUp[]
+
+  @@index([requesterIdentityId])
+  @@index([receiverIdentityId])
+  @@map("connections")
+}
+
+model ConnectionContext {
+  id            String    @id @default(uuid()) @db.Uuid
+  connectionId  String    @map("connection_id") @db.Uuid
+  eventId       String?   @map("event_id") @db.Uuid
+  sourceType    String    @map("source_type") @db.VarChar(50)
+  sourceId      String?   @map("source_id") @db.Uuid
+  firstMetAt    DateTime? @map("first_met_at") @db.Timestamp(6)
+  createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamp(6)
+
+  connection    Connection @relation(fields: [connectionId], references: [id])
+  event         Event?     @relation(fields: [eventId], references: [id])
+
+  @@map("connection_contexts")
+}
+
+model ConnectionNote {
+  id            String    @id @default(uuid()) @db.Uuid
+  connectionId  String    @map("connection_id") @db.Uuid
+  ownerIdentityId String  @map("owner_identity_id") @db.Uuid
+  content       String    @db.Text
+  createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt     DateTime  @updatedAt @map("updated_at") @db.Timestamp(6)
+  deletedAt     DateTime? @map("deleted_at") @db.Timestamp(6)
+
+  connection    Connection @relation(fields: [connectionId], references: [id])
+  owner         PersonIdentity @relation(fields: [ownerIdentityId], references: [id])
+
+  @@map("connection_notes")
+}
+
+model Tag {
+  id            String    @id @default(uuid()) @db.Uuid
+  ownerIdentityId String  @map("owner_identity_id") @db.Uuid
+  name          String    @db.VarChar(100)
+  color         String?   @db.VarChar(20)
+  createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamp(6)
+
+  owner         PersonIdentity @relation(fields: [ownerIdentityId], references: [id])
+  connectionTags ConnectionTag[]
+
+  @@unique([ownerIdentityId, name])
+  @@map("tags")
+}
+
+model ConnectionTag {
+  connectionId  String    @map("connection_id") @db.Uuid
+  tagId         String    @map("tag_id") @db.Uuid
+
+  connection    Connection @relation(fields: [connectionId], references: [id])
+  tag           Tag       @relation(fields: [tagId], references: [id])
+
+  @@id([connectionId, tagId])
+  @@map("connection_tags")
+}
+
+enum LeadStatus {
+  NEW
+  WARM
+  HOT
+}
+
+model Lead {
+  id            String    @id @default(uuid()) @db.Uuid
+  connectionId  String    @map("connection_id") @db.Uuid
+  ownerIdentityId String  @map("owner_identity_id") @db.Uuid
+  status        LeadStatus @default(NEW)
+  priority      String?   @db.VarChar(50)
+  estimatedValue Decimal? @map("estimated_value") @db.Decimal(18,2)
+  source        String?   @db.VarChar(100)
+  createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt     DateTime  @updatedAt @map("updated_at") @db.Timestamp(6)
+
+  connection    Connection @relation(fields: [connectionId], references: [id])
+  owner         PersonIdentity @relation(fields: [ownerIdentityId], references: [id])
+  followUps     FollowUp[]
+
+  @@index([ownerIdentityId])
+  @@map("leads")
+}
+
+enum FollowUpType {
+  CALL
+  MEETING
+  EMAIL
+  SEND_DOCUMENT
+  INVITATION
+  OTHER
+}
+
+enum FollowUpStatus {
+  TODO
+  DONE
+  CANCELLED
+}
+
+model FollowUp {
+  id            String    @id @default(uuid()) @db.Uuid
+  connectionId  String    @map("connection_id") @db.Uuid
+  leadId        String?   @map("lead_id") @db.Uuid
+  ownerIdentityId String  @map("owner_identity_id") @db.Uuid
+  type          FollowUpType
+  title         String    @db.VarChar(255)
+  note          String?   @db.Text
+  dueAt         DateTime  @map("due_at") @db.Timestamp(6)
+  completedAt   DateTime? @map("completed_at") @db.Timestamp(6)
+  status        FollowUpStatus @default(TODO)
+  createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt     DateTime  @updatedAt @map("updated_at") @db.Timestamp(6)
+
+  connection    Connection @relation(fields: [connectionId], references: [id])
+  lead          Lead?     @relation(fields: [leadId], references: [id])
+  owner         PersonIdentity @relation(fields: [ownerIdentityId], references: [id])
+
+  @@index([ownerIdentityId])
+  @@index([dueAt])
+  @@map("follow_ups")
+}
+
+model Role {
+  id            String    @id @default(uuid()) @db.Uuid
+  name          String    @db.VarChar(100)
+  description   String?   @db.Text
+
+  permissions   RolePermission[]
+
+  @@map("roles")
+}
+
+model Permission {
+  id            String    @id @default(uuid()) @db.Uuid
+  key           String    @unique @db.VarChar(150)
+  name          String    @db.VarChar(150)
+  description   String?   @db.Text
+
+  roles         RolePermission[]
+
+  @@map("permissions")
+}
+
+model RolePermission {
+  roleId        String    @map("role_id") @db.Uuid
+  permissionId  String    @map("permission_id") @db.Uuid
+
+  role          Role      @relation(fields: [roleId], references: [id])
+  permission    Permission @relation(fields: [permissionId], references: [id])
+
+  @@id([roleId, permissionId])
+  @@map("role_permissions")
+}
+
+enum ConsentStatus {
+  GRANTED
+  REVOKED
+}
+
+model Consent {
+  id            String    @id @default(uuid()) @db.Uuid
+  userId        String    @map("user_id") @db.Uuid
+  consentType   String    @map("consent_type") @db.VarChar(100)
+  objectType    String?   @map("object_type") @db.VarChar(100)
+  objectId      String?   @map("object_id") @db.Uuid
+  status        ConsentStatus @default(GRANTED)
+  grantedAt     DateTime? @map("granted_at") @db.Timestamp(6)
+  revokedAt     DateTime? @map("revoked_at") @db.Timestamp(6)
+  version       String    @db.VarChar(30)
+  createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamp(6)
+
+  user          User      @relation(fields: [userId], references: [id])
+
+  @@map("consents")
+}
+
+enum VisibilityLevel {
+  PUBLIC
+  MEMBERS_ONLY
+  ORGANIZATION_ONLY
+  PRIVATE
+}
+
+model PrivacySetting {
+  id            String    @id @default(uuid()) @db.Uuid
+  userId        String    @unique @map("user_id") @db.Uuid
+  profileVisibility VisibilityLevel @default(PUBLIC) @map("profile_visibility")
+  contactVisibility VisibilityLevel @default(MEMBERS_ONLY) @map("contact_visibility")
+  eventDirectoryVisibility VisibilityLevel @default(PUBLIC) @map("event_directory_visibility")
+  membershipVisibility VisibilityLevel @default(PUBLIC) @map("membership_visibility")
+  connectionVisibility VisibilityLevel @default(PRIVATE) @map("connection_visibility")
+  createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt     DateTime  @updatedAt @map("updated_at") @db.Timestamp(6)
+
+  user          User      @relation(fields: [userId], references: [id])
+
+  @@map("privacy_settings")
+}
+
+model AuditLog {
+  id            String    @id @default(uuid()) @db.Uuid
+  actorUserId   String    @map("actor_user_id") @db.Uuid
+  action        String    @db.VarChar(100)
+  objectType    String    @map("object_type") @db.VarChar(100)
+  objectId      String    @map("object_id") @db.Uuid
+  organizationId String?  @map("organization_id") @db.Uuid
+  eventId       String?   @map("event_id") @db.Uuid
+  ipAddress     String?   @map("ip_address") @db.VarChar(50)
+  userAgent     String?   @map("user_agent") @db.Text
+  createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamp(6)
+
+  actor         User      @relation(fields: [actorUserId], references: [id])
+
+  @@index([actorUserId])
+  @@index([objectType, objectId])
+  @@index([createdAt])
+  @@map("audit_logs")
+}
