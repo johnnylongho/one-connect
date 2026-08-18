@@ -474,6 +474,52 @@ export function useOneConnectStore() {
     return { identity: newIdentity, card: newCard };
   };
 
+  // Update Existing Identity / Profile
+  const updateIdentity = (identityId: string, updates: {
+    fullName?: string;
+    title?: string;
+    bio?: string;
+    phone?: string;
+    email?: string;
+    website?: string;
+    avatarUrl?: string;
+    businessName?: string;
+  }) => {
+    setState(prev => ({
+      ...prev,
+      identities: prev.identities.map(item => {
+        if (item.id !== identityId) return item;
+
+        const updatedBusinesses = item.businesses && item.businesses.length > 0
+          ? item.businesses.map((b, idx) => idx === 0 && updates.businessName ? { ...b, businessName: updates.businessName, position: updates.title || b.position } : b)
+          : updates.businessName ? [{
+              id: `pbiz-${Date.now()}`,
+              personIdentityId: identityId,
+              businessId: `biz-${Date.now()}`,
+              businessName: updates.businessName,
+              position: updates.title || 'Giám Đốc',
+              relationType: 'FOUNDER_OWNER',
+              isPrimary: true,
+              status: 'ACTIVE' as const
+            }] : [];
+
+        return {
+          ...item,
+          fullName: updates.fullName !== undefined ? updates.fullName : item.fullName,
+          displayName: updates.fullName !== undefined ? updates.fullName : item.displayName,
+          title: updates.title !== undefined ? updates.title : item.title,
+          bio: updates.bio !== undefined ? updates.bio : item.bio,
+          phone: updates.phone !== undefined ? updates.phone : item.phone,
+          email: updates.email !== undefined ? updates.email : item.email,
+          website: updates.website !== undefined ? updates.website : item.website,
+          avatarUrl: updates.avatarUrl !== undefined ? updates.avatarUrl : item.avatarUrl,
+          businesses: updatedBusinesses,
+          updatedAt: new Date().toISOString()
+        };
+      })
+    }));
+  };
+
   // Toggle Privacy
   const updatePrivacy = (newPrivacy: Partial<PrivacySetting>) => {
     setState(prev => ({
@@ -490,6 +536,7 @@ export function useOneConnectStore() {
     setCurrentRole,
     setCurrentIdentityId,
     registerIdentity,
+    updateIdentity,
     resetState,
     performCheckIn,
     requestConnection,
@@ -500,4 +547,3 @@ export function useOneConnectStore() {
     updatePrivacy,
   };
 }
-

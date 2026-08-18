@@ -31,7 +31,8 @@ import {
   EyeOff,
   UserCheck,
   Sparkles,
-  Info
+  Info,
+  Edit3
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -179,7 +180,7 @@ const TAP_LOGS = [
 ];
 
 export default function DigitalNfcCardPage() {
-  const { currentIdentity, currentCard, reissueCard } = useOneConnectStore();
+  const { currentIdentity, currentCard, reissueCard, updateIdentity } = useOneConnectStore();
 
   // Active Sub-Tab
   const [activeTab, setActiveTab] = useState<'my-card' | 'inventory' | 'analytics' | 'pdpl'>('my-card');
@@ -197,10 +198,50 @@ export default function DigitalNfcCardPage() {
   const [isSimulatingTap, setIsSimulatingTap] = useState(false);
   const [tapSuccess, setTapSuccess] = useState(false);
 
+  // Edit Profile Modal State
+  const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
+  const [editFullName, setEditFullName] = useState(currentIdentity?.fullName || '');
+  const [editTitle, setEditTitle] = useState(currentIdentity?.title || '');
+  const [editBusinessName, setEditBusinessName] = useState(currentIdentity?.businesses?.[0]?.businessName || '');
+  const [editPhone, setEditPhone] = useState(currentIdentity?.phone || '');
+  const [editEmail, setEditEmail] = useState(currentIdentity?.email || '');
+  const [editBio, setEditBio] = useState(currentIdentity?.bio || '');
+  const [editWebsite, setEditWebsite] = useState(currentIdentity?.website || 'https://aplusvn.com');
+
+  const handleOpenEditModal = () => {
+    setEditFullName(currentIdentity?.fullName || '');
+    setEditTitle(currentIdentity?.title || '');
+    setEditBusinessName(currentIdentity?.businesses?.[0]?.businessName || '');
+    setEditPhone(currentIdentity?.phone || '');
+    setEditEmail(currentIdentity?.email || '');
+    setEditBio(currentIdentity?.bio || '');
+    setEditWebsite(currentIdentity?.website || 'https://aplusvn.com');
+    setIsEditProfileOpen(true);
+  };
+
+  const handleSaveProfile = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!currentIdentity) return;
+
+    updateIdentity(currentIdentity.id, {
+      fullName: editFullName,
+      title: editTitle,
+      businessName: editBusinessName,
+      phone: editPhone,
+      email: editEmail,
+      bio: editBio,
+      website: editWebsite,
+    });
+
+    setIsEditProfileOpen(false);
+    showAlert('Đã lưu và cập nhật thành công Hồ sơ Định danh Doanh nhân!', 'success');
+  };
+
   // PDPL Settings State
   const [requireConsent, setRequireConsent] = useState(true);
   const [publicProfile, setPublicProfile] = useState(true);
   const [maskSensitiveData, setMaskSensitiveData] = useState(true);
+
 
   const showAlert = (text: string, type: 'success' | 'info' | 'error' = 'success') => {
     setAlertMessage({ text, type });
@@ -310,7 +351,15 @@ export default function DigitalNfcCardPage() {
           </p>
         </div>
 
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center gap-2.5 flex-wrap">
+          <Button
+            onClick={handleOpenEditModal}
+            className="gap-2 border-blue-200 bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold text-xs rounded-xl shadow-xs cursor-pointer"
+          >
+            <Edit3 className="w-4 h-4 text-blue-600" />
+            Chỉnh Sửa Hồ Sơ
+          </Button>
+
           <Button
             onClick={handleTriggerSimulatedTap}
             variant="outline"
@@ -331,6 +380,7 @@ export default function DigitalNfcCardPage() {
           </Button>
         </div>
       </div>
+
 
       {/* ALERT NOTIFICATION */}
       {alertMessage && (
@@ -938,6 +988,127 @@ export default function DigitalNfcCardPage() {
           </form>
         </DialogContent>
       </Dialog>
+
+      {/* ===================================================================== */}
+      {/* 6. MODAL: CHỈNH SỬA HỒ SƠ DOANH NHÂN (EDIT PROFILE DIALOG) */}
+      {/* ===================================================================== */}
+      <Dialog open={isEditProfileOpen} onOpenChange={setIsEditProfileOpen}>
+        <DialogContent className="max-w-xl bg-white rounded-3xl p-6 sm:p-8 shadow-2xl border border-slate-200">
+          <DialogHeader className="border-b border-slate-100 pb-3">
+            <div className="flex items-center gap-2.5">
+              <div className="p-2 rounded-xl bg-blue-50 text-blue-600">
+                <Edit3 className="w-5 h-5" />
+              </div>
+              <div>
+                <DialogTitle className="text-lg font-black text-slate-900 font-heading">
+                  Chỉnh Sửa Hồ Sơ Định Danh Doanh Nhân
+                </DialogTitle>
+                <DialogDescription className="text-xs text-slate-500">
+                  Cập nhật thông tin hiển thị trên Thẻ Danh Thiếp Số 3D và Trang Profile Công Khai
+                </DialogDescription>
+              </div>
+            </div>
+          </DialogHeader>
+
+          <form onSubmit={handleSaveProfile} className="space-y-4 py-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+              <div className="space-y-1">
+                <label className="text-xs font-bold text-slate-700">Họ và Tên <span className="text-red-500">*</span></label>
+                <Input
+                  required
+                  value={editFullName}
+                  onChange={(e) => setEditFullName(e.target.value)}
+                  placeholder="VD: Johnny Long Hồ"
+                  className="rounded-xl text-xs bg-slate-50 border-slate-200"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs font-bold text-slate-700">Chức Vụ / Vị Trí</label>
+                <Input
+                  value={editTitle}
+                  onChange={(e) => setEditTitle(e.target.value)}
+                  placeholder="VD: Tổng Giám Đốc"
+                  className="rounded-xl text-xs bg-slate-50 border-slate-200"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-1">
+              <label className="text-xs font-bold text-slate-700">Tên Doanh Nghiệp / Hiệp Hội <span className="text-red-500">*</span></label>
+              <Input
+                required
+                value={editBusinessName}
+                onChange={(e) => setEditBusinessName(e.target.value)}
+                placeholder="VD: Tập đoàn Công nghệ Số A+ (APLUSVN)"
+                className="rounded-xl text-xs bg-slate-50 border-slate-200"
+              />
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+              <div className="space-y-1">
+                <label className="text-xs font-bold text-slate-700">Số Điện Thoại Cá Nhân</label>
+                <Input
+                  value={editPhone}
+                  onChange={(e) => setEditPhone(e.target.value)}
+                  placeholder="VD: 0903.888.999"
+                  className="rounded-xl text-xs bg-slate-50 border-slate-200"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs font-bold text-slate-700">Email Làm Việc</label>
+                <Input
+                  type="email"
+                  value={editEmail}
+                  onChange={(e) => setEditEmail(e.target.value)}
+                  placeholder="VD: johnny@aplusvn.com"
+                  className="rounded-xl text-xs bg-slate-50 border-slate-200"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-1">
+              <label className="text-xs font-bold text-slate-700">Website / Cổng Thông Tin</label>
+              <Input
+                value={editWebsite}
+                onChange={(e) => setEditWebsite(e.target.value)}
+                placeholder="VD: https://aplusvn.com"
+                className="rounded-xl text-xs bg-slate-50 border-slate-200"
+              />
+            </div>
+
+            <div className="space-y-1">
+              <label className="text-xs font-bold text-slate-700">Giới Thiệu Ngắn (Bio)</label>
+              <textarea
+                rows={3}
+                value={editBio}
+                onChange={(e) => setEditBio(e.target.value)}
+                placeholder="Mô tả ngắn gọn về kinh nghiệm, lĩnh vực hoạt động và sứ mệnh kinh doanh..."
+                className="w-full rounded-xl text-xs bg-slate-50 border border-slate-200 p-3 text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+              />
+            </div>
+
+            <DialogFooter className="pt-3 gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setIsEditProfileOpen(false)}
+                className="text-xs rounded-xl"
+              >
+                Hủy Bỏ
+              </Button>
+              <Button
+                type="submit"
+                className="bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs rounded-xl shadow-md shadow-blue-500/20"
+              >
+                Lưu Thay Đổi Hồ Sơ
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
+
