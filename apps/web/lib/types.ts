@@ -31,6 +31,10 @@ export interface PersonBusiness {
   businessLogo?: string;
   position?: string;
   department?: string;
+  taxCode?: string;
+  address?: string;
+  association?: string;
+  slogan?: string;
   relationType: string;
   isPrimary: boolean;
   status: PersonBusinessStatus;
@@ -49,11 +53,16 @@ export interface PersonIdentity {
   phone?: string;
   email?: string;
   website?: string;
+  taxCode?: string;
+  address?: string;
+  association?: string;
+  slogan?: string;
   socialLinks: IdentitySocialLink[];
   businesses: PersonBusiness[];
   createdAt: string;
   updatedAt: string;
 }
+
 
 export interface AccessCard {
   id: string;

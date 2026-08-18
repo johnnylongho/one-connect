@@ -194,11 +194,16 @@ function DigitalProfileContent() {
   );
 
   // Edit Profile Modal States
+
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editFullName, setEditFullName] = useState(matchedIdentity?.fullName || 'Hồ Hoàng Long');
   const [editDisplayName, setEditDisplayName] = useState(matchedIdentity?.displayName || matchedIdentity?.fullName || 'Johnny Long Hồ');
   const [editTitle, setEditTitle] = useState(matchedIdentity?.title || 'Project Manager & Media Director');
   const [editCompany, setEditCompany] = useState(matchedIdentity?.businesses?.[0]?.businessName || 'Tập đoàn Công nghệ Số A+ (APLUSVN)');
+  const [editTaxCode, setEditTaxCode] = useState(matchedIdentity?.taxCode || matchedIdentity?.businesses?.[0]?.taxCode || '0316888999');
+  const [editAddress, setEditAddress] = useState(matchedIdentity?.address || matchedIdentity?.businesses?.[0]?.address || 'Tầng 8, Tòa nhà ASIA, 25 Lê Lợi, TP. Nha Trang, Khánh Hòa');
+  const [editAssociation, setEditAssociation] = useState(matchedIdentity?.association || 'Hiệp hội Doanh nhân Công nghệ Aplusvn (UV Ban Chấp Hành)');
+  const [editSlogan, setEditSlogan] = useState(matchedIdentity?.slogan || 'Bứt Phá Giao Thương - Chuyển Hóa Mối Quan Hệ Kinh Doanh Số');
   const [editPhone, setEditPhone] = useState(matchedIdentity?.phone || '0794677369');
   const [editEmail, setEditEmail] = useState(matchedIdentity?.email || 'contact.johnnylongho@gmail.com');
   const [editBio, setEditBio] = useState(matchedIdentity?.bio || 'Chuyên gia triển khai giải pháp hạ tầng danh thiếp số NFC...');
@@ -216,10 +221,10 @@ function DigitalProfileContent() {
     title: matchedIdentity?.title || 'Project Manager & Media Director',
     roleVietnamese: matchedIdentity?.title || 'Giám Đốc Dự Án kiêm Trưởng Ban Truyền Thông',
     company: matchedIdentity?.businesses?.[0]?.businessName || 'Tập đoàn Công nghệ Số A+ (APLUSVN)',
-    taxCode: '0316888999',
-    address: 'Tầng 8, Tòa nhà ASIA, 25 Lê Lợi, TP. Nha Trang, Khánh Hòa',
-    association: 'Hiệp hội Doanh nhân Công nghệ Aplusvn (UV Ban Chấp Hành)',
-    slogan: 'Bứt Phá Giao Thương - Chuyển Hóa Mối Quan Hệ Kinh Doanh Số',
+    taxCode: matchedIdentity?.taxCode || matchedIdentity?.businesses?.[0]?.taxCode || '0316888999',
+    address: matchedIdentity?.address || matchedIdentity?.businesses?.[0]?.address || 'Tầng 8, Tòa nhà ASIA, 25 Lê Lợi, TP. Nha Trang, Khánh Hòa',
+    association: matchedIdentity?.association || 'Hiệp hội Doanh nhân Công nghệ Aplusvn (UV Ban Chấp Hành)',
+    slogan: matchedIdentity?.slogan || 'Bứt Phá Giao Thương - Chuyển Hóa Mối Quan Hệ Kinh Doanh Số',
     bio: matchedIdentity?.bio || 'Chuyên gia triển khai giải pháp hạ tầng danh thiếp số NFC, định danh doanh nghiệp và tự động hóa giao thương B2B sự kiện.',
     phone: matchedIdentity?.phone || '0794677369',
     email: matchedIdentity?.email || 'contact.johnnylongho@gmail.com',
@@ -254,6 +259,10 @@ function DigitalProfileContent() {
     setEditDisplayName(matchedIdentity?.displayName || profile.displayName);
     setEditTitle(matchedIdentity?.title || profile.title);
     setEditCompany(matchedIdentity?.businesses?.[0]?.businessName || profile.company);
+    setEditTaxCode(matchedIdentity?.taxCode || matchedIdentity?.businesses?.[0]?.taxCode || profile.taxCode);
+    setEditAddress(matchedIdentity?.address || matchedIdentity?.businesses?.[0]?.address || profile.address);
+    setEditAssociation(matchedIdentity?.association || profile.association);
+    setEditSlogan(matchedIdentity?.slogan || profile.slogan);
     setEditPhone(matchedIdentity?.phone || profile.phone);
     setEditEmail(matchedIdentity?.email || profile.email);
     setEditBio(matchedIdentity?.bio || profile.bio);
@@ -277,6 +286,10 @@ function DigitalProfileContent() {
       displayName: editDisplayName,
       title: editTitle,
       businessName: editCompany,
+      taxCode: editTaxCode,
+      address: editAddress,
+      association: editAssociation,
+      slogan: editSlogan,
       phone: editPhone,
       email: editEmail,
       bio: editBio,
@@ -286,10 +299,11 @@ function DigitalProfileContent() {
     setIsEditModalOpen(false);
     toast({
       title: 'ĐÃ CẬP NHẬT HỒ SƠ THÀNH CÔNG! ✨',
-      description: 'Dữ liệu hồ sơ số và thẻ NFC đã được cập nhật theo thời gian thực.',
+      description: 'Dữ liệu hồ sơ số, doanh nghiệp và MST đã được cập nhật theo thời gian thực.',
       variant: 'success',
     });
   };
+
 
 
 
@@ -1153,6 +1167,48 @@ END:VCARD`;
                   className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-semibold text-slate-900 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0066FF]/20 focus:border-[#0066FF]"
                 />
               </div>
+
+              <div className="grid grid-cols-2 gap-2.5">
+                <div className="space-y-1 text-left">
+                  <label className="text-[11px] font-bold text-slate-800 uppercase tracking-wider">Mã Số Thuế / GPKD</label>
+                  <input
+                    value={editTaxCode}
+                    onChange={(e) => setEditTaxCode(e.target.value)}
+                    placeholder="VD: 0316888999"
+                    className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-semibold text-slate-900 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0066FF]/20 focus:border-[#0066FF]"
+                  />
+                </div>
+                <div className="space-y-1 text-left">
+                  <label className="text-[11px] font-bold text-slate-800 uppercase tracking-wider">Hiệp Hội / Đoàn Thể</label>
+                  <input
+                    value={editAssociation}
+                    onChange={(e) => setEditAssociation(e.target.value)}
+                    placeholder="VD: Hiệp hội Doanh nhân Aplusvn"
+                    className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-semibold text-slate-900 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0066FF]/20 focus:border-[#0066FF]"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-1 text-left">
+                <label className="text-[11px] font-bold text-slate-800 uppercase tracking-wider">Địa Chỉ Trụ Sở Chính Doanh Nghiệp</label>
+                <input
+                  value={editAddress}
+                  onChange={(e) => setEditAddress(e.target.value)}
+                  placeholder="VD: Tầng 8, Tòa nhà ASIA, 25 Lê Lợi, TP. Nha Trang, Khánh Hòa"
+                  className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-semibold text-slate-900 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0066FF]/20 focus:border-[#0066FF]"
+                />
+              </div>
+
+              <div className="space-y-1 text-left">
+                <label className="text-[11px] font-bold text-slate-800 uppercase tracking-wider">Khẩu Hiệu / Slogan Doanh Nghiệp</label>
+                <input
+                  value={editSlogan}
+                  onChange={(e) => setEditSlogan(e.target.value)}
+                  placeholder="VD: Bứt Phá Giao Thương - Chuyển Hóa Mối Quan Hệ Kinh Doanh Số"
+                  className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-semibold text-slate-900 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0066FF]/20 focus:border-[#0066FF]"
+                />
+              </div>
+
 
               <div className="grid grid-cols-2 gap-2.5">
                 <div className="space-y-1 text-left">

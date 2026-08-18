@@ -485,6 +485,10 @@ export function useOneConnectStore() {
     website?: string;
     avatarUrl?: string;
     businessName?: string;
+    taxCode?: string;
+    address?: string;
+    association?: string;
+    slogan?: string;
   }) => {
     setState(prev => ({
       ...prev,
@@ -494,13 +498,25 @@ export function useOneConnectStore() {
         }
 
         const updatedBusinesses = item.businesses && item.businesses.length > 0
-          ? item.businesses.map((b, idx) => idx === 0 && updates.businessName ? { ...b, businessName: updates.businessName, position: updates.title || b.position } : b)
+          ? item.businesses.map((b, idx) => idx === 0 ? {
+              ...b,
+              businessName: updates.businessName || b.businessName,
+              position: updates.title || b.position,
+              taxCode: updates.taxCode !== undefined ? updates.taxCode : b.taxCode,
+              address: updates.address !== undefined ? updates.address : b.address,
+              association: updates.association !== undefined ? updates.association : b.association,
+              slogan: updates.slogan !== undefined ? updates.slogan : b.slogan,
+            } : b)
           : updates.businessName ? [{
               id: `pbiz-${Date.now()}`,
               personIdentityId: item.id,
               businessId: `biz-${Date.now()}`,
               businessName: updates.businessName,
               position: updates.title || 'Giám Đốc',
+              taxCode: updates.taxCode,
+              address: updates.address,
+              association: updates.association,
+              slogan: updates.slogan,
               relationType: 'FOUNDER_OWNER',
               isPrimary: true,
               status: 'ACTIVE' as const
@@ -526,6 +542,10 @@ export function useOneConnectStore() {
           email: updates.email !== undefined ? updates.email : item.email,
           website: updates.website !== undefined ? updates.website : item.website,
           avatarUrl: updates.avatarUrl !== undefined ? updates.avatarUrl : item.avatarUrl,
+          taxCode: updates.taxCode !== undefined ? updates.taxCode : item.taxCode,
+          address: updates.address !== undefined ? updates.address : item.address,
+          association: updates.association !== undefined ? updates.association : item.association,
+          slogan: updates.slogan !== undefined ? updates.slogan : item.slogan,
           businesses: updatedBusinesses,
           socialLinks: updatedSocialLinks.length > 0 ? updatedSocialLinks : item.socialLinks,
           updatedAt: new Date().toISOString()
@@ -533,6 +553,7 @@ export function useOneConnectStore() {
       })
     }));
   };
+
 
 
   // Toggle Privacy
