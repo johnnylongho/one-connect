@@ -22,15 +22,15 @@ export const INITIAL_IDENTITIES: PersonIdentity[] = [
     avatarUrl: '/avatar-johnny-long.jpg',
     coverUrl: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=1200&auto=format&fit=crop&q=80',
     title: 'Quản lý & Triển khai Dự án kiêm Media',
-    bio: 'Định hướng chiến lược & xây dựng hệ sinh thái kết nối doanh nhân One Connect Network. Chuyên gia tư vấn chuyển đổi số doanh nghiệp.',
-    phone: '0908 123 456',
-    email: 'long.ho@aplusvn.com',
-    website: 'https://aplusvn.com',
+    bio: 'Chuyên gia triển khai giải pháp hạ tầng danh thiếp số NFC, định danh doanh nghiệp và tự động hóa giao thương B2B sự kiện.',
+    phone: '0794677369',
+    email: 'contact.johnnylongho@gmail.com',
+    website: 'https://aplusvn.net',
     socialLinks: [
       { id: 's-1', identityId: 'id-001', platform: 'linkedin', url: 'https://linkedin.com/in/johnnylongho', isPublic: true, sortOrder: 1 },
-      { id: 's-2', identityId: 'id-001', platform: 'zalo', url: 'https://zalo.me/0908123456', isPublic: true, sortOrder: 2 },
+      { id: 's-2', identityId: 'id-001', platform: 'zalo', url: 'https://zalo.me/0794677369', isPublic: true, sortOrder: 2 },
       { id: 's-3', identityId: 'id-001', platform: 'facebook', url: 'https://facebook.com/johnnylong.official', isPublic: true, sortOrder: 3 },
-      { id: 's-4', identityId: 'id-001', platform: 'website', url: 'https://aplusvn.com', isPublic: true, sortOrder: 4 },
+      { id: 's-4', identityId: 'id-001', platform: 'website', url: 'https://aplusvn.net', isPublic: true, sortOrder: 4 },
     ],
     businesses: [
       {
@@ -38,11 +38,12 @@ export const INITIAL_IDENTITIES: PersonIdentity[] = [
         personIdentityId: 'id-001',
         businessId: 'biz-101',
         businessName: 'Tập đoàn Công nghệ số A+ (Aplusvn)',
-        position: 'Giám đốc Triển khai Dự án',
+        position: 'Giám đốc Triển khai Dự án kiêm Media',
         relationType: 'OWNER',
         isPrimary: true,
         status: 'ACTIVE',
       }
+
     ],
     createdAt: '2026-08-01T08:00:00Z',
     updatedAt: '2026-08-12T10:00:00Z',
