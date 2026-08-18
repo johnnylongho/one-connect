@@ -14,7 +14,13 @@ import {
   CheckCircle2,
   Lock,
   ExternalLink,
-  ShieldCheck
+  ShieldCheck,
+  Zap,
+  Radio,
+  Download,
+  Copy,
+  Sparkles,
+  RotateCw
 } from 'lucide-react';
 
 interface Props {
@@ -22,149 +28,455 @@ interface Props {
   card?: AccessCard;
   onReissueCard?: () => void;
   showActions?: boolean;
+  theme?: 'obsidian' | 'sapphire' | 'gold' | 'emerald';
 }
 
-export default function BusinessCard3D({ identity, card, onReissueCard, showActions = true }: Props) {
+const THEME_STYLES = {
+  obsidian: {
+    bg: 'linear-gradient(135deg, #0A0E17 0%, #151D2E 40%, #0F172A 100%)',
+    border: 'border-cyan-500/40',
+    accentText: 'text-cyan-400',
+    accentBg: 'bg-cyan-500/10',
+    accentBorder: 'border-cyan-500/30',
+    glow: 'shadow-[0_15px_35px_rgba(0,102,255,0.25)]',
+    badge: 'bg-cyan-950/80 text-cyan-300 border-cyan-500/40',
+    chipColor: 'text-cyan-400',
+  },
+  sapphire: {
+    bg: 'linear-gradient(135deg, #031B4D 0%, #003B95 50%, #021235 100%)',
+    border: 'border-blue-400/50',
+    accentText: 'text-blue-300',
+    accentBg: 'bg-blue-500/15',
+    accentBorder: 'border-blue-400/40',
+    glow: 'shadow-[0_15px_35px_rgba(0,194,255,0.3)]',
+    badge: 'bg-blue-950/80 text-blue-200 border-blue-400/40',
+    chipColor: 'text-blue-300',
+  },
+  gold: {
+    bg: 'linear-gradient(135deg, #1C180E 0%, #3D3215 50%, #1A150B 100%)',
+    border: 'border-amber-400/50',
+    accentText: 'text-amber-400',
+    accentBg: 'bg-amber-500/15',
+    accentBorder: 'border-amber-400/40',
+    glow: 'shadow-[0_15px_35px_rgba(245,158,11,0.25)]',
+    badge: 'bg-amber-950/80 text-amber-300 border-amber-400/40',
+    chipColor: 'text-amber-400',
+  },
+  emerald: {
+    bg: 'linear-gradient(135deg, #062419 0%, #0B4530 50%, #041710 100%)',
+    border: 'border-emerald-400/50',
+    accentText: 'text-emerald-400',
+    accentBg: 'bg-emerald-500/15',
+    accentBorder: 'border-emerald-400/40',
+    glow: 'shadow-[0_15px_35px_rgba(16,185,129,0.25)]',
+    badge: 'bg-emerald-950/80 text-emerald-300 border-emerald-400/40',
+    chipColor: 'text-emerald-400',
+  },
+};
+
+export default function BusinessCard3D({
+  identity,
+  card,
+  onReissueCard,
+  showActions = true,
+  theme = 'obsidian',
+}: Props) {
   const [isFlipped, setIsFlipped] = useState(false);
   const [showQrModal, setShowQrModal] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [isTapping, setIsTapping] = useState(false);
+  const [activeTheme, setActiveTheme] = useState<'obsidian' | 'sapphire' | 'gold' | 'emerald'>(theme);
 
-  const primaryBiz = identity.businesses.find(b => b.isPrimary) || identity.businesses[0];
-  const profileUrl = typeof window !== 'undefined' ? `${window.location.origin}/p/${identity.username}` : `https://oneconnect.network/p/${identity.username}`;
+  const currentTheme = THEME_STYLES[activeTheme];
+  const primaryBiz = identity.businesses?.find((b) => b.isPrimary) || identity.businesses?.[0];
+  const profileUrl =
+    typeof window !== 'undefined'
+      ? `${window.location.origin}/p/${identity.username || 'johnnylong'}`
+      : `https://one-connect-pink.vercel.app/p/${identity.username || 'johnnylong'}`;
 
   const copyLink = () => {
     navigator.clipboard.writeText(profileUrl);
     setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    setTimeout(() => setCopied(false), 2200);
+  };
+
+  const handleSimulateTap = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsTapping(true);
+    setTimeout(() => {
+      setIsTapping(false);
+    }, 1500);
   };
 
   return (
-    <div className="w-full max-w-md mx-auto">
-      {/* 3D Glass Executive Business Card */}
+    <div className="w-full max-w-lg mx-auto select-none">
+      {/* 3D INTERACTIVE CARD CONTAINER */}
       <div className="relative group perspective-1000">
         <div
           onClick={() => setIsFlipped(!isFlipped)}
-          className={`w-full h-64 rounded-2xl cursor-pointer transition-all duration-700 transform-style-3d shadow-[0_15px_40px_rgba(0,0,0,0.6)] border border-cyan-500/30 overflow-hidden relative ${
-            isFlipped ? 'rotate-y-180' : ''
-          }`}
-          style={{
-            background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 41, 59, 0.9) 50%, rgba(15, 23, 42, 0.98) 100%)',
-          }}
+          className={`w-full h-72 sm:h-76 rounded-3xl cursor-pointer transition-transform duration-700 transform-style-3d relative ${
+            currentTheme.glow
+          } ${isFlipped ? 'rotate-y-180' : ''}`}
         >
-          {/* Card Front Ambient Decorative Elements */}
-          <div className="absolute top-0 right-0 w-48 h-48 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
-          <div className="absolute bottom-0 left-0 w-40 h-40 bg-indigo-500/10 rounded-full blur-2xl pointer-events-none" />
-          
-          {/* NFC Chip Indicator Icon */}
-          <div className="absolute top-4 right-4 flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-[11px] font-mono font-bold tracking-wider">
-            <CreditCard className="w-3.5 h-3.5 text-cyan-400 animate-pulse" />
-            NFC {card?.cardUid || 'ACTIVE'}
+          {/* ================================================================= */}
+          {/* 1. FRONT FACE OF EXECUTIVE BUSINESS CARD */}
+          {/* ================================================================= */}
+          <div
+            className={`absolute inset-0 w-full h-full rounded-3xl p-6 sm:p-7 flex flex-col justify-between backface-hidden border ${currentTheme.border} overflow-hidden`}
+            style={{ background: currentTheme.bg }}
+          >
+            {/* Ambient Background Glows */}
+            <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute bottom-0 left-0 w-64 h-64 bg-blue-600/10 rounded-full blur-3xl pointer-events-none" />
+
+            {/* Micro Circuit Grid Pattern */}
+            <div
+              className="absolute inset-0 opacity-[0.04] pointer-events-none"
+              style={{
+                backgroundImage:
+                  'radial-gradient(circle at 1px 1px, white 1px, transparent 0)',
+                backgroundSize: '16px 16px',
+              }}
+            />
+
+            {/* Top Bar on Front */}
+            <div className="relative z-10 flex items-center justify-between">
+              {/* Brand Logo Watermark */}
+              <div className="flex items-center gap-2">
+                <img
+                  src="/one_connect_final_logo_orange.png"
+                  alt="One Connect"
+                  className="h-6 w-auto object-contain drop-shadow"
+                />
+                <span className="text-[11px] font-black tracking-wider text-white font-heading">
+                  ONE<span className="text-cyan-400">CONNECT</span>
+                </span>
+              </div>
+
+              {/* NFC Chip Indicator Badge */}
+              <div
+                className={`flex items-center gap-1.5 px-3 py-1 rounded-full border text-[10px] font-mono font-bold tracking-widest ${currentTheme.badge}`}
+              >
+                <Radio className={`w-3 h-3 ${currentTheme.chipColor} animate-pulse`} />
+                <span>NFC {card?.cardUid || 'NFC-LONG-888'}</span>
+              </div>
+            </div>
+
+            {/* Middle Section: Avatar & Executive Info */}
+            <div className="relative z-10 flex items-center gap-4 my-auto">
+              <div className="relative shrink-0">
+                <img
+                  src={
+                    identity.avatarUrl ||
+                    '/avatar-johnny-long.jpg'
+                  }
+                  alt={identity.fullName}
+                  className="w-18 h-18 sm:w-20 sm:h-20 rounded-2xl object-cover border-2 border-white/20 shadow-xl"
+                />
+                <span className="absolute -bottom-1 -right-1 p-1 rounded-full bg-emerald-500 border-2 border-slate-900 shadow">
+                  <ShieldCheck className="w-3.5 h-3.5 text-white" />
+                </span>
+              </div>
+
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  <h3 className="text-lg sm:text-xl font-black text-white tracking-tight font-heading truncate">
+                    {identity.fullName}
+                  </h3>
+                </div>
+                <p className={`text-xs font-semibold mt-0.5 ${currentTheme.accentText}`}>
+                  {identity.title || 'Quản lý & Triển khai Dự án kiêm Media'}
+                </p>
+                {primaryBiz && (
+                  <p className="text-xs text-slate-300 font-medium flex items-center gap-1.5 mt-1.5 truncate">
+                    <Building2 className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                    <span className="truncate">{primaryBiz.businessName}</span>
+                  </p>
+                )}
+              </div>
+            </div>
+
+            {/* Bottom Bar on Front */}
+            <div className="relative z-10 pt-3 border-t border-white/10 flex items-center justify-between text-xs">
+              <div>
+                <p className="text-[9px] font-mono uppercase tracking-widest text-slate-400">
+                  Digital Identity ID
+                </p>
+                <p className="text-xs font-mono font-bold text-white mt-0.5">
+                  @{identity.username || 'johnnylong'}
+                </p>
+              </div>
+
+              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-[11px] text-slate-300 group-hover:text-white transition-colors">
+                <RotateCw className="w-3 h-3 text-cyan-400 animate-spin-slow" />
+                <span>Chạm để lật mặt sau</span>
+              </div>
+            </div>
           </div>
 
-          {/* FRONT FACE */}
-          <div className="p-6 h-full flex flex-col justify-between relative z-10">
-            <div>
-              <div className="flex items-center gap-4">
-                <img
-                  src={identity.avatarUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80'}
-                  alt={identity.fullName}
-                  className="w-16 h-16 rounded-full object-cover border-2 border-cyan-400 shadow-[0_0_15px_rgba(0,229,255,0.4)]"
-                />
-                <div>
-                  <h3 className="text-xl font-extrabold text-white tracking-tight font-['Outfit'] flex items-center gap-1.5">
-                    {identity.fullName}
-                    <ShieldCheck className="w-4 h-4 text-cyan-400" />
-                  </h3>
-                  <p className="text-xs text-cyan-300 font-medium">{identity.title}</p>
-                  {primaryBiz && (
-                    <p className="text-xs text-gray-400 flex items-center gap-1 mt-1">
-                      <Building2 className="w-3.5 h-3.5 text-indigo-400" /> {primaryBiz.businessName}
-                    </p>
-                  )}
+          {/* ================================================================= */}
+          {/* 2. BACK FACE OF EXECUTIVE BUSINESS CARD */}
+          {/* ================================================================= */}
+          <div
+            className={`absolute inset-0 w-full h-full rounded-3xl p-6 sm:p-7 flex flex-col justify-between backface-hidden rotate-y-180 border ${currentTheme.border} overflow-hidden`}
+            style={{ background: currentTheme.bg }}
+          >
+            {/* Ambient Background Glows */}
+            <div className="absolute top-0 left-0 w-64 h-64 bg-blue-600/10 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute bottom-0 right-0 w-64 h-64 bg-orange-500/10 rounded-full blur-3xl pointer-events-none" />
+
+            {/* Top Bar on Back */}
+            <div className="relative z-10 flex items-center justify-between">
+              <span className="text-[10px] font-mono uppercase tracking-wider text-slate-300 font-bold flex items-center gap-1">
+                <Zap className="w-3 h-3 text-amber-400" /> Dynamic Connect QR
+              </span>
+              <span className="text-[10px] font-bold text-emerald-400 bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-500/30 flex items-center gap-1">
+                <ShieldCheck className="w-3 h-3" /> PDPL 91/2025
+              </span>
+            </div>
+
+            {/* Middle Section: Scannable QR & Quick Contact Chips */}
+            <div className="relative z-10 grid grid-cols-12 gap-4 items-center my-auto">
+              {/* High Contrast Scannable QR */}
+              <div className="col-span-5 flex justify-center">
+                <div className="p-2.5 bg-white rounded-2xl shadow-xl border border-slate-200">
+                  <svg className="w-24 h-24 sm:w-28 sm:h-28" viewBox="0 0 100 100">
+                    <rect width="100" height="100" fill="#FFFFFF" rx="4" />
+                    {/* Top Left Finder */}
+                    <rect x="8" y="8" width="26" height="26" fill="#0F172A" rx="3" />
+                    <rect x="13" y="13" width="16" height="16" fill="#FFFFFF" rx="2" />
+                    <rect x="17" y="17" width="8" height="8" fill="#0066FF" rx="1" />
+
+                    {/* Top Right Finder */}
+                    <rect x="66" y="8" width="26" height="26" fill="#0F172A" rx="3" />
+                    <rect x="71" y="13" width="16" height="16" fill="#FFFFFF" rx="2" />
+                    <rect x="75" y="17" width="8" height="8" fill="#0066FF" rx="1" />
+
+                    {/* Bottom Left Finder */}
+                    <rect x="8" y="66" width="26" height="26" fill="#0F172A" rx="3" />
+                    <rect x="13" y="71" width="16" height="16" fill="#FFFFFF" rx="2" />
+                    <rect x="17" y="75" width="8" height="8" fill="#0066FF" rx="1" />
+
+                    {/* Center Brand Accent */}
+                    <rect x="42" y="42" width="16" height="16" fill="#FF6B00" rx="3" />
+                    <circle cx="50" cy="50" r="4" fill="#FFFFFF" />
+
+                    {/* Data Matrix Bits */}
+                    <rect x="40" y="12" width="6" height="6" fill="#0F172A" />
+                    <rect x="52" y="18" width="6" height="6" fill="#0F172A" />
+                    <rect x="42" y="28" width="6" height="6" fill="#0F172A" />
+                    <rect x="12" y="42" width="6" height="6" fill="#0F172A" />
+                    <rect x="22" y="52" width="6" height="6" fill="#0F172A" />
+                    <rect x="66" y="42" width="6" height="6" fill="#0F172A" />
+                    <rect x="78" y="50" width="6" height="6" fill="#0F172A" />
+                    <rect x="66" y="66" width="6" height="6" fill="#0F172A" />
+                    <rect x="80" y="78" width="6" height="6" fill="#0F172A" />
+                    <rect x="42" y="68" width="6" height="6" fill="#0F172A" />
+                    <rect x="52" y="80" width="6" height="6" fill="#0F172A" />
+                  </svg>
+                </div>
+              </div>
+
+              {/* Direct Points of Contact */}
+              <div className="col-span-7 space-y-2 text-xs">
+                <div className="flex items-center gap-2 text-slate-200 bg-white/5 px-2.5 py-1.5 rounded-xl border border-white/5">
+                  <Phone className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+                  <span className="font-mono text-[11px] truncate">
+                    {identity.phone || '0903.888.999'}
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-2 text-slate-200 bg-white/5 px-2.5 py-1.5 rounded-xl border border-white/5">
+                  <Mail className="w-3.5 h-3.5 text-blue-400 shrink-0" />
+                  <span className="font-mono text-[11px] truncate">
+                    {identity.email || 'longhh@aplusvn.com'}
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-2 text-slate-200 bg-white/5 px-2.5 py-1.5 rounded-xl border border-white/5">
+                  <Globe className="w-3.5 h-3.5 text-orange-400 shrink-0" />
+                  <span className="font-mono text-[11px] truncate">
+                    aplusvn.com
+                  </span>
                 </div>
               </div>
             </div>
 
-            <div className="border-t border-white/10 pt-4 flex items-center justify-between text-xs text-gray-300">
-              <div>
-                <p className="text-[10px] text-gray-500 uppercase font-mono">Định danh số One Connect</p>
-                <p className="font-mono text-cyan-400 font-semibold">@{identity.username}</p>
-              </div>
-              <div className="text-right">
-                <p className="text-[10px] text-gray-500">Chạm thẻ / Quét QR</p>
-                <span className="text-[11px] text-cyan-400 font-semibold flex items-center gap-1 justify-end">
-                  <QrCode className="w-3.5 h-3.5" /> Xem Mặt Sau (Lật)
-                </span>
-              </div>
+            {/* Bottom Bar on Back */}
+            <div className="relative z-10 pt-2 border-t border-white/10 flex items-center justify-between text-[10px] text-slate-400">
+              <span className="font-mono">{card?.dynamicUrl || profileUrl}</span>
+              <span className="text-cyan-400 font-bold flex items-center gap-1">
+                <RotateCw className="w-3 h-3" /> Lật mặt trước
+              </span>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Action Buttons Below Card */}
+      {/* ================================================================= */}
+      {/* 3. CARD THEME PICKER & ACTION TOOLBAR */}
+      {/* ================================================================= */}
       {showActions && (
-        <div className="mt-4 grid grid-cols-3 gap-2">
-          <button
-            onClick={() => setShowQrModal(true)}
-            className="py-2.5 px-3 rounded-xl bg-cyan-500/15 hover:bg-cyan-500/25 border border-cyan-500/30 text-cyan-300 font-semibold text-xs flex items-center justify-center gap-1.5 transition-all"
-          >
-            <QrCode className="w-4 h-4 text-cyan-400" /> Mã QR Thẻ
-          </button>
-          
-          <button
-            onClick={copyLink}
-            className="py-2.5 px-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-gray-200 font-semibold text-xs flex items-center justify-center gap-1.5 transition-all"
-          >
-            <Share2 className="w-4 h-4 text-indigo-400" /> {copied ? 'Đã Chép Link!' : 'Chia Sẻ'}
-          </button>
+        <div className="mt-5 space-y-4">
+          {/* Card Material Theme Selector */}
+          <div className="flex items-center justify-between px-2">
+            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+              Chất liệu & Màu Thẻ:
+            </span>
+            <div className="flex items-center gap-2">
+              {[
+                { id: 'obsidian', label: 'Obsidian Black', color: 'bg-slate-900 border-cyan-500' },
+                { id: 'sapphire', label: 'Ocean Sapphire', color: 'bg-blue-900 border-blue-400' },
+                { id: 'gold', label: 'Titanium Gold', color: 'bg-amber-900 border-amber-400' },
+                { id: 'emerald', label: 'Emerald Elite', color: 'bg-emerald-900 border-emerald-400' },
+              ].map((t) => (
+                <button
+                  key={t.id}
+                  onClick={() => setActiveTheme(t.id as any)}
+                  title={t.label}
+                  className={`w-6 h-6 rounded-full border-2 transition-all ${t.color} ${
+                    activeTheme === t.id ? 'scale-125 ring-2 ring-blue-500 shadow-md' : 'opacity-70 hover:opacity-100'
+                  }`}
+                />
+              ))}
+            </div>
+          </div>
 
-          {onReissueCard && (
+          {/* Action Button Grid */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
             <button
-              onClick={onReissueCard}
-              className="py-2.5 px-3 rounded-xl bg-purple-500/15 hover:bg-purple-500/25 border border-purple-500/30 text-purple-300 font-semibold text-xs flex items-center justify-center gap-1.5 transition-all"
-              title="Đổi thẻ NFC mới mà không mất dữ liệu lịch sử"
+              onClick={() => setIsFlipped(!isFlipped)}
+              className="py-2.5 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-800 font-bold text-xs flex items-center justify-center gap-2 transition-all shadow-sm cursor-pointer"
             >
-              <RefreshCw className="w-4 h-4 text-purple-400" /> Đổi Thẻ NFC
+              <RotateCw className="w-4 h-4 text-blue-600" />
+              <span>{isFlipped ? 'Mặt Trước' : 'Lật Thẻ 3D'}</span>
             </button>
-          )}
+
+            <button
+              onClick={() => setShowQrModal(true)}
+              className="py-2.5 px-3 rounded-xl bg-blue-50 hover:bg-blue-100 border border-blue-200 text-blue-700 font-bold text-xs flex items-center justify-center gap-2 transition-all shadow-sm cursor-pointer"
+            >
+              <QrCode className="w-4 h-4 text-blue-600" />
+              <span>Mã QR Thẻ</span>
+            </button>
+
+            <button
+              onClick={copyLink}
+              className="py-2.5 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-800 font-bold text-xs flex items-center justify-center gap-2 transition-all shadow-sm cursor-pointer"
+            >
+              {copied ? <CheckCircle2 className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4 text-slate-600" />}
+              <span>{copied ? 'Đã Chép!' : 'Chép Link'}</span>
+            </button>
+
+            {onReissueCard && (
+              <button
+                onClick={onReissueCard}
+                className="py-2.5 px-3 rounded-xl bg-purple-50 hover:bg-purple-100 border border-purple-200 text-purple-700 font-bold text-xs flex items-center justify-center gap-2 transition-all shadow-sm cursor-pointer"
+                title="Đổi thẻ NFC vật lý mới mà không làm mất lịch sử dữ liệu"
+              >
+                <RefreshCw className="w-4 h-4 text-purple-600" />
+                <span>Đổi Thẻ NFC</span>
+              </button>
+            )}
+          </div>
         </div>
       )}
 
-      {/* QR Code Dynamic Modal */}
+      {/* ================================================================= */}
+      {/* 4. DYNAMIC QR CODE MODAL */}
+      {/* ================================================================= */}
       {showQrModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4" onClick={() => setShowQrModal(false)}>
-          <div className="bg-[#0f172a] border border-cyan-500/40 rounded-3xl p-6 max-w-sm w-full text-center space-y-4 shadow-2xl" onClick={e => e.stopPropagation()}>
-            <div className="flex justify-between items-center border-b border-white/10 pb-3">
-              <h4 className="font-bold text-white text-base flex items-center gap-2">
-                <QrCode className="w-5 h-5 text-cyan-400" /> Dynamic QR Code — One Connect
-              </h4>
-              <button onClick={() => setShowQrModal(false)} className="text-gray-400 hover:text-white">✕</button>
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/70 backdrop-blur-sm p-4 animate-in fade-in duration-200"
+          onClick={() => setShowQrModal(false)}
+        >
+          <div
+            className="bg-white border border-slate-200 rounded-3xl p-6 max-w-sm w-full text-center space-y-5 shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex justify-between items-center border-b border-slate-100 pb-3">
+              <div className="flex items-center gap-2 text-left">
+                <div className="p-2 rounded-xl bg-blue-50 text-blue-600">
+                  <QrCode className="w-5 h-5" />
+                </div>
+                <div>
+                  <h4 className="font-extrabold text-slate-900 text-sm">Dynamic QR Code</h4>
+                  <p className="text-[11px] text-slate-500">Định danh số One Connect</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowQrModal(false)}
+                className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center text-sm font-bold transition-colors"
+              >
+                ✕
+              </button>
             </div>
 
-            <div className="p-4 bg-white rounded-2xl inline-block shadow-[0_0_25px_rgba(0,229,255,0.3)]">
-              {/* Render dynamic QR code SVG simulation */}
-              <svg className="w-48 h-48 mx-auto" viewBox="0 0 100 100">
-                <path d="M0,0 L30,0 L30,30 L0,30 Z M70,0 L100,0 L100,30 L70,30 Z M0,70 L30,70 L30,100 L0,100 Z" fill="#000" />
-                <path d="M5,5 L25,5 L25,25 L5,25 Z M75,5 L95,5 L95,25 L75,25 Z M5,75 L25,75 L25,95 L5,95 Z" fill="#fff" />
-                <rect x="40" y="40" width="20" height="20" fill="#00e5ff" />
-                <path d="M35,10 L65,10 L65,25 L35,25 Z M10,35 L25,35 L25,65 L10,65 Z M75,35 L90,35 L90,65 L75,65 Z M35,75 L65,75 L65,90 L35,90 Z" fill="#111" />
+            {/* High-Resolution QR Display */}
+            <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200 inline-block shadow-inner">
+              <svg className="w-52 h-52 mx-auto" viewBox="0 0 100 100">
+                <rect width="100" height="100" fill="#FFFFFF" rx="6" />
+                {/* Top Left */}
+                <rect x="8" y="8" width="26" height="26" fill="#0F172A" rx="4" />
+                <rect x="13" y="13" width="16" height="16" fill="#FFFFFF" rx="2" />
+                <rect x="17" y="17" width="8" height="8" fill="#0066FF" rx="1" />
+
+                {/* Top Right */}
+                <rect x="66" y="8" width="26" height="26" fill="#0F172A" rx="4" />
+                <rect x="71" y="13" width="16" height="16" fill="#FFFFFF" rx="2" />
+                <rect x="75" y="17" width="8" height="8" fill="#0066FF" rx="1" />
+
+                {/* Bottom Left */}
+                <rect x="8" y="66" width="26" height="26" fill="#0F172A" rx="4" />
+                <rect x="13" y="71" width="16" height="16" fill="#FFFFFF" rx="2" />
+                <rect x="17" y="75" width="8" height="8" fill="#0066FF" rx="1" />
+
+                {/* Center Brand Accent */}
+                <rect x="40" y="40" width="20" height="20" fill="#FF6B00" rx="4" />
+                <circle cx="50" cy="50" r="5" fill="#FFFFFF" />
+
+                {/* Data Grid Bits */}
+                <rect x="40" y="12" width="6" height="6" fill="#0F172A" />
+                <rect x="52" y="18" width="6" height="6" fill="#0F172A" />
+                <rect x="42" y="28" width="6" height="6" fill="#0F172A" />
+                <rect x="12" y="42" width="6" height="6" fill="#0F172A" />
+                <rect x="22" y="52" width="6" height="6" fill="#0F172A" />
+                <rect x="66" y="42" width="6" height="6" fill="#0F172A" />
+                <rect x="78" y="50" width="6" height="6" fill="#0F172A" />
+                <rect x="66" y="66" width="6" height="6" fill="#0F172A" />
+                <rect x="80" y="78" width="6" height="6" fill="#0F172A" />
+                <rect x="42" y="68" width="6" height="6" fill="#0F172A" />
+                <rect x="52" y="80" width="6" height="6" fill="#0F172A" />
               </svg>
             </div>
 
-            <div className="space-y-1">
-              <p className="text-sm font-semibold text-white">{identity.fullName}</p>
-              <p className="text-xs text-cyan-400 font-mono">{card?.dynamicUrl || profileUrl}</p>
-              <p className="text-[11px] text-gray-400 pt-2">
-                Bất kỳ camera điện thoại nào quét mã này sẽ mở trực tiếp Hồ sơ Định danh Số One Connect với ma sát bằng 0.
+            <div className="space-y-1 text-center">
+              <p className="text-sm font-bold text-slate-900">{identity.fullName}</p>
+              <p className="text-xs text-blue-600 font-mono font-medium truncate">{profileUrl}</p>
+              <p className="text-[11px] text-slate-500 leading-relaxed pt-1">
+                Bất kỳ camera smartphone nào quét mã QR này sẽ tự động mở trang Định danh Số với cơ chế bảo mật PDPL 91/2025.
               </p>
             </div>
 
-            <button
-              onClick={() => setShowQrModal(false)}
-              className="w-full py-2.5 rounded-xl bg-cyan-500 text-black font-bold text-sm hover:bg-cyan-400 transition-colors"
-            >
-              Đóng Mã QR
-            </button>
+            <div className="grid grid-cols-2 gap-2 pt-2">
+              <button
+                onClick={copyLink}
+                className="py-2.5 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs flex items-center justify-center gap-1.5 transition-colors"
+              >
+                <Copy className="w-3.5 h-3.5" />
+                <span>{copied ? 'Đã Chép!' : 'Chép Link'}</span>
+              </button>
+
+              <button
+                onClick={() => {
+                  alert('Đang tạo và tải file mã QR độ phân giải cao...');
+                }}
+                className="py-2.5 px-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-colors shadow-md shadow-blue-500/20"
+              >
+                <Download className="w-3.5 h-3.5" />
+                <span>Tải Mã QR</span>
+              </button>
+            </div>
           </div>
         </div>
       )}
