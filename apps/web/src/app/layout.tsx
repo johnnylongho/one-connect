@@ -89,6 +89,7 @@ export default function RootLayout({
     { href: '/matching', label: 'B2B Matchmaking', icon: Zap, badge: 'AI Match' },
     { href: '/dashboard/card', label: 'Thẻ NFC Doanh Nhân', icon: CreditCard },
     { href: '/reports', label: 'Báo Cáo & KPI', icon: BarChart3 },
+    { href: '/dashboard/settings', label: 'Quyền Riêng Tư & PDPL', icon: ShieldCheck },
     { href: '/demo', label: 'Live Demo Hub', icon: Sparkles, highlight: true },
   ];
 
