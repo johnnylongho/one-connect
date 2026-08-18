@@ -1,0 +1,296 @@
+================================================================================
+KICH BAN PITCHING DECK THUYET TRINH DU AN ONE CONNECT NETWORK
+CUOC THI KHOI NGHIEP DOI MOI SANG TAO TINH KHANH HOA 2026
+================================================================================
+
+De tai: NEN TANG HA TANG DINH DANH SO (BUSINESS IDENTITY) & QUAN TRI QUAN HE
+        GIAO THUONG B2B TICH HOP THE CHAM NFC KHONG MA SAT TUAN THU LUAT
+        DU LIEU CA NHAN 91/2025/QH15 CHO HE SINH THAI DOANH NGHIEP KHANH HOA
+
+Thoi luong thuyet trinh: 5 - 7 Phut trinh bay + 5 Phut Hoi/Dap (Q&A)
+Nguoi trinh bay: Ho Hoang Long (Johnny Long Ho) - Aplusvn Media & Tech
+Website san pham Live: https://one-connect-network.vercel.app/
+
+--------------------------------------------------------------------------------
+TONG QUAN HANH TRINH PITCHING 7 PHUT
+--------------------------------------------------------------------------------
+1. PHAN MO DAU (1.5 Phut):
+   - Slide 1: Hook & Dinh danh du an One Connect
+   - Slide 2: 3 Diem nghen thuc tien tai TP. Nha Trang & tinh Khanh Hoa
+   - Slide 3: Giai phap One Connect 1-Cham khong ma sat
+
+2. PHAN CONG NGHE & SAN PHAM (2.5 Phut):
+   - Slide 4: Trinh dien 4 Phan he Live tren nen tang web
+   - Slide 5: Dot pha 2-Way Consent & Tuan thu Luat PDPL 91/2025
+   - Slide 6: Mo hinh Kinh doanh & 4 Dong doanh thu ben vung
+
+3. PHAN THI TRUONG & KEU GOI NGUON LUC (2.5 Phut):
+   - Slide 7: Dung luong thi truong MICE Khanh Hoa (TAM / SAM / SOM)
+   - Slide 8: Bang so sanh Loi the canh tranh vuot troi
+   - Slide 9: Lo trinh Pilot thuc te tai Nha Trang (Q4/2026)
+   - Slide 10: Doi ngu sang lap & Keu goi nguon luc $30,000 - $50,000 USD
+   - Slide 11 & 12: Tam nhin 2030 & Loi keu goi hanh dong
+
+================================================================================
+CHI TIET TUNG SLIDE & LOI THOAI THUYET TRINH (SPEECH SCRIPT)
+================================================================================
+
+--------------------------------------------------------------------------------
+SLIDE 1: TIEU DE & HOOK MO DAU
+--------------------------------------------------------------------------------
+[NOI DUNG SLIDE]:
+- Logo: ONE CONNECT NETWORK (Beta v1.0)
+- Tieu de: NEN TANG HA TANG DINH DANH SO & QUAN TRI QUAN HE B2B KHONG MA SAT
+- Khau hieu: "Tu Mot Lan Cham - Den Moi Ket Noi Giao Thuong Ben Vung"
+- Don vi chu tri: Aplusvn Media & Tech
+- Nguoi dai dien: Ho Hoang Long (Johnny Long Ho)
+- Web demo: https://one-connect-network.vercel.app/
+
+[LOI THOAI THUYET TRINH - 45 giay]:
+"Kinh thua Hoi dong Giam khao, thua quy vi dai bieu!
+Mot nam tai TP. Nha Trang va tinh Khanh Hoa, co hang tram hoi nghi xuc tien
+dau tu, dien dan MICE va le hoi giao thuong dien ra. Nhung sau nhung cai bat tay
+va hang van chiec danh thiep giay duoc trao doi... co bao nhieu moi quan he
+thuc su tro thanh hop dong kinh te? Hay phan lon danh thiep se nam lai trong
+ngan keo hoac thung rac khach san?
+
+Hom nay, toi xin dai dien Aplusvn Media & Tech mang den Cuoc thi Khoi nghiep
+Doi moi Sang tao Khanh Hoa 2026 giai phap: ONE CONNECT NETWORK — Nen tang ha tang
+dinh danh so va quan tri quan he B2B 1-cham khong ma sat, tien phong tuan thu
+Luat Bao ve Du lieu Ca nhan so 91/2025/QH15, bien moi cuoc gap go tai Khanh Hoa
+thanh tai san so cua doanh nghiep!"
+
+
+--------------------------------------------------------------------------------
+SLIDE 2: BAI TOAN THUC TIEN & 3 DIEM NGHEN LON (THE PROBLEM)
+--------------------------------------------------------------------------------
+[NOI DUNG SLIDE]:
+1. Lang phi in an & Rac thai carbon (Trai dinh huong Kinh te Xanh):
+   - Hon 88% danh thiep giay bi vut bo trong vong 7 ngay dau tien.
+   - Lang phi hang tram trieu dong chi phi in an tai lieu moi mua su kien MICE.
+2. Dut gay boi canh quan he sau su kien (Relationship Disconnection):
+   - Hon 70% doanh nhan khong theo doi (follow-up) duoc doi tac sau hoi nghi.
+3. Rui ro Phap ly Du lieu Ca nhan (Luat PDPL 91/2025/QH15):
+   - Danh sach dai bieu bi chia se cong khai khong qua dong y 2 chieu (Explicit Consent).
+
+[CAN CU & DU LIEU TRICH DAN]:
+* Nguon thong ke: Bao cao Statistic Brain Research Institute & Adobe Insights.
+* Boi canh dia phuong: Nghi quyet so 09-NQ/TW cua Bo Chinh tri ve phat trien Khanh Hoa.
+* Co so phap ly: Luat Bao ve Du lieu Ca nhan so 91/2025/QH15.
+
+[LOI THOAI THUYET TRINH - 45 giay]:
+"Nghien cuu thi truong chi ra rang: 88% danh thiep giay in ra bi vut bo sau 1 tuan.
+Tai mot thanh pho du lich MICE lon nhu Nha Trang, viec nay khong chi gay lang phi
+hang tram trieu dong tien in an moi su kien ma con tao ra luong rac thai giay lon.
+Dang lo ngai hon, du lieu lien he dai bieu bi chia se cong khai khong qua dong y
+2 chieu, vi pham nghiem trong Luat Du lieu Ca nhan 91/2025/QH15. Doanh nghiep
+Khanh Hoa dang thieu mot cong cu so vua hien dai, vua xanh, vua bao mat tuyet doi."
+
+
+--------------------------------------------------------------------------------
+SLIDE 3: GIAI PHAP DOI MOI SANG TAO — ONE CONNECT (THE SOLUTION)
+--------------------------------------------------------------------------------
+[NOI DUNG SLIDE]:
+Mo hinh All-in-One Pre-CRM & Networking Layer:
+- Cham NFC 1-Cham Sieu Toc (0.42s): Khong can cai app, mo ngay tren trinh duyet Web PWA.
+- Card Replacement Continuity: Doi the vat ly moi 100% khong mat du lieu quan he.
+- Explicit 2-Way Consent: An SDT/Email rieng tu, chi mo khoa khi ca hai ben dong y.
+- Relationship Memory: Tu dong luu vet ngay gap, boi canh su kien, ghi chu rieng tu.
+
+[QUY TRINH 1-CHAM]:
+Cham The NFC (0.42s) -> Mo Ho So 3D -> Gui Yeu Cau 2-Way Consent -> Mo Khoa Du Lieu & Ghi Chu
+
+[LOI THOAI THUYET TRINH - 45 giay]:
+"ONE CONNECT giai quyet triet de 3 diem nghen tren bang mot he sinh thai 4-trong-1.
+Doanh nhan chi can cham nhe the kim loai NFC vao lung dien thoai doi tac trong 0.42 giay:
+Ho so so 3D lap tuc xuat hien ma khong can cai bat ky ung dung nao. Khi hai ben nhan
+'Chap Nhan Ket Noi', he thong tu dong thiet lap quyen bao ve du lieu 2 chieu,
+ghi nhan boi canh su kien va cho phep ghi chu rieng tu ngay lap tuc!"
+
+
+--------------------------------------------------------------------------------
+SLIDE 4: SAN PHAM THUC TE & 4 PHAN HE LOI (PRODUCT MVP)
+--------------------------------------------------------------------------------
+[NOI DUNG SLIDE]:
+(Trinh chieu man hinh Live Product tai: https://one-connect-network.vercel.app/)
+
+1. SCR-B01: The Doanh Nhan So 3D & Kho Quan Tri The NFC (4 Mau: Obsidian, Sapphire, Gold, Emerald).
+2. ADM-ORG: Cong Quan Tri Hiep Hoi / CLB Doanh Nghiep (Cap the, quan ly danh ba hoi vien).
+3. EVT-CHK: Tram Check-in Cua Su Kien Sieu Toc (<0.5s/luot, chong quet lap Idempotent).
+4. NET-MEM: B2B Matchmaking & Relationship Memory (AI Goi y doi tac, Lead Follow-up).
+
+[CAN CU KY THUAT]:
+* Co so du lieu: 11 bang quan he PostgreSQL tren Supabase Cloud voi Row Level Security (RLS).
+* Thoi gian phan hoi: Tram check-in do luong dat <0.5 giay/luot quet.
+
+[LOI THOAI THUYET TRINH - 60 giay]:
+"Du an cua chung toi khong dung lai o y tuong tren giay. Hom nay, quy vi co the truy cap
+ngay vao dia chi one-connect-network.vercel.app de trai nghiem san pham thuc te da hoan
+thanh 100% ban MVP voi 4 phan he loi: The dinh danh so 3D, Cong quan tri Hiep hoi,
+Tram soat ve check-in sieu toc duoi 0.5 giay va He thong ghi nho quan he giao thuong B2B.
+Toan bo nen tang van hanh tren ha tang dam may hien dai, do on dinh 99.9%."
+
+
+--------------------------------------------------------------------------------
+SLIDE 5: TIEN PHONG PHAP LY & LUAT DU LIEU CA NHAN 91/2025/QH15
+--------------------------------------------------------------------------------
+[NOI DUNG SLIDE]:
+Tuan thu toan dien 3 Dieu khoan trong yeu cua Luat PDPL 91/2025:
+- Dieu 11 (Explicit 2-Way Consent): Du lieu nhay cam tu dong che mo (Data Masking), chi hien thi khi duyet.
+- Dieu 14 (Data Portability): Nut bam 1-click xuat toan bo ban sao du lieu ca nhan (JSON/CSV).
+- Dieu 16 (Right to be Forgotten): Quyen yeu cau xoa vinh vien du lieu va vo hieu the NFC.
+- Data Sovereignty: 3 che do tuy chon hien thi (Cong khai / Hoi vien / Rieng tu).
+
+[LOI THOAI THUYET TRINH - 45 giay]:
+"Diem khac biet lon nhat giup ONE CONNECT vuot len cac san pham danh thiep dien tu
+thong thuong la su tuan thu tuyet doi Luat Bao ve Du lieu Ca nhan 91/2025/QH15.
+Chung toi trang bi cho doanh nhan quyen lam chu du lieu (Data Sovereignty): Tu bat tat
+hien thi cong khai, yeu cau xuat ban sao du lieu theo Dieu 14, va quyen xoa vinh vien
+thong tin theo Dieu 16. Day la tam la chan phap ly an toan nhat cho cac Hiep hoi va
+Doanh nghiep khi tham gia chuyen doi so."
+
+
+--------------------------------------------------------------------------------
+SLIDE 6: MO HINH KINH DOANH & 4 DONG DOANH THU (BUSINESS MODEL)
+--------------------------------------------------------------------------------
+[NOI DUNG SLIDE]:
+1. Phan Cung The Kim Loai Cao Cap: Ban the NFC khac Laser (250,000 - 600,000 VND/the, Margin ~60%).
+2. Thue Bao SaaS Quan Tri Hiep Hoi (Org Tier): Goi quan tri CLB (5,000,000 - 15,000,000 VND/nam).
+3. Dich Vu Tram Check-in Su Kien MICE: Tram diem danh & bao cao (3,000,000 - 10,000,000 VND/su kien).
+4. Dich Vu AI B2B Matchmaking: Phi ket noi giao thuong theo hoi cho/dien dan.
+
+[LOI THOAI THUYET TRINH - 45 giay]:
+"ONE CONNECT xay dung mo hinh kinh doanh ket hop giua Doanh thu phan cung tuc thi
+(The kim loai NFC) va Doanh thu dinh ky SaaS (Phan mem quan tri Hiep hoi & Su kien MICE).
+Voi bien loi nhuan gop phan cung tren 60% va chi phi may chu dam may toi uu,
+du an co kha nang dat diem hoa von (Break-even) chi sau 6 thang trien khai thuc te."
+
+
+--------------------------------------------------------------------------------
+SLIDE 7: THI TRUONG MUC TIEU TAI KHANH HOA & TIEM NANG (MARKET SIZE)
+--------------------------------------------------------------------------------
+[NOI DUNG SLIDE]:
+- TAM (Toan quoc): ~900,000 Doanh nghiep dang hoat dong + 300 Hiep hoi Doanh nghiep.
+- SAM (Nam Trung Bo & MICE): ~35,000 Doanh nghiep va hon 1,000 su kien MICE hang nam.
+- SOM (Muc tieu Pilot Khanh Hoa 2026 - 2027):
+  * 2,500 Doanh nhan tai Khanh Hoa kich hoat the so;
+  * 15+ Hiep hoi / CLB Doanh nghiep tinh Khanh Hoa su dung nen tang;
+  * 30+ Su kien MICE / Xuc tien Dau tu tai Nha Trang su dung tram check-in ONE CONNECT.
+
+[LOI THOAI THUYET TRINH - 45 giay]:
+"Tai Khanh Hoa, voi hon 35,000 doanh nghiep cung hang ngan su kien MICE cao cap
+hang nam tai cac khach san 5 sao Nha Trang, nhu cau so hoa danh ba va quan tri
+su kien la cuc ky lon. Muc tieu trong 12 thang toi cua chung toi tai Khanh Hoa
+la tiep can 2,500 doanh nhan chu chot, phuc vu 30 su kien MICE va dong hanh
+cung cac Hiep hoi doanh nghiep tieu bieu cua tinh."
+
+
+--------------------------------------------------------------------------------
+SLIDE 8: LOI THE CANH TRANH VUOT TROI (COMPETITIVE MOAT)
+--------------------------------------------------------------------------------
+[BANG SO SANH]:
+- Thoi gian trao doi: Danh thiep giay (Cham) | Namecard thuong (~2s) | ONE CONNECT (Sieu toc 0.42s)
+- Bao ve moi truong (ESG): Danh thiep giay (Lang phi) | ONE CONNECT (Chuyen doi Xanh 100%)
+- Ghi nho boi canh gap: Danh thiep giay (Khong) | ONE CONNECT (Tu dong luu vet su kien)
+- Tuan thu Luat PDPL 91/2025: Danh thiep giay (Khong) | ONE CONNECT (Explicit 2-Way Consent)
+- Tram Check-in Su kien: Danh thiep giay (Thu cong) | ONE CONNECT (Tich hop san duoi 0.5s)
+
+[LOI THOAI THUYET TRINH - 45 giay]:
+"So voi danh thiep giay truyen thong va cac loai namecard dien tu troi noi tren thi truong,
+ONE CONNECT co 3 loi the canh tranh doc quyen: Thu nhat, tich hop san tram check-in MICE;
+Thu hai, lop ghi nho quan he Relationship Memory tu dong; Thu ba, kien truc bao mat
+2-Way Consent chuan Luat PDPL 91/2025. Chung toi khong chi ban mot chiec the,
+chung toi cung cap ha tang ket noi giao thuong hoan chinh."
+
+
+--------------------------------------------------------------------------------
+SLIDE 9: LO TRINH TRIEN KHAI & KE HOACH PILOT (ROADMAP)
+--------------------------------------------------------------------------------
+[NOI DUNG SLIDE]:
+- Q3/2026: Hoan thanh MVP v1.0, thu nghiem noi bo 50 users, nop ho so Cuoc thi InnoKhanhHoa.
+- Q4/2026: Trien khai Pilot thuc te tai 1 Su kien Doanh nhan quy mo 150 - 300 khach tai Nha Trang.
+  (KPI: Ty le kich hoat the >90%, Toc do check-in <0.5s, Hai long >95%).
+- Q1-Q2/2027: Mo rong ra 20 Hiep hoi va 50 su kien MICE tai Khanh Hoa va Nam Trung Bo.
+- Q3-Q4/2027: Tich hop AI B2B Matchmaking thong minh va mo rong toan quoc.
+
+[LOI THOAI THUYET TRINH - 45 giay]:
+"Ve lo trinh: Ngay trong Quy 4/2026, chung toi se phoi hop cung mot Hiep hoi Doanh nghiep
+tai TP. Nha Trang de trien khai Pilot thuc te tai mot su kien quy mo 200 khach moi.
+Day se la minh chung song dong nhat ve nang luc van hanh thuc te truoc khi thuong mai hoa
+toan dien tren dia ban toan tinh vao dau nam 2027."
+
+
+--------------------------------------------------------------------------------
+SLIDE 10: DOI NGU SANG LAP & NANG LUC THUC THI (THE TEAM)
+--------------------------------------------------------------------------------
+[NOI DUNG SLIDE]:
+- Ho Hoang Long (Johnny Long Ho) — Founder & Project Lead (Aplusvn Media & Tech).
+- Doi ngu Ky thuat & Van hanh: Full-stack Engineers (Next.js, Supabase, NFC Hardware) & UX/UI Designers.
+
+[LOI THOAI THUYET TRINH - 30 giay]:
+"Doi ngu phat trien Aplusvn Media & Tech chung toi la nhung nguoi tre, am hieu sau sac
+ve cong nghe phan mem hien dai va co kinh nghiem thuc te trong to chuc truyen thong
+su kien doanh nghiep. Chung toi cam ket don 100% tam huyet de bien ONE CONNECT
+thanh niem tu hao cong nghe khoi nghiep cua tinh Khanh Hoa."
+
+
+--------------------------------------------------------------------------------
+SLIDE 11: DE XUAT KEU GOI NGUON LUC & SU DUNG VON (THE ASK)
+--------------------------------------------------------------------------------
+[NOI DUNG SLIDE]:
+1. Dong hanh Uom tao (InnoKhanhHoa Incubation): Khong gian vuon uom, tu van SHTT va chuyen gia Mentor.
+2. Co hoi Trien khai: Thu nghiem tram check-in tai cac su kien, TECHFEST cua tinh Khanh Hoa.
+3. Keu goi Von moi (Seed Funding): $30,000 - $50,000 USD (tuong duong 750 trieu - 1.25 ty VND).
+   * 35% San xuat phoi the NFC & May in Laser
+   * 25% Nang cap R&D & Ha tang Cloud Server
+   * 25% Trien khai Pilot & Tiep can Hiep hoi Doanh nghiep
+   * 15% Chi phi Phap ly & Du phong Van hanh
+
+[LOI THOAI THUYET TRINH - 45 giay]:
+"De hien thuc hoa muc tieu nay, chung toi kinh de xuat So KH&CN Khanh Hoa tiep nhan
+du an vao Chuong trinh Uom tao Doi moi Sang tao cua tinh, dong thoi tao dieu kien
+de ONE CONNECT duoc thu nghiem tai cac su kien xuc tien thuong mai cua tinh.
+Dong thoi, chung toi tim kiem nguon von moi $30,000 - $50,000 USD tu cac quy DMST
+va nha dau tu thien than de nhap khau phoi the chat luong cao va mo rong ha tang."
+
+
+--------------------------------------------------------------------------------
+SLIDE 12: TAM NHIN 2030 & LOI KET (VISION & CALL TO ACTION)
+--------------------------------------------------------------------------------
+[NOI DUNG SLIDE]:
+- Tam nhin 2030: Tro thanh Nen tang Dinh danh Doanh nhan & Ha tang Giao thuong So tieu chuan cua mien Trung.
+- Thong diep ket luan:
+  "Chuyen doi so bat dau tu mot lan cham. Hay cung ONE CONNECT kien tao mot Khanh Hoa thong minh, xanh va ket noi khong gioi han!"
+- Lien he: Website https://one-connect-network.vercel.app/ | Email: johnny@aplusvn.com | Hotline: 0903.888.999
+
+[LOI THOAI THUYET TRINH - 30 giay]:
+"Kinh thua Hoi dong Giam khao! Chuyen doi so khong phai la dieu gi xa voi,
+no bat dau tu chinh chiec danh thiep tren tay moi doanh nhan. ONE CONNECT da san sang
+dong hanh cung he sinh thai khoi nghiep doi moi sang tao tinh Khanh Hoa.
+Xin tran trong cam on quy Ban Giam khao va rat mong nhan duoc nhung gop y quy bau!"
+
+================================================================================
+BO 4 CAU HOI PHAN BIEN & HUONG TRA LOI MAU (Q&A CHEAT SHEET)
+================================================================================
+
+Cau 1: "Thi truong da co nhieu danh thiep dien tu, ONE CONNECT khac biet o diem nao?"
+Tra loi: "Da thua Ban giam khao, cac san pham hien nay chi la 'Trang web ca nhan tinh gan chip NFC'.
+ONE CONNECT la mot HA TANG PRE-CRM & EVENT CHECK-IN: Tich hop tram diem danh su kien <0.5s,
+tu dong ghi nho boi canh gap go (Relationship Memory), va la nen tang dau tien tuan thu
+Luat PDPL 91/2025 voi co che 2-Way Consent bao ve du lieu ca nhan."
+
+Cau 2: "Neu nguoi dung mat the NFC thi co bi mat danh ba va du lieu khong?"
+Tra loi: "Da hoan toan khong! Nho kien truc Card Replacement Continuity, UID the nam doc lap
+o bang access_cards. Khi cap the moi, chi can cap nhat ma the, toan bo danh ba, ghi chu
+va lich su su kien van nguyen ven 100% tren tai khoan dam may."
+
+Cau 3: "Kha nang tuong thich tren cac dong dien thoai cu nhu the nao?"
+Tra loi: "Nen tang ho tro 100% dien thoai thong minh: Doi voi may co NFC (iPhone 7 tro len va hau het
+may Android), chi can cham 1 cham. Doi voi may khong co NFC, ma Dynamic QR cho phep quet
+qua Zalo, Camera hoac bat ky ung dung quet ma nao."
+
+Cau 4: "Du an da san sang trien khai chua hay moi la y tuong?"
+Tra loi: "Da du an da hoan thanh 100% ban MVP hoat dong thuc te tren nen tang dam may tai dia chi
+one-connect-network.vercel.app, CSDL 11 bang loi tren Supabase da duoc kiem thu voi 0 loi build
+va san sang chay Pilot ngay trong Quy 4/2026."
+================================================================================

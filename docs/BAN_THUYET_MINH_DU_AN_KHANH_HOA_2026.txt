@@ -1,0 +1,105 @@
+================================================================================
+BAN THUYET MINH DU AN KHOI NGHIEP DOI MOI SANG TAO TINH KHANH HOA 2026
+================================================================================
+
+Cuoc thi: Khoi nghiep Doi moi Sang tao tinh Khanh Hoa – 2026
+Chu de: "Khoi nghiep sang tao Khanh Hoa – Giai quyet nhung van de cua thuc tien"
+Co quan chu tri: So Khoa hoc va Cong nghe tinh Khanh Hoa
+Trang thong tin: https://innokhanhhoa.vn
+
+--------------------------------------------------------------------------------
+THONG TIN TONG QUAN VE DU AN
+--------------------------------------------------------------------------------
+- Ten de tai: ONE CONNECT NETWORK — NEN TANG HA TANG DINH DANH SO (BUSINESS IDENTITY)
+              & QUAN TRI QUAN HE GIAO THUONG B2B TICH HOP THE CHAM NFC KHONG MA SAT
+              TUAN THU LUAT DU LIEU CA NHAN 91/2025/QH15 CHO HE SINH THAI DOANH NGHIEP KHANH HOA
+- Linh vuc: Chuyen doi so, CNTT, Doi moi sang tao trong Du lich MICE & Dich vu B2B
+- Don vi / Tac gia chu tri: Ho Hoang Long (Johnny Long Ho) - Aplusvn Media & Tech
+- Email: johnny@aplusvn.com / long.ho@aplusvn.com | Dien thoai: 0903.888.999
+- Trang thai phat trien: Da hoan thanh ban MVP v1.0 hoat dong thuc te (Live Product)
+- Link san pham Live: https://one-connect-network.vercel.app/
+- Ma nguon du an: https://github.com/johnnylongho/one-connect
+
+--------------------------------------------------------------------------------
+1. TINH CAP THIET & BAI TOAN THUC TIEN TAI KHANH HOA
+--------------------------------------------------------------------------------
+1.1. Boi canh dac thu tinh Khanh Hoa:
+* Tinh Khanh Hoa dang tren lo trinh phat trien thanh Thanh pho truc thuoc Trung uong,
+  trung tam kinh te bien, khoa hoc cong nghe va doi moi sang tao theo Nghi quyet 09-NQ/TW
+  cua Bo Chinh tri.
+* TP. Nha Trang la thu phu Du lich MICE (Hoi nghi, Hoi thao, Trien lam), quy tu hang van
+  luot doanh nhan, nha dau tu, hiep hoi doanh nghiep hang nam.
+
+1.2. Ba "Diem nghen" lon can giai quyet:
+(1) Lang phi in an & Rac thai carbon (Trai dinh huong Chuyen doi Xanh):
+    - Hon 88% danh thiep giay bi vut bo sau 7 ngay dau tien.
+    - Lang phi hang tram trieu dong chi phi in an tai lieu moi mua su kien.
+(2) Dut gay boi canh quan he sau su kien (Relationship Disconnection):
+    - Hon 70% doanh nhan khong theo doi (follow-up) duoc doi tac vi khong nho boi canh cuoc gap.
+(3) Rui ro phap ly ve Du lieu Ca nhan (Luat PDPL 91/2025/QH15):
+    - Danh sach dai bieu bi chia se cong khai, thieu co che Dong Y Tu Nguyen (Explicit Consent).
+
+--------------------------------------------------------------------------------
+2. MUC TIEU DU AN
+--------------------------------------------------------------------------------
+- Muc tieu tong quat: Xay dung nen tang ha tang so (Pre-CRM & Relationship Layer)
+  ket noi dinh danh doanh nhan, to chuc Hoi/CLB va su kien MICE tai Khanh Hoa
+  voi ma sat bang 0 (Zero Friction), bao ve du lieu ca nhan theo chuan quoc te.
+- Muc tieu cu the:
+  1. So hoa 100% danh thiep & diem danh su kien bang The kim loai NFC (0.42s) & Dynamic QR.
+  2. Trien khai Pilot cho it nhat 01 Hiep hoi / Su kien 150-300 nguoi tai Nha Trang (Q4/2026).
+  3. Tiet kiem toi thieu 85% chi phi in an danh thiep/tai lieu giay.
+  4. 100% ket noi tuan thu Explicit 2-Way Consent theo Luat PDPL 91/2025/QH15.
+
+--------------------------------------------------------------------------------
+3. GIAI PHAP DOI MOI SANG TAO & HA TANG CONG NGHE
+--------------------------------------------------------------------------------
+3.1. Diem moi & Dot pha cong nghe:
+- Cham NFC 1-Cham Sieu Toc (0.42s): Tuong thich 100% dien thoai (iOS/Android), khong can cai app.
+- Card Replacement Continuity: Doi the vat ly moi 100% khong mat bat ky danh ba hay ghi chu nao.
+- Tien phong Phap ly 2-Way Consent: Du lieu nhay cam (SDT/Email) tu dong che mo (Data Masking),
+  chi mo khoa khi ca hai ben dong y.
+- Data Sovereignty (Chu quyen du lieu): Tu bat/tat hien thi cong khai, xuat ban sao du lieu (Dieu 14)
+  va xoa vinh vien du lieu (Dieu 16).
+
+3.2. Bon phan he cot loi da hoan thanh tren ban Live:
+- Module 1 (Identity & Cards): The doanh nhan 3D tuong tac, 4 phoi kim loai Obsidian/Sapphire/Gold/Emerald.
+- Module 2 (Org & Membership): Quan ly danh ba hoi vien, phan quyen Ban chap hanh.
+- Module 3 (Event Check-in): Tram diem danh cua su kien sieu toc (<0.5s/luot, chong quet lap Idempotent).
+- Module 4 (Networking & Memory): Ket noi consent 2 chieu, ghi chu rieng tu (Private Notes), Lead Tagging.
+
+--------------------------------------------------------------------------------
+4. MO HINH KINH DOANH (4 DONG DOANH THU)
+--------------------------------------------------------------------------------
+1. Ban phoi the NFC Laser cao cap: 250,000 - 600,000 VND / the (Margin loi nhuan gop ~60%).
+2. Goi thue bao SaaS Quan tri Hiep hoi: 5,000,000 - 15,000,000 VND / nam.
+3. Goi phan mem Tram Check-in Su kien MICE: 3,000,000 - 10,000,000 VND / su kien.
+4. Dich vu AI B2B Matchmaking Doanh nghiep.
+
+--------------------------------------------------------------------------------
+5. LO TRINH TRIEN KHAI THUC TE TAI KHANH HOA
+--------------------------------------------------------------------------------
+- Thang 08/2026: Nop ho so Cuoc thi InnoKhanhHoa 2026; kiem thu noi bo 50 nguoi dung.
+- Thang 09 - 10/2026: Phoi hop 01 Hiep hoi tai Nha Trang to chuc Pilot thuc te 150-300 dai bieu.
+- Thang 11 - 12/2026: Bao cao ket qua Pilot tai Vong Chung ket; Keu goi von moi $30,000 - $50,000 USD.
+- Nam 2027: Trien khai cho 20+ Hiep hoi va 50+ su kien MICE tai Khanh Hoa va Nam Trung Bo.
+
+--------------------------------------------------------------------------------
+6. DANH GIA TAC DONG KINH TE - XA HOI & MOI TRUONG (ESG)
+--------------------------------------------------------------------------------
+- Moi truong (E): Giam hang trieu to giay in an, huong toi Paperless MICE va Net Zero.
+- Xa hoi (S): Nang cao nhan thuc bao ve du lieu ca nhan theo Luat 91/2025; giao thuong minh bach.
+- Quan tri (G): Bao cao du lieu dinh luong, truy vet thoi gian thuc (Idempotent Audit Log).
+
+--------------------------------------------------------------------------------
+7. DE XUAT KEU GOI NGUON LUC HO TRO
+--------------------------------------------------------------------------------
+1. Ho tro Uom tao tu So KH&CN Khanh Hoa (Khong gian vuon uom, tu van SHTT, chuyen gia Mentor).
+2. Tao dieu kien Pilot tai cac su kien, TECHFEST cua tinh Khanh Hoa.
+3. Ket noi nguon von dau tu: Tiep can cac quy tai tro DMST (ADB, NIC) va Nha dau tu thien than
+   voi quy mo von keu goi giai doan dau: $30,000 - $50,000 USD.
+
+Khanh Hoa, ngay 18 thang 08 nam 2026
+DAI DIEN DU AN ONE CONNECT NETWORK
+Ho Hoang Long (Johnny Long Ho)
+================================================================================
