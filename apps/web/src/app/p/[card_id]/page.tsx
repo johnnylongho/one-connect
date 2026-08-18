@@ -2,7 +2,10 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'next/navigation';
+import Link from 'next/link';
 import {
+  ArrowLeft,
+  LayoutDashboard,
   ShieldCheck,
   Building2,
   Phone,
@@ -23,6 +26,7 @@ import {
   Copy,
   Check,
   Award,
+
   MapPin,
   Calendar,
   CreditCard,
@@ -399,41 +403,37 @@ END:VCARD`;
       <div className="max-w-md mx-auto relative bg-white min-h-screen border-x border-slate-200/80 shadow-2xl overflow-hidden pb-8">
         
         {/* 1. TOP APP BAR (Compact Glassmorphic Header) */}
-        <header className="bg-white/95 border-b border-slate-100 px-3.5 sm:px-4 py-3 flex items-center justify-between sticky top-0 z-30 backdrop-blur-md">
-          <div className="flex items-center gap-2.5">
+        <header className="bg-white/95 border-b border-slate-100 px-3.5 sm:px-4 py-2.5 flex items-center justify-between sticky top-0 z-30 backdrop-blur-md">
+          <div className="flex items-center gap-2">
+            <Link
+              href="/dashboard"
+              className="p-1.5 sm:p-2 rounded-full bg-slate-50 border border-slate-200 text-slate-700 hover:bg-blue-50 hover:text-[#0066FF] hover:border-blue-200 transition-all active:scale-95 cursor-pointer shadow-2xs"
+              title="Quay lại Trang Tổng Quan Dashboard"
+            >
+              <ArrowLeft className="w-4 h-4" />
+            </Link>
+
             <img
               src="/one_connect_final_logo_orange.png"
               alt="One Connect Logo"
-              className="h-7 sm:h-8 w-auto object-contain shrink-0 drop-shadow-xs"
+              className="h-6 sm:h-7 w-auto object-contain shrink-0 drop-shadow-xs"
             />
             <div>
-              <div className="text-[14px] sm:text-[15px] font-black tracking-wider text-slate-900 leading-tight font-heading">
-                ONE<span className="text-[#0066FF]">CONNECT</span>
-              </div>
-              <div className="text-[11px] sm:text-[12px] text-[#0066FF] font-bold tracking-tight">
+              <div className="text-[12px] sm:text-[13px] text-[#0066FF] font-black tracking-tight uppercase flex items-center gap-1.5 font-heading">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shrink-0" />
                 Executive Digital Pass
               </div>
             </div>
           </div>
 
           <div className="flex items-center gap-1.5 sm:gap-2">
-            {isOwner && (
-              <button
-                type="button"
-                onClick={handleOpenEditModal}
-                className="p-2 rounded-full bg-blue-50 border border-blue-200 text-[#0066FF] hover:bg-blue-100 transition-colors active:scale-95 cursor-pointer shadow-xs"
-                title="Chỉnh sửa hồ sơ của bạn"
-              >
-                <Edit3 className="w-4.5 h-4.5 text-[#0066FF]" />
-              </button>
-            )}
             <button
               type="button"
               onClick={() => setIsQrModalOpen(true)}
               className="p-2 rounded-full bg-slate-50 border border-slate-200 text-slate-700 hover:bg-slate-100 transition-colors active:scale-95 cursor-pointer shadow-xs"
               title="Xem mã QR"
             >
-              <QrCode className="w-4.5 h-4.5 text-slate-700" />
+              <QrCode className="w-4 h-4 text-slate-700" />
             </button>
             <button
               type="button"
@@ -441,10 +441,11 @@ END:VCARD`;
               className="p-2 rounded-full bg-slate-50 border border-slate-200 text-slate-700 hover:bg-slate-100 transition-colors active:scale-95 cursor-pointer shadow-xs"
               title="Chia sẻ hồ sơ"
             >
-              <Share2 className="w-4.5 h-4.5 text-slate-700" />
+              <Share2 className="w-4 h-4 text-slate-700" />
             </button>
           </div>
         </header>
+
 
         {/* 2. EXECUTIVE HERO BLOCK VỚI HIỆU ỨNG LIQUID GLASS */}
         <div className="p-3.5 sm:p-4">
