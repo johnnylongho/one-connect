@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Plus_Jakarta_Sans, Inter, Be_Vietnam_Pro } from 'next/font/google';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -14,12 +14,15 @@ import {
   LogOut,
   ShieldCheck,
   Search,
-  Bell,
   ChevronDown,
   Sparkles,
   Menu,
   X,
   Smartphone,
+  PanelLeftClose,
+  PanelLeftOpen,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react';
 import './globals.css';
 
@@ -52,7 +55,32 @@ export default function RootLayout({
   const [currentRole, setCurrentRole] = useState<'SUPER_ADMIN' | 'ORGANIZER'>('SUPER_ADMIN');
   const [isRoleDropdownOpen, setIsRoleDropdownOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+
+  // Load saved sidebar state from localStorage if available
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('one_connect_sidebar_collapsed');
+      if (saved !== null) {
+        setIsSidebarCollapsed(saved === 'true');
+      }
+    } catch (e) {
+      // ignore
+    }
+  }, []);
+
+  const toggleSidebar = () => {
+    setIsSidebarCollapsed((prev) => {
+      const next = !prev;
+      try {
+        localStorage.setItem('one_connect_sidebar_collapsed', String(next));
+      } catch (e) {
+        // ignore
+      }
+      return next;
+    });
+  };
 
   const navItems = [
     { href: '/dashboard', label: 'Tổng Quan', icon: LayoutDashboard },
@@ -105,50 +133,115 @@ export default function RootLayout({
       >
         <div className="min-h-screen flex flex-col md:flex-row bg-[#F8FAFC]">
           
-          {/* 1. DESKTOP / TABLET SIDEBAR (Cố định w-64 trên Desktop) */}
-          <aside className="w-full md:w-64 lg:w-64 shrink-0 border-r border-slate-200 bg-white flex flex-col justify-between hidden md:flex sticky top-0 h-screen z-30 shadow-sm">
-            {/* Top Brand Logo & Menu */}
-            <div className="p-5 space-y-6 overflow-y-auto">
-              {/* Brand Logo Header */}
-              <Link href="/dashboard" className="flex items-center space-x-3 group">
-                <img
-                  src="/one_connect_final_logo_orange.png"
-                  alt="One Connect Logo"
-                  className="h-9 w-auto object-contain shrink-0"
-                />
-                <div>
-                  <span className="text-base font-black tracking-tight text-slate-900 block leading-none font-heading">
-                    ONE<span className="text-[#0066FF]">CONNECT</span>
-                  </span>
-                  <span className="text-[9px] font-bold text-slate-500 tracking-widest uppercase mt-1 block">
-                    APLUSVN ECOSYSTEM
-                  </span>
-                </div>
-              </Link>
+          {/* ================================================================= */}
+          {/* 1. DESKTOP / TABLET COLLAPSIBLE SIDEBAR */}
+          {/* ================================================================= */}
+          <aside
+            className={`shrink-0 border-r border-slate-200 bg-white flex flex-col justify-between hidden md:flex sticky top-0 h-screen z-30 shadow-sm transition-all duration-300 ease-in-out ${
+              isSidebarCollapsed ? 'w-20' : 'w-64'
+            }`}
+          >
+            {/* Top Brand Logo & Menu Items */}
+            <div className={`space-y-5 overflow-y-auto ${isSidebarCollapsed ? 'p-3' : 'p-5'}`}>
+              {/* Brand Header with Logo & Beta Badge + Minimize Toggle */}
+              <div className="relative">
+                {!isSidebarCollapsed ? (
+                  <div className="flex items-center justify-between gap-2">
+                    <Link
+                      href="/dashboard"
+                      className="flex-1 flex flex-col items-center justify-center p-2 rounded-2xl hover:bg-slate-50 transition-all text-center group"
+                    >
+                      <img
+                        src="/one_connect_final_logo_orange.png"
+                        alt="One Connect"
+                        className="h-10 w-auto object-contain shrink-0 group-hover:scale-105 transition-transform"
+                      />
+                      <div className="mt-1.5 flex items-center justify-center">
+                        <span className="text-[10px] font-extrabold tracking-widest px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200/80 shadow-xs uppercase inline-flex items-center gap-1">
+                          <Sparkles className="w-3 h-3 text-[#FF6B00]" /> Beta v1.0
+                        </span>
+                      </div>
+                    </Link>
 
-              {/* User Admin Badge */}
-              <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-center gap-3">
-                <img
-                  src="/avatar-johnny-long.jpg"
-                  alt="Johnny Long Hồ"
-                  className="w-9 h-9 rounded-full object-cover border-2 border-blue-500 shadow-sm shrink-0"
-                />
-                <div className="min-w-0 flex-1">
-                  <p className="font-bold text-slate-900 text-xs truncate">Johnny Long Hồ</p>
-                  <div className="flex items-center gap-1 mt-0.5">
-                    <span className="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                    <span className="text-[9px] font-extrabold text-blue-700 bg-blue-50 px-1.5 py-0.5 rounded border border-blue-200 uppercase">
-                      {currentRole}
-                    </span>
+                    {/* Minimize Button */}
+                    <button
+                      onClick={toggleSidebar}
+                      className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer shrink-0"
+                      title="Thu gọn Menu"
+                    >
+                      <PanelLeftClose className="w-4 h-4" />
+                    </button>
                   </div>
-                </div>
+                ) : (
+                  <div className="flex flex-col items-center justify-center space-y-2">
+                    <Link
+                      href="/dashboard"
+                      className="flex flex-col items-center justify-center p-1.5 rounded-xl hover:bg-slate-50 transition-all text-center group"
+                      title="ONE CONNECT - Beta v1.0"
+                    >
+                      <img
+                        src="/one_connect_final_logo_orange.png"
+                        alt="One Connect"
+                        className="h-8 w-auto object-contain shrink-0 group-hover:scale-110 transition-transform"
+                      />
+                      <span className="text-[8px] font-extrabold px-1.5 py-0.2 rounded-full bg-blue-50 text-blue-700 border border-blue-200 mt-1 uppercase">
+                        Beta
+                      </span>
+                    </Link>
+
+                    {/* Expand Button */}
+                    <button
+                      onClick={toggleSidebar}
+                      className="p-1.5 rounded-xl text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-colors cursor-pointer"
+                      title="Mở rộng Menu"
+                    >
+                      <PanelLeftOpen className="w-4 h-4" />
+                    </button>
+                  </div>
+                )}
               </div>
 
-              {/* Menu Navigation Group */}
-              <div className="space-y-3">
-                <div className="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest px-2">
-                  Danh Mục Quản Trị
+              {/* User Admin Badge */}
+              {!isSidebarCollapsed ? (
+                <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-center gap-3">
+                  <img
+                    src="/avatar-johnny-long.jpg"
+                    alt="Johnny Long Hồ"
+                    className="w-9 h-9 rounded-full object-cover border-2 border-blue-500 shadow-sm shrink-0"
+                  />
+                  <div className="min-w-0 flex-1">
+                    <p className="font-bold text-slate-900 text-xs truncate">Johnny Long Hồ</p>
+                    <div className="flex items-center gap-1 mt-0.5">
+                      <span className="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                      <span className="text-[9px] font-extrabold text-blue-700 bg-blue-50 px-1.5 py-0.5 rounded border border-blue-200 uppercase">
+                        {currentRole}
+                      </span>
+                    </div>
+                  </div>
                 </div>
+              ) : (
+                <div
+                  className="flex justify-center p-1.5 rounded-xl bg-slate-50 border border-slate-200/80 cursor-pointer"
+                  title={`Johnny Long Hồ (${currentRole})`}
+                >
+                  <div className="relative">
+                    <img
+                      src="/avatar-johnny-long.jpg"
+                      alt="Johnny Long Hồ"
+                      className="w-8 h-8 rounded-full object-cover border-2 border-blue-500"
+                    />
+                    <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-500 border border-white" />
+                  </div>
+                </div>
+              )}
+
+              {/* Menu Navigation Group */}
+              <div className="space-y-2">
+                {!isSidebarCollapsed && (
+                  <div className="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest px-2">
+                    Danh Mục Quản Trị
+                  </div>
+                )}
 
                 <nav className="space-y-1 text-xs font-medium">
                   {navItems.map((item) => {
@@ -158,7 +251,12 @@ export default function RootLayout({
                       <Link
                         key={item.href}
                         href={item.href}
-                        className={`flex items-center justify-between px-3.5 py-2.5 rounded-xl transition-all ${
+                        title={isSidebarCollapsed ? item.label : undefined}
+                        className={`flex items-center rounded-xl transition-all ${
+                          isSidebarCollapsed
+                            ? 'justify-center p-3'
+                            : 'justify-between px-3.5 py-2.5'
+                        } ${
                           isActive
                             ? 'font-bold bg-blue-50 text-[#0066FF] border border-blue-200 shadow-sm'
                             : item.highlight
@@ -166,11 +264,19 @@ export default function RootLayout({
                             : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
                         }`}
                       >
-                        <div className="flex items-center gap-2.5">
-                          <Icon className={`w-4 h-4 ${isActive ? 'text-[#0066FF]' : item.highlight ? 'text-[#FF6B00]' : 'text-slate-500'}`} />
-                          <span>{item.label}</span>
+                        <div className={`flex items-center ${isSidebarCollapsed ? '' : 'gap-2.5'}`}>
+                          <Icon
+                            className={`w-4 h-4 shrink-0 ${
+                              isActive
+                                ? 'text-[#0066FF]'
+                                : item.highlight
+                                ? 'text-[#FF6B00]'
+                                : 'text-slate-500'
+                            }`}
+                          />
+                          {!isSidebarCollapsed && <span>{item.label}</span>}
                         </div>
-                        {item.badge && (
+                        {!isSidebarCollapsed && item.badge && (
                           <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-orange-100 text-orange-600 border border-orange-200">
                             {item.badge}
                           </span>
@@ -183,18 +289,37 @@ export default function RootLayout({
             </div>
 
             {/* Bottom Footer Status */}
-            <div className="p-4 border-t border-slate-200 bg-slate-50 flex items-center justify-between text-xs text-slate-500">
-              <div className="flex items-center gap-2">
-                <ShieldCheck className="w-4 h-4 text-emerald-600" />
-                <span className="text-[11px] text-slate-700 font-semibold">PDPL 91/2025 Verified</span>
-              </div>
-              <Link href="/login" title="Đăng xuất" className="p-1.5 text-slate-400 hover:text-rose-600 transition-colors">
-                <LogOut className="w-4 h-4" />
-              </Link>
+            <div
+              className={`border-t border-slate-200 bg-slate-50 flex items-center text-xs text-slate-500 ${
+                isSidebarCollapsed ? 'p-3 flex-col justify-center gap-3' : 'p-4 justify-between'
+              }`}
+            >
+              {!isSidebarCollapsed ? (
+                <>
+                  <div className="flex items-center gap-2">
+                    <ShieldCheck className="w-4 h-4 text-emerald-600" />
+                    <span className="text-[11px] text-slate-700 font-semibold">PDPL 91/2025 Verified</span>
+                  </div>
+                  <Link href="/login" title="Đăng xuất" className="p-1.5 text-slate-400 hover:text-rose-600 transition-colors">
+                    <LogOut className="w-4 h-4" />
+                  </Link>
+                </>
+              ) : (
+                <>
+                  <div title="PDPL 91/2025 Verified">
+                    <ShieldCheck className="w-4 h-4 text-emerald-600" />
+                  </div>
+                  <Link href="/login" title="Đăng xuất" className="p-1 text-slate-400 hover:text-rose-600 transition-colors">
+                    <LogOut className="w-4 h-4" />
+                  </Link>
+                </>
+              )}
             </div>
           </aside>
 
+          {/* ================================================================= */}
           {/* 2. MOBILE TOPBAR (Chỉ hiển thị trên Mobile) */}
+          {/* ================================================================= */}
           <div className="md:hidden sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 px-4 py-3 flex items-center justify-between shadow-sm">
             <Link href="/dashboard" className="flex items-center gap-2">
               <img
@@ -202,8 +327,8 @@ export default function RootLayout({
                 alt="One Connect"
                 className="h-7 w-auto object-contain shrink-0"
               />
-              <span className="text-sm font-black text-slate-900 font-heading">
-                ONE<span className="text-[#0066FF]">CONNECT</span>
+              <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200 uppercase">
+                Beta
               </span>
             </Link>
 
@@ -232,7 +357,12 @@ export default function RootLayout({
               >
                 <div className="space-y-4">
                   <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-                    <span className="font-extrabold text-sm text-slate-900">MENU ĐIỀU HƯỚNG</span>
+                    <div className="flex items-center gap-2">
+                      <img src="/one_connect_final_logo_orange.png" alt="Logo" className="h-6 w-auto" />
+                      <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200 uppercase">
+                        Beta v1.0
+                      </span>
+                    </div>
                     <button onClick={() => setIsMobileMenuOpen(false)} className="p-1 text-slate-400">
                       <X className="w-5 h-5" />
                     </button>
@@ -272,7 +402,9 @@ export default function RootLayout({
             </div>
           )}
 
+          {/* ================================================================= */}
           {/* 3. MAIN CONTENT AREA */}
+          {/* ================================================================= */}
           <div className="flex-1 flex flex-col min-w-0 min-h-screen">
             {/* Desktop Top Header Bar */}
             <header className="hidden md:flex h-16 border-b border-slate-200 bg-white sticky top-0 z-20 px-6 items-center justify-between shadow-sm">
