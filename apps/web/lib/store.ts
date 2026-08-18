@@ -477,6 +477,7 @@ export function useOneConnectStore() {
   // Update Existing Identity / Profile
   const updateIdentity = (identityId: string, updates: {
     fullName?: string;
+    displayName?: string;
     title?: string;
     bio?: string;
     phone?: string;
@@ -488,13 +489,15 @@ export function useOneConnectStore() {
     setState(prev => ({
       ...prev,
       identities: prev.identities.map(item => {
-        if (item.id !== identityId) return item;
+        if (item.id !== identityId && item.username !== identityId && item.userId !== identityId) {
+          return item;
+        }
 
         const updatedBusinesses = item.businesses && item.businesses.length > 0
           ? item.businesses.map((b, idx) => idx === 0 && updates.businessName ? { ...b, businessName: updates.businessName, position: updates.title || b.position } : b)
           : updates.businessName ? [{
               id: `pbiz-${Date.now()}`,
-              personIdentityId: identityId,
+              personIdentityId: item.id,
               businessId: `biz-${Date.now()}`,
               businessName: updates.businessName,
               position: updates.title || 'Giám Đốc',
@@ -503,10 +506,20 @@ export function useOneConnectStore() {
               status: 'ACTIVE' as const
             }] : [];
 
+        const updatedSocialLinks = item.socialLinks ? item.socialLinks.map(s => {
+          if (s.platform === 'phone' && updates.phone) {
+            return { ...s, url: `tel:${updates.phone}` };
+          }
+          if (s.platform === 'website' && updates.website) {
+            return { ...s, url: updates.website };
+          }
+          return s;
+        }) : [];
+
         return {
           ...item,
           fullName: updates.fullName !== undefined ? updates.fullName : item.fullName,
-          displayName: updates.fullName !== undefined ? updates.fullName : item.displayName,
+          displayName: updates.displayName !== undefined ? updates.displayName : (updates.fullName !== undefined ? updates.fullName : item.displayName),
           title: updates.title !== undefined ? updates.title : item.title,
           bio: updates.bio !== undefined ? updates.bio : item.bio,
           phone: updates.phone !== undefined ? updates.phone : item.phone,
@@ -514,11 +527,13 @@ export function useOneConnectStore() {
           website: updates.website !== undefined ? updates.website : item.website,
           avatarUrl: updates.avatarUrl !== undefined ? updates.avatarUrl : item.avatarUrl,
           businesses: updatedBusinesses,
+          socialLinks: updatedSocialLinks.length > 0 ? updatedSocialLinks : item.socialLinks,
           updatedAt: new Date().toISOString()
         };
       })
     }));
   };
+
 
   // Toggle Privacy
   const updatePrivacy = (newPrivacy: Partial<PrivacySetting>) => {

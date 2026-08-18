@@ -168,14 +168,24 @@ function DigitalProfileContent() {
         i.username.toLowerCase() === cardId.toLowerCase() ||
         i.id.toLowerCase() === cardId.toLowerCase() ||
         (cardId.toLowerCase() === 'hoanglong' && i.username === 'johnnylong')
-    ) || currentIdentity || state.identities[0];
+    ) || (cardId.toLowerCase() === 'hoanglong' ? currentIdentity : null) || state.identities[0];
 
   const matchedCard = state.cards.find(c => c.personIdentityId === matchedIdentity?.id && c.status === 'ACTIVE') || state.cards[0];
+
+  // Quyền chỉnh sửa: CHỈ cho phép chủ sở hữu tài khoản (hoặc Super Admin) chỉnh sửa hồ sơ
+  const isOwner = Boolean(
+    currentIdentity &&
+    matchedIdentity &&
+    (currentIdentity.id === matchedIdentity.id ||
+     currentIdentity.username.toLowerCase() === matchedIdentity.username.toLowerCase() ||
+     currentIdentity.userId === matchedIdentity.userId ||
+     state.currentRole === 'SUPER_ADMIN')
+  );
 
   // Edit Profile Modal States
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editFullName, setEditFullName] = useState(matchedIdentity?.fullName || 'Hồ Hoàng Long');
-  const [editDisplayName, setEditDisplayName] = useState(matchedIdentity?.displayName || 'Johnny Long Hồ');
+  const [editDisplayName, setEditDisplayName] = useState(matchedIdentity?.displayName || matchedIdentity?.fullName || 'Johnny Long Hồ');
   const [editTitle, setEditTitle] = useState(matchedIdentity?.title || 'Project Manager & Media Director');
   const [editCompany, setEditCompany] = useState(matchedIdentity?.businesses?.[0]?.businessName || 'Tập đoàn Công nghệ Số A+ (APLUSVN)');
   const [editPhone, setEditPhone] = useState(matchedIdentity?.phone || '0794677369');
@@ -188,7 +198,7 @@ function DigitalProfileContent() {
     setCurrentDateStr(now.toLocaleDateString('vi-VN'));
   }, []);
 
-  // Synchronized Profile Object
+  // Synchronized Profile Object (Phản ánh dữ liệu mới nhất ngay khi store cập nhật)
   const profile = {
     fullName: matchedIdentity?.fullName || 'Hồ Hoàng Long',
     displayName: matchedIdentity?.displayName || matchedIdentity?.fullName || 'Johnny Long Hồ',
@@ -221,6 +231,14 @@ function DigitalProfileContent() {
   };
 
   const handleOpenEditModal = () => {
+    if (!isOwner) {
+      toast({
+        title: 'BẠN KHÔNG CÓ QUYỀN CHỈNH SỬA! 🔒',
+        description: 'Chỉ chủ sở hữu hồ sơ mới có quyền cập nhật thông tin này.',
+        variant: 'destructive',
+      });
+      return;
+    }
     setEditFullName(matchedIdentity?.fullName || profile.fullName);
     setEditDisplayName(matchedIdentity?.displayName || profile.displayName);
     setEditTitle(matchedIdentity?.title || profile.title);
@@ -234,10 +252,18 @@ function DigitalProfileContent() {
 
   const handleSaveProfile = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!matchedIdentity) return;
+    if (!matchedIdentity || !isOwner) {
+      toast({
+        title: 'BẠN KHÔNG CÓ QUYỀN CHỈNH SỬA! 🔒',
+        description: 'Chỉ chủ sở hữu hồ sơ mới có quyền cập nhật thông tin này.',
+        variant: 'destructive',
+      });
+      return;
+    }
 
     updateIdentity(matchedIdentity.id, {
       fullName: editFullName,
+      displayName: editDisplayName,
       title: editTitle,
       businessName: editCompany,
       phone: editPhone,
@@ -253,6 +279,7 @@ function DigitalProfileContent() {
       variant: 'success',
     });
   };
+
 
 
   // Convert exact profile image to Base64 reliably for vCard export
@@ -371,14 +398,16 @@ END:VCARD`;
           </div>
 
           <div className="flex items-center gap-1.5 sm:gap-2">
-            <button
-              type="button"
-              onClick={handleOpenEditModal}
-              className="p-2 rounded-full bg-blue-50 border border-blue-200 text-[#0066FF] hover:bg-blue-100 transition-colors active:scale-95 cursor-pointer shadow-xs"
-              title="Chỉnh sửa hồ sơ cá nhân"
-            >
-              <Edit3 className="w-4.5 h-4.5 text-[#0066FF]" />
-            </button>
+            {isOwner && (
+              <button
+                type="button"
+                onClick={handleOpenEditModal}
+                className="p-2 rounded-full bg-blue-50 border border-blue-200 text-[#0066FF] hover:bg-blue-100 transition-colors active:scale-95 cursor-pointer shadow-xs"
+                title="Chỉnh sửa hồ sơ của bạn"
+              >
+                <Edit3 className="w-4.5 h-4.5 text-[#0066FF]" />
+              </button>
+            )}
             <button
               type="button"
               onClick={() => setIsQrModalOpen(true)}
@@ -419,16 +448,19 @@ END:VCARD`;
                   {profile.cardUid}
                 </span>
 
-                <button
-                  type="button"
-                  onClick={handleOpenEditModal}
-                  className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-blue-50 hover:bg-blue-100 border border-blue-200 text-[#0066FF] text-[10px] sm:text-[11px] font-bold shadow-2xs transition-all cursor-pointer active:scale-95"
-                >
-                  <Edit3 className="w-3 h-3 text-[#0066FF]" />
-                  <span>Sửa Profile</span>
-                </button>
+                {isOwner && (
+                  <button
+                    type="button"
+                    onClick={handleOpenEditModal}
+                    className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-blue-50 hover:bg-blue-100 border border-blue-200 text-[#0066FF] text-[10px] sm:text-[11px] font-bold shadow-2xs transition-all cursor-pointer active:scale-95"
+                  >
+                    <Edit3 className="w-3 h-3 text-[#0066FF]" />
+                    <span>Sửa Profile</span>
+                  </button>
+                )}
               </div>
             </div>
+
 
 
             {/* Name & Enterprise Verified Badge & Company Info */}

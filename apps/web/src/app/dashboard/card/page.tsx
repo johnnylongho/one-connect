@@ -201,21 +201,23 @@ export default function DigitalNfcCardPage() {
   // Edit Profile Modal State
   const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
   const [editFullName, setEditFullName] = useState(currentIdentity?.fullName || '');
+  const [editDisplayName, setEditDisplayName] = useState(currentIdentity?.displayName || currentIdentity?.fullName || '');
   const [editTitle, setEditTitle] = useState(currentIdentity?.title || '');
   const [editBusinessName, setEditBusinessName] = useState(currentIdentity?.businesses?.[0]?.businessName || '');
   const [editPhone, setEditPhone] = useState(currentIdentity?.phone || '');
   const [editEmail, setEditEmail] = useState(currentIdentity?.email || '');
   const [editBio, setEditBio] = useState(currentIdentity?.bio || '');
-  const [editWebsite, setEditWebsite] = useState(currentIdentity?.website || 'https://aplusvn.com');
+  const [editWebsite, setEditWebsite] = useState(currentIdentity?.website || 'https://aplusvn.net');
 
   const handleOpenEditModal = () => {
     setEditFullName(currentIdentity?.fullName || '');
+    setEditDisplayName(currentIdentity?.displayName || currentIdentity?.fullName || '');
     setEditTitle(currentIdentity?.title || '');
     setEditBusinessName(currentIdentity?.businesses?.[0]?.businessName || '');
     setEditPhone(currentIdentity?.phone || '');
     setEditEmail(currentIdentity?.email || '');
     setEditBio(currentIdentity?.bio || '');
-    setEditWebsite(currentIdentity?.website || 'https://aplusvn.com');
+    setEditWebsite(currentIdentity?.website || 'https://aplusvn.net');
     setIsEditProfileOpen(true);
   };
 
@@ -225,6 +227,7 @@ export default function DigitalNfcCardPage() {
 
     updateIdentity(currentIdentity.id, {
       fullName: editFullName,
+      displayName: editDisplayName,
       title: editTitle,
       businessName: editBusinessName,
       phone: editPhone,
@@ -236,6 +239,7 @@ export default function DigitalNfcCardPage() {
     setIsEditProfileOpen(false);
     showAlert('Đã lưu và cập nhật thành công Hồ sơ Định danh Doanh nhân!', 'success');
   };
+
 
   // PDPL Settings State
   const [requireConsent, setRequireConsent] = useState(true);
@@ -1018,20 +1022,30 @@ export default function DigitalNfcCardPage() {
                   required
                   value={editFullName}
                   onChange={(e) => setEditFullName(e.target.value)}
-                  placeholder="VD: Johnny Long Hồ"
+                  placeholder="VD: Hồ Hoàng Long"
                   className="rounded-xl text-xs font-semibold bg-slate-50 border-slate-300 text-slate-900 focus:bg-white focus:border-blue-600"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="text-[11px] font-extrabold text-slate-900 uppercase tracking-wider">Chức Vụ / Vị Trí</label>
+                <label className="text-[11px] font-extrabold text-slate-900 uppercase tracking-wider">Tên Thường Gọi</label>
                 <Input
-                  value={editTitle}
-                  onChange={(e) => setEditTitle(e.target.value)}
-                  placeholder="VD: Tổng Giám Đốc"
+                  value={editDisplayName}
+                  onChange={(e) => setEditDisplayName(e.target.value)}
+                  placeholder="VD: Johnny Long Hồ"
                   className="rounded-xl text-xs font-semibold bg-slate-50 border-slate-300 text-slate-900 focus:bg-white focus:border-blue-600"
                 />
               </div>
+            </div>
+
+            <div className="space-y-1">
+              <label className="text-[11px] font-extrabold text-slate-900 uppercase tracking-wider">Chức Vụ / Vị Trí Công Tác</label>
+              <Input
+                value={editTitle}
+                onChange={(e) => setEditTitle(e.target.value)}
+                placeholder="VD: Tổng Giám Đốc / Giám Đốc Dự Án"
+                className="rounded-xl text-xs font-semibold bg-slate-50 border-slate-300 text-slate-900 focus:bg-white focus:border-blue-600"
+              />
             </div>
 
             <div className="space-y-1">
