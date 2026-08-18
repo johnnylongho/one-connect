@@ -392,6 +392,9 @@ export function useOneConnectStore() {
     title?: string;
     username?: string;
     taxCode?: string;
+    association?: string;
+    address?: string;
+    cardType?: 'NFC_EXECUTIVE' | 'NFC_BUSINESS_PRO' | 'NFC_STANDARD';
     bio?: string;
   }) => {
     const cleanUsername = (data.username || data.fullName.toLowerCase().replace(/[^a-z0-9]/g, '') || `user${Date.now().toString().slice(-4)}`);
@@ -407,6 +410,9 @@ export function useOneConnectStore() {
       title: data.title || 'Giám Đốc Doanh Nghiệp',
       phone: data.phone || '0903.888.999',
       email: data.email,
+      taxCode: data.taxCode || '4201888999',
+      association: data.association || 'Hội Doanh Nhân Trẻ Khánh Hòa (YBA)',
+      address: data.address || 'TP. Nha Trang, Tỉnh Khánh Hòa',
       avatarUrl: `https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300&auto=format&fit=crop&q=80`,
       bio: data.bio || `Đại diện ${data.businessName} - Thành viên Hệ sinh thái One Connect Network.`,
       socialLinks: [
@@ -432,6 +438,9 @@ export function useOneConnectStore() {
           businessId: `biz-${Date.now()}`,
           businessName: data.businessName,
           position: data.title || 'Giám Đốc',
+          taxCode: data.taxCode || '4201888999',
+          address: data.address || 'TP. Nha Trang, Tỉnh Khánh Hòa',
+          association: data.association || 'Hội Doanh Nhân Trẻ Khánh Hòa (YBA)',
           relationType: 'FOUNDER_OWNER',
           isPrimary: true,
           status: 'ACTIVE'
@@ -445,13 +454,14 @@ export function useOneConnectStore() {
       id: `card-${Date.now()}`,
       personIdentityId: newId,
       cardUid: newCardUid,
-      cardType: 'NFC_EXECUTIVE',
+      cardType: data.cardType || 'NFC_EXECUTIVE',
       nfcIdentifier: `NFC-UID-${Date.now()}`,
       dynamicUrl: `https://oneconnect.network/c/${newCardUid}`,
       qrValue: `https://oneconnect.network/c/${newCardUid}`,
       status: 'ACTIVE',
       issuedAt: new Date().toISOString(),
     };
+
 
     const newAuditLog: AuditLog = {
       id: `log-${Date.now()}`,

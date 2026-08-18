@@ -31,6 +31,9 @@ export default function MemberDirectoryAdminPage() {
   const [fullName, setFullName] = useState('');
   const [title, setTitle] = useState('Giám Đốc Điều Hành');
   const [businessName, setBusinessName] = useState('');
+  const [association, setAssociation] = useState('Ủy Viên Ban Chấp Hành');
+  const [cardType, setCardType] = useState<'NFC_EXECUTIVE' | 'NFC_BUSINESS_PRO' | 'NFC_STANDARD'>('NFC_EXECUTIVE');
+  const [address, setAddress] = useState('TP. Nha Trang, Khánh Hòa');
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
   const [taxCode, setTaxCode] = useState('');
@@ -41,6 +44,7 @@ export default function MemberDirectoryAdminPage() {
       m.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (m.displayName && m.displayName.toLowerCase().includes(searchTerm.toLowerCase())) ||
       (m.title && m.title.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (m.association && m.association.toLowerCase().includes(searchTerm.toLowerCase())) ||
       (m.businesses && m.businesses[0]?.businessName.toLowerCase().includes(searchTerm.toLowerCase()));
     
     return matchesSearch;
@@ -54,18 +58,24 @@ export default function MemberDirectoryAdminPage() {
       fullName,
       title: title || 'Giám Đốc Doanh Nghiệp',
       businessName,
+      association,
+      cardType,
+      address,
       phone: phone || '0903.888.999',
       email,
       taxCode: taxCode || '4201888999',
     });
 
-    setSuccessToast(`Đã thêm thành công hội viên "${fullName}" & tự động kích hoạt Thẻ NFC Số!`);
+    setSuccessToast(`Đã thêm thành công hội viên "${fullName}" (${association}) & tự động kích hoạt Thẻ NFC Số!`);
     setShowAddModal(false);
 
     // Reset form
     setFullName('');
     setTitle('Giám Đốc Điều Hành');
     setBusinessName('');
+    setAssociation('Ủy Viên Ban Chấp Hành');
+    setCardType('NFC_EXECUTIVE');
+    setAddress('TP. Nha Trang, Khánh Hòa');
     setPhone('');
     setEmail('');
     setTaxCode('');
@@ -74,6 +84,7 @@ export default function MemberDirectoryAdminPage() {
       setSuccessToast('');
     }, 4000);
   };
+
 
   return (
     <div className="min-h-screen bg-slate-50/80 text-slate-900 pb-16 antialiased">
@@ -309,6 +320,48 @@ export default function MemberDirectoryAdminPage() {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
+                    <label className="text-xs font-bold text-slate-700 block mb-1">Vị trí / Vai trò Hiệp Hội</label>
+                    <select
+                      value={association}
+                      onChange={e => setAssociation(e.target.value)}
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-[#0066FF]/20 focus:border-[#0066FF]"
+                    >
+                      <option value="Ủy Viên Ban Chấp Hành">Ủy Viên Ban Chấp Hành</option>
+                      <option value="Chủ Tịch Hiệp Hội">Chủ Tịch Hiệp Hội</option>
+                      <option value="Phó Chủ Tịch Thường Trực">Phó Chủ Tịch Thường Trực</option>
+                      <option value="Trưởng Ban Xúc Tiến Thương Mại">Trưởng Ban Xúc Tiến Thương Mại</option>
+                      <option value="Trưởng Ban Công Nghệ & Media">Trưởng Ban Công Nghệ & Media</option>
+                      <option value="Hội Viên Doanh Nhân Chính Thức">Hội Viên Doanh Nhân Chính Thức</option>
+                      <option value="Hội Viên Danh Dự & Cố Vấn">Hội Viên Danh Dự & Cố Vấn</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="text-xs font-bold text-slate-700 block mb-1">Hạng Thẻ NFC Cấp Phát</label>
+                    <select
+                      value={cardType}
+                      onChange={e => setCardType(e.target.value as any)}
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-[#0066FF]/20 focus:border-[#0066FF]"
+                    >
+                      <option value="NFC_EXECUTIVE">Thẻ Kim Loại Đen VIP (NFC Executive)</option>
+                      <option value="NFC_BUSINESS_PRO">Thẻ Doanh Nhân Pro (Business Pro)</option>
+                      <option value="NFC_STANDARD">Thẻ Tiêu Chuẩn (Standard Member)</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="text-xs font-bold text-slate-700 block mb-1">Địa chỉ Trụ sở Doanh nghiệp</label>
+                  <input
+                    type="text"
+                    placeholder="VD: Tầng 8, Tòa nhà ASIA, 25 Lê Lợi, TP. Nha Trang, Khánh Hòa"
+                    value={address}
+                    onChange={e => setAddress(e.target.value)}
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#0066FF]/20 focus:border-[#0066FF]"
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
                     <label className="text-xs font-bold text-slate-700 block mb-1">Email làm việc <span className="text-red-500">*</span></label>
                     <input
                       type="email"
@@ -330,6 +383,7 @@ export default function MemberDirectoryAdminPage() {
                     />
                   </div>
                 </div>
+
 
                 <div className="pt-2 flex items-center justify-end gap-3">
                   <Button

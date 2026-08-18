@@ -202,7 +202,7 @@ function DigitalProfileContent() {
   const [editCompany, setEditCompany] = useState(matchedIdentity?.businesses?.[0]?.businessName || 'Tập đoàn Công nghệ Số A+ (APLUSVN)');
   const [editTaxCode, setEditTaxCode] = useState(matchedIdentity?.taxCode || matchedIdentity?.businesses?.[0]?.taxCode || '0316888999');
   const [editAddress, setEditAddress] = useState(matchedIdentity?.address || matchedIdentity?.businesses?.[0]?.address || 'Tầng 8, Tòa nhà ASIA, 25 Lê Lợi, TP. Nha Trang, Khánh Hòa');
-  const [editAssociation, setEditAssociation] = useState(matchedIdentity?.association || 'Hiệp hội Doanh nhân Công nghệ Aplusvn (UV Ban Chấp Hành)');
+  const [editAssociation, setEditAssociation] = useState(matchedIdentity?.association || matchedIdentity?.businesses?.[0]?.association || 'Hội Doanh Nhân Trẻ Khánh Hòa (YBA) • Ban Công Nghệ');
   const [editSlogan, setEditSlogan] = useState(matchedIdentity?.slogan || 'Bứt Phá Giao Thương - Chuyển Hóa Mối Quan Hệ Kinh Doanh Số');
   const [editPhone, setEditPhone] = useState(matchedIdentity?.phone || '0794677369');
   const [editEmail, setEditEmail] = useState(matchedIdentity?.email || 'contact.johnnylongho@gmail.com');
@@ -223,7 +223,7 @@ function DigitalProfileContent() {
     company: matchedIdentity?.businesses?.[0]?.businessName || 'Tập đoàn Công nghệ Số A+ (APLUSVN)',
     taxCode: matchedIdentity?.taxCode || matchedIdentity?.businesses?.[0]?.taxCode || '0316888999',
     address: matchedIdentity?.address || matchedIdentity?.businesses?.[0]?.address || 'Tầng 8, Tòa nhà ASIA, 25 Lê Lợi, TP. Nha Trang, Khánh Hòa',
-    association: matchedIdentity?.association || 'Hiệp hội Doanh nhân Công nghệ Aplusvn (UV Ban Chấp Hành)',
+    association: matchedIdentity?.association || matchedIdentity?.businesses?.[0]?.association || 'Hội Doanh Nhân Trẻ Khánh Hòa (YBA) • Ban Công Nghệ',
     slogan: matchedIdentity?.slogan || 'Bứt Phá Giao Thương - Chuyển Hóa Mối Quan Hệ Kinh Doanh Số',
     bio: matchedIdentity?.bio || 'Chuyên gia triển khai giải pháp hạ tầng danh thiếp số NFC, định danh doanh nghiệp và tự động hóa giao thương B2B sự kiện.',
     phone: matchedIdentity?.phone || '0794677369',

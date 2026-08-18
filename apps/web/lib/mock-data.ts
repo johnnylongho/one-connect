@@ -26,6 +26,10 @@ export const INITIAL_IDENTITIES: PersonIdentity[] = [
     phone: '0794677369',
     email: 'contact.johnnylongho@gmail.com',
     website: 'https://aplusvn.net',
+    taxCode: '0316888999',
+    address: 'Tầng 8, Tòa nhà ASIA, 25 Lê Lợi, TP. Nha Trang, Khánh Hòa',
+    association: 'Hội Doanh Nhân Trẻ Khánh Hòa (YBA) • Ban Công Nghệ',
+    slogan: 'Bứt Phá Giao Thương - Chuyển Hóa Mối Quan Hệ Kinh Doanh Số',
     socialLinks: [
       { id: 's-1', identityId: 'id-001', platform: 'linkedin', url: 'https://linkedin.com/in/johnnylongho', isPublic: true, sortOrder: 1 },
       { id: 's-2', identityId: 'id-001', platform: 'zalo', url: 'https://zalo.me/0794677369', isPublic: true, sortOrder: 2 },
@@ -39,10 +43,15 @@ export const INITIAL_IDENTITIES: PersonIdentity[] = [
         businessId: 'biz-101',
         businessName: 'Tập đoàn Công nghệ số A+ (Aplusvn)',
         position: 'Giám đốc Triển khai Dự án kiêm Media',
+        taxCode: '0316888999',
+        address: 'Tầng 8, Tòa nhà ASIA, 25 Lê Lợi, TP. Nha Trang, Khánh Hòa',
+        association: 'Hội Doanh Nhân Trẻ Khánh Hòa (YBA) • Ban Công Nghệ',
+        slogan: 'Bứt Phá Giao Thương - Chuyển Hóa Mối Quan Hệ Kinh Doanh Số',
         relationType: 'OWNER',
         isPrimary: true,
         status: 'ACTIVE',
       }
+
 
     ],
     createdAt: '2026-08-01T08:00:00Z',
