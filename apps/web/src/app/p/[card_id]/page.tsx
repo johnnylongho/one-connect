@@ -152,6 +152,7 @@ function DigitalProfileContent() {
   const { state, currentIdentity, updateIdentity } = useOneConnectStore();
 
   const [activeTab, setActiveTab] = useState('about');
+  const [mounted, setMounted] = useState(false);
   const [isConnRequested, setIsConnRequested] = useState(false);
   const [isB2bModalOpen, setIsB2bModalOpen] = useState(false);
   const [isQrModalOpen, setIsQrModalOpen] = useState(false);
@@ -160,6 +161,12 @@ function DigitalProfileContent() {
   const [isCopied, setIsCopied] = useState(false);
   const [carouselIndex, setCarouselIndex] = useState(0);
   const [currentDateStr, setCurrentDateStr] = useState('14/08/2026');
+
+  useEffect(() => {
+    setMounted(true);
+    const now = new Date();
+    setCurrentDateStr(now.toLocaleDateString('vi-VN'));
+  }, []);
 
   // Find matched identity from store
   const matchedIdentity =
@@ -374,8 +381,20 @@ END:VCARD`;
     setCarouselIndex((prev) => (prev - 1 + PRODUCTS.length) % PRODUCTS.length);
   };
 
+  if (!mounted) {
+    return (
+      <div className="min-h-screen bg-[#F8FAFC] text-slate-900 flex flex-col items-center justify-center space-y-4">
+        <div className="w-12 h-12 rounded-full border-4 border-[#0066FF] border-t-transparent animate-spin" />
+        <p className="text-xs font-mono font-bold text-[#0066FF] animate-pulse">
+          Đang tải danh thiếp số One Connect...
+        </p>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-slate-100/90 text-slate-900 pb-12 antialiased selection:bg-blue-600 selection:text-white">
+    <div className="min-h-screen bg-slate-100/90 text-slate-900 pb-12 antialiased selection:bg-blue-600 selection:text-white" suppressHydrationWarning>
+
       {/* MOBILE APPLICATION CONTAINER */}
       <div className="max-w-md mx-auto relative bg-white min-h-screen border-x border-slate-200/80 shadow-2xl overflow-hidden pb-8">
         

@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+
 import Link from 'next/link';
 import BusinessCard3D from '@/components/BusinessCard3D';
 import { useOneConnectStore } from '@/lib/store';
@@ -181,9 +182,15 @@ const TAP_LOGS = [
 
 export default function DigitalNfcCardPage() {
   const { currentIdentity, currentCard, reissueCard, updateIdentity } = useOneConnectStore();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Active Sub-Tab
   const [activeTab, setActiveTab] = useState<'my-card' | 'inventory' | 'analytics' | 'pdpl'>('my-card');
+
 
   // Inventory & Issuance State
   const [cards, setCards] = useState<NfcCardItem[]>(INITIAL_NFC_CARDS);
