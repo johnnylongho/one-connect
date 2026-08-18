@@ -38,6 +38,7 @@ import {
   CheckCircle2,
   TrendingUp,
   Star,
+  Edit3,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -48,8 +49,10 @@ import {
   DialogHeader,
   DialogTitle,
   DialogDescription,
+  DialogFooter,
 } from '@/components/ui/dialog';
 import { ToastProvider, useToast } from '@/components/ui/toast';
+import { useOneConnectStore } from '@/lib/store';
 
 // Official Enterprise Verified Badge Component with Guaranteed Fixed Dimensions
 export function EnterpriseVerifiedBadge({ className = "w-6 h-6 min-w-[24px] min-h-[24px]" }: { className?: string }) {
@@ -146,6 +149,7 @@ function DigitalProfileContent() {
   const params = useParams();
   const cardId = (params?.card_id as string) || (params?.username as string) || 'NFC-HA-777';
   const { toast } = useToast();
+  const { state, currentIdentity, updateIdentity } = useOneConnectStore();
 
   const [activeTab, setActiveTab] = useState('about');
   const [isConnRequested, setIsConnRequested] = useState(false);
@@ -157,31 +161,53 @@ function DigitalProfileContent() {
   const [carouselIndex, setCarouselIndex] = useState(0);
   const [currentDateStr, setCurrentDateStr] = useState('14/08/2026');
 
+  // Find matched identity from store
+  const matchedIdentity =
+    state.identities.find(
+      (i) =>
+        i.username.toLowerCase() === cardId.toLowerCase() ||
+        i.id.toLowerCase() === cardId.toLowerCase() ||
+        (cardId.toLowerCase() === 'hoanglong' && i.username === 'johnnylong')
+    ) || currentIdentity || state.identities[0];
+
+  const matchedCard = state.cards.find(c => c.personIdentityId === matchedIdentity?.id && c.status === 'ACTIVE') || state.cards[0];
+
+  // Edit Profile Modal States
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editFullName, setEditFullName] = useState(matchedIdentity?.fullName || 'Hồ Hoàng Long');
+  const [editDisplayName, setEditDisplayName] = useState(matchedIdentity?.displayName || 'Johnny Long Hồ');
+  const [editTitle, setEditTitle] = useState(matchedIdentity?.title || 'Project Manager & Media Director');
+  const [editCompany, setEditCompany] = useState(matchedIdentity?.businesses?.[0]?.businessName || 'Tập đoàn Công nghệ Số A+ (APLUSVN)');
+  const [editPhone, setEditPhone] = useState(matchedIdentity?.phone || '0794677369');
+  const [editEmail, setEditEmail] = useState(matchedIdentity?.email || 'contact.johnnylongho@gmail.com');
+  const [editBio, setEditBio] = useState(matchedIdentity?.bio || 'Chuyên gia triển khai giải pháp hạ tầng danh thiếp số NFC...');
+  const [editWebsite, setEditWebsite] = useState(matchedIdentity?.website || 'https://aplusvn.net');
+
   useEffect(() => {
     const now = new Date();
     setCurrentDateStr(now.toLocaleDateString('vi-VN'));
   }, []);
 
-  // Profile Data chuẩn theo yêu cầu người dùng
+  // Synchronized Profile Object
   const profile = {
-    fullName: 'Hồ Hoàng Long',
-    displayName: 'Johnny Long Hồ',
-    title: 'Project Manager & Media Director',
-    roleVietnamese: 'Giám Đốc Dự Án kiêm Trưởng Ban Truyền Thông',
-    company: 'Tập đoàn Công nghệ Số A+ (APLUSVN)',
+    fullName: matchedIdentity?.fullName || 'Hồ Hoàng Long',
+    displayName: matchedIdentity?.displayName || matchedIdentity?.fullName || 'Johnny Long Hồ',
+    title: matchedIdentity?.title || 'Project Manager & Media Director',
+    roleVietnamese: matchedIdentity?.title || 'Giám Đốc Dự Án kiêm Trưởng Ban Truyền Thông',
+    company: matchedIdentity?.businesses?.[0]?.businessName || 'Tập đoàn Công nghệ Số A+ (APLUSVN)',
     taxCode: '0316888999',
-    address: 'Tầng 8, Tòa nhà ASIA, 25 Lê Lợi, Nam Nha Trang, Khánh Hòa',
+    address: 'Tầng 8, Tòa nhà ASIA, 25 Lê Lợi, TP. Nha Trang, Khánh Hòa',
     association: 'Hiệp hội Doanh nhân Công nghệ Aplusvn (UV Ban Chấp Hành)',
     slogan: 'Bứt Phá Giao Thương - Chuyển Hóa Mối Quan Hệ Kinh Doanh Số',
-    bio: 'Chuyên gia triển khai giải pháp hạ tầng danh thiếp số NFC, định danh doanh nghiệp và tự động hóa giao thương B2B sự kiện. Với hơn 8 năm kinh nghiệm vận hành các diễn đàn kết nối doanh nhân quy mô 500-2.000 đại biểu.',
-    phone: '0794677369',
-    email: 'contact.johnnylongho@gmail.com',
-    website: 'https://aplusvn.net',
-    websiteDisplay: 'aplusvn.net',
-    zalo: 'https://zalo.me/0794677369',
-    avatarUrl: '/avatar-johnny-long.jpg',
-    ticketCode: 'QR_ONECONNECT_HOANGLONG_2026',
-    cardUid: 'NFC-HA-777',
+    bio: matchedIdentity?.bio || 'Chuyên gia triển khai giải pháp hạ tầng danh thiếp số NFC, định danh doanh nghiệp và tự động hóa giao thương B2B sự kiện.',
+    phone: matchedIdentity?.phone || '0794677369',
+    email: matchedIdentity?.email || 'contact.johnnylongho@gmail.com',
+    website: matchedIdentity?.website || 'https://aplusvn.net',
+    websiteDisplay: (matchedIdentity?.website || 'https://aplusvn.net').replace('https://', '').replace('http://', ''),
+    zalo: `https://zalo.me/${(matchedIdentity?.phone || '0794677369').replace(/[^0-9]/g, '')}`,
+    avatarUrl: matchedIdentity?.avatarUrl || '/avatar-johnny-long.jpg',
+    ticketCode: `QR_ONECONNECT_${(matchedIdentity?.username || 'USER').toUpperCase()}_2026`,
+    cardUid: matchedCard?.cardUid || 'NFC-HA-777',
     cardType: 'NFC Executive Black Metal',
     eventJoined: 'Diễn Đàn Kết Nối Doanh Nghiệp Quốc Gia 2026',
     ticketTier: 'VIP Executive Pass',
@@ -193,6 +219,41 @@ function DigitalProfileContent() {
     verificationLevel: 'Enterprise Level 3 Verified',
     signatureHash: '0x9F4C82A3E1B8D9720066FF',
   };
+
+  const handleOpenEditModal = () => {
+    setEditFullName(matchedIdentity?.fullName || profile.fullName);
+    setEditDisplayName(matchedIdentity?.displayName || profile.displayName);
+    setEditTitle(matchedIdentity?.title || profile.title);
+    setEditCompany(matchedIdentity?.businesses?.[0]?.businessName || profile.company);
+    setEditPhone(matchedIdentity?.phone || profile.phone);
+    setEditEmail(matchedIdentity?.email || profile.email);
+    setEditBio(matchedIdentity?.bio || profile.bio);
+    setEditWebsite(matchedIdentity?.website || profile.website);
+    setIsEditModalOpen(true);
+  };
+
+  const handleSaveProfile = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!matchedIdentity) return;
+
+    updateIdentity(matchedIdentity.id, {
+      fullName: editFullName,
+      title: editTitle,
+      businessName: editCompany,
+      phone: editPhone,
+      email: editEmail,
+      bio: editBio,
+      website: editWebsite,
+    });
+
+    setIsEditModalOpen(false);
+    toast({
+      title: 'ĐÃ CẬP NHẬT HỒ SƠ THÀNH CÔNG! ✨',
+      description: 'Dữ liệu hồ sơ số và thẻ NFC đã được cập nhật theo thời gian thực.',
+      variant: 'success',
+    });
+  };
+
 
   // Convert exact profile image to Base64 reliably for vCard export
   const getAvatarBase64 = async (): Promise<string> => {
@@ -312,6 +373,14 @@ END:VCARD`;
           <div className="flex items-center gap-1.5 sm:gap-2">
             <button
               type="button"
+              onClick={handleOpenEditModal}
+              className="p-2 rounded-full bg-blue-50 border border-blue-200 text-[#0066FF] hover:bg-blue-100 transition-colors active:scale-95 cursor-pointer shadow-xs"
+              title="Chỉnh sửa hồ sơ cá nhân"
+            >
+              <Edit3 className="w-4.5 h-4.5 text-[#0066FF]" />
+            </button>
+            <button
+              type="button"
               onClick={() => setIsQrModalOpen(true)}
               className="p-2 rounded-full bg-slate-50 border border-slate-200 text-slate-700 hover:bg-slate-100 transition-colors active:scale-95 cursor-pointer shadow-xs"
               title="Xem mã QR"
@@ -321,10 +390,10 @@ END:VCARD`;
             <button
               type="button"
               onClick={() => setIsShareModalOpen(true)}
-              className="p-2 rounded-full bg-blue-50 border border-blue-200 text-[#0066FF] hover:bg-blue-100 transition-colors active:scale-95 cursor-pointer shadow-xs"
+              className="p-2 rounded-full bg-slate-50 border border-slate-200 text-slate-700 hover:bg-slate-100 transition-colors active:scale-95 cursor-pointer shadow-xs"
               title="Chia sẻ hồ sơ"
             >
-              <Share2 className="w-4.5 h-4.5 text-[#0066FF]" />
+              <Share2 className="w-4.5 h-4.5 text-slate-700" />
             </button>
           </div>
         </header>
@@ -333,9 +402,9 @@ END:VCARD`;
         <div className="p-3.5 sm:p-4">
           <div className="relative rounded-[28px] p-4 sm:p-5 overflow-hidden transition-all duration-300 backdrop-blur-2xl bg-white/80 border border-white/90 shadow-[0_12px_40px_rgba(0,102,255,0.12),0_4px_20px_rgba(255,107,0,0.08)] before:absolute before:inset-0 before:bg-gradient-to-br before:from-blue-500/[0.07] before:via-white/40 before:to-orange-500/[0.07] before:pointer-events-none after:absolute after:inset-x-0 after:top-0 after:h-[1.5px] after:bg-gradient-to-r after:from-transparent after:via-white after:to-transparent space-y-3.5 text-center">
             
-            {/* Centered Avatar Section (Tăng kích thước lên w-[130px] h-[130px] sm:w-[145px] sm:h-[145px]) */}
+            {/* Centered Avatar Section */}
             <div className="relative z-10 flex flex-col items-center justify-center pt-1">
-              <div className="w-[130px] h-[130px] sm:w-[145px] sm:h-[145px] rounded-3xl overflow-hidden shadow-md bg-slate-100 shrink-0">
+              <div className="w-[130px] h-[130px] sm:w-[145px] sm:h-[145px] rounded-3xl overflow-hidden shadow-md bg-slate-100 shrink-0 relative group">
                 <img
                   src={profile.avatarUrl}
                   alt={profile.fullName}
@@ -343,12 +412,24 @@ END:VCARD`;
                 />
               </div>
               
-              {/* Chip UID Tag below Avatar */}
-              <span className="mt-2.5 inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-slate-900/90 text-white text-[10px] sm:text-[11px] font-mono font-bold shadow-xs">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                {profile.cardUid}
-              </span>
+              {/* Chip UID Tag & Quick Edit Pill below Avatar */}
+              <div className="mt-2.5 flex items-center gap-2">
+                <span className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-slate-900/90 text-white text-[10px] sm:text-[11px] font-mono font-bold shadow-xs">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                  {profile.cardUid}
+                </span>
+
+                <button
+                  type="button"
+                  onClick={handleOpenEditModal}
+                  className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-blue-50 hover:bg-blue-100 border border-blue-200 text-[#0066FF] text-[10px] sm:text-[11px] font-bold shadow-2xs transition-all cursor-pointer active:scale-95"
+                >
+                  <Edit3 className="w-3 h-3 text-[#0066FF]" />
+                  <span>Sửa Profile</span>
+                </button>
+              </div>
             </div>
+
 
             {/* Name & Enterprise Verified Badge & Company Info */}
             <div className="relative z-10 space-y-1">
@@ -957,10 +1038,139 @@ END:VCARD`;
           </DialogContent>
         </Dialog>
 
+        {/* EDIT PROFILE MODAL (HIGH CONTRAST & INTUITIVE) */}
+        <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
+          <DialogContent className="max-w-md bg-white border border-slate-200 text-slate-900 shadow-2xl rounded-3xl p-6 sm:p-7">
+            <DialogHeader className="border-b border-slate-100 pb-3 text-left">
+              <div className="flex items-center gap-2.5">
+                <div className="p-2 rounded-xl bg-blue-50 text-[#0066FF]">
+                  <Edit3 className="w-5 h-5" />
+                </div>
+                <div>
+                  <DialogTitle className="text-base sm:text-lg font-black text-slate-900 font-heading">
+                    Chỉnh Sửa Hồ Sơ Cá Nhân
+                  </DialogTitle>
+                  <DialogDescription className="text-xs text-slate-500 font-medium">
+                    Cập nhật danh thiếp số hiển thị cho đối tác & thẻ NFC 1-chạm
+                  </DialogDescription>
+                </div>
+              </div>
+            </DialogHeader>
+
+            <form onSubmit={handleSaveProfile} className="space-y-3.5 py-2">
+              <div className="grid grid-cols-2 gap-2.5">
+                <div className="space-y-1 text-left">
+                  <label className="text-[11px] font-bold text-slate-800 uppercase tracking-wider">Họ và Tên <span className="text-red-500">*</span></label>
+                  <input
+                    required
+                    value={editFullName}
+                    onChange={(e) => setEditFullName(e.target.value)}
+                    placeholder="VD: Hồ Hoàng Long"
+                    className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-semibold text-slate-900 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0066FF]/20 focus:border-[#0066FF]"
+                  />
+                </div>
+                <div className="space-y-1 text-left">
+                  <label className="text-[11px] font-bold text-slate-800 uppercase tracking-wider">Tên Thường Gọi</label>
+                  <input
+                    value={editDisplayName}
+                    onChange={(e) => setEditDisplayName(e.target.value)}
+                    placeholder="VD: Johnny Long Hồ"
+                    className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-semibold text-slate-900 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0066FF]/20 focus:border-[#0066FF]"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-1 text-left">
+                <label className="text-[11px] font-bold text-slate-800 uppercase tracking-wider">Chức Danh / Vị Trí Công Tác <span className="text-red-500">*</span></label>
+                <input
+                  required
+                  value={editTitle}
+                  onChange={(e) => setEditTitle(e.target.value)}
+                  placeholder="VD: Giám Đốc Dự Án & Media Director"
+                  className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-semibold text-slate-900 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0066FF]/20 focus:border-[#0066FF]"
+                />
+              </div>
+
+              <div className="space-y-1 text-left">
+                <label className="text-[11px] font-bold text-slate-800 uppercase tracking-wider">Tên Doanh Nghiệp / Hiệp Hội <span className="text-red-500">*</span></label>
+                <input
+                  required
+                  value={editCompany}
+                  onChange={(e) => setEditCompany(e.target.value)}
+                  placeholder="VD: Tập đoàn Công nghệ Số A+ (APLUSVN)"
+                  className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-semibold text-slate-900 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0066FF]/20 focus:border-[#0066FF]"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-2.5">
+                <div className="space-y-1 text-left">
+                  <label className="text-[11px] font-bold text-slate-800 uppercase tracking-wider">Số Điện Thoại</label>
+                  <input
+                    type="tel"
+                    value={editPhone}
+                    onChange={(e) => setEditPhone(e.target.value)}
+                    placeholder="VD: 0794677369"
+                    className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-semibold text-slate-900 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0066FF]/20 focus:border-[#0066FF]"
+                  />
+                </div>
+                <div className="space-y-1 text-left">
+                  <label className="text-[11px] font-bold text-slate-800 uppercase tracking-wider">Email Công Tác</label>
+                  <input
+                    type="email"
+                    value={editEmail}
+                    onChange={(e) => setEditEmail(e.target.value)}
+                    placeholder="VD: contact@aplusvn.com"
+                    className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-semibold text-slate-900 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0066FF]/20 focus:border-[#0066FF]"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-1 text-left">
+                <label className="text-[11px] font-bold text-slate-800 uppercase tracking-wider">Website / Cổng Thông Tin</label>
+                <input
+                  value={editWebsite}
+                  onChange={(e) => setEditWebsite(e.target.value)}
+                  placeholder="VD: https://aplusvn.net"
+                  className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-semibold text-slate-900 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0066FF]/20 focus:border-[#0066FF]"
+                />
+              </div>
+
+              <div className="space-y-1 text-left">
+                <label className="text-[11px] font-bold text-slate-800 uppercase tracking-wider">Giới Thiệu Ngắn (Bio)</label>
+                <textarea
+                  rows={3}
+                  value={editBio}
+                  onChange={(e) => setEditBio(e.target.value)}
+                  placeholder="Mô tả kinh nghiệm, thế mạnh kinh doanh..."
+                  className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-medium text-slate-900 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0066FF]/20 focus:border-[#0066FF]"
+                />
+              </div>
+
+              <DialogFooter className="pt-2 gap-2 flex-row justify-end">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setIsEditModalOpen(false)}
+                  className="text-xs font-bold rounded-xl border-slate-300 text-slate-700 py-2.5 px-4 cursor-pointer hover:bg-slate-100"
+                >
+                  Hủy Bỏ
+                </Button>
+                <Button
+                  type="submit"
+                  className="bg-[#0066FF] hover:bg-blue-700 text-white font-extrabold text-xs rounded-xl py-2.5 px-5 shadow-sm cursor-pointer"
+                >
+                  Lưu & Cập Nhật Thẻ
+                </Button>
+              </DialogFooter>
+            </form>
+          </DialogContent>
+        </Dialog>
+
       </div>
     </div>
   );
 }
+
 
 export default function DigitalBusinessCardPage() {
   return (

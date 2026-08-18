@@ -1013,79 +1013,80 @@ export default function DigitalNfcCardPage() {
           <form onSubmit={handleSaveProfile} className="space-y-4 py-2">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
               <div className="space-y-1">
-                <label className="text-xs font-bold text-slate-700">Họ và Tên <span className="text-red-500">*</span></label>
+                <label className="text-[11px] font-extrabold text-slate-900 uppercase tracking-wider">Họ và Tên <span className="text-red-500">*</span></label>
                 <Input
                   required
                   value={editFullName}
                   onChange={(e) => setEditFullName(e.target.value)}
                   placeholder="VD: Johnny Long Hồ"
-                  className="rounded-xl text-xs bg-slate-50 border-slate-200"
+                  className="rounded-xl text-xs font-semibold bg-slate-50 border-slate-300 text-slate-900 focus:bg-white focus:border-blue-600"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-bold text-slate-700">Chức Vụ / Vị Trí</label>
+                <label className="text-[11px] font-extrabold text-slate-900 uppercase tracking-wider">Chức Vụ / Vị Trí</label>
                 <Input
                   value={editTitle}
                   onChange={(e) => setEditTitle(e.target.value)}
                   placeholder="VD: Tổng Giám Đốc"
-                  className="rounded-xl text-xs bg-slate-50 border-slate-200"
+                  className="rounded-xl text-xs font-semibold bg-slate-50 border-slate-300 text-slate-900 focus:bg-white focus:border-blue-600"
                 />
               </div>
             </div>
 
             <div className="space-y-1">
-              <label className="text-xs font-bold text-slate-700">Tên Doanh Nghiệp / Hiệp Hội <span className="text-red-500">*</span></label>
+              <label className="text-[11px] font-extrabold text-slate-900 uppercase tracking-wider">Tên Doanh Nghiệp / Hiệp Hội <span className="text-red-500">*</span></label>
               <Input
                 required
                 value={editBusinessName}
                 onChange={(e) => setEditBusinessName(e.target.value)}
                 placeholder="VD: Tập đoàn Công nghệ Số A+ (APLUSVN)"
-                className="rounded-xl text-xs bg-slate-50 border-slate-200"
+                className="rounded-xl text-xs font-semibold bg-slate-50 border-slate-300 text-slate-900 focus:bg-white focus:border-blue-600"
               />
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
               <div className="space-y-1">
-                <label className="text-xs font-bold text-slate-700">Số Điện Thoại Cá Nhân</label>
+                <label className="text-[11px] font-extrabold text-slate-900 uppercase tracking-wider">Số Điện Thoại Cá Nhân</label>
                 <Input
+                  type="tel"
                   value={editPhone}
                   onChange={(e) => setEditPhone(e.target.value)}
-                  placeholder="VD: 0903.888.999"
-                  className="rounded-xl text-xs bg-slate-50 border-slate-200"
+                  placeholder="VD: 0794677369"
+                  className="rounded-xl text-xs font-semibold bg-slate-50 border-slate-300 text-slate-900 focus:bg-white focus:border-blue-600"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-bold text-slate-700">Email Làm Việc</label>
+                <label className="text-[11px] font-extrabold text-slate-900 uppercase tracking-wider">Email Làm Việc</label>
                 <Input
                   type="email"
                   value={editEmail}
                   onChange={(e) => setEditEmail(e.target.value)}
-                  placeholder="VD: johnny@aplusvn.com"
-                  className="rounded-xl text-xs bg-slate-50 border-slate-200"
+                  placeholder="VD: contact@aplusvn.com"
+                  className="rounded-xl text-xs font-semibold bg-slate-50 border-slate-300 text-slate-900 focus:bg-white focus:border-blue-600"
                 />
               </div>
             </div>
 
             <div className="space-y-1">
-              <label className="text-xs font-bold text-slate-700">Website / Cổng Thông Tin</label>
+              <label className="text-[11px] font-extrabold text-slate-900 uppercase tracking-wider">Website / Cổng Thông Tin</label>
               <Input
                 value={editWebsite}
                 onChange={(e) => setEditWebsite(e.target.value)}
-                placeholder="VD: https://aplusvn.com"
-                className="rounded-xl text-xs bg-slate-50 border-slate-200"
+                placeholder="VD: https://aplusvn.net"
+                className="rounded-xl text-xs font-semibold bg-slate-50 border-slate-300 text-slate-900 focus:bg-white focus:border-blue-600"
               />
             </div>
 
             <div className="space-y-1">
-              <label className="text-xs font-bold text-slate-700">Giới Thiệu Ngắn (Bio)</label>
+              <label className="text-[11px] font-extrabold text-slate-900 uppercase tracking-wider">Giới Thiệu Bản Thân / Lĩnh Vực Hoạt Động (Bio)</label>
               <textarea
                 rows={3}
                 value={editBio}
                 onChange={(e) => setEditBio(e.target.value)}
-                placeholder="Mô tả ngắn gọn về kinh nghiệm, lĩnh vực hoạt động và sứ mệnh kinh doanh..."
-                className="w-full rounded-xl text-xs bg-slate-50 border border-slate-200 p-3 text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                placeholder="Mô tả kinh nghiệm, thế mạnh kinh doanh và sứ mệnh kết nối..."
+                className="w-full bg-slate-50 border border-slate-300 rounded-xl p-3 text-xs font-medium text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600"
               />
             </div>
 
@@ -1094,13 +1095,13 @@ export default function DigitalNfcCardPage() {
                 type="button"
                 variant="outline"
                 onClick={() => setIsEditProfileOpen(false)}
-                className="text-xs rounded-xl"
+                className="text-xs font-bold rounded-xl border-slate-300 text-slate-700 hover:bg-slate-100"
               >
                 Hủy Bỏ
               </Button>
               <Button
                 type="submit"
-                className="bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs rounded-xl shadow-md shadow-blue-500/20"
+                className="bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs rounded-xl shadow-md py-2.5 px-5 cursor-pointer"
               >
                 Lưu Thay Đổi Hồ Sơ
               </Button>
