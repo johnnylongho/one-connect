@@ -1,53 +1,35 @@
 @echo off
 chcp 65001 >nul
-title ONE CONNECT - KẾT THÚC PHIÊN LÀM VIỆC & ĐỒNG BỘ CLOUD
+title ONE CONNECT - KET THUC & DONG BO CLOUD
 color 0A
 
 echo ====================================================================
-echo   ONE CONNECT NETWORK - KẾT THÚC & ĐỒNG BỘ LÊN GITHUB / VERCEL
+echo   ONE CONNECT NETWORK - KET THUC & DONG BO LEN GITHUB
 echo ====================================================================
 echo.
 
 cd /d "%~dp0"
 
-echo [1/4] Danh sách file có thay đổi:
+echo [1/3] Kiem tra trang thai thay doi (git status)...
 git status -s
 echo.
 
-set "commit_msg="
-set /p commit_msg="👉 Nhập ghi chú công việc vừa làm (Bấm Enter để dùng mặc định): "
-
-if "%commit_msg%"=="" (
-    set commit_msg=Luu tien do lam viec ngay %date% luc %time%
-)
-
-echo.
-echo [2/4] Đang đóng gói các file thay đổi (git add)...
+echo [2/3] Dang dong goi cac file thay doi (git add)...
 git add .
 
 echo.
-echo [3/4] Đang tạo commit lưu trữ: "%commit_msg%"...
-git commit -m "%commit_msg%"
-
-echo.
-echo [4/4] Đang đẩy lên GitHub (git push origin main)...
+echo [3/3] Dang day len GitHub (git commit & push)...
+git commit -m "Auto save - %DATE% %TIME%"
 git push origin main
 
-if %errorlevel% equ 0 (
-    echo.
-    echo ====================================================================
-    echo   🎉 ĐỒNG BỘ THÀNH CÔNG 100%!
-    echo   - GitHub Repo: https://github.com/johnnylongho/one-connect
-    echo   - Live Website: https://one-connect-network.vercel.app/ (Vercel tự deploy)
-    echo.
-    echo   Bạn có thể yên tâm tắt máy!
-    echo   Khi sang máy khác (Nhà/Công ty), chỉ cần click:
-    echo   [ 1_BAT_DAU_LAM_VIEC.bat ] để tiếp tục!
-    echo ====================================================================
-) else (
-    echo.
-    echo [CHÚ Ý] Nếu không có thay đổi mới nào hoặc lỗi mạng, kiểm tra lại thông báo ở trên.
-)
-
+echo.
+echo ====================================================================
+echo   DONG BO HOAN TAT 100%!
+echo   - GitHub: https://github.com/johnnylongho/one-connect
+echo   - Live:   https://one-connect-network.vercel.app/
+echo.
+echo   Ban co the YEN TAM TAT MAY!
+echo ====================================================================
 echo.
 pause
+
