@@ -101,7 +101,8 @@ export const DbService = {
       };
     });
 
-    return localIdentities.find(i => i.id === identityId || i.username === identityId || i.userId === identityId) || localIdentities[0];
+    const foundUpdated = localIdentities.find(i => i.id === identityId || i.username === identityId || i.userId === identityId);
+    return foundUpdated || localIdentities[0] || null;
   },
 
   /**
@@ -128,16 +129,18 @@ export const DbService = {
     }
 
     const cleanUid = cardUid.toLowerCase();
-    const card = localCards.find(
+    const foundCard = localCards.find(
       c => c.cardUid.toLowerCase() === cleanUid ||
            c.id.toLowerCase() === cleanUid ||
-           c.nfcIdentifier.toLowerCase() === cleanUid ||
+           (c.nfcIdentifier && c.nfcIdentifier.toLowerCase() === cleanUid) ||
            (cleanUid.includes('04:8f') && c.personIdentityId === 'id-001')
-    ) || localCards[0];
+    );
 
-    const identity = card ? localIdentities.find(i => i.id === card.personIdentityId) || localIdentities[0] : null;
+    const card = foundCard || localCards[0] || null;
+    const identity = card ? (localIdentities.find(i => i.id === card.personIdentityId) || localIdentities[0] || null) : null;
     return { card, identity };
   },
+
 
 
   /**
