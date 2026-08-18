@@ -22,9 +22,19 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 
 export default function MemberDirectoryAdminPage() {
-  const { state } = useOneConnectStore();
+  const { state, registerIdentity } = useOneConnectStore();
   const [searchTerm, setSearchTerm] = useState('');
   const [filterRole, setFilterRole] = useState('ALL');
+  const [showAddModal, setShowAddModal] = useState(false);
+
+  // Form states for new member
+  const [fullName, setFullName] = useState('');
+  const [title, setTitle] = useState('Giám Đốc Điều Hành');
+  const [businessName, setBusinessName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [email, setEmail] = useState('');
+  const [taxCode, setTaxCode] = useState('');
+  const [successToast, setSuccessToast] = useState('');
 
   const filteredMembers = state.identities.filter(m => {
     const matchesSearch =
@@ -36,11 +46,51 @@ export default function MemberDirectoryAdminPage() {
     return matchesSearch;
   });
 
+  const handleCreateMember = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!fullName || !businessName || !email) return;
+
+    registerIdentity({
+      fullName,
+      title: title || 'Giám Đốc Doanh Nghiệp',
+      businessName,
+      phone: phone || '0903.888.999',
+      email,
+      taxCode: taxCode || '4201888999',
+    });
+
+    setSuccessToast(`Đã thêm thành công hội viên "${fullName}" & tự động kích hoạt Thẻ NFC Số!`);
+    setShowAddModal(false);
+
+    // Reset form
+    setFullName('');
+    setTitle('Giám Đốc Điều Hành');
+    setBusinessName('');
+    setPhone('');
+    setEmail('');
+    setTaxCode('');
+
+    setTimeout(() => {
+      setSuccessToast('');
+    }, 4000);
+  };
+
   return (
     <div className="min-h-screen bg-slate-50/80 text-slate-900 pb-16 antialiased">
       <Navbar />
 
       <main className="max-w-6xl mx-auto px-4 space-y-6">
+        {/* Success Toast */}
+        {successToast && (
+          <div className="p-4 rounded-2xl bg-emerald-500 text-white font-bold text-sm flex items-center justify-between shadow-lg animate-in fade-in slide-in-from-top duration-300">
+            <div className="flex items-center gap-2">
+              <CheckCircle2 className="w-5 h-5 text-white" />
+              <span>{successToast}</span>
+            </div>
+            <button onClick={() => setSuccessToast('')} className="text-white/80 hover:text-white font-mono text-xs">✕</button>
+          </div>
+        )}
+
         {/* Header Block */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-slate-200 shadow-xs">
           <div>
@@ -61,10 +111,10 @@ export default function MemberDirectoryAdminPage() {
 
           <div className="flex items-center gap-2">
             <Button
-              onClick={() => alert('Chức năng mời hội viên mới: Đã tạo mã QR liên kết đăng ký!')}
-              className="bg-[#0066FF] hover:bg-blue-700 text-white font-bold rounded-2xl text-xs sm:text-sm py-5 px-4 shadow-xs cursor-pointer"
+              onClick={() => setShowAddModal(true)}
+              className="bg-[#0066FF] hover:bg-blue-700 text-white font-bold rounded-2xl text-xs sm:text-sm py-5 px-4 shadow-xs cursor-pointer flex items-center gap-1.5"
             >
-              <Plus className="w-4 h-4 mr-1.5" /> Mời Hội Viên Mới
+              <Plus className="w-4 h-4" /> Thêm & Cấp Thẻ Hội Viên Mới
             </Button>
           </div>
         </div>
@@ -124,8 +174,8 @@ export default function MemberDirectoryAdminPage() {
         <div className="space-y-3">
           {filteredMembers.map((m, index) => {
             const companyName = m.businesses && m.businesses[0] ? m.businesses[0].businessName : 'Tập đoàn Công nghệ Số A+ (APLUSVN)';
-            const position = m.businesses && m.businesses[0] ? m.businesses[0].position : m.title;
             const profileLink = m.username === 'johnnylong' ? '/p/hoanglong' : `/p/${m.username || m.id}`;
+            const memberCard = state.cards.find(c => c.personIdentityId === m.id && c.status === 'ACTIVE') || state.cards.find(c => c.personIdentityId === m.id);
 
             return (
               <div
@@ -145,7 +195,10 @@ export default function MemberDirectoryAdminPage() {
                         {m.fullName}
                       </h3>
                       <Badge className="bg-blue-50 text-[#0066FF] border-blue-200 text-[10.5px] font-bold">
-                        {index === 0 ? 'Ủy Viên BCH' : 'Hội Viên VIP'}
+                        {index === 0 ? 'Ủy Viên BCH' : 'Hội Viên Chính Thức'}
+                      </Badge>
+                      <Badge className="bg-emerald-50 text-emerald-700 border-emerald-200 text-[10px] font-mono">
+                        {memberCard?.cardUid || 'NFC-ACTIVE'}
                       </Badge>
                     </div>
 
@@ -172,17 +225,134 @@ export default function MemberDirectoryAdminPage() {
                   <Button
                     size="sm"
                     variant="outline"
-                    onClick={() => alert(`Cấp phát / Cập nhật thẻ NFC cho hội viên: ${m.fullName}`)}
+                    onClick={() => alert(`Thẻ NFC ${memberCard?.cardUid || 'NFC-EXECUTIVE'} của hội viên ${m.fullName} đang hoạt động bình thường!`)}
                     className="rounded-xl border-slate-200 text-slate-700 hover:bg-slate-50 text-xs font-bold py-2 cursor-pointer shadow-2xs"
                   >
-                    <CreditCard className="w-3.5 h-3.5 mr-1 text-[#FF6B00]" /> Cấp Thẻ NFC
+                    <CreditCard className="w-3.5 h-3.5 mr-1 text-[#FF6B00]" /> Thẻ NFC
                   </Button>
                 </div>
               </div>
             );
           })}
+
         </div>
+
+        {/* Modal: Thêm Hội Viên Mới */}
+        {showAddModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-xs animate-in fade-in duration-200">
+            <div className="bg-white w-full max-w-lg rounded-3xl p-6 sm:p-8 shadow-2xl border border-slate-200 space-y-5 animate-in zoom-in-95 duration-200">
+              <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                <div className="flex items-center gap-2.5">
+                  <div className="p-2 rounded-xl bg-blue-50 text-[#0066FF]">
+                    <Users className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h2 className="text-lg font-black text-slate-900 font-heading">Thêm & Cấp Thẻ Hội Viên Mới</h2>
+                    <p className="text-xs text-slate-500">Khởi tạo định danh số & liên kết chip NFC</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setShowAddModal(false)}
+                  className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center text-sm font-bold"
+                >
+                  ✕
+                </button>
+              </div>
+
+              <form onSubmit={handleCreateMember} className="space-y-3.5">
+                <div>
+                  <label className="text-xs font-bold text-slate-700 block mb-1">Họ và tên Doanh nhân <span className="text-red-500">*</span></label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="VD: Trần Văn Minh"
+                    value={fullName}
+                    onChange={e => setFullName(e.target.value)}
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#0066FF]/20 focus:border-[#0066FF]"
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="text-xs font-bold text-slate-700 block mb-1">Chức danh</label>
+                    <input
+                      type="text"
+                      placeholder="VD: Giám Đốc Điều Hành"
+                      value={title}
+                      onChange={e => setTitle(e.target.value)}
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#0066FF]/20 focus:border-[#0066FF]"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs font-bold text-slate-700 block mb-1">Số điện thoại</label>
+                    <input
+                      type="tel"
+                      placeholder="VD: 0912.345.678"
+                      value={phone}
+                      onChange={e => setPhone(e.target.value)}
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#0066FF]/20 focus:border-[#0066FF]"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="text-xs font-bold text-slate-700 block mb-1">Tên Doanh nghiệp / Đơn vị <span className="text-red-500">*</span></label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="VD: Công ty TNHH Du Lịch Biển Xanh Nha Trang"
+                    value={businessName}
+                    onChange={e => setBusinessName(e.target.value)}
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#0066FF]/20 focus:border-[#0066FF]"
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="text-xs font-bold text-slate-700 block mb-1">Email làm việc <span className="text-red-500">*</span></label>
+                    <input
+                      type="email"
+                      required
+                      placeholder="VD: minh.tran@bienxanh.vn"
+                      value={email}
+                      onChange={e => setEmail(e.target.value)}
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#0066FF]/20 focus:border-[#0066FF]"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs font-bold text-slate-700 block mb-1">Mã số thuế</label>
+                    <input
+                      type="text"
+                      placeholder="VD: 4201998877"
+                      value={taxCode}
+                      onChange={e => setTaxCode(e.target.value)}
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#0066FF]/20 focus:border-[#0066FF]"
+                    />
+                  </div>
+                </div>
+
+                <div className="pt-2 flex items-center justify-end gap-3">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setShowAddModal(false)}
+                    className="rounded-xl border-slate-200 text-slate-600 font-bold text-xs px-4 py-2.5 cursor-pointer"
+                  >
+                    Hủy bỏ
+                  </Button>
+                  <Button
+                    type="submit"
+                    className="bg-[#0066FF] hover:bg-blue-700 text-white font-bold rounded-xl text-xs px-5 py-2.5 cursor-pointer shadow-xs"
+                  >
+                    Lưu & Kích Hoạt Thẻ NFC
+                  </Button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
       </main>
     </div>
   );
 }
+

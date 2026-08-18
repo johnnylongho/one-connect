@@ -383,6 +383,97 @@ export function useOneConnectStore() {
     return newReg;
   };
 
+  // Register New User / Identity (Self-Service or Admin)
+  const registerIdentity = (data: {
+    fullName: string;
+    businessName: string;
+    email: string;
+    phone?: string;
+    title?: string;
+    username?: string;
+    taxCode?: string;
+    bio?: string;
+  }) => {
+    const cleanUsername = (data.username || data.fullName.toLowerCase().replace(/[^a-z0-9]/g, '') || `user${Date.now().toString().slice(-4)}`);
+    const newId = `id-${Date.now()}`;
+    const newCardUid = `NFC-${cleanUsername.toUpperCase().slice(0, 8)}-${Math.floor(100 + Math.random() * 900)}`;
+
+    const newIdentity: PersonIdentity = {
+      id: newId,
+      userId: `usr-${Date.now()}`,
+      username: cleanUsername,
+      fullName: data.fullName,
+      displayName: data.fullName,
+      title: data.title || 'Giám Đốc Doanh Nghiệp',
+      phone: data.phone || '0903.888.999',
+      email: data.email,
+      avatarUrl: `https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300&auto=format&fit=crop&q=80`,
+      bio: data.bio || `Đại diện ${data.businessName} - Thành viên Hệ sinh thái One Connect Network.`,
+      socialLinks: [
+        {
+          id: `soc-${Date.now()}-1`,
+          identityId: newId,
+          platform: 'phone',
+          url: `tel:${data.phone || '0903888999'}`,
+          isPublic: true,
+        },
+        {
+          id: `soc-${Date.now()}-2`,
+          identityId: newId,
+          platform: 'website',
+          url: 'https://aplusvn.com',
+          isPublic: true,
+        }
+      ],
+      businesses: [
+        {
+          id: `pbiz-${Date.now()}`,
+          personIdentityId: newId,
+          businessId: `biz-${Date.now()}`,
+          businessName: data.businessName,
+          position: data.title || 'Giám Đốc',
+          relationType: 'FOUNDER_OWNER',
+          isPrimary: true,
+          status: 'ACTIVE'
+        }
+      ],
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+
+    const newCard: AccessCard = {
+      id: `card-${Date.now()}`,
+      personIdentityId: newId,
+      cardUid: newCardUid,
+      cardType: 'NFC_EXECUTIVE',
+      nfcIdentifier: `NFC-UID-${Date.now()}`,
+      dynamicUrl: `https://oneconnect.network/c/${newCardUid}`,
+      qrValue: `https://oneconnect.network/c/${newCardUid}`,
+      status: 'ACTIVE',
+      issuedAt: new Date().toISOString(),
+    };
+
+    const newAuditLog: AuditLog = {
+      id: `log-${Date.now()}`,
+      actorUserId: newId,
+      actorName: data.fullName,
+      action: 'IDENTITY_REGISTERED_NFC_ISSUED',
+      objectType: 'PERSON_IDENTITY',
+      objectId: newId,
+      createdAt: new Date().toISOString(),
+    };
+
+    setState(prev => ({
+      ...prev,
+      currentIdentityId: newId,
+      identities: [newIdentity, ...prev.identities],
+      cards: [newCard, ...prev.cards],
+      auditLogs: [newAuditLog, ...prev.auditLogs],
+    }));
+
+    return { identity: newIdentity, card: newCard };
+  };
+
   // Toggle Privacy
   const updatePrivacy = (newPrivacy: Partial<PrivacySetting>) => {
     setState(prev => ({
@@ -391,12 +482,14 @@ export function useOneConnectStore() {
     }));
   };
 
+
   return {
     state,
     currentIdentity,
     currentCard,
     setCurrentRole,
     setCurrentIdentityId,
+    registerIdentity,
     resetState,
     performCheckIn,
     requestConnection,
@@ -407,3 +500,4 @@ export function useOneConnectStore() {
     updatePrivacy,
   };
 }
+
