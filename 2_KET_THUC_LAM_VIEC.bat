@@ -38,7 +38,7 @@ if %errorlevel% equ 0 (
     echo ====================================================================
     echo   🎉 ĐỒNG BỘ THÀNH CÔNG 100%!
     echo   - GitHub Repo: https://github.com/johnnylongho/one-connect
-    echo   - Live Website: https://one-connect-pink.vercel.app/ (Vercel tự deploy)
+    echo   - Live Website: https://one-connect-network.vercel.app/ (Vercel tự deploy)
     echo.
     echo   Bạn có thể yên tâm tắt máy!
     echo   Khi sang máy khác (Nhà/Công ty), chỉ cần click:

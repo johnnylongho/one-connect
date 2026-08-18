@@ -92,7 +92,7 @@ export default function BusinessCard3D({
   const profileUrl =
     typeof window !== 'undefined'
       ? `${window.location.origin}/p/${identity.username || 'johnnylong'}`
-      : `https://one-connect-pink.vercel.app/p/${identity.username || 'johnnylong'}`;
+      : `https://one-connect-network.vercel.app/p/${identity.username || 'johnnylong'}`;
 
   const copyLink = () => {
     navigator.clipboard.writeText(profileUrl);
