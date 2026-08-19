@@ -53,8 +53,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const pathname = usePathname();
-  const { currentIdentity, state } = useOneConnectStore();
-  const [currentRole, setCurrentRole] = useState<'SUPER_ADMIN' | 'ORGANIZER'>('SUPER_ADMIN');
+  const { currentIdentity, state, setCurrentRole } = useOneConnectStore();
   const [isRoleDropdownOpen, setIsRoleDropdownOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
@@ -62,7 +61,7 @@ export default function RootLayout({
 
   const currentUserName = currentIdentity?.displayName || currentIdentity?.fullName || 'Hội Viên One Connect';
   const currentUserAvatar = currentIdentity?.avatarUrl || (currentIdentity?.username === 'johnnylongho' ? '/avatar-johnny-long.jpg' : `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(currentUserName)}`);
-  const effectiveRole = state?.currentRole || currentRole;
+  const effectiveRole = state?.currentRole || 'MEMBER';
 
   // Load saved sidebar state from localStorage if available
   useEffect(() => {
@@ -443,33 +442,55 @@ export default function RootLayout({
                     onClick={() => setIsRoleDropdownOpen(!isRoleDropdownOpen)}
                     className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold border border-slate-200 transition-colors"
                   >
-                    <span>Vai trò: <strong className="text-slate-900">{currentRole}</strong></span>
+                    <span>Vai trò: <strong className="text-slate-900">{effectiveRole}</strong></span>
                     <ChevronDown className="w-3.5 h-3.5 text-slate-500" />
                   </button>
 
                   {isRoleDropdownOpen && (
-                    <div className="absolute right-0 mt-2 w-48 rounded-xl bg-white border border-slate-200 shadow-xl p-1 z-30 space-y-1">
+                    <div className="absolute right-0 mt-2 w-56 rounded-xl bg-white border border-slate-200 shadow-xl p-1 z-30 space-y-1">
                       <button
                         onClick={() => {
                           setCurrentRole('SUPER_ADMIN');
                           setIsRoleDropdownOpen(false);
                         }}
                         className={`w-full text-left px-3 py-2 rounded-lg text-xs font-semibold ${
-                          currentRole === 'SUPER_ADMIN' ? 'bg-blue-50 text-[#0066FF]' : 'text-slate-700 hover:bg-slate-50'
+                          effectiveRole === 'SUPER_ADMIN' ? 'bg-blue-50 text-[#0066FF]' : 'text-slate-700 hover:bg-slate-50'
                         }`}
                       >
-                        SUPER_ADMIN (Toàn quyền)
+                        👑 SUPER_ADMIN (Quản Trị Hệ Thống)
                       </button>
                       <button
                         onClick={() => {
-                          setCurrentRole('ORGANIZER');
+                          setCurrentRole('ORG_ADMIN');
                           setIsRoleDropdownOpen(false);
                         }}
                         className={`w-full text-left px-3 py-2 rounded-lg text-xs font-semibold ${
-                          currentRole === 'ORGANIZER' ? 'bg-blue-50 text-[#0066FF]' : 'text-slate-700 hover:bg-slate-50'
+                          effectiveRole === 'ORG_ADMIN' ? 'bg-blue-50 text-[#0066FF]' : 'text-slate-700 hover:bg-slate-50'
                         }`}
                       >
-                        ORGANIZER (Ban Tổ Chức)
+                        🏛️ ORG_ADMIN (Quản Trị Hiệp Hội)
+                      </button>
+                      <button
+                        onClick={() => {
+                          setCurrentRole('EVENT_OPERATOR');
+                          setIsRoleDropdownOpen(false);
+                        }}
+                        className={`w-full text-left px-3 py-2 rounded-lg text-xs font-semibold ${
+                          effectiveRole === 'EVENT_OPERATOR' ? 'bg-blue-50 text-[#0066FF]' : 'text-slate-700 hover:bg-slate-50'
+                        }`}
+                      >
+                        📱 EVENT_OPERATOR (Lễ Tân Check-in)
+                      </button>
+                      <button
+                        onClick={() => {
+                          setCurrentRole('MEMBER');
+                          setIsRoleDropdownOpen(false);
+                        }}
+                        className={`w-full text-left px-3 py-2 rounded-lg text-xs font-semibold ${
+                          effectiveRole === 'MEMBER' ? 'bg-blue-50 text-[#0066FF]' : 'text-slate-700 hover:bg-slate-50'
+                        }`}
+                      >
+                        💼 MEMBER (Doanh Nhân / Hội Viên)
                       </button>
                     </div>
                   )}
