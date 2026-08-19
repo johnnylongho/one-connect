@@ -87,7 +87,7 @@ export default function NfcLandingRouter() {
     const identity = state.identities.find(
       i => i.username.toLowerCase() === cleanUid ||
            i.id.toLowerCase() === cleanUid ||
-           (isJohnnyLongAlias && (i.username === 'johnnylong' || i.id === 'id-001'))
+           (isJohnnyLongAlias && (i.username === 'johnnylongho' || i.username === 'johnnylong' || i.id === 'id-001'))
     ) || (isJohnnyLongAlias ? state.identities[0] : null);
 
     if (identity) {
@@ -95,7 +95,7 @@ export default function NfcLandingRouter() {
       if (action === 'checkin') {
         performCheckIn(eventId, cleanUid, 'NFC');
       }
-      router.replace(`/p/${identity.username || 'johnnylong'}${action === 'checkin' ? '?checked_in=1' : ''}`);
+      router.replace(`/p/${identity.username || 'johnnylongho'}${action === 'checkin' ? '?checked_in=1' : ''}`);
       return;
     }
 

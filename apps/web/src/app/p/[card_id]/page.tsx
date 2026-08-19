@@ -189,7 +189,7 @@ function DigitalProfileContent() {
       (i) =>
         i.username.toLowerCase() === cleanCardId ||
         i.id.toLowerCase() === cleanCardId ||
-        (isJohnnyLongAlias && (i.username === 'johnnylong' || i.id === 'id-001'))
+        (isJohnnyLongAlias && (i.username === 'johnnylongho' || i.username === 'johnnylong' || i.id === 'id-001'))
     ) || (isJohnnyLongAlias ? currentIdentity : null) || state.identities[0];
 
   const matchedCard = state.cards.find(c => c.personIdentityId === matchedIdentity?.id && c.status === 'ACTIVE') || state.cards[0];

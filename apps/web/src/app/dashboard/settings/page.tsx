@@ -199,7 +199,7 @@ export default function SettingsAndPrivacyPage() {
                 <span className="font-bold text-slate-900 text-sm">Chế Độ Hiển Thị Hồ Sơ Số (Profile Visibility)</span>
                 <p className="text-slate-500 text-[11px]">
                   Quyết định phạm vi hiển thị khi người khác truy cập đường link{' '}
-                  <code className="text-blue-600 font-mono font-bold">/p/{currentIdentity?.username || 'johnnylong'}</code>
+                  <code className="text-blue-600 font-mono font-bold">/p/{currentIdentity?.username || 'johnnylongho'}</code>
                 </p>
               </div>
               <Badge

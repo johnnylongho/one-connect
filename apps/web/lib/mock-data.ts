@@ -16,7 +16,7 @@ export const INITIAL_IDENTITIES: PersonIdentity[] = [
   {
     id: 'id-001',
     userId: 'user-001',
-    username: 'johnnylong',
+    username: 'johnnylongho',
     fullName: 'Hồ Hoàng Long (Johnny Long Hồ)',
     displayName: 'Johnny Long Hồ',
     avatarUrl: '/avatar-johnny-long.jpg',

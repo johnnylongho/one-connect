@@ -49,8 +49,8 @@ export const DbService = {
       i => i.id.toLowerCase() === cleanParam ||
            i.username.toLowerCase() === cleanParam ||
            i.userId.toLowerCase() === cleanParam ||
-           (cleanParam === 'usr-001' && (i.userId === 'usr-001' || i.id === 'id-001' || i.username === 'johnnylong')) ||
-           (cleanParam === 'hoanglong' && i.username === 'johnnylong')
+           (cleanParam === 'usr-001' && (i.userId === 'usr-001' || i.id === 'id-001' || i.username === 'johnnylongho' || i.username === 'johnnylong')) ||
+           (cleanParam === 'hoanglong' && (i.username === 'johnnylongho' || i.username === 'johnnylong'))
     );
     return found || localIdentities[0] || null;
   },

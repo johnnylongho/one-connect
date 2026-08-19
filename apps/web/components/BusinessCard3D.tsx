@@ -91,8 +91,8 @@ export default function BusinessCard3D({
   const primaryBiz = identity.businesses?.find((b) => b.isPrimary) || identity.businesses?.[0];
   const profileUrl =
     typeof window !== 'undefined'
-      ? `${window.location.origin}/p/${identity.username || 'johnnylong'}`
-      : `https://one-connect-network.vercel.app/p/${identity.username || 'johnnylong'}`;
+      ? `${window.location.origin}/p/${identity.username || 'johnnylongho'}`
+      : `https://one-connect-network.vercel.app/p/${identity.username || 'johnnylongho'}`;
 
   const copyLink = () => {
     navigator.clipboard.writeText(profileUrl);
@@ -203,7 +203,7 @@ export default function BusinessCard3D({
                   Digital Identity ID
                 </p>
                 <p className="text-xs font-mono font-bold text-white mt-0.5">
-                  @{identity.username || 'johnnylong'}
+                  @{identity.username || 'johnnylongho'}
                 </p>
               </div>
 

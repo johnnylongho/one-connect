@@ -185,7 +185,7 @@ export default function MemberDirectoryAdminPage() {
         <div className="space-y-3">
           {filteredMembers.map((m, index) => {
             const companyName = m.businesses && m.businesses[0] ? m.businesses[0].businessName : 'Tập đoàn Công nghệ Số A+ (APLUSVN)';
-            const profileLink = m.username === 'johnnylong' ? '/p/hoanglong' : `/p/${m.username || m.id}`;
+            const profileLink = `/p/${m.username || m.id}`;
             const memberCard = state.cards.find(c => c.personIdentityId === m.id && c.status === 'ACTIVE') || state.cards.find(c => c.personIdentityId === m.id);
 
             return (

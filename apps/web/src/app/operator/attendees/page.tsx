@@ -90,7 +90,7 @@ export default function RealtimeAttendeeDirectory() {
         <div className="space-y-3">
           {filtered.map(item => {
             const company = item.identity.businesses && item.identity.businesses[0] ? item.identity.businesses[0].businessName : 'Tập đoàn Công nghệ Số A+ (APLUSVN)';
-            const profileLink = item.identity.username === 'johnnylong' ? '/p/hoanglong' : `/p/${item.identity.username || item.identity.id}`;
+            const profileLink = `/p/${item.identity.username || item.identity.id}`;
 
             return (
               <div

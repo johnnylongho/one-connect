@@ -96,7 +96,7 @@ export default function AssociationAdminDashboard() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {state.identities.map((m, idx) => {
               const companyName = m.businesses && m.businesses[0] ? m.businesses[0].businessName : 'Tập đoàn Công nghệ Số A+ (APLUSVN)';
-              const profileLink = m.username === 'johnnylong' ? '/p/hoanglong' : `/p/${m.username || m.id}`;
+              const profileLink = `/p/${m.username || m.id}`;
 
               return (
                 <div key={m.id} className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-center justify-between gap-3 hover:bg-slate-100/80 transition-colors">

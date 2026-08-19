@@ -560,7 +560,7 @@ export default function DigitalNfcCardPage() {
                     <div>
                       <p className="text-xs font-bold text-emerald-900">ĐÃ NHẬN DIỆN THẺ NFC CHẠM GẦN</p>
                       <p className="text-[11px] text-emerald-700">
-                        Đang đồng bộ hồ sơ @{currentIdentity?.username || 'johnnylong'} vào thiết bị đối tác
+                        Đang đồng bộ hồ sơ @{currentIdentity?.username || 'johnnylongho'} vào thiết bị đối tác
                       </p>
                     </div>
                   </div>
@@ -642,7 +642,7 @@ export default function DigitalNfcCardPage() {
                 <div className="flex items-center justify-between py-1.5 border-b border-slate-100">
                   <span className="text-slate-500 font-medium">Đường dẫn Dynamic:</span>
                   <span className="font-bold text-blue-600 font-mono truncate max-w-[200px]">
-                    https://oneconnect.network/p/johnnylong
+                    https://one-connect-network.vercel.app/p/johnnylongho
                   </span>
                 </div>
                 <div className="flex items-center justify-between py-1.5">
