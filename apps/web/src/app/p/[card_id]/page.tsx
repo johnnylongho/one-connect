@@ -194,8 +194,9 @@ function DigitalProfileContent() {
   );
 
   // Edit Profile Modal States
-
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isVcardModalOpen, setIsVcardModalOpen] = useState(false);
+  const [isZaloModalOpen, setIsZaloModalOpen] = useState(false);
   const [editFullName, setEditFullName] = useState(matchedIdentity?.fullName || 'Hồ Hoàng Long');
   const [editDisplayName, setEditDisplayName] = useState(matchedIdentity?.displayName || matchedIdentity?.fullName || 'Johnny Long Hồ');
   const [editTitle, setEditTitle] = useState(matchedIdentity?.title || 'Project Manager & Media Director');
@@ -326,45 +327,73 @@ function DigitalProfileContent() {
     }
   };
 
-  // Generate standard vCard with photo base64 and simplified minimal icon notes
+  // Generate standard vCard 3.0 with photo base64, tax code, address and Zalo link
   const handleSaveContact = async () => {
     const now = new Date();
     const formattedDateTime = `${now.toLocaleDateString('vi-VN')} lúc ${now.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}`;
 
-    // Get Avatar Base64 of Johnny Long Hồ
+    // Get Avatar Base64 of profile
     const photoBase64 = await getAvatarBase64();
     const photoField = photoBase64 ? `PHOTO;ENCODING=b;TYPE=JPEG:${photoBase64}\n` : '';
 
-    // Simplified minimal icon notes
+    // Standard vCard 3.0 format compatible with iOS, Android & Windows Outlook
     const vCardData = `BEGIN:VCARD
 VERSION:3.0
 N:Hồ;Hoàng Long;;;
 FN:${profile.fullName} (${profile.displayName})
 ORG:${profile.company}
 TITLE:${profile.roleVietnamese}
-TEL;TYPE=CELL,VOICE;VALUE=uri:tel:${profile.phone}
+TEL;TYPE=CELL,VOICE,PREF;VALUE=uri:tel:${profile.phone}
 EMAIL;TYPE=WORK,INTERNET:${profile.email}
 URL:${profile.website}
 ADR;TYPE=WORK:;;${profile.address};;;;
 X-SOCIALPROFILE;type=zalo:${profile.zalo}
+X-TAXCODE:${profile.taxCode}
+X-ASSOCIATION:${profile.association}
 ${photoField}CATEGORIES:One Connect,B2B Partner,VIP Delegate,${profile.eventJoined}
-NOTE:👤 ${profile.fullName} (${profile.displayName})\\n🏢 ${profile.company}\\n📅 Gặp gỡ: ${formattedDateTime}\\n🎪 Sự kiện: ${profile.eventJoined}\\n💡 Slogan: ${profile.slogan}\\n🌐 Website: ${profile.websiteDisplay}
+NOTE:👤 ${profile.fullName} (${profile.displayName})\\n🏢 ${profile.company}\\n💼 Chức vụ: ${profile.roleVietnamese}\\n🏛️ Hiệp hội: ${profile.association}\\n📋 MST: ${profile.taxCode}\\n📍 Địa chỉ: ${profile.address}\\n💬 Zalo: ${profile.zalo}\\n📅 Bối cảnh gặp gỡ: ${formattedDateTime}\\n🎪 Sự kiện: ${profile.eventJoined}\\n💡 Slogan: "${profile.slogan}"\\n🌐 Website: ${profile.websiteDisplay}
 END:VCARD`;
 
     const blob = new Blob([vCardData], { type: 'text/vcard;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.setAttribute('download', `Ho_Hoang_Long_${now.getFullYear()}${String(now.getMonth()+1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}.vcf`);
+    link.setAttribute('download', `${profile.fullName.replace(/\s+/g, '_')}_OneConnect.vcf`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
 
+    setIsVcardModalOpen(true);
     toast({
-      title: 'ĐÃ LƯU DANH BẠ KÈM ẢNH ĐẠI DIỆN! 📇',
-      description: `Đã lưu hồ sơ của ${profile.fullName} (${profile.displayName}) vào danh bạ.`,
+      title: 'ĐÃ TẢI DANH BẠ vCARD 1-CLICK! 📇',
+      description: `Tệp danh bạ chuẩn của ${profile.fullName} đã được tải về máy.`,
       variant: 'success',
     });
+  };
+
+  // 1-Click Zalo Direct Chat
+  const handleOpenZaloChat = () => {
+    const zaloUrl = profile.zalo;
+    if (typeof window !== 'undefined') {
+      window.open(zaloUrl, '_blank', 'noopener,noreferrer');
+    }
+  };
+
+  // 1-Click Zalo Share with Professional B2B Introduction
+  const handleShareZalo = () => {
+    const shareText = `👤 Kính gửi Quý Đối Tác, tôi xin gửi Danh Thiếp Số One Connect của ${profile.fullName} (${profile.displayName}) - ${profile.roleVietnamese} tại ${profile.company}.\n🌐 Xem hồ sơ & Kết nối B2B: ${typeof window !== 'undefined' ? window.location.href : 'https://one-connect-network.vercel.app/p/johnnylongho'}\n📞 Hotline: ${profile.phone} | 💬 Zalo: ${profile.zalo}`;
+    
+    if (typeof window !== 'undefined') {
+      navigator.clipboard.writeText(shareText);
+      setIsCopied(true);
+      setTimeout(() => setIsCopied(false), 2000);
+      toast({
+        title: 'ĐÃ SAO CHÉP MẪU TIN NHẮN ZALO! 💬',
+        description: 'Đã sao chép lời giới thiệu B2B. Bạn có thể dán vào Zalo gửi ngay.',
+        variant: 'success',
+      });
+      window.open(profile.zalo, '_blank', 'noopener,noreferrer');
+    }
   };
 
   // Instant B2B Connection trigger without any async lag
@@ -1084,21 +1113,89 @@ END:VCARD`;
               </DialogDescription>
             </DialogHeader>
 
-            <div className="p-3.5 space-y-3.5">
+            <div className="p-3.5 space-y-3">
               <img
-                src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://oneconnect.vn/p/hoanglong`}
+                src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${typeof window !== 'undefined' ? window.location.href : 'https://one-connect-network.vercel.app/p/johnnylongho'}`}
                 alt="Profile Link QR"
                 className="w-36 h-36 rounded-2xl border border-slate-200 p-2 bg-white mx-auto shadow-sm"
               />
 
+              <div className="space-y-2">
+                <Button
+                  type="button"
+                  onClick={handleShareZalo}
+                  size="sm"
+                  className="w-full bg-[#0066FF] hover:bg-blue-700 text-white font-bold rounded-xl text-[13px] py-3.5 cursor-pointer flex items-center justify-center gap-1.5 shadow-sm"
+                >
+                  <MessageCircle className="w-4 h-4" /> Chia Sẻ Qua Zalo 1-Click
+                </Button>
+
+                <Button
+                  type="button"
+                  onClick={handleCopyLink}
+                  size="sm"
+                  variant="outline"
+                  className="w-full border-slate-200 hover:bg-slate-50 text-slate-800 font-bold rounded-xl text-[13px] py-3.5 cursor-pointer flex items-center justify-center gap-1.5"
+                >
+                  {isCopied ? <Check className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4" />}
+                  {isCopied ? 'Đã Sao Chép Link!' : 'Sao Chép Đường Dẫn'}
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* 1-CLICK vCARD 3.0 EXPORT CONFIRMATION MODAL */}
+        <Dialog open={isVcardModalOpen} onOpenChange={setIsVcardModalOpen}>
+          <DialogContent className="sm:max-w-sm bg-white border-slate-200 text-slate-900 shadow-2xl rounded-3xl p-5 space-y-3 text-center">
+            <DialogHeader className="space-y-1.5">
+              <div className="w-14 h-14 rounded-full bg-blue-50 border-2 border-blue-200 text-[#0066FF] flex items-center justify-center mx-auto shadow-xs">
+                <Download className="w-7 h-7" />
+              </div>
+              <DialogTitle className="text-lg font-black text-slate-900 font-heading">
+                Đã Xuất Danh Bạ vCard 3.0! 📇
+              </DialogTitle>
+              <DialogDescription className="text-[13px] text-slate-600 leading-relaxed">
+                Tệp danh bạ điện tử chuẩn hóa của <strong>{profile.fullName}</strong> đã được tạo thành công kèm ảnh đại diện, chức vụ, MST và Zalo.
+              </DialogDescription>
+            </DialogHeader>
+
+            <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-left space-y-2 text-xs">
+              <div className="flex justify-between items-center pb-1.5 border-b border-slate-200/80">
+                <span className="text-slate-500 font-medium">Họ & Tên:</span>
+                <strong className="text-slate-900">{profile.fullName}</strong>
+              </div>
+              <div className="flex justify-between items-center pb-1.5 border-b border-slate-200/80">
+                <span className="text-slate-500 font-medium">Doanh nghiệp:</span>
+                <span className="font-semibold text-slate-800 truncate max-w-[180px]">{profile.company}</span>
+              </div>
+              <div className="flex justify-between items-center pb-1.5 border-b border-slate-200/80">
+                <span className="text-slate-500 font-medium">Số điện thoại:</span>
+                <span className="font-mono font-bold text-[#0066FF]">{profile.phone}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-slate-500 font-medium">Định dạng file:</span>
+                <Badge className="bg-emerald-50 text-emerald-700 border-emerald-200 text-[10px]">
+                  Apple iOS & Android Contacts Ready (.vcf)
+                </Badge>
+              </div>
+            </div>
+
+            <div className="space-y-2 pt-1">
               <Button
                 type="button"
-                onClick={handleCopyLink}
-                size="sm"
-                className="w-full bg-[#0066FF] hover:bg-blue-700 text-white font-bold rounded-xl text-[13.5px] py-4 cursor-pointer"
+                onClick={handleOpenZaloChat}
+                className="w-full bg-cyan-600 hover:bg-cyan-700 text-white font-bold rounded-xl py-3 text-xs flex items-center justify-center gap-1.5 shadow-sm"
               >
-                {isCopied ? <Check className="w-4 h-4 mr-1.5" /> : <Copy className="w-4 h-4 mr-1.5" />}
-                {isCopied ? 'Đã Sao Chép Link!' : 'Sao Chép Đường Dẫn'}
+                <MessageCircle className="w-4 h-4" /> Kết Bạn & Nhắn Zalo Ngay
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setIsVcardModalOpen(false)}
+                className="w-full border-slate-300 text-slate-700 font-bold rounded-xl py-3 text-xs hover:bg-slate-50"
+              >
+                Đóng Cửa Sổ
               </Button>
             </div>
           </DialogContent>
