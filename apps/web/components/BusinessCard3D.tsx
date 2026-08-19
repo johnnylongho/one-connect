@@ -180,18 +180,18 @@ export default function BusinessCard3D({
                 </span>
               </div>
 
-              <div className="min-w-0 flex-1 space-y-0.5">
-                <h3 className="text-lg sm:text-xl font-black bg-gradient-to-r from-white via-slate-50 to-amber-200 bg-clip-text text-transparent tracking-tight font-heading truncate drop-shadow-md">
+              <div className="min-w-0 flex-1 space-y-1">
+                <h3 className="text-xl sm:text-2xl font-black text-white tracking-tight font-heading truncate drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)]">
                   {identity.fullName || 'Hồ Hoàng Long'}
                 </h3>
-                <p className="text-[12px] font-bold text-slate-200 truncate">
+                <p className="text-xs sm:text-[13px] font-bold text-amber-300 tracking-wide truncate">
                   {identity.displayName || 'Johnny Long Hồ'}
                 </p>
                 <p className={`text-xs ${currentTheme.accentText} truncate pt-0.5`}>
                   {identity.title || 'Quản lý & Triển khai Dự án kiêm Media'}
                 </p>
-                <p className="text-xs text-slate-200 font-medium flex items-center gap-1.5 truncate pt-0.5">
-                  <Building2 className="w-3.5 h-3.5 text-slate-300 shrink-0" />
+                <p className="text-xs text-slate-100 font-semibold flex items-center gap-1.5 truncate pt-0.5">
+                  <Building2 className="w-3.5 h-3.5 text-amber-400 shrink-0" />
                   <span className="truncate">
                     {primaryBiz?.businessName || identity.businesses?.[0]?.businessName || 'Tập đoàn Công nghệ số A+ (Aplusvn)'}
                   </span>
