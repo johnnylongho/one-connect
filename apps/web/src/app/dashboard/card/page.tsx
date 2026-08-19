@@ -568,34 +568,49 @@ export default function DigitalNfcCardPage() {
                 </div>
               )}
 
-              {/* Real Hardware NFC Writer Block */}
-              <div className="p-4 bg-blue-50/80 border border-blue-200 rounded-2xl text-left space-y-3">
+              {/* Professional NFC Programming & NFC Tools Guide */}
+              <div className="p-4 bg-slate-900 text-white rounded-2xl text-left space-y-3.5 shadow-md">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <Smartphone className="w-4 h-4 text-[#0066FF]" />
-                    <h4 className="font-bold text-slate-900 text-xs">Ghi Chip NFC Vật Lý (Hardware Writer)</h4>
+                    <Radio className="w-4 h-4 text-[#00C2FF]" />
+                    <h4 className="font-bold text-xs">Ghi Dữ Liệu Lên Thẻ NFC Vật Lý</h4>
                   </div>
-                  <Badge className="bg-blue-100 text-[#0066FF] border-blue-300 text-[10px]">
-                    NTAG213 / 215 / 216
+                  <Badge className="bg-blue-500/20 text-[#00C2FF] border-blue-400/30 text-[10px]">
+                    NFC Tools App (iOS/Android)
                   </Badge>
                 </div>
-                <p className="text-[11px] text-slate-600">
-                  Lập trình đường dẫn định danh <code className="font-mono font-bold text-[#0066FF]">https://one-connect-network.vercel.app/c/{currentCard?.cardUid || '04:8F:2A:1B:9C:5D:80'}</code> trực tiếp vào thẻ vật lý.
-                </p>
 
-                {isWritingNfc ? (
-                  <div className="p-3 rounded-xl bg-blue-600 text-white text-xs font-bold flex items-center justify-center gap-2 animate-pulse shadow-md">
-                    <div className="w-4 h-4 rounded-full border-2 border-white border-t-transparent animate-spin" />
-                    <span>{nfcWriteStatus || 'Áp thẻ NFC vào lưng điện thoại...'}</span>
+                <div className="p-2.5 rounded-xl bg-slate-800/90 border border-slate-700/80 flex items-center justify-between gap-2">
+                  <div className="min-w-0 flex-1">
+                    <p className="text-[10px] text-slate-400 font-mono uppercase tracking-wider">Đường dẫn nạp vào thẻ:</p>
+                    <p className="text-xs font-mono font-bold text-[#00C2FF] truncate">
+                      https://one-connect-network.vercel.app/p/johnnylongho
+                    </p>
                   </div>
-                ) : (
                   <Button
-                    onClick={() => handleWritePhysicalNfc(currentCard?.cardUid || '04:8F:2A:1B:9C:5D:80')}
-                    className="w-full bg-gradient-to-r from-[#0066FF] to-[#FF6B00] hover:opacity-90 text-white font-bold text-xs py-2.5 rounded-xl cursor-pointer shadow-sm gap-1.5"
+                    size="sm"
+                    onClick={() => {
+                      if (typeof window !== 'undefined') {
+                        navigator.clipboard.writeText('https://one-connect-network.vercel.app/p/johnnylongho');
+                        showAlert('Đã sao chép đường dẫn hồ sơ! Hãy dán vào app NFC Tools để ghi thẻ.', 'success');
+                      }
+                    }}
+                    className="bg-[#0066FF] hover:bg-blue-600 text-white font-bold text-xs rounded-lg px-3 py-1.5 shrink-0 cursor-pointer shadow-xs"
                   >
-                    <Radio className="w-4 h-4" /> Ghi Vào Thẻ NFC Vật Lý Ngay
+                    Sao Chép Link
                   </Button>
-                )}
+                </div>
+
+                <div className="space-y-1.5 text-[11px] text-slate-300">
+                  <p className="font-bold text-white flex items-center gap-1.5">
+                    <Smartphone className="w-3.5 h-3.5 text-[#FF6B00]" /> 3 Bước Ghi Thẻ Bằng App NFC Tools (iPhone & Android):
+                  </p>
+                  <ol className="list-decimal list-inside space-y-1 pl-1 text-slate-300 text-[10.5px]">
+                    <li>Mở app <strong>NFC Tools</strong> $\rightarrow$ Chọn tab <strong>Write</strong>.</li>
+                    <li>Chọn <strong>Add a record</strong> $\rightarrow$ <strong>Custom URL / URI</strong> $\rightarrow$ Dán link vừa sao chép.</li>
+                    <li>Bấm nút <strong>Write</strong> $\rightarrow$ Áp thẻ NFC vào lưng điện thoại trong 1 giây là xong!</li>
+                  </ol>
+                </div>
               </div>
 
               {/* Card Continuity Explanation Box */}
