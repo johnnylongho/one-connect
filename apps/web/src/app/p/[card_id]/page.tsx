@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import {
@@ -26,7 +26,10 @@ import {
   Copy,
   Check,
   Award,
-
+  Camera,
+  Upload,
+  ImageIcon,
+  RefreshCw,
   MapPin,
   Calendar,
   CreditCard,
@@ -224,8 +227,10 @@ function DigitalProfileContent() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isVcardModalOpen, setIsVcardModalOpen] = useState(false);
   const [isZaloModalOpen, setIsZaloModalOpen] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [editFullName, setEditFullName] = useState(matchedIdentity?.fullName || 'Hồ Hoàng Long');
   const [editDisplayName, setEditDisplayName] = useState(matchedIdentity?.displayName || matchedIdentity?.fullName || 'Johnny Long Hồ');
+  const [editAvatarUrl, setEditAvatarUrl] = useState(matchedIdentity?.avatarUrl || '');
   const [editTitle, setEditTitle] = useState(matchedIdentity?.title || 'Project Manager & Media Director');
   const [editCompany, setEditCompany] = useState(matchedIdentity?.businesses?.[0]?.businessName || 'Tập đoàn Công nghệ Số A+ (APLUSVN)');
   const [editTaxCode, setEditTaxCode] = useState(matchedIdentity?.taxCode || matchedIdentity?.businesses?.[0]?.taxCode || '0316888999');
@@ -278,6 +283,44 @@ function DigitalProfileContent() {
     signatureHash: '0x9F4C82A3E1B8D9720066FF',
   };
 
+  const handleAvatarFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      toast({
+        title: 'TỆP QUÁ LỚN! ⚠️',
+        description: 'Vui lòng chọn ảnh có dung lượng dưới 5MB.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (uploadEvent) => {
+      const result = uploadEvent.target?.result as string;
+      if (result) {
+        setEditAvatarUrl(result);
+        toast({
+          title: 'ĐÃ TẢI ẢNH CHÂN DUNG LÊN! 📸',
+          description: 'Bấm "Lưu Thay Đổi" để áp dụng vào danh thiếp số của bạn.',
+          variant: 'success',
+        });
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleGenerateDicebearAvatar = () => {
+    const newAvatar = `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(editFullName || 'User')}&backgroundColor=0066ff,00c2ff,10b981,f59e0b`;
+    setEditAvatarUrl(newAvatar);
+    toast({
+      title: 'ĐÃ TẠO AVATAR CHỮ KÝ! 🎨',
+      description: 'Đã tự động tạo avatar theo họ tên của bạn.',
+      variant: 'success',
+    });
+  };
+
   const handleOpenEditModal = () => {
     if (!isOwner) {
       toast({
@@ -289,6 +332,7 @@ function DigitalProfileContent() {
     }
     setEditFullName(matchedIdentity?.fullName || profile.fullName);
     setEditDisplayName(matchedIdentity?.displayName || profile.displayName);
+    setEditAvatarUrl(matchedIdentity?.avatarUrl || profile.avatarUrl);
     setEditTitle(matchedIdentity?.title || profile.title);
     setEditCompany(matchedIdentity?.businesses?.[0]?.businessName || profile.company);
     setEditTaxCode(matchedIdentity?.taxCode || matchedIdentity?.businesses?.[0]?.taxCode || profile.taxCode);
@@ -326,12 +370,13 @@ function DigitalProfileContent() {
       email: editEmail,
       bio: editBio,
       website: editWebsite,
+      avatarUrl: editAvatarUrl || undefined,
     });
 
     setIsEditModalOpen(false);
     toast({
       title: 'ĐÃ CẬP NHẬT HỒ SƠ THÀNH CÔNG! ✨',
-      description: 'Dữ liệu hồ sơ số, doanh nghiệp và MST đã được cập nhật theo thời gian thực.',
+      description: 'Dữ liệu hồ sơ số, ảnh đại diện, doanh nghiệp và MST đã được cập nhật.',
       variant: 'success',
     });
   };
@@ -566,6 +611,17 @@ END:VCARD`;
                   alt={profile.fullName}
                   className="w-full h-full object-cover"
                 />
+                {isOwner && (
+                  <button
+                    type="button"
+                    onClick={handleOpenEditModal}
+                    className="absolute inset-0 bg-slate-950/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center text-white text-xs font-bold gap-1 cursor-pointer"
+                    title="Bấm để đổi ảnh đại diện"
+                  >
+                    <Camera className="w-5 h-5 text-white animate-bounce" />
+                    <span>Đổi Ảnh</span>
+                  </button>
+                )}
               </div>
               
               {/* Chip UID Tag & Quick Edit Pill below Avatar */}
@@ -1289,6 +1345,57 @@ END:VCARD`;
             {/* SCROLLABLE FORM BODY */}
             <form onSubmit={handleSaveProfile} className="flex-1 flex flex-col min-h-0 overflow-hidden">
               <div className="flex-1 overflow-y-auto px-5 py-4 space-y-3.5 overscroll-contain">
+                {/* AVATAR UPLOAD & PREVIEW CARD */}
+                <div className="p-3.5 rounded-2xl bg-gradient-to-r from-blue-50/80 to-slate-50 border border-blue-200/80 flex items-center gap-3.5">
+                  <div className="relative w-16 h-16 rounded-2xl overflow-hidden shadow-sm bg-white shrink-0 border-2 border-[#0066FF] group">
+                    <img
+                      src={editAvatarUrl || profile.avatarUrl}
+                      alt="Avatar Preview"
+                      className="w-full h-full object-cover"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => fileInputRef.current?.click()}
+                      className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white cursor-pointer"
+                      title="Chọn ảnh từ thiết bị"
+                    >
+                      <Camera className="w-5 h-5 text-white" />
+                    </button>
+                  </div>
+
+                  <div className="flex-1 space-y-1.5 min-w-0">
+                    <label className="text-[11px] font-bold text-slate-800 uppercase tracking-wider block">
+                      Ảnh Chân Dung / Logo Đại Diện
+                    </label>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <input
+                        type="file"
+                        ref={fileInputRef}
+                        accept="image/*"
+                        onChange={handleAvatarFileSelect}
+                        className="hidden"
+                      />
+                      <Button
+                        type="button"
+                        size="sm"
+                        onClick={() => fileInputRef.current?.click()}
+                        className="bg-[#0066FF] hover:bg-blue-700 text-white font-bold text-xs py-1.5 px-3 rounded-xl cursor-pointer shadow-xs"
+                      >
+                        <Upload className="w-3.5 h-3.5 mr-1" /> Tải Ảnh Mới
+                      </Button>
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="outline"
+                        onClick={handleGenerateDicebearAvatar}
+                        className="text-slate-700 border-slate-200 hover:bg-slate-100 font-bold text-xs py-1.5 px-2.5 rounded-xl cursor-pointer"
+                      >
+                        <Sparkles className="w-3.5 h-3.5 mr-1 text-[#FF6B00]" /> Initials
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+
                 <div className="grid grid-cols-2 gap-2.5">
                   <div className="space-y-1 text-left">
                     <label className="text-[11px] font-bold text-slate-800 uppercase tracking-wider">Họ và Tên <span className="text-red-500">*</span></label>

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import Link from 'next/link';
 import { useOneConnectStore } from '@/lib/store';
 import {
@@ -26,7 +26,10 @@ import {
   FileDown,
   Sparkles,
   Copy,
-  Check
+  Check,
+  Camera,
+  Upload,
+  User,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -41,7 +44,8 @@ import {
 } from '@/components/ui/dialog';
 
 export default function SettingsAndPrivacyPage() {
-  const { state, updatePrivacy, reissueCard, currentCard, currentIdentity, resetState } = useOneConnectStore();
+  const { state, updatePrivacy, updateIdentity, reissueCard, currentCard, currentIdentity, resetState } = useOneConnectStore();
+  const settingsFileInputRef = useRef<HTMLInputElement>(null);
   const privacy = state.privacy || {
     profileVisibility: 'PUBLIC',
     contactVisibility: 'MEMBERS_ONLY',
@@ -61,6 +65,36 @@ export default function SettingsAndPrivacyPage() {
   const showToast = (text: string, type: 'success' | 'error' | 'info' = 'success') => {
     setAlertNotice({ text, type });
     setTimeout(() => setAlertNotice(null), 4000);
+  };
+
+  // Upload Avatar Handler
+  const handleUploadAvatarSettings = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !currentIdentity) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      showToast('Tệp ảnh quá lớn! Vui lòng chọn ảnh dưới 5MB.', 'error');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (uploadEvent) => {
+      const result = uploadEvent.target?.result as string;
+      if (result) {
+        updateIdentity(currentIdentity.id, { avatarUrl: result });
+        showToast('Đã cập nhật ảnh đại diện thành công!', 'success');
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
+  // Generate Initials Avatar Handler
+  const handleGenerateDicebearSettings = () => {
+    if (!currentIdentity) return;
+    const name = currentIdentity.displayName || currentIdentity.fullName || 'User';
+    const newAvatar = `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(name)}&backgroundColor=0066ff,00c2ff,10b981,f59e0b`;
+    updateIdentity(currentIdentity.id, { avatarUrl: newAvatar });
+    showToast('Đã tạo ảnh đại diện Initials thành công!', 'success');
   };
 
   // Save privacy settings
@@ -170,13 +204,96 @@ export default function SettingsAndPrivacyPage() {
       )}
 
       {/* ===================================================================== */}
-      {/* 2. KHỐI 1: BẬT / TẮT KHẢ NĂNG HIỂN THỊ CÔNG KHAI HỒ SƠ */}
+      {/* 1. KHỐI 0: ẢNH ĐẠI DIỆN & CHÂN DUNG HỘI VIÊN */}
+      {/* ===================================================================== */}
+      <div className="glass-panel p-6 sm:p-7 space-y-5">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-4">
+          <div>
+            <h3 className="text-base font-extrabold text-slate-900 flex items-center gap-2 font-heading">
+              <Camera className="w-5 h-5 text-blue-600" /> 1. Ảnh Đại Diện & Chân Dung Doanh Nhân
+            </h3>
+            <p className="text-xs text-slate-500 mt-0.5">
+              Hình ảnh chân dung hiển thị trực tiếp trên Danh thiếp 3D, Hồ sơ số và Cổng kết nối B2B
+            </p>
+          </div>
+          <Badge className="bg-blue-50 text-blue-700 border-blue-200 text-xs font-bold px-3 py-1">
+            {currentIdentity?.displayName || currentIdentity?.fullName || 'Hội Viên VIP'}
+          </Badge>
+        </div>
+
+        <div className="flex flex-col sm:flex-row items-center gap-6 p-4 rounded-2xl bg-gradient-to-r from-blue-50/70 to-slate-50 border border-blue-200/80">
+          <div className="relative w-24 h-24 sm:w-28 sm:h-28 rounded-3xl overflow-hidden shadow-md bg-white shrink-0 border-3 border-blue-500 group">
+            <img
+              src={currentIdentity?.avatarUrl || (currentIdentity?.username === 'johnnylongho' ? '/avatar-johnny-long.jpg' : `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(currentIdentity?.fullName || 'User')}`)}
+              alt="Avatar"
+              className="w-full h-full object-cover"
+            />
+            <button
+              type="button"
+              onClick={() => settingsFileInputRef.current?.click()}
+              className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center text-white text-xs font-bold gap-1 cursor-pointer"
+              title="Bấm để tải ảnh mới"
+            >
+              <Camera className="w-6 h-6 text-white" />
+              <span>Đổi Ảnh</span>
+            </button>
+          </div>
+
+          <div className="flex-1 space-y-2 text-center sm:text-left">
+            <h4 className="text-sm font-bold text-slate-900">
+              {currentIdentity?.fullName} ({currentIdentity?.displayName || currentIdentity?.fullName})
+            </h4>
+            <p className="text-xs text-slate-500">
+              {currentIdentity?.title} • {currentIdentity?.businesses?.[0]?.businessName || 'Doanh Nghiệp'}
+            </p>
+            <div className="flex items-center justify-center sm:justify-start gap-2.5 pt-1 flex-wrap">
+              <input
+                type="file"
+                ref={settingsFileInputRef}
+                accept="image/*"
+                onChange={handleUploadAvatarSettings}
+                className="hidden"
+              />
+              <Button
+                type="button"
+                size="sm"
+                onClick={() => settingsFileInputRef.current?.click()}
+                className="bg-[#0066FF] hover:bg-blue-700 text-white font-bold text-xs py-2 px-4 rounded-xl cursor-pointer shadow-xs"
+              >
+                <Upload className="w-4 h-4 mr-1.5" /> Tải Ảnh Chân Dung Mới
+              </Button>
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                onClick={handleGenerateDicebearSettings}
+                className="text-slate-700 border-slate-300 hover:bg-slate-100 font-bold text-xs py-2 px-3 rounded-xl cursor-pointer"
+              >
+                <Sparkles className="w-3.5 h-3.5 mr-1 text-[#FF6B00]" /> Tạo Initials Avatar
+              </Button>
+              <Link
+                href={`/p/${currentIdentity?.username || 'johnnylongho'}`}
+                target="_blank"
+                className="inline-flex items-center gap-1 text-xs font-bold text-blue-600 hover:underline px-2 py-1"
+              >
+                <ExternalLink className="w-3.5 h-3.5" /> Xem Trang Profile Số
+              </Link>
+            </div>
+            <p className="text-[11px] text-slate-400">
+              Hỗ trợ định dạng JPG, PNG, WEBP (Tối đa 5MB). Tỷ lệ khuyến nghị: hình vuông 1:1 hoặc chân dung 3:4.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* ===================================================================== */}
+      {/* 2. KHỐI 2: BẬT / TẮT KHẢ NĂNG HIỂN THỊ CÔNG KHAI HỒ SƠ */}
       {/* ===================================================================== */}
       <div className="glass-panel p-6 sm:p-7 space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-4">
           <div>
             <h3 className="text-base font-extrabold text-slate-900 flex items-center gap-2 font-heading">
-              <Eye className="w-5 h-5 text-blue-600" /> 1. Khả Năng Hiển Thị Hồ Sơ & Quyền Riêng Tư
+              <Eye className="w-5 h-5 text-blue-600" /> 2. Khả Năng Hiển Thị Hồ Sơ & Quyền Riêng Tư
             </h3>
             <p className="text-xs text-slate-500 mt-0.5">
               Kiểm soát những ai có thể nhìn thấy hồ sơ và thông tin cá nhân của bạn khi quét mã QR hoặc chạm thẻ NFC
