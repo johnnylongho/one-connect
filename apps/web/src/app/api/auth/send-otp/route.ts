@@ -40,8 +40,26 @@ export async function POST(req: NextRequest) {
     const isRegister = type === 'register';
 
     const subject = isRegister
-      ? `[ONE CONNECT] Mã xác thực kích hoạt tài khoản: ${otpCode}`
-      : `[ONE CONNECT] Mã OTP đăng nhập bảo mật: ${otpCode}`;
+      ? `Mã xác thực tài khoản One Connect của bạn: ${otpCode}`
+      : `Mã OTP đăng nhập One Connect: ${otpCode}`;
+
+    const textContent = `
+ONE CONNECT NETWORK - HỆ SINH THÁI DANH THIẾP SỐ & GIAO THƯƠNG B2B
+-----------------------------------------------------------------
+Kính gửi ${recipientName},
+
+${isRegister ? 'Cảm ơn bạn đã đăng ký gia nhập Hệ sinh thái One Connect Network.' : 'Bạn vừa yêu cầu mã xác thực đăng nhập bảo mật vào hệ thống One Connect.'}
+
+MÃ XÁC THỰC BẢO MẬT (OTP) CỦA BẠN: ${otpCode}
+
+(Mã có hiệu lực trong vòng 5 phút. Vui lòng không chia sẻ mã này cho bất kỳ ai).
+
+Nếu bạn không thực hiện yêu cầu này, vui lòng bỏ qua email hoặc liên hệ hotline: 0794.677.369.
+
+Trân trọng,
+Ban Quản Trị Hệ Sinh Thái One Connect
+Tầng 8, Tòa nhà ASIA, 25 Lê Lợi, TP. Nha Trang, Tỉnh Khánh Hòa
+    `.trim();
 
     const htmlContent = `
       <!DOCTYPE html>
@@ -130,8 +148,15 @@ export async function POST(req: NextRequest) {
         await smtpTransporter.sendMail({
           from: `"One Connect Network" <${gmailUser}>`,
           to: email,
+          replyTo: 'contact.johnnylongho@gmail.com',
           subject,
+          text: textContent,
           html: htmlContent,
+          headers: {
+            'X-Priority': '1',
+            'X-MSMail-Priority': 'High',
+            'Importance': 'high',
+          },
         });
 
         return NextResponse.json({
