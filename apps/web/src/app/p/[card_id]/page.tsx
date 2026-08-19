@@ -1201,172 +1201,177 @@ END:VCARD`;
           </DialogContent>
         </Dialog>
 
-        {/* EDIT PROFILE MODAL (HIGH CONTRAST & INTUITIVE) */}
+        {/* EDIT PROFILE MODAL (OPTIMIZED RESPONSIVE MODAL WITH STICKY FOOTER) */}
         <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
-          <DialogContent className="max-w-md bg-white border border-slate-200 text-slate-900 shadow-2xl rounded-3xl p-6 sm:p-7">
-            <DialogHeader className="border-b border-slate-100 pb-3 text-left">
+          <DialogContent className="max-w-md w-[95vw] sm:w-full bg-white border border-slate-200 text-slate-900 shadow-2xl rounded-3xl p-0 flex flex-col max-h-[88vh] sm:max-h-[85vh] overflow-hidden">
+            
+            {/* STICKY TOP MODAL HEADER */}
+            <div className="px-5 py-4 border-b border-slate-100 bg-white flex items-center justify-between shrink-0">
               <div className="flex items-center gap-2.5">
-                <div className="p-2 rounded-xl bg-blue-50 text-[#0066FF]">
+                <div className="p-2 rounded-xl bg-blue-50 text-[#0066FF] shrink-0">
                   <Edit3 className="w-5 h-5" />
                 </div>
                 <div>
                   <DialogTitle className="text-base sm:text-lg font-black text-slate-900 font-heading">
                     Chỉnh Sửa Hồ Sơ Cá Nhân
                   </DialogTitle>
-                  <DialogDescription className="text-xs text-slate-500 font-medium">
+                  <DialogDescription className="text-[11.5px] text-slate-500 font-medium">
                     Cập nhật danh thiếp số hiển thị cho đối tác & thẻ NFC 1-chạm
                   </DialogDescription>
                 </div>
               </div>
-            </DialogHeader>
+            </div>
 
-            <form onSubmit={handleSaveProfile} className="space-y-3.5 py-2">
-              <div className="grid grid-cols-2 gap-2.5">
+            {/* SCROLLABLE FORM BODY */}
+            <form onSubmit={handleSaveProfile} className="flex-1 flex flex-col min-h-0 overflow-hidden">
+              <div className="flex-1 overflow-y-auto px-5 py-4 space-y-3.5 overscroll-contain">
+                <div className="grid grid-cols-2 gap-2.5">
+                  <div className="space-y-1 text-left">
+                    <label className="text-[11px] font-bold text-slate-800 uppercase tracking-wider">Họ và Tên <span className="text-red-500">*</span></label>
+                    <input
+                      required
+                      value={editFullName}
+                      onChange={(e) => setEditFullName(e.target.value)}
+                      placeholder="VD: Hồ Hoàng Long"
+                      className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-semibold text-slate-900 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0066FF]/20 focus:border-[#0066FF]"
+                    />
+                  </div>
+                  <div className="space-y-1 text-left">
+                    <label className="text-[11px] font-bold text-slate-800 uppercase tracking-wider">Tên Thường Gọi</label>
+                    <input
+                      value={editDisplayName}
+                      onChange={(e) => setEditDisplayName(e.target.value)}
+                      placeholder="VD: Johnny Long Hồ"
+                      className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-semibold text-slate-900 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0066FF]/20 focus:border-[#0066FF]"
+                    />
+                  </div>
+                </div>
+
                 <div className="space-y-1 text-left">
-                  <label className="text-[11px] font-bold text-slate-800 uppercase tracking-wider">Họ và Tên <span className="text-red-500">*</span></label>
+                  <label className="text-[11px] font-bold text-slate-800 uppercase tracking-wider">Chức Danh / Vị Trí Công Tác <span className="text-red-500">*</span></label>
                   <input
                     required
-                    value={editFullName}
-                    onChange={(e) => setEditFullName(e.target.value)}
-                    placeholder="VD: Hồ Hoàng Long"
+                    value={editTitle}
+                    onChange={(e) => setEditTitle(e.target.value)}
+                    placeholder="VD: Giám Đốc Dự Án & Media Director"
                     className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-semibold text-slate-900 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0066FF]/20 focus:border-[#0066FF]"
                   />
                 </div>
+
                 <div className="space-y-1 text-left">
-                  <label className="text-[11px] font-bold text-slate-800 uppercase tracking-wider">Tên Thường Gọi</label>
+                  <label className="text-[11px] font-bold text-slate-800 uppercase tracking-wider">Tên Doanh Nghiệp / Hiệp Hội <span className="text-red-500">*</span></label>
                   <input
-                    value={editDisplayName}
-                    onChange={(e) => setEditDisplayName(e.target.value)}
-                    placeholder="VD: Johnny Long Hồ"
+                    required
+                    value={editCompany}
+                    onChange={(e) => setEditCompany(e.target.value)}
+                    placeholder="VD: Tập đoàn Công nghệ Số A+ (APLUSVN)"
                     className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-semibold text-slate-900 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0066FF]/20 focus:border-[#0066FF]"
                   />
                 </div>
-              </div>
 
-              <div className="space-y-1 text-left">
-                <label className="text-[11px] font-bold text-slate-800 uppercase tracking-wider">Chức Danh / Vị Trí Công Tác <span className="text-red-500">*</span></label>
-                <input
-                  required
-                  value={editTitle}
-                  onChange={(e) => setEditTitle(e.target.value)}
-                  placeholder="VD: Giám Đốc Dự Án & Media Director"
-                  className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-semibold text-slate-900 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0066FF]/20 focus:border-[#0066FF]"
-                />
-              </div>
+                <div className="grid grid-cols-2 gap-2.5">
+                  <div className="space-y-1 text-left">
+                    <label className="text-[11px] font-bold text-slate-800 uppercase tracking-wider">Mã Số Thuế / GPKD</label>
+                    <input
+                      value={editTaxCode}
+                      onChange={(e) => setEditTaxCode(e.target.value)}
+                      placeholder="VD: 0316888999"
+                      className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-semibold text-slate-900 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0066FF]/20 focus:border-[#0066FF]"
+                    />
+                  </div>
+                  <div className="space-y-1 text-left">
+                    <label className="text-[11px] font-bold text-slate-800 uppercase tracking-wider">Hiệp Hội / Đoàn Thể</label>
+                    <input
+                      value={editAssociation}
+                      onChange={(e) => setEditAssociation(e.target.value)}
+                      placeholder="VD: Hiệp hội Doanh nhân Aplusvn"
+                      className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-semibold text-slate-900 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0066FF]/20 focus:border-[#0066FF]"
+                    />
+                  </div>
+                </div>
 
-              <div className="space-y-1 text-left">
-                <label className="text-[11px] font-bold text-slate-800 uppercase tracking-wider">Tên Doanh Nghiệp / Hiệp Hội <span className="text-red-500">*</span></label>
-                <input
-                  required
-                  value={editCompany}
-                  onChange={(e) => setEditCompany(e.target.value)}
-                  placeholder="VD: Tập đoàn Công nghệ Số A+ (APLUSVN)"
-                  className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-semibold text-slate-900 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0066FF]/20 focus:border-[#0066FF]"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-2.5">
                 <div className="space-y-1 text-left">
-                  <label className="text-[11px] font-bold text-slate-800 uppercase tracking-wider">Mã Số Thuế / GPKD</label>
+                  <label className="text-[11px] font-bold text-slate-800 uppercase tracking-wider">Địa Chỉ Trụ Sở Chính Doanh Nghiệp</label>
                   <input
-                    value={editTaxCode}
-                    onChange={(e) => setEditTaxCode(e.target.value)}
-                    placeholder="VD: 0316888999"
+                    value={editAddress}
+                    onChange={(e) => setEditAddress(e.target.value)}
+                    placeholder="VD: Tầng 8, Tòa nhà ASIA, 25 Lê Lợi, TP. Nha Trang, Khánh Hòa"
                     className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-semibold text-slate-900 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0066FF]/20 focus:border-[#0066FF]"
                   />
                 </div>
+
                 <div className="space-y-1 text-left">
-                  <label className="text-[11px] font-bold text-slate-800 uppercase tracking-wider">Hiệp Hội / Đoàn Thể</label>
+                  <label className="text-[11px] font-bold text-slate-800 uppercase tracking-wider">Khẩu Hiệu / Slogan Doanh Nghiệp</label>
                   <input
-                    value={editAssociation}
-                    onChange={(e) => setEditAssociation(e.target.value)}
-                    placeholder="VD: Hiệp hội Doanh nhân Aplusvn"
+                    value={editSlogan}
+                    onChange={(e) => setEditSlogan(e.target.value)}
+                    placeholder="VD: Bứt Phá Giao Thương - Chuyển Hóa Mối Quan Hệ Kinh Doanh Số"
                     className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-semibold text-slate-900 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0066FF]/20 focus:border-[#0066FF]"
                   />
                 </div>
-              </div>
 
-              <div className="space-y-1 text-left">
-                <label className="text-[11px] font-bold text-slate-800 uppercase tracking-wider">Địa Chỉ Trụ Sở Chính Doanh Nghiệp</label>
-                <input
-                  value={editAddress}
-                  onChange={(e) => setEditAddress(e.target.value)}
-                  placeholder="VD: Tầng 8, Tòa nhà ASIA, 25 Lê Lợi, TP. Nha Trang, Khánh Hòa"
-                  className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-semibold text-slate-900 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0066FF]/20 focus:border-[#0066FF]"
-                />
-              </div>
+                <div className="grid grid-cols-2 gap-2.5">
+                  <div className="space-y-1 text-left">
+                    <label className="text-[11px] font-bold text-slate-800 uppercase tracking-wider">Số Điện Thoại</label>
+                    <input
+                      type="tel"
+                      value={editPhone}
+                      onChange={(e) => setEditPhone(e.target.value)}
+                      placeholder="VD: 0794677369"
+                      className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-semibold text-slate-900 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0066FF]/20 focus:border-[#0066FF]"
+                    />
+                  </div>
+                  <div className="space-y-1 text-left">
+                    <label className="text-[11px] font-bold text-slate-800 uppercase tracking-wider">Email Công Tác</label>
+                    <input
+                      type="email"
+                      value={editEmail}
+                      onChange={(e) => setEditEmail(e.target.value)}
+                      placeholder="VD: contact@aplusvn.com"
+                      className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-semibold text-slate-900 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0066FF]/20 focus:border-[#0066FF]"
+                    />
+                  </div>
+                </div>
 
-              <div className="space-y-1 text-left">
-                <label className="text-[11px] font-bold text-slate-800 uppercase tracking-wider">Khẩu Hiệu / Slogan Doanh Nghiệp</label>
-                <input
-                  value={editSlogan}
-                  onChange={(e) => setEditSlogan(e.target.value)}
-                  placeholder="VD: Bứt Phá Giao Thương - Chuyển Hóa Mối Quan Hệ Kinh Doanh Số"
-                  className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-semibold text-slate-900 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0066FF]/20 focus:border-[#0066FF]"
-                />
-              </div>
-
-
-              <div className="grid grid-cols-2 gap-2.5">
                 <div className="space-y-1 text-left">
-                  <label className="text-[11px] font-bold text-slate-800 uppercase tracking-wider">Số Điện Thoại</label>
+                  <label className="text-[11px] font-bold text-slate-800 uppercase tracking-wider">Website / Cổng Thông Tin</label>
                   <input
-                    type="tel"
-                    value={editPhone}
-                    onChange={(e) => setEditPhone(e.target.value)}
-                    placeholder="VD: 0794677369"
+                    value={editWebsite}
+                    onChange={(e) => setEditWebsite(e.target.value)}
+                    placeholder="VD: https://aplusvn.net"
                     className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-semibold text-slate-900 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0066FF]/20 focus:border-[#0066FF]"
                   />
                 </div>
+
                 <div className="space-y-1 text-left">
-                  <label className="text-[11px] font-bold text-slate-800 uppercase tracking-wider">Email Công Tác</label>
-                  <input
-                    type="email"
-                    value={editEmail}
-                    onChange={(e) => setEditEmail(e.target.value)}
-                    placeholder="VD: contact@aplusvn.com"
-                    className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-semibold text-slate-900 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0066FF]/20 focus:border-[#0066FF]"
+                  <label className="text-[11px] font-bold text-slate-800 uppercase tracking-wider">Giới Thiệu Ngắn (Bio)</label>
+                  <textarea
+                    rows={3}
+                    value={editBio}
+                    onChange={(e) => setEditBio(e.target.value)}
+                    placeholder="Mô tả kinh nghiệm, thế mạnh kinh doanh..."
+                    className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-medium text-slate-900 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0066FF]/20 focus:border-[#0066FF]"
                   />
                 </div>
               </div>
 
-              <div className="space-y-1 text-left">
-                <label className="text-[11px] font-bold text-slate-800 uppercase tracking-wider">Website / Cổng Thông Tin</label>
-                <input
-                  value={editWebsite}
-                  onChange={(e) => setEditWebsite(e.target.value)}
-                  placeholder="VD: https://aplusvn.net"
-                  className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-semibold text-slate-900 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0066FF]/20 focus:border-[#0066FF]"
-                />
-              </div>
-
-              <div className="space-y-1 text-left">
-                <label className="text-[11px] font-bold text-slate-800 uppercase tracking-wider">Giới Thiệu Ngắn (Bio)</label>
-                <textarea
-                  rows={3}
-                  value={editBio}
-                  onChange={(e) => setEditBio(e.target.value)}
-                  placeholder="Mô tả kinh nghiệm, thế mạnh kinh doanh..."
-                  className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-medium text-slate-900 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0066FF]/20 focus:border-[#0066FF]"
-                />
-              </div>
-
-              <DialogFooter className="pt-2 gap-2 flex-row justify-end">
+              {/* STICKY BOTTOM ACTIONS FOOTER (LUÔN NẰM CỐ ĐỊNH, DỄ BẤM TRÊN MOBILE) */}
+              <div className="px-5 py-3.5 border-t border-slate-100 bg-slate-50/95 backdrop-blur-sm shrink-0 flex items-center justify-end gap-2.5 shadow-xs">
                 <Button
                   type="button"
                   variant="outline"
                   onClick={() => setIsEditModalOpen(false)}
-                  className="text-xs font-bold rounded-xl border-slate-300 text-slate-700 py-2.5 px-4 cursor-pointer hover:bg-slate-100"
+                  className="flex-1 sm:flex-initial text-xs font-bold rounded-xl border-slate-300 text-slate-700 py-3 px-5 cursor-pointer hover:bg-slate-100"
                 >
                   Hủy Bỏ
                 </Button>
                 <Button
                   type="submit"
-                  className="bg-[#0066FF] hover:bg-blue-700 text-white font-extrabold text-xs rounded-xl py-2.5 px-5 shadow-sm cursor-pointer"
+                  className="flex-1 sm:flex-initial bg-[#0066FF] hover:bg-blue-700 text-white font-extrabold text-xs rounded-xl py-3 px-6 shadow-sm cursor-pointer"
                 >
                   Lưu & Cập Nhật Thẻ
                 </Button>
-              </DialogFooter>
+              </div>
             </form>
           </DialogContent>
         </Dialog>
