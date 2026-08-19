@@ -6,15 +6,22 @@ const resendApiKey = process.env.RESEND_API_KEY;
 const resend = resendApiKey ? new Resend(resendApiKey) : null;
 
 // Gmail SMTP Transporter (Alternative Free Option)
-const gmailUser = process.env.GMAIL_USER || process.env.SMTP_USER;
-const gmailPass = process.env.GMAIL_APP_PASSWORD || process.env.SMTP_PASSWORD;
+const rawGmailUser = process.env.GMAIL_USER || process.env.SMTP_USER;
+const rawGmailPass = process.env.GMAIL_APP_PASSWORD || process.env.SMTP_PASSWORD;
+const gmailUser = rawGmailUser?.trim();
+const gmailPass = rawGmailPass ? rawGmailPass.replace(/\s+/g, '') : undefined;
 
 const smtpTransporter = (gmailUser && gmailPass)
   ? nodemailer.createTransport({
-      service: 'gmail',
+      host: 'smtp.gmail.com',
+      port: 587,
+      secure: false,
       auth: {
         user: gmailUser,
         pass: gmailPass,
+      },
+      tls: {
+        rejectUnauthorized: false,
       },
     })
   : null;
