@@ -205,9 +205,22 @@ function RegisterForm() {
         setStep('success');
         setLoading(false);
 
+        // Gửi Thư Chào Mừng VIP tự động về hòm thư đối tác
+        fetch('/api/auth/send-welcome', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email,
+            fullName,
+            title: title || 'Giám Đốc Doanh Nghiệp',
+            businessName,
+            profileUrl: typeof window !== 'undefined' ? `${window.location.origin}${targetUrl}` : `https://one-connect-network.vercel.app${targetUrl}`,
+          }),
+        }).catch((err) => console.warn('Send welcome email error:', err));
+
         setTimeout(() => {
           router.push(targetUrl);
-        }, 1500);
+        }, 1600);
       } else {
         const { organization, admin } = registerOrganization({
           orgName,
@@ -226,9 +239,22 @@ function RegisterForm() {
         setStep('success');
         setLoading(false);
 
+        // Gửi Thư Chào Mừng Quản Trị Tổ Chức
+        fetch('/api/auth/send-welcome', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: adminEmail,
+            fullName: adminFullName,
+            title: adminTitle || 'Trưởng Ban Quản Trị Tổ Chức',
+            businessName: orgName,
+            profileUrl: typeof window !== 'undefined' ? `${window.location.origin}/admin/org/members` : `https://one-connect-network.vercel.app/admin/org/members`,
+          }),
+        }).catch((err) => console.warn('Send welcome email error:', err));
+
         setTimeout(() => {
           router.push(targetUrl);
-        }, 1500);
+        }, 1600);
       }
     }, 800);
   };
