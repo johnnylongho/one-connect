@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useOneConnectStore } from '@/lib/store';
 import { RoleType } from '@/lib/types';
+import WorkspaceRoleSwitcher from '@/components/WorkspaceRoleSwitcher';
 import {
   CreditCard,
   QrCode,
@@ -140,27 +141,17 @@ export default function Navbar() {
           )}
         </nav>
 
-        {/* User Persona & Role Switcher */}
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => setShowRoleModal(!showRoleModal)}
-            className="flex items-center gap-2 px-3 py-1.5 rounded-2xl bg-slate-50 hover:bg-slate-100 border border-slate-200/90 text-left transition-all text-xs shadow-2xs cursor-pointer"
+        {/* Workspace & Role Switcher + Auth Options */}
+        <div className="flex items-center gap-2.5">
+          <WorkspaceRoleSwitcher />
+
+          <Link
+            href="/login"
+            className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs transition-all shadow-xs cursor-pointer active:scale-98"
           >
-            <img
-              src={currentIdentity?.avatarUrl || '/avatar-johnny-long.jpg'}
-              alt={currentIdentity?.fullName || 'User'}
-              className="w-7 h-7 rounded-full object-cover shadow-xs shrink-0"
-            />
-            <div className="hidden sm:block">
-              <p className="font-bold text-slate-900 leading-tight flex items-center gap-1">
-                {currentIdentity?.displayName || 'Johnny Long Hồ'}
-                <ChevronDown className="w-3 h-3 text-slate-500" />
-              </p>
-              <p className="text-[10px] text-[#0066FF] font-mono font-bold">
-                {state.currentRole}
-              </p>
-            </div>
-          </button>
+            <UserCheck className="w-3.5 h-3.5" />
+            <span>Tài Khoản</span>
+          </Link>
         </div>
       </div>
 

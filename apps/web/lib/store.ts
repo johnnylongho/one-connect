@@ -598,6 +598,136 @@ export function useOneConnectStore() {
 
 
 
+  // Register New Paid Organization Workspace (B2B Multi-Tenant)
+  const registerOrganization = (data: {
+    orgName: string;
+    slug?: string;
+    industry?: string;
+    memberCountEstimate?: number;
+    adminFullName: string;
+    adminEmail: string;
+    adminPhone?: string;
+    adminTitle?: string;
+  }) => {
+    const orgId = `org-${Date.now()}`;
+    const cleanSlug = (data.slug || data.orgName.toLowerCase().replace(/[^a-z0-9]/g, '-')).replace(/-+/g, '-');
+    const adminId = `id-admin-${Date.now()}`;
+    const cleanUsername = data.adminFullName.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]/g, '');
+
+    const newOrg: Organization = {
+      id: orgId,
+      name: data.orgName,
+      slug: cleanSlug,
+      industry: data.industry || 'Hiệp hội Doanh nghiệp & Công nghệ',
+      memberCount: data.memberCountEstimate || 50,
+      status: 'ACTIVE',
+      createdAt: new Date().toISOString(),
+    };
+
+    const newAdminIdentity: PersonIdentity = {
+      id: adminId,
+      userId: `user-${Date.now()}`,
+      username: cleanUsername || `admin_${cleanSlug}`,
+      fullName: data.adminFullName,
+      displayName: data.adminFullName,
+      title: data.adminTitle || 'Chủ tịch / Đại diện Tổ chức',
+      phone: data.adminPhone || '0794677369',
+      email: data.adminEmail,
+      association: `${data.orgName} • Ban Lãnh Đạo`,
+      socialLinks: [
+        { id: `s-email-${Date.now()}`, identityId: adminId, platform: 'website', url: `https://one-connect-network.vercel.app/org/${cleanSlug}`, isPublic: true },
+      ],
+      businesses: [
+        {
+          id: `biz-${Date.now()}`,
+          personIdentityId: adminId,
+          businessId: orgId,
+          businessName: data.orgName,
+          position: data.adminTitle || 'Đại diện Tổ chức',
+          relationType: 'OWNER_PRESIDENT',
+          isPrimary: true,
+          status: 'ACTIVE',
+        },
+      ],
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+
+    const newCard: AccessCard = {
+      id: `card-${Date.now()}`,
+      personIdentityId: adminId,
+      cardUid: `NFC-${cleanSlug.substring(0, 4).toUpperCase()}-${Math.floor(100 + Math.random() * 900)}`,
+      cardType: 'NFC_EXECUTIVE',
+      dynamicUrl: `https://one-connect-network.vercel.app/p/${newAdminIdentity.username}`,
+      qrValue: `https://one-connect-network.vercel.app/p/${newAdminIdentity.username}`,
+      status: 'ACTIVE',
+      issuedAt: new Date().toISOString(),
+    };
+
+    setState(prev => ({
+      ...prev,
+      currentRole: 'ORG_ADMIN',
+      currentIdentityId: adminId,
+      organizations: [newOrg, ...prev.organizations],
+      identities: [newAdminIdentity, ...prev.identities],
+      cards: [newCard, ...prev.cards],
+      auditLogs: [
+        {
+          id: `aud-${Date.now()}`,
+          actorUserId: adminId,
+          actorName: data.adminFullName,
+          action: 'ORGANIZATION_REGISTERED_TENANT_PROVISIONED',
+          objectType: 'ORGANIZATION',
+          objectId: orgId,
+          createdAt: new Date().toISOString(),
+        },
+        ...prev.auditLogs,
+      ],
+    }));
+
+    return { organization: newOrg, admin: newAdminIdentity, card: newCard };
+  };
+
+  // Direct Unified Login by Email, Phone or Username
+  const loginUser = (identifier: string) => {
+    const clean = identifier.trim().toLowerCase();
+    const found = state.identities.find(
+      (i) =>
+        i.username.toLowerCase() === clean ||
+        i.id.toLowerCase() === clean ||
+        (i.email && i.email.toLowerCase() === clean) ||
+        (i.phone && i.phone.replace(/[^0-9]/g, '') === clean.replace(/[^0-9]/g, ''))
+    );
+
+    if (found) {
+      setState(prev => ({
+        ...prev,
+        currentIdentityId: found.id,
+      }));
+      return found;
+    }
+
+    // Default fallback to Johnny Long if keywords matched
+    if (clean.includes('admin') || clean.includes('johnny') || clean.includes('long')) {
+      setState(prev => ({
+        ...prev,
+        currentIdentityId: 'id-001',
+      }));
+      return state.identities[0];
+    }
+
+    return null;
+  };
+
+  // Quick Workspace & Role Switcher
+  const switchWorkspace = (role: RoleType, identityId?: string) => {
+    setState(prev => ({
+      ...prev,
+      currentRole: role,
+      currentIdentityId: identityId || prev.currentIdentityId,
+    }));
+  };
+
   // Toggle Privacy
   const updatePrivacy = (newPrivacy: Partial<PrivacySetting>) => {
     setState(prev => ({
@@ -606,7 +736,6 @@ export function useOneConnectStore() {
     }));
   };
 
-
   return {
     state,
     currentIdentity,
@@ -614,6 +743,9 @@ export function useOneConnectStore() {
     setCurrentRole,
     setCurrentIdentityId,
     registerIdentity,
+    registerOrganization,
+    loginUser,
+    switchWorkspace,
     updateIdentity,
     resetState,
     performCheckIn,
