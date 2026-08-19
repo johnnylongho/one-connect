@@ -563,7 +563,7 @@ export function useOneConnectStore() {
 
     setState(prev => ({
       ...prev,
-      currentRole: 'MEMBER',
+      currentRole: 'ORGANIZER',
       currentIdentityId: newId,
       identities: [newIdentity, ...prev.identities],
       cards: [newCard, ...prev.cards],
@@ -766,8 +766,7 @@ export function useOneConnectStore() {
         return null;
       }
       const isSuperAdmin = found.username === 'johnnylongho' || found.id === 'id-001' || clean.includes('johnny');
-      const isOrgAdmin = Boolean(found.businesses?.some(b => b.relationType === 'OWNER_PRESIDENT'));
-      const determinedRole: RoleType = isSuperAdmin ? 'SUPER_ADMIN' : isOrgAdmin ? 'ORG_ADMIN' : 'MEMBER';
+      const determinedRole: RoleType = isSuperAdmin ? 'SUPER_ADMIN' : 'ORGANIZER';
 
       setState(prev => ({
         ...prev,

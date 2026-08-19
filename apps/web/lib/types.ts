@@ -12,7 +12,7 @@ export type LeadStatus = 'NEW' | 'WARM' | 'HOT';
 export type FollowUpType = 'CALL' | 'MEETING' | 'EMAIL' | 'SEND_DOCUMENT' | 'INVITATION' | 'OTHER';
 export type FollowUpStatus = 'TODO' | 'DONE' | 'CANCELLED';
 export type VisibilityLevel = 'PUBLIC' | 'MEMBERS_ONLY' | 'ORGANIZATION_ONLY' | 'PRIVATE';
-export type RoleType = 'SUPER_ADMIN' | 'ORG_ADMIN' | 'EVENT_OPERATOR' | 'MEMBER' | 'GUEST';
+export type RoleType = 'SUPER_ADMIN' | 'ORGANIZER' | 'ORG_ADMIN' | 'EVENT_OPERATOR' | 'MEMBER' | 'GUEST';
 
 export interface IdentitySocialLink {
   id: string;

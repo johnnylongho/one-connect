@@ -461,36 +461,14 @@ export default function RootLayout({
                       </button>
                       <button
                         onClick={() => {
-                          setCurrentRole('ORG_ADMIN');
+                          setCurrentRole('ORGANIZER');
                           setIsRoleDropdownOpen(false);
                         }}
                         className={`w-full text-left px-3 py-2 rounded-lg text-xs font-semibold ${
-                          effectiveRole === 'ORG_ADMIN' ? 'bg-blue-50 text-[#0066FF]' : 'text-slate-700 hover:bg-slate-50'
+                          effectiveRole === 'ORGANIZER' ? 'bg-blue-50 text-[#0066FF]' : 'text-slate-700 hover:bg-slate-50'
                         }`}
                       >
-                        🏛️ ORG_ADMIN (Quản Trị Hiệp Hội)
-                      </button>
-                      <button
-                        onClick={() => {
-                          setCurrentRole('EVENT_OPERATOR');
-                          setIsRoleDropdownOpen(false);
-                        }}
-                        className={`w-full text-left px-3 py-2 rounded-lg text-xs font-semibold ${
-                          effectiveRole === 'EVENT_OPERATOR' ? 'bg-blue-50 text-[#0066FF]' : 'text-slate-700 hover:bg-slate-50'
-                        }`}
-                      >
-                        📱 EVENT_OPERATOR (Lễ Tân Check-in)
-                      </button>
-                      <button
-                        onClick={() => {
-                          setCurrentRole('MEMBER');
-                          setIsRoleDropdownOpen(false);
-                        }}
-                        className={`w-full text-left px-3 py-2 rounded-lg text-xs font-semibold ${
-                          effectiveRole === 'MEMBER' ? 'bg-blue-50 text-[#0066FF]' : 'text-slate-700 hover:bg-slate-50'
-                        }`}
-                      >
-                        💼 MEMBER (Doanh Nhân / Hội Viên)
+                        🏛️ ORGANIZER (Ban Tổ Chức)
                       </button>
                     </div>
                   )}
