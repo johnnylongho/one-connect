@@ -57,6 +57,9 @@ import {
 } from '@/components/ui/dialog';
 import { ToastProvider, useToast } from '@/components/ui/toast';
 import { useOneConnectStore } from '@/lib/store';
+import { DbService } from '@/lib/db-service';
+import { PersonIdentity } from '@/lib/types';
+import BusinessCard3D from '@/components/BusinessCard3D';
 
 // Official Enterprise Verified Badge Component with Guaranteed Fixed Dimensions
 export function EnterpriseVerifiedBadge({ className = "w-6 h-6 min-w-[24px] min-h-[24px]" }: { className?: string }) {
@@ -184,13 +187,26 @@ function DigitalProfileContent() {
     '04:8f',
   ].some((alias) => cleanCardId.includes(alias));
 
-  const matchedIdentity =
-    state.identities.find(
-      (i) =>
-        i.username.toLowerCase() === cleanCardId ||
-        i.id.toLowerCase() === cleanCardId ||
-        (isJohnnyLongAlias && (i.username === 'johnnylongho' || i.username === 'johnnylong' || i.id === 'id-001'))
-    ) || (isJohnnyLongAlias ? currentIdentity : null) || state.identities[0];
+  const [cloudIdentity, setCloudIdentity] = useState<PersonIdentity | null>(null);
+
+  const localMatched = state.identities.find(
+    (i) =>
+      i.username.toLowerCase() === cleanCardId ||
+      i.id.toLowerCase() === cleanCardId ||
+      (isJohnnyLongAlias && (i.username === 'johnnylongho' || i.username === 'johnnylong' || i.id === 'id-001'))
+  );
+
+  useEffect(() => {
+    if (!localMatched && !isJohnnyLongAlias) {
+      DbService.getIdentity(cleanCardId).then((fetched) => {
+        if (fetched) {
+          setCloudIdentity(fetched);
+        }
+      });
+    }
+  }, [cleanCardId, localMatched, isJohnnyLongAlias]);
+
+  const matchedIdentity = cloudIdentity || localMatched || (isJohnnyLongAlias ? currentIdentity : null) || state.identities[0];
 
   const matchedCard = state.cards.find(c => c.personIdentityId === matchedIdentity?.id && c.status === 'ACTIVE') || state.cards[0];
 

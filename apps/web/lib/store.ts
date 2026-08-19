@@ -15,6 +15,7 @@ import {
   AuditLog,
   RoleType
 } from './types';
+import { DbService } from './db-service';
 import {
   INITIAL_IDENTITIES,
   INITIAL_CARDS,
@@ -112,6 +113,38 @@ export function useOneConnectStore() {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
     }
   }, [state]);
+
+  // Realtime Cloud Synchronization with Supabase
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const unsubscribe = DbService.subscribeToRealtime(({ table, newRecord }) => {
+      if (table === 'check_ins' && newRecord) {
+        setState(prev => {
+          if (prev.checkIns.some(c => c.id === newRecord.id)) return prev;
+          return {
+            ...prev,
+            checkIns: [
+              {
+                id: newRecord.id || `chk-${Date.now()}`,
+                eventId: newRecord.event_id || 'evt-001',
+                registrationId: newRecord.registration_id || `reg-${Date.now()}`,
+                personIdentityId: newRecord.person_identity_id,
+                method: newRecord.check_in_method || 'NFC',
+                checkedInAt: newRecord.check_in_time || new Date().toISOString(),
+                operatorName: newRecord.verified_by || 'Trạm Check-in',
+              },
+              ...prev.checkIns,
+            ],
+          };
+        });
+      }
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, []);
 
   const currentIdentity = state.identities.find(i => i.id === state.currentIdentityId) || state.identities[0];
   const currentCard = state.cards.find(c => c.personIdentityId === state.currentIdentityId && c.status === 'ACTIVE') || state.cards[0];
@@ -254,6 +287,16 @@ export function useOneConnectStore() {
         auditLogs: [newAuditLog, ...prev.auditLogs],
       };
     });
+
+    // Sync with Cloud Database
+    if (targetIdentity) {
+      DbService.recordCheckIn({
+        eventId,
+        personIdentityId: targetIdentity.id,
+        checkInMethod: method,
+        verifiedBy: newCheckIn.operatorName,
+      }).catch(console.error);
+    }
 
     return {
       success: true,
@@ -525,6 +568,9 @@ export function useOneConnectStore() {
       cards: [newCard, ...prev.cards],
       auditLogs: [newAuditLog, ...prev.auditLogs],
     }));
+
+    // Sync with Cloud Database
+    DbService.createIdentity(newIdentity, newCard, data.password).catch(console.error);
 
     return { identity: newIdentity, card: newCard };
   };
