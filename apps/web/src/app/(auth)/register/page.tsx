@@ -62,6 +62,12 @@ function RegisterForm() {
   const [otpCode, setOtpCode] = useState(['', '', '', '', '', '']);
   const [errorMsg, setErrorMsg] = useState('');
   const [loading, setLoading] = useState(false);
+  const [emailDeliveryStatus, setEmailDeliveryStatus] = useState<{
+    delivered?: boolean;
+    provider?: string;
+    message?: string;
+    resendError?: string;
+  } | null>(null);
   const [registeredProfileUrl, setRegisteredProfileUrl] = useState('');
   const [countdown, setCountdown] = useState(60);
 
@@ -136,7 +142,13 @@ function RegisterForm() {
       }),
     })
       .then((res) => res.json())
-      .catch((err) => console.warn('Send OTP network error:', err))
+      .then((data) => {
+        setEmailDeliveryStatus(data);
+      })
+      .catch((err) => {
+        console.warn('Send OTP network error:', err);
+        setEmailDeliveryStatus({ delivered: false, message: 'Lỗi mạng khi gọi cổng email' });
+      })
       .finally(() => {
         setLoading(false);
         setStep('otp');
@@ -669,20 +681,38 @@ function RegisterForm() {
           {/* ============================================================= */}
           {step === 'otp' && (
             <form onSubmit={handleVerifyAndActivate} className="space-y-5 text-center">
-              {/* Simulated OTP Notification Banner */}
+              {/* Real Email & Simulated OTP Notification Banner */}
               <div className="p-3.5 rounded-2xl bg-blue-500/15 border border-blue-400/30 text-left flex items-start gap-3 shadow-lg">
                 <div className="w-8 h-8 rounded-xl bg-blue-600 text-white flex items-center justify-center shrink-0">
                   <Mail className="w-4 h-4" />
                 </div>
-                <div className="space-y-0.5 flex-1">
-                  <p className="text-[11px] font-bold text-slate-200">
-                    One Connect Verification Service:
-                  </p>
+                <div className="space-y-1 flex-1">
+                  <div className="flex items-center gap-2">
+                    <span className="text-[11px] font-bold text-slate-200">
+                      Cổng xác thực One Connect:
+                    </span>
+                    {emailDeliveryStatus?.delivered ? (
+                      <span className="px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 text-[10px] font-bold">
+                        Đã gửi Email thật
+                      </span>
+                    ) : (
+                      <span className="px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 text-[10px] font-bold">
+                        Mã hiển thị trực tiếp
+                      </span>
+                    )}
+                  </div>
+                  
+                  {emailDeliveryStatus?.resendError && (
+                    <p className="text-[10px] text-amber-300/90 leading-tight">
+                      Lưu ý Resend Free: {emailDeliveryStatus.resendError}
+                    </p>
+                  )}
+
                   <p className="text-xs text-[#00C2FF]">
                     Mã OTP của bạn là: <strong className="font-mono text-white text-sm tracking-wider bg-slate-950 px-2 py-0.5 rounded-md border border-blue-400/40">{generatedOtp}</strong>
                   </p>
                   <p className="text-[10px] text-slate-400">
-                    Đã gửi tới: {currentEmailTarget} (Hiệu lực: {countdown}s)
+                    Gửi tới: <span className="text-slate-200">{currentEmailTarget}</span> (Hiệu lực: {countdown}s)
                   </p>
                 </div>
                 <button
