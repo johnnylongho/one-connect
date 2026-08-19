@@ -584,15 +584,16 @@ export default function DigitalNfcCardPage() {
                   <div className="min-w-0 flex-1">
                     <p className="text-[10px] text-slate-400 font-mono uppercase tracking-wider">Đường dẫn nạp vào thẻ:</p>
                     <p className="text-xs font-mono font-bold text-[#00C2FF] truncate">
-                      https://one-connect-network.vercel.app/p/johnnylongho
+                      {typeof window !== 'undefined' ? `${window.location.origin}/p/${currentIdentity?.username || 'johnnylongho'}` : `https://one-connect-network.vercel.app/p/${currentIdentity?.username || 'johnnylongho'}`}
                     </p>
                   </div>
                   <Button
                     size="sm"
                     onClick={() => {
                       if (typeof window !== 'undefined') {
-                        navigator.clipboard.writeText('https://one-connect-network.vercel.app/p/johnnylongho');
-                        showAlert('Đã sao chép đường dẫn hồ sơ! Hãy dán vào app NFC Tools để ghi thẻ.', 'success');
+                        const targetUrl = `${window.location.origin}/p/${currentIdentity?.username || 'johnnylongho'}`;
+                        navigator.clipboard.writeText(targetUrl);
+                        showAlert(`Đã sao chép link profile [${currentIdentity?.fullName || 'Doanh nhân'}]! Hãy dán vào app NFC Tools để ghi thẻ.`, 'success');
                       }
                     }}
                     className="bg-[#0066FF] hover:bg-blue-600 text-white font-bold text-xs rounded-lg px-3 py-1.5 shrink-0 cursor-pointer shadow-xs"

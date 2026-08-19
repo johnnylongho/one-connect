@@ -24,6 +24,7 @@ import {
   ChevronLeft,
   ChevronRight,
 } from 'lucide-react';
+import { useOneConnectStore } from '@/lib/store';
 import './globals.css';
 
 const beVietnamPro = Be_Vietnam_Pro({
@@ -52,11 +53,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const pathname = usePathname();
+  const { currentIdentity, state } = useOneConnectStore();
   const [currentRole, setCurrentRole] = useState<'SUPER_ADMIN' | 'ORGANIZER'>('SUPER_ADMIN');
   const [isRoleDropdownOpen, setIsRoleDropdownOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+
+  const currentUserName = currentIdentity?.displayName || currentIdentity?.fullName || 'Hội Viên One Connect';
+  const currentUserAvatar = currentIdentity?.avatarUrl || (currentIdentity?.username === 'johnnylongho' ? '/avatar-johnny-long.jpg' : `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(currentUserName)}`);
+  const effectiveRole = state?.currentRole || currentRole;
 
   // Load saved sidebar state from localStorage if available
   useEffect(() => {
@@ -206,16 +212,16 @@ export default function RootLayout({
               {!isSidebarCollapsed ? (
                 <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-center gap-3">
                   <img
-                    src="/avatar-johnny-long.jpg"
-                    alt="Johnny Long Hồ"
-                    className="w-9 h-9 rounded-full object-cover border-2 border-blue-500 shadow-sm shrink-0"
+                    src={currentUserAvatar}
+                    alt={currentUserName}
+                    className="w-9 h-9 rounded-full object-cover border-2 border-blue-500 shadow-sm shrink-0 bg-white"
                   />
                   <div className="min-w-0 flex-1">
-                    <p className="font-bold text-slate-900 text-xs truncate">Johnny Long Hồ</p>
+                    <p className="font-bold text-slate-900 text-xs truncate">{currentUserName}</p>
                     <div className="flex items-center gap-1 mt-0.5">
                       <span className="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                       <span className="text-[9px] font-extrabold text-blue-700 bg-blue-50 px-1.5 py-0.5 rounded border border-blue-200 uppercase">
-                        {currentRole}
+                        {effectiveRole}
                       </span>
                     </div>
                   </div>
@@ -223,13 +229,13 @@ export default function RootLayout({
               ) : (
                 <div
                   className="flex justify-center p-1.5 rounded-xl bg-slate-50 border border-slate-200/80 cursor-pointer"
-                  title={`Johnny Long Hồ (${currentRole})`}
+                  title={`${currentUserName} (${effectiveRole})`}
                 >
                   <div className="relative">
                     <img
-                      src="/avatar-johnny-long.jpg"
-                      alt="Johnny Long Hồ"
-                      className="w-8 h-8 rounded-full object-cover border-2 border-blue-500"
+                      src={currentUserAvatar}
+                      alt={currentUserName}
+                      className="w-8 h-8 rounded-full object-cover border-2 border-blue-500 bg-white"
                     />
                     <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-500 border border-white" />
                   </div>
