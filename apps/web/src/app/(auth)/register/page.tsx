@@ -19,6 +19,9 @@ import {
   Crown,
   Users,
   Radio,
+  Lock,
+  KeyRound,
+  AlertCircle,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useOneConnectStore } from '@/lib/store';
@@ -28,9 +31,10 @@ export default function RegisterPage() {
   const searchParams = useSearchParams();
   const initialType = searchParams?.get('type') === 'org' ? 'org' : 'personal';
 
-  const { registerIdentity, registerOrganization } = useOneConnectStore();
+  const { registerIdentity, registerOrganization, setCurrentIdentityId } = useOneConnectStore();
 
   const [accountType, setAccountType] = useState<'personal' | 'org'>(initialType);
+  const [step, setStep] = useState<'form' | 'otp' | 'success'>('form');
 
   // Personal Form Fields
   const [fullName, setFullName] = useState('');
@@ -48,8 +52,11 @@ export default function RegisterPage() {
   const [adminEmail, setAdminEmail] = useState('');
   const [adminPhone, setAdminPhone] = useState('');
 
+  // OTP Verification States
+  const [otpCode, setOtpCode] = useState(['', '', '', '', '', '']);
+  const [errorMsg, setErrorMsg] = useState('');
   const [loading, setLoading] = useState(false);
-  const [successMsg, setSuccessMsg] = useState<{ title: string; desc: string; redirect: string } | null>(null);
+  const [registeredProfileUrl, setRegisteredProfileUrl] = useState('');
 
   useEffect(() => {
     if (searchParams?.get('type') === 'org') {
@@ -57,65 +64,103 @@ export default function RegisterPage() {
     }
   }, [searchParams]);
 
-  // Handle Personal Registration
-  const handlePersonalSubmit = (e: React.FormEvent) => {
+  // Step 1: Proceed to OTP Verification
+  const handleProceedToOtp = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!fullName || !businessName || !email) return;
+    setErrorMsg('');
+
+    if (accountType === 'personal') {
+      if (!fullName.trim() || !businessName.trim() || !email.trim()) {
+        setErrorMsg('Vui lòng điền đầy đủ Họ tên, Tên doanh nghiệp và Email');
+        return;
+      }
+    } else {
+      if (!orgName.trim() || !adminFullName.trim() || !adminEmail.trim()) {
+        setErrorMsg('Vui lòng điền đầy đủ Tên tổ chức, Người đại diện và Email');
+        return;
+      }
+    }
 
     setLoading(true);
-
     setTimeout(() => {
-      const { identity } = registerIdentity({
-        fullName,
-        title: title || 'Giám Đốc Dự Án',
-        businessName,
-        phone: phone || '0794677369',
-        email,
-      });
-
-      setSuccessMsg({
-        title: 'Khởi Tạo Danh Thiếp Số Thành Công!',
-        desc: `Chào mừng ${fullName} gia nhập One Connect. Thẻ NFC và Profile số của bạn đã sẵn sàng.`,
-        redirect: `/p/${identity.username || 'johnnylongho'}`,
-      });
       setLoading(false);
-
-      setTimeout(() => {
-        router.push('/dashboard/card');
-      }, 1200);
-    }, 700);
+      setStep('otp');
+    }, 500);
   };
 
-  // Handle Organization Registration
-  const handleOrgSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!orgName || !adminFullName || !adminEmail) return;
+  // Handle OTP Digit Input
+  const handleOtpChange = (index: number, val: string) => {
+    if (val.length > 1) {
+      val = val.slice(-1);
+    }
+    const next = [...otpCode];
+    next[index] = val;
+    setOtpCode(next);
 
+    // Auto-focus next input
+    if (val && index < 5) {
+      const nextInput = document.getElementById(`reg-otp-${index + 1}`);
+      nextInput?.focus();
+    }
+  };
+
+  // Step 2: Confirm OTP & Activate Account
+  const handleVerifyAndActivate = (e: React.FormEvent) => {
+    e.preventDefault();
+    const entered = otpCode.join('');
+    if (entered.length < 6) {
+      setErrorMsg('Vui lòng nhập đủ 6 chữ số mã xác thực OTP (ví dụ: 123456)');
+      return;
+    }
+
+    setErrorMsg('');
     setLoading(true);
 
     setTimeout(() => {
-      const { organization } = registerOrganization({
-        orgName,
-        industry: orgIndustry,
-        memberCountEstimate: parseInt(orgMemberCount, 10) || 100,
-        adminFullName,
-        adminTitle,
-        adminEmail,
-        adminPhone,
-      });
+      if (accountType === 'personal') {
+        const { identity } = registerIdentity({
+          fullName,
+          title: title || 'Giám Đốc Doanh Nghiệp',
+          businessName,
+          phone: phone || '0794677369',
+          email,
+        });
 
-      setSuccessMsg({
-        title: 'Khởi Tạo Không Gian Tổ Chức Thành Công!',
-        desc: `Không gian ${orgName} đã được thiết lập. Đang chuyển hướng vào bảng điều khiển quản trị...`,
-        redirect: '/admin/org/members',
-      });
-      setLoading(false);
+        setCurrentIdentityId(identity.id);
+        const targetUrl = `/p/${identity.username}`;
+        setRegisteredProfileUrl(targetUrl);
+        setStep('success');
+        setLoading(false);
 
-      setTimeout(() => {
-        router.push('/admin/org/members');
-      }, 1200);
+        setTimeout(() => {
+          router.push(targetUrl);
+        }, 1500);
+      } else {
+        const { organization, admin } = registerOrganization({
+          orgName,
+          industry: orgIndustry,
+          memberCountEstimate: parseInt(orgMemberCount, 10) || 100,
+          adminFullName,
+          adminTitle,
+          adminEmail,
+          adminPhone,
+        });
+
+        setCurrentIdentityId(admin.id);
+        const targetUrl = `/admin/org/members`;
+        setRegisteredProfileUrl(targetUrl);
+        setStep('success');
+        setLoading(false);
+
+        setTimeout(() => {
+          router.push(targetUrl);
+        }, 1500);
+      }
     }, 800);
   };
+
+  const currentEmailTarget = accountType === 'personal' ? email : adminEmail;
+  const currentPhoneTarget = accountType === 'personal' ? phone : adminPhone;
 
   return (
     <div className="min-h-screen bg-[#070A12] text-slate-100 flex flex-col justify-between selection:bg-blue-600 selection:text-white relative overflow-hidden">
@@ -158,69 +203,85 @@ export default function RegisterPage() {
               Đăng Ký Tài Khoản Mới
             </h1>
             <p className="text-xs text-slate-400 max-w-md mx-auto">
-              Lựa chọn hình thức đăng ký phù hợp với nhu cầu kết nối và quản trị của bạn
+              Khởi tạo danh tính số và xác thực bảo mật 2 lớp chuẩn PDPL
             </p>
           </div>
 
-          {/* Account Type Selector (Personal vs B2B Organization) */}
-          <div className="grid grid-cols-2 p-1.5 rounded-2xl bg-slate-950/90 border border-slate-800 gap-1.5 text-xs font-bold">
-            <button
-              type="button"
-              onClick={() => setAccountType('personal')}
-              className={`p-3 rounded-xl transition-all flex flex-col items-center justify-center gap-1 text-center cursor-pointer ${
-                accountType === 'personal'
-                  ? 'bg-blue-600 text-white shadow-md'
-                  : 'text-slate-400 hover:text-white hover:bg-white/5'
-              }`}
-            >
-              <div className="flex items-center gap-1.5">
-                <User className="w-4 h-4" />
-                <span className="text-xs font-bold">Doanh Nhân Cá Nhân</span>
-              </div>
-              <span className="text-[10px] opacity-80">Danh thiếp số VIP & Thẻ NFC</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setAccountType('org')}
-              className={`p-3 rounded-xl transition-all flex flex-col items-center justify-center gap-1 text-center cursor-pointer ${
-                accountType === 'org'
-                  ? 'bg-purple-600 text-white shadow-md'
-                  : 'text-slate-400 hover:text-white hover:bg-white/5'
-              }`}
-            >
-              <div className="flex items-center gap-1.5">
-                <Crown className="w-4 h-4 text-amber-300" />
-                <span className="text-xs font-bold">Tổ Chức / Hiệp Hội B2B</span>
-              </div>
-              <span className="text-[10px] opacity-80">Không gian YBA & Quản trị hội viên</span>
-            </button>
+          {/* Progress Step Bar */}
+          <div className="flex items-center justify-center gap-3 text-xs font-bold">
+            <div className={`flex items-center gap-1.5 ${step === 'form' ? 'text-[#00C2FF]' : 'text-emerald-400'}`}>
+              <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] ${step === 'form' ? 'bg-[#0066FF] text-white' : 'bg-emerald-500 text-white'}`}>
+                1
+              </span>
+              <span>Điền Thông Tin</span>
+            </div>
+            <div className="w-8 h-[1px] bg-slate-700" />
+            <div className={`flex items-center gap-1.5 ${step === 'otp' ? 'text-[#00C2FF]' : step === 'success' ? 'text-emerald-400' : 'text-slate-500'}`}>
+              <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] ${step === 'otp' ? 'bg-[#0066FF] text-white' : step === 'success' ? 'bg-emerald-500 text-white' : 'bg-slate-800 text-slate-400'}`}>
+                2
+              </span>
+              <span>Xác Thực OTP</span>
+            </div>
+            <div className="w-8 h-[1px] bg-slate-700" />
+            <div className={`flex items-center gap-1.5 ${step === 'success' ? 'text-emerald-400' : 'text-slate-500'}`}>
+              <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] ${step === 'success' ? 'bg-emerald-500 text-white' : 'bg-slate-800 text-slate-400'}`}>
+                3
+              </span>
+              <span>Kích Hoạt</span>
+            </div>
           </div>
 
-          {/* Success Box */}
-          {successMsg ? (
-            <div className="p-6 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-center space-y-3 animate-in zoom-in-95 duration-200">
-              <div className="w-14 h-14 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center mx-auto shadow-lg">
-                <CheckCircle2 className="w-8 h-8" />
-              </div>
-              <h3 className="text-xl font-bold text-white">{successMsg.title}</h3>
-              <p className="text-xs text-slate-300 leading-relaxed max-w-md mx-auto">
-                {successMsg.desc}
-              </p>
-              <div className="pt-2">
-                <span className="text-[11px] text-emerald-400 font-mono flex items-center justify-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-                  Đang chuyển hướng vào không gian làm việc...
-                </span>
-              </div>
+          {/* Error Message */}
+          {errorMsg && (
+            <div className="p-3 rounded-2xl bg-red-500/10 border border-red-500/30 text-xs text-red-400 flex items-start gap-2 animate-in fade-in-0 duration-150">
+              <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+              <span>{errorMsg}</span>
             </div>
-          ) : (
-            <div>
-              {/* ============================================================= */}
-              {/* 1. PERSONAL REGISTRATION FORM */}
-              {/* ============================================================= */}
+          )}
+
+          {/* ============================================================= */}
+          {/* STEP 1: FORM INPUT (PERSONAL VS ORG) */}
+          {/* ============================================================= */}
+          {step === 'form' && (
+            <div className="space-y-5">
+              {/* Account Type Selector */}
+              <div className="grid grid-cols-2 p-1.5 rounded-2xl bg-slate-950/90 border border-slate-800 gap-1.5 text-xs font-bold">
+                <button
+                  type="button"
+                  onClick={() => setAccountType('personal')}
+                  className={`p-3 rounded-xl transition-all flex flex-col items-center justify-center gap-1 text-center cursor-pointer ${
+                    accountType === 'personal'
+                      ? 'bg-blue-600 text-white shadow-md'
+                      : 'text-slate-400 hover:text-white hover:bg-white/5'
+                  }`}
+                >
+                  <div className="flex items-center gap-1.5">
+                    <User className="w-4 h-4" />
+                    <span className="text-xs font-bold">Doanh Nhân Cá Nhân</span>
+                  </div>
+                  <span className="text-[10px] opacity-80">Danh thiếp số VIP & Thẻ NFC</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setAccountType('org')}
+                  className={`p-3 rounded-xl transition-all flex flex-col items-center justify-center gap-1 text-center cursor-pointer ${
+                    accountType === 'org'
+                      ? 'bg-purple-600 text-white shadow-md'
+                      : 'text-slate-400 hover:text-white hover:bg-white/5'
+                  }`}
+                >
+                  <div className="flex items-center gap-1.5">
+                    <Crown className="w-4 h-4 text-amber-300" />
+                    <span className="text-xs font-bold">Tổ Chức / Hiệp Hội B2B</span>
+                  </div>
+                  <span className="text-[10px] opacity-80">Không gian YBA & Quản trị hội viên</span>
+                </button>
+              </div>
+
+              {/* Personal Form */}
               {accountType === 'personal' && (
-                <form onSubmit={handlePersonalSubmit} className="space-y-4 text-left">
+                <form onSubmit={handleProceedToOtp} className="space-y-4 text-left">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-1">
                       <label className="text-xs font-semibold text-slate-300">
@@ -231,10 +292,10 @@ export default function RegisterPage() {
                         <input
                           type="text"
                           required
-                          placeholder="VD: Hồ Hoàng Long"
+                          placeholder="VD: Nguyễn Nhật Thanh"
                           value={fullName}
                           onChange={(e) => setFullName(e.target.value)}
-                          className="w-full pl-9 pr-4 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-600 focus:outline-none focus:border-blue-500"
+                          className="w-full pl-9 pr-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-600 focus:outline-none focus:border-blue-500"
                         />
                       </div>
                     </div>
@@ -247,10 +308,10 @@ export default function RegisterPage() {
                         <Briefcase className="w-4 h-4 absolute left-3 top-3 text-slate-500" />
                         <input
                           type="text"
-                          placeholder="VD: Giám Đốc Dự Án"
+                          placeholder="VD: Tổng Giám Đốc / Founder"
                           value={title}
                           onChange={(e) => setTitle(e.target.value)}
-                          className="w-full pl-9 pr-4 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-600 focus:outline-none focus:border-blue-500"
+                          className="w-full pl-9 pr-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-600 focus:outline-none focus:border-blue-500"
                         />
                       </div>
                     </div>
@@ -265,10 +326,10 @@ export default function RegisterPage() {
                       <input
                         type="text"
                         required
-                        placeholder="VD: Tập đoàn Công nghệ số A+ (Aplusvn)"
+                        placeholder="VD: Công ty TNHH Giải Pháp Nhật Thanh"
                         value={businessName}
                         onChange={(e) => setBusinessName(e.target.value)}
-                        className="w-full pl-9 pr-4 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-600 focus:outline-none focus:border-blue-500"
+                        className="w-full pl-9 pr-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-600 focus:outline-none focus:border-blue-500"
                       />
                     </div>
                   </div>
@@ -283,10 +344,10 @@ export default function RegisterPage() {
                         <input
                           type="tel"
                           required
-                          placeholder="0794677369"
+                          placeholder="0912345678"
                           value={phone}
                           onChange={(e) => setPhone(e.target.value)}
-                          className="w-full pl-9 pr-4 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-600 focus:outline-none focus:border-blue-500 font-mono"
+                          className="w-full pl-9 pr-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-600 focus:outline-none focus:border-blue-500 font-mono"
                         />
                       </div>
                     </div>
@@ -300,10 +361,10 @@ export default function RegisterPage() {
                         <input
                           type="email"
                           required
-                          placeholder="contact.johnnylongho@gmail.com"
+                          placeholder="nhatthanh@example.com"
                           value={email}
                           onChange={(e) => setEmail(e.target.value)}
-                          className="w-full pl-9 pr-4 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-600 focus:outline-none focus:border-blue-500 font-mono"
+                          className="w-full pl-9 pr-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-600 focus:outline-none focus:border-blue-500 font-mono"
                         />
                       </div>
                     </div>
@@ -319,7 +380,7 @@ export default function RegisterPage() {
                         <span className="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                       ) : (
                         <>
-                          <span>Khởi Tạo Danh Thiếp Số 1-Chạm</span>
+                          <span>Tiếp Tục Xác Thực Bảo Mật (OTP)</span>
                           <ArrowRight className="w-4 h-4" />
                         </>
                       )}
@@ -328,11 +389,9 @@ export default function RegisterPage() {
                 </form>
               )}
 
-              {/* ============================================================= */}
-              {/* 2. ORGANIZATION (B2B SAAS TENANT) REGISTRATION FORM */}
-              {/* ============================================================= */}
+              {/* Organization Form */}
               {accountType === 'org' && (
-                <form onSubmit={handleOrgSubmit} className="space-y-4 text-left">
+                <form onSubmit={handleProceedToOtp} className="space-y-4 text-left">
                   <div className="space-y-1">
                     <label className="text-xs font-semibold text-slate-300">
                       Tên Tổ chức / Hiệp hội / Doanh nghiệp <span className="text-red-400">*</span>
@@ -345,7 +404,7 @@ export default function RegisterPage() {
                         placeholder="VD: Hội Doanh Nhân Trẻ Khánh Hòa (YBA)"
                         value={orgName}
                         onChange={(e) => setOrgName(e.target.value)}
-                        className="w-full pl-9 pr-4 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-600 focus:outline-none focus:border-purple-500"
+                        className="w-full pl-9 pr-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-600 focus:outline-none focus:border-purple-500"
                       />
                     </div>
                   </div>
@@ -358,7 +417,7 @@ export default function RegisterPage() {
                       <select
                         value={orgIndustry}
                         onChange={(e) => setOrgIndustry(e.target.value)}
-                        className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-purple-500"
+                        className="w-full px-3 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-purple-500"
                       >
                         <option value="Hiệp hội Doanh nghiệp & Công nghệ">Hiệp hội Doanh nghiệp & Công nghệ</option>
                         <option value="Tập đoàn Bất động sản & Nghỉ dưỡng">Tập đoàn Bất động sản & Nghỉ dưỡng</option>
@@ -374,7 +433,7 @@ export default function RegisterPage() {
                       <select
                         value={orgMemberCount}
                         onChange={(e) => setOrgMemberCount(e.target.value)}
-                        className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-purple-500 font-mono"
+                        className="w-full px-3 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-purple-500 font-mono"
                       >
                         <option value="50">Gói Thử Nghiệm: 50 Hội viên</option>
                         <option value="200">Gói Tiêu Chuẩn: 200 Hội viên</option>
@@ -397,7 +456,7 @@ export default function RegisterPage() {
                         <input
                           type="text"
                           required
-                          placeholder="VD: Hồ Hoàng Long"
+                          placeholder="VD: Nguyễn Nhật Thanh"
                           value={adminFullName}
                           onChange={(e) => setAdminFullName(e.target.value)}
                           className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-600 focus:outline-none focus:border-purple-500"
@@ -421,12 +480,12 @@ export default function RegisterPage() {
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div className="space-y-1">
                         <label className="text-xs font-semibold text-slate-300">
-                          Email công vụ nhận thông báo <span className="text-red-400">*</span>
+                          Email công vụ nhận mã OTP <span className="text-red-400">*</span>
                         </label>
                         <input
                           type="email"
                           required
-                          placeholder="contact.johnnylongho@gmail.com"
+                          placeholder="admin.nhatthanh@example.com"
                           value={adminEmail}
                           onChange={(e) => setAdminEmail(e.target.value)}
                           className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-600 focus:outline-none focus:border-purple-500 font-mono"
@@ -439,7 +498,7 @@ export default function RegisterPage() {
                         </label>
                         <input
                           type="tel"
-                          placeholder="0794677369"
+                          placeholder="0912345678"
                           value={adminPhone}
                           onChange={(e) => setAdminPhone(e.target.value)}
                           className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-600 focus:outline-none focus:border-purple-500 font-mono"
@@ -459,7 +518,7 @@ export default function RegisterPage() {
                       ) : (
                         <>
                           <Crown className="w-4 h-4 text-amber-300" />
-                          <span>Khởi Tạo Không Gian Quản Trị Tổ Chức</span>
+                          <span>Tiếp Tục Xác Thực Tổ Chức (OTP)</span>
                         </>
                       )}
                     </Button>
@@ -469,15 +528,106 @@ export default function RegisterPage() {
             </div>
           )}
 
+          {/* ============================================================= */}
+          {/* STEP 2: OTP VERIFICATION STEP */}
+          {/* ============================================================= */}
+          {step === 'otp' && (
+            <form onSubmit={handleVerifyAndActivate} className="space-y-5 text-center">
+              <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-blue-600 to-cyan-500 text-white flex items-center justify-center mx-auto shadow-lg shadow-blue-500/25">
+                <ShieldCheck className="w-7 h-7" />
+              </div>
+
+              <div className="space-y-1">
+                <h3 className="text-lg font-bold text-white">Xác Thực Mã Bảo Mật OTP</h3>
+                <p className="text-xs text-slate-400">
+                  Mã 6 chữ số đã được gửi đến Email:{' '}
+                  <strong className="text-[#00C2FF] font-mono">{currentEmailTarget}</strong>
+                </p>
+              </div>
+
+              {/* 6-Digit OTP Boxes */}
+              <div className="flex items-center justify-center gap-2 pt-2">
+                {otpCode.map((digit, idx) => (
+                  <input
+                    key={idx}
+                    id={`reg-otp-${idx}`}
+                    type="text"
+                    maxLength={1}
+                    value={digit}
+                    onChange={(e) => handleOtpChange(idx, e.target.value)}
+                    className="w-10 h-12 text-center text-lg font-mono font-bold bg-slate-950 border border-slate-700 rounded-xl text-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/30"
+                  />
+                ))}
+              </div>
+
+              <div className="flex items-center justify-between text-[11px] pt-1">
+                <button
+                  type="button"
+                  onClick={() => setStep('form')}
+                  className="text-slate-400 hover:text-white underline cursor-pointer"
+                >
+                  ← Sửa thông tin đăng ký
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setOtpCode(['1', '2', '3', '4', '5', '6']);
+                  }}
+                  className="text-[#00C2FF] font-bold hover:underline cursor-pointer"
+                >
+                  Tự động điền mã mẫu (123456)
+                </button>
+              </div>
+
+              <Button
+                type="submit"
+                disabled={loading}
+                className="w-full py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-2xl transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer"
+              >
+                {loading ? (
+                  <span className="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                ) : (
+                  <>
+                    <span>Xác Nhận & Kích Hoạt Tài Khoản</span>
+                    <CheckCircle2 className="w-4 h-4" />
+                  </>
+                )}
+              </Button>
+            </form>
+          )}
+
+          {/* ============================================================= */}
+          {/* STEP 3: SUCCESS & REDIRECTION */}
+          {/* ============================================================= */}
+          {step === 'success' && (
+            <div className="p-6 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-center space-y-3 animate-in zoom-in-95 duration-200">
+              <div className="w-14 h-14 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center mx-auto shadow-lg">
+                <CheckCircle2 className="w-8 h-8" />
+              </div>
+              <h3 className="text-xl font-bold text-white">Xác Thực Thành Công!</h3>
+              <p className="text-xs text-slate-300 leading-relaxed max-w-md mx-auto">
+                Chào mừng <strong>{fullName || adminFullName}</strong> gia nhập One Connect Network.
+              </p>
+              <div className="pt-2">
+                <span className="text-[11px] text-emerald-400 font-mono flex items-center justify-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+                  Đang mở Danh thiếp số: <strong>{registeredProfileUrl}</strong>...
+                </span>
+              </div>
+            </div>
+          )}
+
           {/* Bottom Login Redirect */}
-          <div className="pt-3 border-t border-slate-800/80 text-center space-y-1 text-xs">
-            <p className="text-slate-400">
-              Đã có tài khoản?{' '}
-              <Link href="/login" className="font-bold text-[#00C2FF] hover:underline">
-                Đăng nhập ngay
-              </Link>
-            </p>
-          </div>
+          {step === 'form' && (
+            <div className="pt-3 border-t border-slate-800/80 text-center space-y-1 text-xs">
+              <p className="text-slate-400">
+                Đã có tài khoản?{' '}
+                <Link href="/login" className="font-bold text-[#00C2FF] hover:underline">
+                  Đăng nhập ngay
+                </Link>
+              </p>
+            </div>
+          )}
         </div>
       </main>
 

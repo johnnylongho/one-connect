@@ -429,9 +429,20 @@ export function useOneConnectStore() {
     cardType?: 'NFC_EXECUTIVE' | 'NFC_BUSINESS_PRO' | 'NFC_STANDARD';
     bio?: string;
   }) => {
-    const cleanUsername = (data.username || data.fullName.toLowerCase().replace(/[^a-z0-9]/g, '') || `user${Date.now().toString().slice(-4)}`);
+    const slugify = (str: string) => {
+      return str
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/đ/g, 'd')
+        .replace(/Đ/g, 'd')
+        .replace(/[^a-z0-9]/g, '');
+    };
+
+    const cleanUsername = data.username || slugify(data.fullName) || `user${Date.now().toString().slice(-4)}`;
     const newId = `id-${Date.now()}`;
     const newCardUid = `NFC-${cleanUsername.toUpperCase().slice(0, 8)}-${Math.floor(100 + Math.random() * 900)}`;
+    const avatar = `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(data.fullName)}&backgroundColor=0066ff,00c2ff,10b981,f59e0b`;
 
     const newIdentity: PersonIdentity = {
       id: newId,
@@ -440,26 +451,26 @@ export function useOneConnectStore() {
       fullName: data.fullName,
       displayName: data.fullName,
       title: data.title || 'Giám Đốc Doanh Nghiệp',
-      phone: data.phone || '0903.888.999',
+      phone: data.phone || '0794677369',
       email: data.email,
       taxCode: data.taxCode || '4201888999',
-      association: data.association || 'Hội Doanh Nhân Trẻ Khánh Hòa (YBA)',
-      address: data.address || 'TP. Nha Trang, Tỉnh Khánh Hòa',
-      avatarUrl: `https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300&auto=format&fit=crop&q=80`,
+      association: data.association || 'Hội Viên One Connect Network',
+      address: data.address || 'Việt Nam',
+      avatarUrl: avatar,
       bio: data.bio || `Đại diện ${data.businessName} - Thành viên Hệ sinh thái One Connect Network.`,
       socialLinks: [
         {
           id: `soc-${Date.now()}-1`,
           identityId: newId,
           platform: 'phone',
-          url: `tel:${data.phone || '0903888999'}`,
+          url: `tel:${data.phone || ''}`,
           isPublic: true,
         },
         {
           id: `soc-${Date.now()}-2`,
           identityId: newId,
           platform: 'website',
-          url: 'https://aplusvn.com',
+          url: `https://one-connect-network.vercel.app/p/${cleanUsername}`,
           isPublic: true,
         }
       ],
@@ -471,8 +482,8 @@ export function useOneConnectStore() {
           businessName: data.businessName,
           position: data.title || 'Giám Đốc',
           taxCode: data.taxCode || '4201888999',
-          address: data.address || 'TP. Nha Trang, Tỉnh Khánh Hòa',
-          association: data.association || 'Hội Doanh Nhân Trẻ Khánh Hòa (YBA)',
+          address: data.address || 'Việt Nam',
+          association: data.association || 'Hội Viên One Connect Network',
           relationType: 'FOUNDER_OWNER',
           isPrimary: true,
           status: 'ACTIVE'
@@ -488,8 +499,8 @@ export function useOneConnectStore() {
       cardUid: newCardUid,
       cardType: data.cardType || 'NFC_EXECUTIVE',
       nfcIdentifier: `NFC-UID-${Date.now()}`,
-      dynamicUrl: `https://oneconnect.network/c/${newCardUid}`,
-      qrValue: `https://oneconnect.network/c/${newCardUid}`,
+      dynamicUrl: `https://one-connect-network.vercel.app/p/${cleanUsername}`,
+      qrValue: `https://one-connect-network.vercel.app/p/${cleanUsername}`,
       status: 'ACTIVE',
       issuedAt: new Date().toISOString(),
     };
