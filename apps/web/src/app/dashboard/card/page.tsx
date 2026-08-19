@@ -676,7 +676,7 @@ export default function DigitalNfcCardPage() {
                   <Building2 className="w-4 h-4 text-blue-600" /> Thông Tin Doanh Nghiệp Đồng Bộ
                 </h3>
                 <Link
-                  href="/p/johnny-long"
+                  href={`/p/${currentIdentity?.username || 'johnnylongho'}`}
                   target="_blank"
                   className="text-xs font-bold text-blue-600 hover:text-blue-700 flex items-center gap-1"
                 >
@@ -689,24 +689,34 @@ export default function DigitalNfcCardPage() {
                 <div className="flex items-start gap-3 p-2.5 rounded-xl bg-slate-50 border border-slate-200/80">
                   <Building2 className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
                   <div>
-                    <p className="font-bold text-slate-900">Tập đoàn Công nghệ số A+ (Aplusvn)</p>
-                    <p className="text-[11px] text-slate-500">Hội viên Ban Chấp Hành Hiệp Hội Doanh Nghiệp</p>
+                    <p className="font-bold text-slate-900">
+                      {currentIdentity?.businesses?.[0]?.businessName || 'Tập đoàn Công nghệ số A+ (Aplusvn)'}
+                    </p>
+                    <p className="text-[11px] text-slate-500">
+                      {currentIdentity?.association || 'Hội Doanh Nhân Trẻ Khánh Hòa (YBA) • Ban Công Nghệ'}
+                    </p>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-3 p-2.5 rounded-xl bg-slate-50 border border-slate-200/80">
                   <Phone className="w-4 h-4 text-emerald-600 shrink-0" />
-                  <span className="font-mono font-bold text-slate-800">0903.888.999</span>
+                  <span className="font-mono font-bold text-slate-800">
+                    {currentIdentity?.phone || '0794677369'}
+                  </span>
                 </div>
 
                 <div className="flex items-center gap-3 p-2.5 rounded-xl bg-slate-50 border border-slate-200/80">
                   <Mail className="w-4 h-4 text-blue-600 shrink-0" />
-                  <span className="font-mono font-bold text-slate-800">longhh@aplusvn.com</span>
+                  <span className="font-mono font-bold text-slate-800">
+                    {currentIdentity?.email || 'contact.johnnylongho@gmail.com'}
+                  </span>
                 </div>
 
                 <div className="flex items-center gap-3 p-2.5 rounded-xl bg-slate-50 border border-slate-200/80">
                   <Globe className="w-4 h-4 text-orange-600 shrink-0" />
-                  <span className="font-mono font-bold text-slate-800">https://aplusvn.com</span>
+                  <span className="font-mono font-bold text-slate-800">
+                    {currentIdentity?.website || 'https://aplusvn.net'}
+                  </span>
                 </div>
               </div>
             </div>
