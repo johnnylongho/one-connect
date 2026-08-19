@@ -172,14 +172,25 @@ function DigitalProfileContent() {
     setCurrentDateStr(now.toLocaleDateString('vi-VN'));
   }, []);
 
-  // Find matched identity from store
+  // Find matched identity from store (supporting all alias slugs)
+  const cleanCardId = decodeURIComponent(cardId).trim().toLowerCase();
+  const isJohnnyLongAlias = [
+    'johnnylong',
+    'johnnylongho',
+    'hoanglong',
+    'johnny-long',
+    'johnny-long-ho',
+    'aplus-001',
+    '04:8f',
+  ].some((alias) => cleanCardId.includes(alias));
+
   const matchedIdentity =
     state.identities.find(
       (i) =>
-        i.username.toLowerCase() === cardId.toLowerCase() ||
-        i.id.toLowerCase() === cardId.toLowerCase() ||
-        (cardId.toLowerCase() === 'hoanglong' && i.username === 'johnnylong')
-    ) || (cardId.toLowerCase() === 'hoanglong' ? currentIdentity : null) || state.identities[0];
+        i.username.toLowerCase() === cleanCardId ||
+        i.id.toLowerCase() === cleanCardId ||
+        (isJohnnyLongAlias && (i.username === 'johnnylong' || i.id === 'id-001'))
+    ) || (isJohnnyLongAlias ? currentIdentity : null) || state.identities[0];
 
   const matchedCard = state.cards.find(c => c.personIdentityId === matchedIdentity?.id && c.status === 'ACTIVE') || state.cards[0];
 

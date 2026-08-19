@@ -73,13 +73,22 @@ export default function NfcLandingRouter() {
       }
     }
 
-    // 2. Check direct username matching
+    // 2. Check direct username and alias matching
+    const isJohnnyLongAlias = [
+      'johnnylong',
+      'johnnylongho',
+      'hoanglong',
+      'johnny-long',
+      'johnny-long-ho',
+      'aplus-001',
+      '04:8f',
+    ].some((alias) => cleanUid.includes(alias));
+
     const identity = state.identities.find(
       i => i.username.toLowerCase() === cleanUid ||
            i.id.toLowerCase() === cleanUid ||
-           (cleanUid === 'hoanglong' && i.username === 'johnnylong') ||
-           cleanUid.includes('04:8f')
-    ) || (cleanUid.includes('04:8f') || cleanUid === 'hoanglong' ? state.identities[0] : null);
+           (isJohnnyLongAlias && (i.username === 'johnnylong' || i.id === 'id-001'))
+    ) || (isJohnnyLongAlias ? state.identities[0] : null);
 
     if (identity) {
       setMatchedIdentity(identity);
