@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useOneConnectStore } from '@/lib/store';
 import { Zap, ShieldCheck, UserCheck, ArrowRight, Lock, Sparkles, CheckCircle2 } from 'lucide-react';
@@ -10,9 +10,12 @@ import { Badge } from '@/components/ui/badge';
 
 export default function NfcLandingRouter() {
   const params = useParams();
+  const searchParams = useSearchParams();
   const router = useRouter();
   const cardUid = (params?.cardUid as string) || '';
-  const { state, requestConnection } = useOneConnectStore();
+  const action = searchParams?.get('action') || '';
+  const eventId = searchParams?.get('eventId') || 'evt-001';
+  const { state, performCheckIn } = useOneConnectStore();
 
   const [loading, setLoading] = useState(true);
   const [matchedCard, setMatchedCard] = useState<any>(null);
@@ -36,6 +39,13 @@ export default function NfcLandingRouter() {
       return;
     }
 
+    // Mobile Haptic feedback when card is tapped
+    if (typeof window !== 'undefined' && 'vibrate' in navigator) {
+      try {
+        navigator.vibrate(80);
+      } catch {}
+    }
+
     // Instant High-speed NFC card resolution (<0.05s)
     const cleanUid = decodeURIComponent(cardUid).trim().toLowerCase();
 
@@ -52,8 +62,13 @@ export default function NfcLandingRouter() {
       setMatchedCard(card);
       const identity = state.identities.find(i => i.id === card.personIdentityId) || state.identities[0];
       setMatchedIdentity(identity);
+
+      if (action === 'checkin') {
+        performCheckIn(eventId, card.cardUid, 'NFC');
+      }
+
       if (identity?.username) {
-        router.replace(`/p/${identity.username}`);
+        router.replace(`/p/${identity.username}${action === 'checkin' ? '?checked_in=1' : ''}`);
         return;
       }
     }
@@ -68,12 +83,15 @@ export default function NfcLandingRouter() {
 
     if (identity) {
       setMatchedIdentity(identity);
-      router.replace(`/p/${identity.username || 'johnnylong'}`);
+      if (action === 'checkin') {
+        performCheckIn(eventId, cleanUid, 'NFC');
+      }
+      router.replace(`/p/${identity.username || 'johnnylong'}${action === 'checkin' ? '?checked_in=1' : ''}`);
       return;
     }
 
     setLoading(false);
-  }, [cardUid, state, router]);
+  }, [cardUid, action, eventId, state, performCheckIn, router]);
 
 
   if (loading) {

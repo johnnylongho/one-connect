@@ -205,6 +205,50 @@ export default function DigitalNfcCardPage() {
   const [isSimulatingTap, setIsSimulatingTap] = useState(false);
   const [tapSuccess, setTapSuccess] = useState(false);
 
+  // Hardware Web NFC Tag Writer State
+  const [isWritingNfc, setIsWritingNfc] = useState(false);
+  const [nfcWriteStatus, setNfcWriteStatus] = useState<string | null>(null);
+
+  const handleWritePhysicalNfc = async (cardUidToProgram: string) => {
+    if (typeof window === 'undefined') return;
+
+    if (!('NDEFReader' in window)) {
+      showAlert('Thiết bị hoặc trình duyệt không hỗ trợ Web NFC API. Vui lòng mở bằng Chrome trên điện thoại Android có bật NFC.', 'error');
+      return;
+    }
+
+    try {
+      setIsWritingNfc(true);
+      setNfcWriteStatus('Đang chờ chạm thẻ... Áp thẻ NFC vật lý vào mặt lưng điện thoại.');
+      const NDEFReaderClass = (window as any).NDEFReader;
+      const ndef = new NDEFReaderClass();
+      
+      const targetUrl = `https://one-connect-network.vercel.app/c/${cardUidToProgram}`;
+      await ndef.write({
+        records: [
+          {
+            recordType: 'url',
+            data: targetUrl,
+          },
+        ],
+      });
+
+      if ('vibrate' in navigator) {
+        navigator.vibrate([100, 50, 100]);
+      }
+      setNfcWriteStatus('GHI THẺ NFC THÀNH CÔNG! 🎉');
+      showAlert(`Đã ghi thành công liên kết định danh vào chip NFC: ${targetUrl}`, 'success');
+      setTimeout(() => {
+        setIsWritingNfc(false);
+        setNfcWriteStatus(null);
+      }, 3000);
+    } catch (err: any) {
+      setIsWritingNfc(false);
+      setNfcWriteStatus(null);
+      showAlert(`Lỗi khi ghi chip NFC: ${err?.message || 'Quá trình bị gián đoạn'}`, 'error');
+    }
+  };
+
   // Edit Profile Modal State
   const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
   const [editFullName, setEditFullName] = useState(currentIdentity?.fullName || '');
@@ -523,6 +567,36 @@ export default function DigitalNfcCardPage() {
                   <Badge className="bg-emerald-600 text-white text-[10px]">0.42s FAST TAP</Badge>
                 </div>
               )}
+
+              {/* Real Hardware NFC Writer Block */}
+              <div className="p-4 bg-blue-50/80 border border-blue-200 rounded-2xl text-left space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Smartphone className="w-4 h-4 text-[#0066FF]" />
+                    <h4 className="font-bold text-slate-900 text-xs">Ghi Chip NFC Vật Lý (Hardware Writer)</h4>
+                  </div>
+                  <Badge className="bg-blue-100 text-[#0066FF] border-blue-300 text-[10px]">
+                    NTAG213 / 215 / 216
+                  </Badge>
+                </div>
+                <p className="text-[11px] text-slate-600">
+                  Lập trình đường dẫn định danh <code className="font-mono font-bold text-[#0066FF]">https://one-connect-network.vercel.app/c/{currentCard?.cardUid || '04:8F:2A:1B:9C:5D:80'}</code> trực tiếp vào thẻ vật lý.
+                </p>
+
+                {isWritingNfc ? (
+                  <div className="p-3 rounded-xl bg-blue-600 text-white text-xs font-bold flex items-center justify-center gap-2 animate-pulse shadow-md">
+                    <div className="w-4 h-4 rounded-full border-2 border-white border-t-transparent animate-spin" />
+                    <span>{nfcWriteStatus || 'Áp thẻ NFC vào lưng điện thoại...'}</span>
+                  </div>
+                ) : (
+                  <Button
+                    onClick={() => handleWritePhysicalNfc(currentCard?.cardUid || '04:8F:2A:1B:9C:5D:80')}
+                    className="w-full bg-gradient-to-r from-[#0066FF] to-[#FF6B00] hover:opacity-90 text-white font-bold text-xs py-2.5 rounded-xl cursor-pointer shadow-sm gap-1.5"
+                  >
+                    <Radio className="w-4 h-4" /> Ghi Vào Thẻ NFC Vật Lý Ngay
+                  </Button>
+                )}
+              </div>
 
               {/* Card Continuity Explanation Box */}
               <div className="p-4 bg-purple-50 border border-purple-200 rounded-2xl text-left space-y-2 text-xs">
