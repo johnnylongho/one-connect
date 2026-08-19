@@ -121,10 +121,26 @@ function RegisterForm() {
     setCountdown(60);
     setOtpCode(['', '', '', '', '', '']);
 
-    setTimeout(() => {
-      setLoading(false);
-      setStep('otp');
-    }, 600);
+    const targetEmail = accountType === 'personal' ? email : adminEmail;
+    const targetName = accountType === 'personal' ? fullName : adminFullName;
+
+    // Gửi email thật qua Resend API Gateway
+    fetch('/api/auth/send-otp', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: targetEmail,
+        fullName: targetName,
+        otp: randomOtp,
+        type: 'register',
+      }),
+    })
+      .then((res) => res.json())
+      .catch((err) => console.warn('Send OTP network error:', err))
+      .finally(() => {
+        setLoading(false);
+        setStep('otp');
+      });
   };
 
   // Handle OTP Digit Input

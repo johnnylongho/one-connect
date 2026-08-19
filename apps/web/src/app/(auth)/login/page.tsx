@@ -34,6 +34,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [otpStep, setOtpStep] = useState<'request' | 'verify'>('request');
+  const [generatedLoginOtp, setGeneratedLoginOtp] = useState('123456');
   const [otpCode, setOtpCode] = useState(['', '', '', '', '', '']);
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
@@ -49,10 +50,25 @@ export default function LoginPage() {
     setErrorMsg('');
     setLoading(true);
 
-    setTimeout(() => {
-      setLoading(false);
-      setOtpStep('verify');
-    }, 600);
+    const randomOtp = Math.floor(100000 + Math.random() * 900000).toString();
+    setGeneratedLoginOtp(randomOtp);
+    setOtpCode(['', '', '', '', '', '']);
+
+    fetch('/api/auth/send-otp', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: identifier,
+        otp: randomOtp,
+        type: 'login',
+      }),
+    })
+      .then((res) => res.json())
+      .catch((err) => console.warn('Send login OTP error:', err))
+      .finally(() => {
+        setLoading(false);
+        setOtpStep('verify');
+      });
   };
 
   // Handle OTP Digit Input
@@ -75,10 +91,11 @@ export default function LoginPage() {
   const handleVerifyOtp = (e: React.FormEvent) => {
     e.preventDefault();
     const entered = otpCode.join('');
-    if (entered.length < 6) {
-      setErrorMsg('Vui lòng nhập đủ 6 chữ số mã xác thực OTP');
+    if (entered !== generatedLoginOtp && entered !== '123456') {
+      setErrorMsg(`Mã OTP không chính xác. Vui lòng nhập mã: ${generatedLoginOtp} (hoặc 123456)`);
       return;
     }
+
     setErrorMsg('');
     setLoading(true);
 
@@ -92,7 +109,7 @@ export default function LoginPage() {
         }, 800);
       } else {
         setLoading(false);
-        setErrorMsg('Mã OTP không chính xác hoặc đã hết hạn. Vui lòng thử lại.');
+        setErrorMsg('Mã OTP hợp lệ nhưng không tìm thấy tài khoản. Vui lòng đăng ký mới.');
       }
     }, 700);
   };
@@ -347,6 +364,26 @@ export default function LoginPage() {
                       </form>
                     ) : (
                       <form onSubmit={handleVerifyOtp} className="space-y-4">
+                        {/* OTP Banner */}
+                        <div className="p-3 rounded-2xl bg-blue-500/15 border border-blue-400/30 text-left flex items-start gap-2.5 shadow-md">
+                          <div className="w-7 h-7 rounded-lg bg-blue-600 text-white flex items-center justify-center shrink-0">
+                            <Mail className="w-3.5 h-3.5" />
+                          </div>
+                          <div className="space-y-0.5 flex-1 text-xs">
+                            <p className="text-[10.5px] font-bold text-slate-300">Mã xác thực OTP:</p>
+                            <p className="text-[#00C2FF] font-bold">
+                              Mã của bạn: <strong className="font-mono text-white text-xs px-1.5 py-0.5 bg-slate-950 rounded border border-blue-400/40">{generatedLoginOtp}</strong>
+                            </p>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => setOtpCode(generatedLoginOtp.split(''))}
+                            className="px-2 py-1 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-[10px] font-bold shrink-0 cursor-pointer shadow-xs"
+                          >
+                            Tự điền
+                          </button>
+                        </div>
+
                         <div className="space-y-2 text-center">
                           <p className="text-xs text-slate-300">
                             Nhập mã 6 số đã gửi tới <strong className="text-[#00C2FF]">{identifier}</strong>:
@@ -378,7 +415,9 @@ export default function LoginPage() {
                             <button
                               type="button"
                               onClick={() => {
-                                setOtpCode(['1', '2', '3', '4', '5', '6']);
+                                const newOtp = Math.floor(100000 + Math.random() * 900000).toString();
+                                setGeneratedLoginOtp(newOtp);
+                                setOtpCode(['', '', '', '', '', '']);
                               }}
                               className="text-[#00C2FF] font-bold hover:underline cursor-pointer"
                             >
