@@ -17,11 +17,11 @@ import {
   Sparkles,
   Layers,
   Crown,
-  Users,
-  Radio,
   Lock,
-  KeyRound,
+  Eye,
+  EyeOff,
   AlertCircle,
+  RefreshCw,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useOneConnectStore } from '@/lib/store';
@@ -42,6 +42,9 @@ export default function RegisterPage() {
   const [businessName, setBusinessName] = useState('');
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   // Organization Form Fields
   const [orgName, setOrgName] = useState('');
@@ -51,18 +54,31 @@ export default function RegisterPage() {
   const [adminTitle, setAdminTitle] = useState('Chủ tịch / Trưởng ban tổ chức');
   const [adminEmail, setAdminEmail] = useState('');
   const [adminPhone, setAdminPhone] = useState('');
+  const [adminPassword, setAdminPassword] = useState('');
+  const [adminConfirmPassword, setAdminConfirmPassword] = useState('');
 
   // OTP Verification States
+  const [generatedOtp, setGeneratedOtp] = useState('123456');
   const [otpCode, setOtpCode] = useState(['', '', '', '', '', '']);
   const [errorMsg, setErrorMsg] = useState('');
   const [loading, setLoading] = useState(false);
   const [registeredProfileUrl, setRegisteredProfileUrl] = useState('');
+  const [countdown, setCountdown] = useState(60);
 
   useEffect(() => {
     if (searchParams?.get('type') === 'org') {
       setAccountType('org');
     }
   }, [searchParams]);
+
+  // Countdown timer for OTP
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (step === 'otp' && countdown > 0) {
+      timer = setTimeout(() => setCountdown(countdown - 1), 1000);
+    }
+    return () => clearTimeout(timer);
+  }, [step, countdown]);
 
   // Step 1: Proceed to OTP Verification
   const handleProceedToOtp = (e: React.FormEvent) => {
@@ -74,18 +90,41 @@ export default function RegisterPage() {
         setErrorMsg('Vui lòng điền đầy đủ Họ tên, Tên doanh nghiệp và Email');
         return;
       }
+      if (!password || password.length < 6) {
+        setErrorMsg('Vui lòng tạo mật khẩu tối thiểu 6 ký tự để bảo mật tài khoản');
+        return;
+      }
+      if (password !== confirmPassword) {
+        setErrorMsg('Mật khẩu xác nhận không khớp. Vui lòng kiểm tra lại');
+        return;
+      }
     } else {
       if (!orgName.trim() || !adminFullName.trim() || !adminEmail.trim()) {
         setErrorMsg('Vui lòng điền đầy đủ Tên tổ chức, Người đại diện và Email');
         return;
       }
+      if (!adminPassword || adminPassword.length < 6) {
+        setErrorMsg('Vui lòng tạo mật khẩu quản trị tối thiểu 6 ký tự');
+        return;
+      }
+      if (adminPassword !== adminConfirmPassword) {
+        setErrorMsg('Mật khẩu xác nhận không khớp. Vui lòng kiểm tra lại');
+        return;
+      }
     }
 
     setLoading(true);
+
+    // Sinh mã ngẫu nhiên 6 chữ số
+    const randomOtp = Math.floor(100000 + Math.random() * 900000).toString();
+    setGeneratedOtp(randomOtp);
+    setCountdown(60);
+    setOtpCode(['', '', '', '', '', '']);
+
     setTimeout(() => {
       setLoading(false);
       setStep('otp');
-    }, 500);
+    }, 600);
   };
 
   // Handle OTP Digit Input
@@ -109,7 +148,12 @@ export default function RegisterPage() {
     e.preventDefault();
     const entered = otpCode.join('');
     if (entered.length < 6) {
-      setErrorMsg('Vui lòng nhập đủ 6 chữ số mã xác thực OTP (ví dụ: 123456)');
+      setErrorMsg('Vui lòng nhập đủ 6 chữ số mã xác thực OTP');
+      return;
+    }
+
+    if (entered !== generatedOtp && entered !== '123456') {
+      setErrorMsg(`Mã OTP không chính xác. Vui lòng nhập mã: ${generatedOtp} (hoặc mã 123456)`);
       return;
     }
 
@@ -124,6 +168,7 @@ export default function RegisterPage() {
           businessName,
           phone: phone || '0794677369',
           email,
+          password,
         });
 
         setCurrentIdentityId(identity.id);
@@ -144,6 +189,7 @@ export default function RegisterPage() {
           adminTitle,
           adminEmail,
           adminPhone,
+          adminPassword,
         });
 
         setCurrentIdentityId(admin.id);
@@ -160,7 +206,6 @@ export default function RegisterPage() {
   };
 
   const currentEmailTarget = accountType === 'personal' ? email : adminEmail;
-  const currentPhoneTarget = accountType === 'personal' ? phone : adminPhone;
 
   return (
     <div className="min-h-screen bg-[#070A12] text-slate-100 flex flex-col justify-between selection:bg-blue-600 selection:text-white relative overflow-hidden">
@@ -200,10 +245,10 @@ export default function RegisterPage() {
               <span>GIA NHẬP HỆ SINH THÁI ONE CONNECT</span>
             </div>
             <h1 className="text-2xl sm:text-3xl font-black text-white font-heading">
-              Đăng Ký Tài Khoản Mới
+              Đăng Ký & Khởi Tạo Danh Tính Số
             </h1>
             <p className="text-xs text-slate-400 max-w-md mx-auto">
-              Khởi tạo danh tính số và xác thực bảo mật 2 lớp chuẩn PDPL
+              Tạo mật khẩu đăng nhập bảo mật và xác thực OTP 2 lớp theo tiêu chuẩn PDPL 91/2025
             </p>
           </div>
 
@@ -213,7 +258,7 @@ export default function RegisterPage() {
               <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] ${step === 'form' ? 'bg-[#0066FF] text-white' : 'bg-emerald-500 text-white'}`}>
                 1
               </span>
-              <span>Điền Thông Tin</span>
+              <span>Thông Tin & Mật Khẩu</span>
             </div>
             <div className="w-8 h-[1px] bg-slate-700" />
             <div className={`flex items-center gap-1.5 ${step === 'otp' ? 'text-[#00C2FF]' : step === 'success' ? 'text-emerald-400' : 'text-slate-500'}`}>
@@ -240,7 +285,7 @@ export default function RegisterPage() {
           )}
 
           {/* ============================================================= */}
-          {/* STEP 1: FORM INPUT (PERSONAL VS ORG) */}
+          {/* STEP 1: FORM INPUT WITH PASSWORD */}
           {/* ============================================================= */}
           {step === 'form' && (
             <div className="space-y-5">
@@ -370,6 +415,50 @@ export default function RegisterPage() {
                     </div>
                   </div>
 
+                  {/* Password Fields */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-slate-800/80 pt-3">
+                    <div className="space-y-1">
+                      <label className="text-xs font-semibold text-slate-300">
+                        Tạo mật khẩu đăng nhập <span className="text-red-400">*</span>
+                      </label>
+                      <div className="relative">
+                        <Lock className="w-4 h-4 absolute left-3 top-3 text-slate-500" />
+                        <input
+                          type={showPassword ? 'text' : 'password'}
+                          required
+                          placeholder="Tối thiểu 6 ký tự"
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                          className="w-full pl-9 pr-9 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-600 focus:outline-none focus:border-blue-500 font-mono"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword(!showPassword)}
+                          className="absolute right-3 top-3 text-slate-500 hover:text-slate-300 cursor-pointer"
+                        >
+                          {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="space-y-1">
+                      <label className="text-xs font-semibold text-slate-300">
+                        Xác nhận lại mật khẩu <span className="text-red-400">*</span>
+                      </label>
+                      <div className="relative">
+                        <Lock className="w-4 h-4 absolute left-3 top-3 text-slate-500" />
+                        <input
+                          type={showPassword ? 'text' : 'password'}
+                          required
+                          placeholder="Nhập lại mật khẩu"
+                          value={confirmPassword}
+                          onChange={(e) => setConfirmPassword(e.target.value)}
+                          className="w-full pl-9 pr-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-600 focus:outline-none focus:border-blue-500 font-mono"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
                   <div className="pt-2">
                     <Button
                       type="submit"
@@ -380,7 +469,7 @@ export default function RegisterPage() {
                         <span className="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                       ) : (
                         <>
-                          <span>Tiếp Tục Xác Thực Bảo Mật (OTP)</span>
+                          <span>Đăng Ký & Nhận Mã OTP Xác Thực</span>
                           <ArrowRight className="w-4 h-4" />
                         </>
                       )}
@@ -505,6 +594,37 @@ export default function RegisterPage() {
                         />
                       </div>
                     </div>
+
+                    {/* Admin Password */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-slate-800/80 pt-2">
+                      <div className="space-y-1">
+                        <label className="text-xs font-semibold text-slate-300">
+                          Tạo mật khẩu quản trị <span className="text-red-400">*</span>
+                        </label>
+                        <input
+                          type="password"
+                          required
+                          placeholder="Tối thiểu 6 ký tự"
+                          value={adminPassword}
+                          onChange={(e) => setAdminPassword(e.target.value)}
+                          className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-600 focus:outline-none focus:border-purple-500 font-mono"
+                        />
+                      </div>
+
+                      <div className="space-y-1">
+                        <label className="text-xs font-semibold text-slate-300">
+                          Xác nhận mật khẩu quản trị <span className="text-red-400">*</span>
+                        </label>
+                        <input
+                          type="password"
+                          required
+                          placeholder="Nhập lại mật khẩu"
+                          value={adminConfirmPassword}
+                          onChange={(e) => setAdminConfirmPassword(e.target.value)}
+                          className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-600 focus:outline-none focus:border-purple-500 font-mono"
+                        />
+                      </div>
+                    </div>
                   </div>
 
                   <div className="pt-2">
@@ -518,7 +638,7 @@ export default function RegisterPage() {
                       ) : (
                         <>
                           <Crown className="w-4 h-4 text-amber-300" />
-                          <span>Tiếp Tục Xác Thực Tổ Chức (OTP)</span>
+                          <span>Đăng Ký & Nhận Mã OTP Tổ Chức</span>
                         </>
                       )}
                     </Button>
@@ -533,15 +653,41 @@ export default function RegisterPage() {
           {/* ============================================================= */}
           {step === 'otp' && (
             <form onSubmit={handleVerifyAndActivate} className="space-y-5 text-center">
+              {/* Simulated OTP Notification Banner */}
+              <div className="p-3.5 rounded-2xl bg-blue-500/15 border border-blue-400/30 text-left flex items-start gap-3 shadow-lg">
+                <div className="w-8 h-8 rounded-xl bg-blue-600 text-white flex items-center justify-center shrink-0">
+                  <Mail className="w-4 h-4" />
+                </div>
+                <div className="space-y-0.5 flex-1">
+                  <p className="text-[11px] font-bold text-slate-200">
+                    One Connect Verification Service:
+                  </p>
+                  <p className="text-xs text-[#00C2FF]">
+                    Mã OTP của bạn là: <strong className="font-mono text-white text-sm tracking-wider bg-slate-950 px-2 py-0.5 rounded-md border border-blue-400/40">{generatedOtp}</strong>
+                  </p>
+                  <p className="text-[10px] text-slate-400">
+                    Đã gửi tới: {currentEmailTarget} (Hiệu lực: {countdown}s)
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setOtpCode(generatedOtp.split(''));
+                  }}
+                  className="px-2.5 py-1 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-[10px] font-bold shrink-0 cursor-pointer shadow-xs"
+                >
+                  Tự điền mã
+                </button>
+              </div>
+
               <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-blue-600 to-cyan-500 text-white flex items-center justify-center mx-auto shadow-lg shadow-blue-500/25">
                 <ShieldCheck className="w-7 h-7" />
               </div>
 
               <div className="space-y-1">
-                <h3 className="text-lg font-bold text-white">Xác Thực Mã Bảo Mật OTP</h3>
+                <h3 className="text-lg font-bold text-white">Nhập Mã Xác Thực OTP</h3>
                 <p className="text-xs text-slate-400">
-                  Mã 6 chữ số đã được gửi đến Email:{' '}
-                  <strong className="text-[#00C2FF] font-mono">{currentEmailTarget}</strong>
+                  Nhập mã 6 số để kích hoạt bảo mật và hoàn tất đăng ký tài khoản
                 </p>
               </div>
 
@@ -566,16 +712,20 @@ export default function RegisterPage() {
                   onClick={() => setStep('form')}
                   className="text-slate-400 hover:text-white underline cursor-pointer"
                 >
-                  ← Sửa thông tin đăng ký
+                  ← Sửa thông tin & mật khẩu
                 </button>
                 <button
                   type="button"
                   onClick={() => {
-                    setOtpCode(['1', '2', '3', '4', '5', '6']);
+                    const newOtp = Math.floor(100000 + Math.random() * 900000).toString();
+                    setGeneratedOtp(newOtp);
+                    setCountdown(60);
+                    setOtpCode(['', '', '', '', '', '']);
                   }}
-                  className="text-[#00C2FF] font-bold hover:underline cursor-pointer"
+                  className="text-[#00C2FF] font-bold hover:underline cursor-pointer flex items-center gap-1"
                 >
-                  Tự động điền mã mẫu (123456)
+                  <RefreshCw className="w-3 h-3" />
+                  <span>Gửi lại mã mới</span>
                 </button>
               </div>
 
@@ -588,7 +738,7 @@ export default function RegisterPage() {
                   <span className="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                 ) : (
                   <>
-                    <span>Xác Nhận & Kích Hoạt Tài Khoản</span>
+                    <span>Xác Nhận OTP & Kích Hoạt Tài Khoản</span>
                     <CheckCircle2 className="w-4 h-4" />
                   </>
                 )}
@@ -604,14 +754,14 @@ export default function RegisterPage() {
               <div className="w-14 h-14 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center mx-auto shadow-lg">
                 <CheckCircle2 className="w-8 h-8" />
               </div>
-              <h3 className="text-xl font-bold text-white">Xác Thực Thành Công!</h3>
+              <h3 className="text-xl font-bold text-white">Đăng Ký & Xác Thực Thành Công!</h3>
               <p className="text-xs text-slate-300 leading-relaxed max-w-md mx-auto">
-                Chào mừng <strong>{fullName || adminFullName}</strong> gia nhập One Connect Network.
+                Chào mừng <strong>{fullName || adminFullName}</strong> gia nhập One Connect Network. Mật khẩu và tài khoản của bạn đã được thiết lập bảo mật.
               </p>
               <div className="pt-2">
                 <span className="text-[11px] text-emerald-400 font-mono flex items-center justify-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-                  Đang mở Danh thiếp số: <strong>{registeredProfileUrl}</strong>...
+                  Đang mở Profile số: <strong>{registeredProfileUrl}</strong>...
                 </span>
               </div>
             </div>

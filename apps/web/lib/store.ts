@@ -426,6 +426,7 @@ export function useOneConnectStore() {
     taxCode?: string;
     association?: string;
     address?: string;
+    password?: string;
     cardType?: 'NFC_EXECUTIVE' | 'NFC_BUSINESS_PRO' | 'NFC_STANDARD';
     bio?: string;
   }) => {
@@ -453,6 +454,7 @@ export function useOneConnectStore() {
       title: data.title || 'Giám Đốc Doanh Nghiệp',
       phone: data.phone || '0794677369',
       email: data.email,
+      password: data.password || '123456',
       taxCode: data.taxCode || '4201888999',
       association: data.association || 'Hội Viên One Connect Network',
       address: data.address || 'Việt Nam',
@@ -619,6 +621,7 @@ export function useOneConnectStore() {
     adminEmail: string;
     adminPhone?: string;
     adminTitle?: string;
+    adminPassword?: string;
   }) => {
     const orgId = `org-${Date.now()}`;
     const cleanSlug = (data.slug || data.orgName.toLowerCase().replace(/[^a-z0-9]/g, '-')).replace(/-+/g, '-');
@@ -644,6 +647,7 @@ export function useOneConnectStore() {
       title: data.adminTitle || 'Chủ tịch / Đại diện Tổ chức',
       phone: data.adminPhone || '0794677369',
       email: data.adminEmail,
+      password: data.adminPassword || '123456',
       association: `${data.orgName} • Ban Lãnh Đạo`,
       socialLinks: [
         { id: `s-email-${Date.now()}`, identityId: adminId, platform: 'website', url: `https://one-connect-network.vercel.app/org/${cleanSlug}`, isPublic: true },
@@ -700,7 +704,7 @@ export function useOneConnectStore() {
   };
 
   // Direct Unified Login by Email, Phone or Username
-  const loginUser = (identifier: string) => {
+  const loginUser = (identifier: string, password?: string) => {
     const clean = identifier.trim().toLowerCase();
     const found = state.identities.find(
       (i) =>
@@ -711,6 +715,9 @@ export function useOneConnectStore() {
     );
 
     if (found) {
+      if (password && found.password && found.password !== password) {
+        return null;
+      }
       setState(prev => ({
         ...prev,
         currentIdentityId: found.id,

@@ -52,6 +52,7 @@ export interface PersonIdentity {
   bio?: string;
   phone?: string;
   email?: string;
+  password?: string;
   website?: string;
   taxCode?: string;
   address?: string;

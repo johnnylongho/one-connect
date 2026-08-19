@@ -108,7 +108,7 @@ export default function LoginPage() {
     setLoading(true);
 
     setTimeout(() => {
-      const user = loginUser(identifier);
+      const user = loginUser(identifier, password);
       if (user) {
         setSuccessUser(user.fullName);
         setLoading(false);
@@ -117,7 +117,7 @@ export default function LoginPage() {
         }, 800);
       } else {
         setLoading(false);
-        setErrorMsg(`Không tìm thấy tài khoản với thông tin "${identifier}".`);
+        setErrorMsg(`Tên đăng nhập, Email hoặc Mật khẩu không chính xác.`);
       }
     }, 600);
   };
