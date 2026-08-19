@@ -549,17 +549,17 @@ END:VCARD`;
   }
 
   return (
-    <div className="min-h-screen bg-slate-100/90 text-slate-900 pb-12 antialiased selection:bg-blue-600 selection:text-white" suppressHydrationWarning>
+    <div className="min-h-screen bg-slate-100/90 text-slate-900 pb-20 antialiased selection:bg-blue-600 selection:text-white" suppressHydrationWarning>
 
       {/* MOBILE APPLICATION CONTAINER */}
-      <div className="max-w-md mx-auto relative bg-white min-h-screen border-x border-slate-200/80 shadow-2xl overflow-hidden pb-8">
+      <div className="max-w-md mx-auto relative bg-white min-h-screen border-x border-slate-200/80 shadow-2xl overflow-hidden pb-12">
         
         {/* 1. TOP APP BAR (Compact Glassmorphic Header) */}
         <header className="bg-white/95 border-b border-slate-100 px-3.5 sm:px-4 py-2.5 flex items-center justify-between sticky top-0 z-30 backdrop-blur-md">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 min-w-0">
             <Link
               href="/dashboard"
-              className="p-1.5 sm:p-2 rounded-full bg-slate-50 border border-slate-200 text-slate-700 hover:bg-blue-50 hover:text-[#0066FF] hover:border-blue-200 transition-all active:scale-95 cursor-pointer shadow-2xs"
+              className="p-1.5 sm:p-2 rounded-full bg-slate-50 border border-slate-200 text-slate-700 hover:bg-blue-50 hover:text-[#0066FF] hover:border-blue-200 transition-all active:scale-95 cursor-pointer shadow-2xs shrink-0"
               title="Quay lại Trang Tổng Quan Dashboard"
             >
               <ArrowLeft className="w-4 h-4" />
@@ -570,15 +570,15 @@ END:VCARD`;
               alt="One Connect Logo"
               className="h-6 sm:h-7 w-auto object-contain shrink-0 drop-shadow-xs"
             />
-            <div>
-              <div className="text-[12px] sm:text-[13px] text-[#0066FF] font-black tracking-tight uppercase flex items-center gap-1.5 font-heading">
+            <div className="truncate">
+              <div className="text-[11px] sm:text-[12px] text-[#0066FF] font-black tracking-tight uppercase flex items-center gap-1 font-heading truncate">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shrink-0" />
-                Executive Digital Pass
+                <span className="truncate">One Connect Pass</span>
               </div>
             </div>
           </div>
 
-          <div className="flex items-center gap-1.5 sm:gap-2">
+          <div className="flex items-center gap-1.5 shrink-0">
             <button
               type="button"
               onClick={() => setIsQrModalOpen(true)}
@@ -598,284 +598,286 @@ END:VCARD`;
           </div>
         </header>
 
-
-        {/* 2. EXECUTIVE HERO BLOCK VỚI HIỆU ỨNG LIQUID GLASS */}
-        <div className="p-3.5 sm:p-4">
-          <div className="relative rounded-[28px] p-4 sm:p-5 overflow-hidden transition-all duration-300 backdrop-blur-2xl bg-white/80 border border-white/90 shadow-[0_12px_40px_rgba(0,102,255,0.12),0_4px_20px_rgba(255,107,0,0.08)] before:absolute before:inset-0 before:bg-gradient-to-br before:from-blue-500/[0.07] before:via-white/40 before:to-orange-500/[0.07] before:pointer-events-none after:absolute after:inset-x-0 after:top-0 after:h-[1.5px] after:bg-gradient-to-r after:from-transparent after:via-white after:to-transparent space-y-3.5 text-center">
+        {/* 2. EXECUTIVE HERO BLOCK (Thiết kế tinh gọn, chuẩn Mobile-First, chống tràn chữ) */}
+        <div className="px-3 sm:px-4 pt-3 pb-2">
+          <div className="relative rounded-3xl overflow-hidden bg-white border border-slate-200/90 shadow-md">
             
-            {/* Centered Avatar Section */}
-            <div className="relative z-10 flex flex-col items-center justify-center pt-1">
-              <div className="w-[130px] h-[130px] sm:w-[145px] sm:h-[145px] rounded-3xl overflow-hidden shadow-md bg-slate-100 shrink-0 relative group">
-                <img
-                  src={profile.avatarUrl}
-                  alt={profile.fullName}
-                  className="w-full h-full object-cover"
-                />
-                {isOwner && (
-                  <button
-                    type="button"
-                    onClick={handleOpenEditModal}
-                    className="absolute inset-0 bg-slate-950/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center text-white text-xs font-bold gap-1 cursor-pointer"
-                    title="Bấm để đổi ảnh đại diện"
-                  >
-                    <Camera className="w-5 h-5 text-white animate-bounce" />
-                    <span>Đổi Ảnh</span>
-                  </button>
-                )}
-              </div>
-              
-              {/* Chip UID Tag & Quick Edit Pill below Avatar */}
-              <div className="mt-2.5 flex items-center gap-2">
-                <span className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-slate-900/90 text-white text-[10px] sm:text-[11px] font-mono font-bold shadow-xs">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                  {profile.cardUid}
-                </span>
+            {/* Top Cover Banner */}
+            <div className="h-24 sm:h-28 bg-gradient-to-r from-blue-600 via-indigo-600 to-[#FF6B00] relative p-3 flex items-start justify-between">
+              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-black/40 backdrop-blur-md text-white text-[10px] font-mono font-bold border border-white/20">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                {profile.cardUid}
+              </span>
 
-                {isOwner && (
-                  <button
-                    type="button"
-                    onClick={handleOpenEditModal}
-                    className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-blue-50 hover:bg-blue-100 border border-blue-200 text-[#0066FF] text-[10px] sm:text-[11px] font-bold shadow-2xs transition-all cursor-pointer active:scale-95"
-                  >
-                    <Edit3 className="w-3 h-3 text-[#0066FF]" />
-                    <span>Sửa Profile</span>
-                  </button>
-                )}
-              </div>
+              {isOwner && (
+                <button
+                  type="button"
+                  onClick={handleOpenEditModal}
+                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white/90 hover:bg-white text-slate-900 text-[10px] sm:text-[11px] font-bold shadow-md transition-all cursor-pointer active:scale-95"
+                >
+                  <Edit3 className="w-3 h-3 text-[#0066FF]" />
+                  <span>Sửa Hồ Sơ</span>
+                </button>
+              )}
             </div>
 
+            {/* Profile Info Body */}
+            <div className="px-4 pb-4 pt-0 relative space-y-3">
+              
+              {/* Avatar positioned over the banner */}
+              <div className="flex items-end justify-between -mt-12 sm:-mt-14 mb-2">
+                <div className="relative w-22 h-22 sm:w-26 sm:h-26 rounded-2xl overflow-hidden shadow-lg bg-white p-1 border-2 border-white ring-2 ring-blue-500/30 shrink-0 group">
+                  <img
+                    src={profile.avatarUrl}
+                    alt={profile.fullName}
+                    className="w-full h-full object-cover rounded-xl"
+                  />
+                  {isOwner && (
+                    <button
+                      type="button"
+                      onClick={handleOpenEditModal}
+                      className="absolute inset-1 rounded-xl bg-slate-950/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center text-white text-[10px] font-bold gap-0.5 cursor-pointer"
+                      title="Bấm để đổi ảnh đại diện"
+                    >
+                      <Camera className="w-4 h-4 text-white" />
+                      <span>Đổi Ảnh</span>
+                    </button>
+                  )}
+                </div>
 
-
-            {/* Name & Enterprise Verified Badge & Company Info */}
-            <div className="relative z-10 space-y-1">
-              {/* Tên chính: Hồ Hoàng Long + Tích xanh Enterprise Verified (Đảm bảo luôn hiển thị rõ ràng trên mobile) */}
-              <div className="flex items-center justify-center gap-1.5 flex-nowrap">
-                <h1 className="text-[22px] sm:text-[25px] font-black text-slate-900 tracking-tight font-heading">
-                  {profile.fullName}
-                </h1>
-                {/* Enterprise Verified Rosette Badge */}
                 <button
                   type="button"
                   onClick={() => setIsVerifiedModalOpen(true)}
-                  className="inline-flex items-center justify-center shrink-0 hover:scale-110 active:scale-95 transition-transform cursor-pointer ml-0.5"
-                  title="Enterprise Verified (Bấm để xem chứng nhận)"
+                  className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-[#0066FF] text-[11px] font-bold shadow-2xs hover:bg-blue-100 transition-colors"
                 >
-                  <EnterpriseVerifiedBadge className="w-6 h-6 min-w-[24px] min-h-[24px] shrink-0 drop-shadow-xs" />
+                  <EnterpriseVerifiedBadge className="w-4 h-4 shrink-0" />
+                  <span>Enterprise Verified</span>
                 </button>
               </div>
 
-              {/* Tên thường dùng: Johnny Long Hồ */}
-              <p className="text-[14.5px] sm:text-[15.5px] font-bold text-slate-700">
-                {profile.displayName}
-              </p>
-
-              {/* Chức danh */}
-              <p className="text-[14.5px] sm:text-[15.5px] font-bold text-[#0066FF] leading-snug pt-0.5">
-                {profile.roleVietnamese}
-              </p>
-
-              {/* Doanh nghiệp & Hiệp hội */}
-              <div className="space-y-0.5 pt-1 text-[13.5px] sm:text-[14.5px]">
-                <div className="inline-flex items-center gap-1.5 font-bold text-slate-800 bg-slate-50/80 px-3 py-1 rounded-full border border-slate-200/70">
-                  <Building2 className="w-4 h-4 text-[#FF6B00] shrink-0" />
-                  <span>{profile.company}</span>
+              {/* Name & Title Hierarchy (Tối ưu chống tràn chữ trên mọi dòng máy) */}
+              <div className="space-y-1 text-left">
+                <div className="flex items-baseline gap-2 flex-wrap">
+                  <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight font-heading">
+                    {profile.fullName}
+                  </h1>
+                  {profile.displayName && profile.displayName !== profile.fullName && (
+                    <span className="text-xs font-bold text-slate-500">
+                      ({profile.displayName})
+                    </span>
+                  )}
                 </div>
-                <p className="text-[12.5px] text-slate-500 font-medium pt-1">
-                  {profile.association}
+
+                <p className="text-[13.5px] sm:text-[14px] font-bold text-[#0066FF] leading-snug">
+                  {profile.roleVietnamese}
                 </p>
+
+                <div className="flex items-center gap-1.5 text-[12.5px] sm:text-[13px] font-semibold text-slate-700 pt-0.5">
+                  <Building2 className="w-3.5 h-3.5 text-[#FF6B00] shrink-0" />
+                  <span className="truncate">{profile.company}</span>
+                </div>
+
+                {profile.association && (
+                  <p className="text-[11.5px] text-slate-500 font-medium truncate">
+                    {profile.association}
+                  </p>
+                )}
               </div>
-            </div>
 
-            {/* Event Context Pill */}
-            <div className="relative z-10 px-3 py-2 rounded-xl bg-white/80 backdrop-blur-md border border-slate-200/80 flex items-center justify-between text-[12px] sm:text-[12.5px] text-slate-600 shadow-2xs">
-              <div className="flex items-center gap-1.5 truncate">
-                <Compass className="w-4 h-4 text-[#FF6B00] shrink-0" />
-                <span className="truncate font-semibold text-slate-800">{profile.eventJoined}</span>
+              {/* Executive Slogan (Gọn gàng & Thanh lịch) */}
+              {profile.slogan && (
+                <div className="p-2.5 rounded-xl bg-blue-50/70 border border-blue-100 text-[12px] sm:text-[12.5px] text-[#0066FF] font-semibold italic text-center leading-snug">
+                  "{profile.slogan}"
+                </div>
+              )}
+
+              {/* QUICK 1-TAP CONTACT ICONS BAR (4 nút gọi, email, zalo, web gọn gàng) */}
+              <div className="grid grid-cols-4 gap-2 pt-1 border-t border-slate-100">
+                <a
+                  href={`tel:${profile.phone}`}
+                  className="flex flex-col items-center gap-1 p-2 rounded-xl bg-blue-50 border border-blue-200/80 hover:bg-blue-100 text-[#0066FF] transition-all active:scale-95 shadow-2xs"
+                  title="Gọi điện thoại"
+                >
+                  <Phone className="w-4 h-4" />
+                  <span className="text-[11px] font-bold">Gọi Điện</span>
+                </a>
+
+                <a
+                  href={`mailto:${profile.email}`}
+                  className="flex flex-col items-center gap-1 p-2 rounded-xl bg-orange-50 border border-orange-200/80 hover:bg-orange-100 text-[#FF6B00] transition-all active:scale-95 shadow-2xs"
+                  title="Gửi Email"
+                >
+                  <Mail className="w-4 h-4" />
+                  <span className="text-[11px] font-bold">Email</span>
+                </a>
+
+                <a
+                  href={profile.zalo}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex flex-col items-center gap-1 p-2 rounded-xl bg-cyan-50 border border-cyan-200/80 hover:bg-cyan-100 text-cyan-700 transition-all active:scale-95 shadow-2xs"
+                  title="Nhắn Zalo"
+                >
+                  <MessageCircle className="w-4 h-4" />
+                  <span className="text-[11px] font-bold">Zalo</span>
+                </a>
+
+                <a
+                  href={profile.website}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex flex-col items-center gap-1 p-2 rounded-xl bg-purple-50 border border-purple-200/80 hover:bg-purple-100 text-purple-700 transition-all active:scale-95 shadow-2xs"
+                  title="Website"
+                >
+                  <Globe className="w-4 h-4" />
+                  <span className="text-[11px] font-bold">Website</span>
+                </a>
               </div>
-              <div className="flex items-center gap-1 font-mono text-slate-500 shrink-0 ml-2">
-                <Calendar className="w-3.5 h-3.5 text-[#0066FF]" />
-                <span>{currentDateStr}</span>
+
+              {/* PRIMARY ACTION BUTTONS (Lưu Danh Bạ & Kết Nối B2B - Thao tác 1 chạm ngón cái) */}
+              <div className="flex items-center gap-2 pt-1">
+                <Button
+                  type="button"
+                  onClick={handleSaveContact}
+                  size="lg"
+                  className="flex-1 bg-slate-900 hover:bg-slate-800 text-white font-black rounded-xl text-[13.5px] sm:text-[14px] py-4 shadow-sm active:scale-98 transition-all cursor-pointer touch-manipulation"
+                >
+                  <Download className="w-4 h-4 mr-1.5" /> Lưu Danh Bạ
+                </Button>
+
+                <Button
+                  type="button"
+                  onClick={handleRequestConnection}
+                  size="lg"
+                  className="flex-1 bg-gradient-to-r from-[#0066FF] to-[#FF6B00] hover:opacity-95 text-white font-black rounded-xl text-[13.5px] sm:text-[14px] py-4 shadow-sm active:scale-98 transition-all cursor-pointer touch-manipulation"
+                >
+                  <UserCheck className="w-4 h-4 mr-1.5" />
+                  {isConnRequested ? 'Đã Kết Nối' : 'Kết Nối B2B'}
+                </Button>
               </div>
-            </div>
 
-            {/* Executive Motto Slogan */}
-            <div className="relative z-10 p-3 rounded-2xl bg-blue-50/80 backdrop-blur-md border border-blue-200/60 text-[14px] text-[#0066FF] font-semibold italic leading-relaxed text-center shadow-2xs">
-              "{profile.slogan}"
-            </div>
-
-            {/* QUICK 1-TAP CONTACT ICONS BAR (4 nút: Gọi, Email, Zalo, Web) */}
-            <div className="relative z-10 grid grid-cols-4 gap-2 pt-1 border-t border-slate-200/60">
-              <a
-                href={`tel:${profile.phone}`}
-                className="flex flex-col items-center gap-1 p-2.5 rounded-2xl bg-blue-50/90 backdrop-blur-md border border-blue-200/80 hover:bg-blue-100 text-[#0066FF] transition-all active:scale-95 shadow-xs"
-                title="Gọi điện thoại"
-              >
-                <Phone className="w-5 h-5" />
-                <span className="text-[12px] font-bold">Gọi</span>
-              </a>
-
-              <a
-                href={`mailto:${profile.email}`}
-                className="flex flex-col items-center gap-1 p-2.5 rounded-2xl bg-orange-50/90 backdrop-blur-md border border-orange-200/80 hover:bg-orange-100 text-[#FF6B00] transition-all active:scale-95 shadow-xs"
-                title="Gửi Email"
-              >
-                <Mail className="w-5 h-5" />
-                <span className="text-[12px] font-bold">Email</span>
-              </a>
-
-              <a
-                href={profile.zalo}
-                target="_blank"
-                rel="noreferrer"
-                className="flex flex-col items-center gap-1 p-2.5 rounded-2xl bg-cyan-50/90 backdrop-blur-md border border-cyan-200/80 hover:bg-cyan-100 text-cyan-700 transition-all active:scale-95 shadow-xs"
-                title="Nhắn Zalo"
-              >
-                <MessageCircle className="w-5 h-5" />
-                <span className="text-[12px] font-bold">Zalo</span>
-              </a>
-
-              <a
-                href={profile.website}
-                target="_blank"
-                rel="noreferrer"
-                className="flex flex-col items-center gap-1 p-2.5 rounded-2xl bg-purple-50/90 backdrop-blur-md border border-purple-200/80 hover:bg-purple-100 text-purple-700 transition-all active:scale-95 shadow-xs"
-                title="Website"
-              >
-                <Globe className="w-5 h-5" />
-                <span className="text-[12px] font-bold">Web</span>
-              </a>
-            </div>
-
-            {/* PRIMARY INLINE ACTION BUTTONS (Mượt mà, phản hồi tức thì 0 delay) */}
-            <div className="relative z-10 flex items-center gap-2 pt-2 border-t border-slate-200/60">
-              <Button
-                type="button"
-                onClick={handleSaveContact}
-                size="lg"
-                className="flex-1 bg-slate-900 hover:bg-slate-800 text-white font-extrabold rounded-2xl text-[14px] sm:text-[15px] py-4.5 shadow-sm active:scale-98 transition-all cursor-pointer touch-manipulation"
-              >
-                <Download className="w-4.5 h-4.5 mr-1.5" /> Lưu Danh Bạ
-              </Button>
-
-              <Button
-                type="button"
-                onClick={handleRequestConnection}
-                size="lg"
-                className="flex-1 bg-gradient-to-r from-[#0066FF] to-[#FF6B00] hover:opacity-90 text-white font-extrabold rounded-2xl text-[14px] sm:text-[15px] py-4.5 shadow-sm active:scale-98 transition-all cursor-pointer touch-manipulation"
-              >
-                <UserCheck className="w-4.5 h-4.5 mr-1.5" />
-                {isConnRequested ? 'Đã Gửi Kết Nối' : 'Kết Nối B2B'}
-              </Button>
-            </div>
-
-            {/* EXECUTIVE CREDENTIAL METRICS ROW (Đổi '100% Xác thực' thành 'Hạng A+ Tín Nhiệm Doanh Nghiệp' cao cấp) */}
-            <div className="relative z-10 grid grid-cols-3 gap-2 pt-1 border-t border-slate-200/60 text-center">
-              <div className="p-2.5 rounded-2xl bg-white/80 backdrop-blur-md border border-white/90 shadow-2xs">
-                <div className="text-base sm:text-lg font-black text-slate-900 font-heading">{profile.experienceYears}</div>
-                <div className="text-[10.5px] sm:text-[11px] text-slate-600 font-semibold mt-0.5">Năm Kinh Nghiệm</div>
+              {/* EXECUTIVE METRICS ROW (Ngắn gọn, không bị co chữ trên màn hình nhỏ) */}
+              <div className="grid grid-cols-3 gap-1.5 pt-1 text-center">
+                <div className="p-2 rounded-xl bg-slate-50 border border-slate-200/80">
+                  <div className="text-sm sm:text-base font-black text-slate-900 font-heading">{profile.experienceYears}</div>
+                  <div className="text-[10px] sm:text-[10.5px] text-slate-500 font-semibold truncate">Kinh Nghiệm</div>
+                </div>
+                <div className="p-2 rounded-xl bg-slate-50 border border-slate-200/80">
+                  <div className="text-sm sm:text-base font-black text-[#0066FF] font-heading">{profile.b2bMatchesCount}</div>
+                  <div className="text-[10px] sm:text-[10.5px] text-slate-500 font-semibold truncate">Kết Nối B2B</div>
+                </div>
+                <div className="p-2 rounded-xl bg-slate-50 border border-slate-200/80">
+                  <div className="text-sm sm:text-base font-black text-emerald-600 font-heading">{profile.trustRating}</div>
+                  <div className="text-[10px] sm:text-[10.5px] text-emerald-700 font-semibold truncate">Tín Nhiệm</div>
+                </div>
               </div>
-              <div className="p-2.5 rounded-2xl bg-white/80 backdrop-blur-md border border-white/90 shadow-2xs">
-                <div className="text-base sm:text-lg font-black text-[#0066FF] font-heading">{profile.b2bMatchesCount}</div>
-                <div className="text-[10.5px] sm:text-[11px] text-slate-600 font-semibold mt-0.5">Kết Nối B2B</div>
-              </div>
-              <div className="p-2.5 rounded-2xl bg-white/80 backdrop-blur-md border border-white/90 shadow-2xs">
-                <div className="text-base sm:text-lg font-black text-emerald-600 font-heading">{profile.trustRating}</div>
-                <div className="text-[10.5px] sm:text-[11px] text-emerald-700 font-semibold mt-0.5">Tín Nhiệm Doanh Nghiệp</div>
-              </div>
-            </div>
 
+            </div>
           </div>
         </div>
 
-        {/* 3. HỆ THỐNG 4 NÚT BẤM TAB ĐIỀU HƯỚNG */}
-        <div className="px-3.5 sm:px-4 space-y-3.5">
+        {/* 3. HỆ THỐNG TAB ĐIỀU HƯỚNG TINH GỌN (Tên tab ngắn, chuẩn responsive) */}
+        <div className="px-3 sm:px-4 space-y-3 pt-1">
           <Tabs defaultValue="about" value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid grid-cols-4 bg-slate-100/90 p-1 rounded-2xl border border-slate-200/80 gap-1 h-auto">
+            <TabsList className="grid grid-cols-4 bg-slate-100 p-1 rounded-2xl border border-slate-200 gap-1 h-auto">
               <TabsTrigger
                 value="about"
-                className="py-2 sm:py-2.5 px-1 rounded-xl text-[13px] sm:text-[14px] font-bold transition-all data-[state=active]:bg-[#0066FF] data-[state=active]:text-white data-[state=active]:shadow-md flex items-center justify-center gap-1"
+                className="py-2 px-1 rounded-xl text-[12px] sm:text-[13px] font-bold transition-all data-[state=active]:bg-[#0066FF] data-[state=active]:text-white data-[state=active]:shadow-sm flex items-center justify-center gap-1"
               >
-                <UserCheck className="w-3.5 h-3.5" /> Hồ Sơ
+                <UserCheck className="w-3.5 h-3.5 shrink-0" />
+                <span>Hồ Sơ</span>
               </TabsTrigger>
 
               <TabsTrigger
                 value="products"
-                className="py-2 sm:py-2.5 px-1 rounded-xl text-[13px] sm:text-[14px] font-bold transition-all data-[state=active]:bg-[#0066FF] data-[state=active]:text-white data-[state=active]:shadow-md flex items-center justify-center gap-1"
+                className="py-2 px-1 rounded-xl text-[12px] sm:text-[13px] font-bold transition-all data-[state=active]:bg-[#0066FF] data-[state=active]:text-white data-[state=active]:shadow-sm flex items-center justify-center gap-1"
               >
-                <Layers className="w-3.5 h-3.5" /> Sản Phẩm
+                <Layers className="w-3.5 h-3.5 shrink-0" />
+                <span>Dịch Vụ</span>
               </TabsTrigger>
 
               <TabsTrigger
                 value="event"
-                className="py-2 sm:py-2.5 px-1 rounded-xl text-[13px] sm:text-[14px] font-bold transition-all data-[state=active]:bg-[#0066FF] data-[state=active]:text-white data-[state=active]:shadow-md flex items-center justify-center gap-1"
+                className="py-2 px-1 rounded-xl text-[12px] sm:text-[13px] font-bold transition-all data-[state=active]:bg-[#0066FF] data-[state=active]:text-white data-[state=active]:shadow-sm flex items-center justify-center gap-1"
               >
-                <Zap className="w-3.5 h-3.5" /> Vé Sự Kiện
+                <Zap className="w-3.5 h-3.5 shrink-0" />
+                <span>Vé VIP</span>
               </TabsTrigger>
 
               <TabsTrigger
                 value="history"
-                className="py-2 sm:py-2.5 px-1 rounded-xl text-[13px] sm:text-[14px] font-bold transition-all data-[state=active]:bg-[#0066FF] data-[state=active]:text-white data-[state=active]:shadow-md flex items-center justify-center gap-1"
+                className="py-2 px-1 rounded-xl text-[12px] sm:text-[13px] font-bold transition-all data-[state=active]:bg-[#0066FF] data-[state=active]:text-white data-[state=active]:shadow-sm flex items-center justify-center gap-1"
               >
-                <History className="w-3.5 h-3.5" /> Lịch Sử
+                <History className="w-3.5 h-3.5 shrink-0" />
+                <span>Lịch Sử</span>
               </TabsTrigger>
             </TabsList>
 
-            {/* TAB 1: HỒ SƠ, LỊCH SỬ KẾT NỐI & DOANH NGHIỆP */}
-            <TabsContent value="about" className="space-y-3 pt-3 m-0">
+            {/* TAB 1: HỒ SƠ & THÔNG TIN DOANH NGHIỆP */}
+            <TabsContent value="about" className="space-y-3 pt-2.5 m-0">
               
-              {/* LỊCH SỬ & BỐI CẢNH KẾT NỐI */}
-              <div className="p-4 rounded-3xl bg-blue-50/60 border border-blue-200/90 shadow-sm space-y-2.5">
-                <h3 className="font-black text-slate-900 text-[14px] sm:text-[15px] uppercase tracking-wider flex items-center gap-2 font-heading">
-                  <Clock className="w-4 h-4 text-[#0066FF]" /> Lịch Sử & Bối Cảnh Kết Nối
+              {/* Thông tin liên hệ & Pháp nhân chi tiết */}
+              <div className="p-3.5 rounded-2xl bg-white border border-slate-200 shadow-xs space-y-2.5">
+                <h3 className="font-black text-slate-900 text-[13.5px] sm:text-[14px] uppercase tracking-wider flex items-center gap-2 font-heading">
+                  <Building2 className="w-4 h-4 text-[#FF6B00]" /> Pháp Nhân & Liên Hệ
                 </h3>
 
-                <div className="grid grid-cols-1 gap-2 text-[13px] sm:text-[13.5px] text-slate-700">
-                  <div className="flex items-center justify-between p-2 rounded-xl bg-white border border-blue-100">
-                    <span className="text-slate-500 flex items-center gap-1.5">
-                      <Calendar className="w-3.5 h-3.5 text-[#0066FF]" /> Ngày Gặp Gỡ:
-                    </span>
-                    <strong className="text-slate-900 font-mono font-bold">{currentDateStr}</strong>
+                <div className="space-y-2 text-[12.5px] sm:text-[13px] text-slate-700">
+                  <div className="flex items-start gap-2.5 p-2 rounded-xl bg-slate-50 border border-slate-100">
+                    <Building2 className="w-4 h-4 text-slate-400 shrink-0 mt-0.5" />
+                    <div className="min-w-0 flex-1">
+                      <span className="text-slate-400 text-[10px] font-bold block uppercase">DOANH NGHIỆP</span>
+                      <strong className="text-slate-900 font-bold text-[13.5px] block truncate">{profile.company}</strong>
+                    </div>
                   </div>
 
-                  <div className="flex items-center justify-between p-2 rounded-xl bg-white border border-blue-100">
-                    <span className="text-slate-500 flex items-center gap-1.5">
-                      <Compass className="w-3.5 h-3.5 text-[#FF6B00]" /> Bối Cảnh Sự Kiện:
-                    </span>
-                    <strong className="text-slate-900 text-right truncate max-w-[200px]">{profile.eventJoined}</strong>
+                  <div className="flex items-start gap-2.5 p-2 rounded-xl bg-slate-50 border border-slate-100">
+                    <Hash className="w-4 h-4 text-slate-400 shrink-0 mt-0.5" />
+                    <div className="min-w-0 flex-1">
+                      <span className="text-slate-400 text-[10px] font-bold block uppercase">MÃ SỐ THUẾ / GPKD</span>
+                      <span className="font-mono font-bold text-slate-900 text-[13.5px]">{profile.taxCode}</span>
+                    </div>
                   </div>
 
-                  <div className="flex items-center justify-between p-2 rounded-xl bg-white border border-blue-100">
-                    <span className="text-slate-500 flex items-center gap-1.5">
-                      <CreditCard className="w-3.5 h-3.5 text-purple-600" /> Kênh Định Danh:
-                    </span>
-                    <span className="text-blue-700 font-mono font-bold text-[12px]">{profile.cardType} ({profile.cardUid})</span>
+                  <div className="flex items-start gap-2.5 p-2 rounded-xl bg-slate-50 border border-slate-100">
+                    <MapPin className="w-4 h-4 text-slate-400 shrink-0 mt-0.5" />
+                    <div className="min-w-0 flex-1">
+                      <span className="text-slate-400 text-[10px] font-bold block uppercase">TRỤ SỞ CHÍNH</span>
+                      <span className="text-slate-800 text-[12.5px] leading-snug block">{profile.address}</span>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-2.5 p-2 rounded-xl bg-slate-50 border border-slate-100">
+                    <Globe className="w-4 h-4 text-slate-400 shrink-0 mt-0.5" />
+                    <div className="min-w-0 flex-1">
+                      <span className="text-slate-400 text-[10px] font-bold block uppercase">WEBSITE</span>
+                      <a href={profile.website} target="_blank" rel="noreferrer" className="text-[#0066FF] font-semibold hover:underline block truncate">
+                        {profile.websiteDisplay}
+                      </a>
+                    </div>
                   </div>
                 </div>
-
-                <p className="text-[11.5px] text-slate-500 italic text-center pt-0.5">
-                  💡 Toàn bộ ảnh đại diện chân dung, lịch sử, ngày giờ và bối cảnh sự kiện được tự động đính kèm vào danh bạ khi bạn bấm <strong>Lưu Danh Bạ</strong>.
-                </p>
               </div>
 
-              {/* Tiểu sử */}
-              <div className="p-4 rounded-3xl bg-white border border-slate-200 shadow-sm space-y-2.5">
-                <h3 className="font-black text-slate-900 text-[14px] sm:text-[15px] uppercase tracking-wider flex items-center gap-2 font-heading">
-                  <Briefcase className="w-4 h-4 text-[#0066FF]" /> Tiểu Sử Chuyên Gia
+              {/* Tiểu sử chuyên gia */}
+              <div className="p-3.5 rounded-2xl bg-white border border-slate-200 shadow-xs space-y-2">
+                <h3 className="font-black text-slate-900 text-[13.5px] sm:text-[14px] uppercase tracking-wider flex items-center gap-2 font-heading">
+                  <Briefcase className="w-4 h-4 text-[#0066FF]" /> Tiểu Sử & Thế Mạnh
                 </h3>
-                <p className="text-[14px] sm:text-[15px] text-slate-700 leading-relaxed">
+                <p className="text-[13px] sm:text-[13.5px] text-slate-700 leading-relaxed">
                   {profile.bio}
                 </p>
 
                 {/* Skill Pills */}
                 <div className="pt-1">
-                  <span className="text-[11px] sm:text-[12px] text-slate-400 font-mono block pb-1.5 font-bold uppercase">
-                    Lĩnh Vực Chuyên Môn:
+                  <span className="text-[10.5px] text-slate-400 font-mono block pb-1 font-bold uppercase">
+                    LĨNH VỰC CHUYÊN MÔN:
                   </span>
                   <div className="flex flex-wrap gap-1.5">
                     {profile.skills.map((s, idx) => (
                       <span
                         key={idx}
-                        className="px-2.5 py-1 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 text-[12px] sm:text-[13px] font-semibold"
+                        className="px-2.5 py-0.5 rounded-lg bg-blue-50 border border-blue-200 text-[#0066FF] text-[11.5px] font-semibold"
                       >
                         {s}
                       </span>
@@ -884,83 +886,56 @@ END:VCARD`;
                 </div>
               </div>
 
-              {/* Thông tin pháp nhân doanh nghiệp */}
-              <div className="p-4 rounded-3xl bg-white border border-slate-200 shadow-sm space-y-2.5">
-                <h3 className="font-black text-slate-900 text-[14px] sm:text-[15px] uppercase tracking-wider flex items-center gap-2 font-heading">
-                  <Building2 className="w-4 h-4 text-[#FF6B00]" /> Thông Tin Doanh Nghiệp
-                </h3>
-
-                <div className="space-y-2 text-[13.5px] sm:text-[14px] text-slate-700">
-                  <div className="flex items-start gap-2.5">
-                    <Building2 className="w-4 h-4 text-slate-400 shrink-0 mt-0.5" />
-                    <div>
-                      <span className="text-slate-400 text-[10px] sm:text-[11px] font-bold block uppercase">DOANH NGHIỆP</span>
-                      <strong className="text-slate-900 font-bold text-[14.5px] sm:text-[15px]">{profile.company}</strong>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-2.5">
-                    <Hash className="w-4 h-4 text-slate-400 shrink-0 mt-0.5" />
-                    <div>
-                      <span className="text-slate-400 text-[10px] sm:text-[11px] font-bold block uppercase">MÃ SỐ THUẾ / GPKD</span>
-                      <span className="font-mono font-bold text-slate-900 text-[14.5px] sm:text-[15px]">{profile.taxCode}</span>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-2.5">
-                    <MapPin className="w-4 h-4 text-slate-400 shrink-0 mt-0.5" />
-                    <div>
-                      <span className="text-slate-400 text-[10px] sm:text-[11px] font-bold block uppercase">TRỤ SỞ CHÍNH</span>
-                      <span className="text-[13.5px] sm:text-[14px] text-slate-800">{profile.address}</span>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-2.5">
-                    <Globe className="w-4 h-4 text-slate-400 shrink-0 mt-0.5" />
-                    <div>
-                      <span className="text-slate-400 text-[10px] sm:text-[11px] font-bold block uppercase">WEBSITE DOANH NGHIỆP</span>
-                      <a href={profile.website} target="_blank" rel="noreferrer" className="text-[13.5px] sm:text-[14px] text-[#0066FF] font-semibold hover:underline">
-                        {profile.websiteDisplay}
-                      </a>
-                    </div>
-                  </div>
+              {/* Bối cảnh gặp gỡ */}
+              <div className="p-3 rounded-2xl bg-blue-50/60 border border-blue-200/80 space-y-1.5 text-[12px] text-slate-700">
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-500 flex items-center gap-1">
+                    <Calendar className="w-3.5 h-3.5 text-[#0066FF]" /> Ngày gặp gỡ:
+                  </span>
+                  <strong className="text-slate-900 font-mono">{currentDateStr}</strong>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-500 flex items-center gap-1">
+                    <Compass className="w-3.5 h-3.5 text-[#FF6B00]" /> Bối cảnh:
+                  </span>
+                  <strong className="text-slate-900 truncate max-w-[200px]">{profile.eventJoined}</strong>
                 </div>
               </div>
             </TabsContent>
 
             {/* TAB 2: SẢN PHẨM & GIẢI PHÁP CAROUSEL */}
-            <TabsContent value="products" className="space-y-3.5 pt-3 m-0">
-              <div className="relative rounded-3xl bg-white border border-slate-200 shadow-sm overflow-hidden p-4 space-y-3">
+            <TabsContent value="products" className="space-y-3 pt-2.5 m-0">
+              <div className="relative rounded-2xl bg-white border border-slate-200 shadow-xs overflow-hidden p-3.5 space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-[14px] sm:text-[15px] font-black text-slate-900 flex items-center gap-2 font-heading">
+                  <span className="text-[13.5px] sm:text-[14px] font-black text-slate-900 flex items-center gap-1.5 font-heading">
                     <Layers className="w-4 h-4 text-[#FF6B00]" /> Danh Mục Giải Pháp
                   </span>
-                  <span className="text-[11px] sm:text-[12px] font-mono font-bold text-[#0066FF] bg-blue-50 px-2 py-0.5 rounded-full border border-blue-200">
+                  <span className="text-[11px] font-mono font-bold text-[#0066FF] bg-blue-50 px-2 py-0.5 rounded-full border border-blue-200">
                     {carouselIndex + 1} / {PRODUCTS.length}
                   </span>
                 </div>
 
-                <div className="rounded-2xl overflow-hidden border border-slate-200 h-40 sm:h-44 relative bg-slate-100">
+                <div className="rounded-xl overflow-hidden border border-slate-200 h-36 sm:h-40 relative bg-slate-100">
                   <img
                     src={PRODUCTS[carouselIndex]?.image}
                     alt={PRODUCTS[carouselIndex]?.title}
                     className="w-full h-full object-cover transition-all duration-300"
                   />
-                  <div className="absolute top-2.5 left-2.5">
-                    <Badge className="bg-[#0066FF] text-white text-[10.5px] sm:text-[11px] font-bold border-0 shadow-md">
+                  <div className="absolute top-2 left-2">
+                    <Badge className="bg-[#0066FF] text-white text-[10px] font-bold border-0 shadow-sm">
                       {PRODUCTS[carouselIndex]?.category}
                     </Badge>
                   </div>
                 </div>
 
-                <div className="space-y-1">
-                  <div className="text-[12px] sm:text-[13px] font-mono font-bold text-[#FF6B00]">
+                <div className="space-y-1 text-left">
+                  <div className="text-[11.5px] font-mono font-bold text-[#FF6B00]">
                     {PRODUCTS[carouselIndex]?.highlight}
                   </div>
-                  <h4 className="font-bold text-slate-900 text-[15px] sm:text-[16px] leading-snug">
+                  <h4 className="font-bold text-slate-900 text-[14.5px] leading-snug">
                     {PRODUCTS[carouselIndex]?.title}
                   </h4>
-                  <p className="text-[13.5px] sm:text-[14px] text-slate-600 leading-relaxed">
+                  <p className="text-[12.5px] text-slate-600 leading-relaxed">
                     {PRODUCTS[carouselIndex]?.description}
                   </p>
                 </div>
@@ -971,16 +946,16 @@ END:VCARD`;
                     onClick={prevProduct}
                     size="sm"
                     variant="outline"
-                    className="h-8 w-8 p-0 rounded-full border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100 cursor-pointer"
+                    className="h-7 w-7 p-0 rounded-full border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100 cursor-pointer"
                   >
-                    <ChevronLeft className="w-4 h-4" />
+                    <ChevronLeft className="w-3.5 h-3.5" />
                   </Button>
-                  <div className="flex gap-1.5">
+                  <div className="flex gap-1">
                     {PRODUCTS.map((_, i) => (
                       <div
                         key={i}
                         className={`h-1.5 rounded-full transition-all ${
-                          i === carouselIndex ? 'w-6 bg-[#0066FF]' : 'w-1.5 bg-slate-200'
+                          i === carouselIndex ? 'w-5 bg-[#0066FF]' : 'w-1.5 bg-slate-200'
                         }`}
                       />
                     ))}
@@ -990,36 +965,36 @@ END:VCARD`;
                     onClick={nextProduct}
                     size="sm"
                     variant="outline"
-                    className="h-8 w-8 p-0 rounded-full border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100 cursor-pointer"
+                    className="h-7 w-7 p-0 rounded-full border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100 cursor-pointer"
                   >
-                    <ChevronRight className="w-4 h-4" />
+                    <ChevronRight className="w-3.5 h-3.5" />
                   </Button>
                 </div>
               </div>
             </TabsContent>
 
             {/* TAB 3: THÔNG TIN SỰ KIỆN & VÉ CHECK-IN */}
-            <TabsContent value="event" className="space-y-3 pt-3 m-0">
-              <div className="p-4 rounded-3xl bg-white border border-slate-200 shadow-sm space-y-3">
+            <TabsContent value="event" className="space-y-3 pt-2.5 m-0">
+              <div className="p-3.5 rounded-2xl bg-white border border-slate-200 shadow-xs space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-[14px] sm:text-[15px] font-black text-slate-900 flex items-center gap-2 font-heading">
+                  <span className="text-[13.5px] sm:text-[14px] font-black text-slate-900 flex items-center gap-1.5 font-heading">
                     <Zap className="w-4 h-4 text-[#FF6B00]" /> Thẻ VIP & Vé Sự Kiện
                   </span>
-                  <Badge className="bg-emerald-50 text-emerald-700 border-emerald-200 text-[10.5px] sm:text-[11px] font-bold">
+                  <Badge className="bg-emerald-50 text-emerald-700 border-emerald-200 text-[10px] font-bold">
                     ĐÃ CHECK-IN
                   </Badge>
                 </div>
 
-                <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200 flex items-center gap-3">
+                <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 flex items-center gap-3">
                   <img
                     src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${profile.ticketCode}`}
                     alt="Ticket QR"
-                    className="w-18 h-18 sm:w-20 sm:h-20 rounded-2xl border border-slate-200 p-1 bg-white shrink-0 shadow-sm"
+                    className="w-16 h-16 rounded-xl border border-slate-200 p-1 bg-white shrink-0 shadow-2xs"
                   />
-                  <div className="space-y-1 text-[13px] sm:text-[14px]">
-                    <p className="font-bold text-slate-900 leading-tight text-[14px] sm:text-[15px]">{profile.eventJoined}</p>
-                    <p className="font-mono text-[12px] sm:text-[13px] text-[#0066FF] font-bold">{profile.ticketTier}</p>
-                    <p className="text-[12px] sm:text-[13px] text-slate-600 font-semibold">{profile.seatLocation}</p>
+                  <div className="space-y-0.5 text-[12.5px] text-left">
+                    <p className="font-bold text-slate-900 leading-tight text-[13.5px]">{profile.eventJoined}</p>
+                    <p className="font-mono text-[11.5px] text-[#0066FF] font-bold">{profile.ticketTier}</p>
+                    <p className="text-[11.5px] text-slate-600 font-semibold">{profile.seatLocation}</p>
                   </div>
                 </div>
 
@@ -1028,52 +1003,52 @@ END:VCARD`;
                   onClick={() => setIsQrModalOpen(true)}
                   size="sm"
                   variant="outline"
-                  className="w-full border-slate-200 bg-white text-slate-700 hover:bg-slate-50 text-[13.5px] sm:text-[14px] font-bold rounded-xl py-4 cursor-pointer shadow-xs"
+                  className="w-full border-slate-200 bg-white text-slate-700 hover:bg-slate-50 text-[13px] font-bold rounded-xl py-3 cursor-pointer shadow-2xs"
                 >
-                  <QrCode className="w-4 h-4 mr-2 text-[#0066FF]" /> Phóng To Mã QR Để Quét
+                  <QrCode className="w-4 h-4 mr-1.5 text-[#0066FF]" /> Phóng To Mã QR Để Quét
                 </Button>
               </div>
             </TabsContent>
 
             {/* TAB 4: LỊCH SỬ CÁC SỰ KIỆN THAM GIA */}
-            <TabsContent value="history" className="space-y-3 pt-3 m-0">
-              <div className="p-4 rounded-3xl bg-white border border-slate-200 shadow-sm space-y-3">
+            <TabsContent value="history" className="space-y-3 pt-2.5 m-0">
+              <div className="p-3.5 rounded-2xl bg-white border border-slate-200 shadow-xs space-y-2.5">
                 <div className="flex items-center justify-between">
-                  <span className="text-[14px] sm:text-[15px] font-black text-slate-900 flex items-center gap-2 font-heading">
+                  <span className="text-[13.5px] sm:text-[14px] font-black text-slate-900 flex items-center gap-1.5 font-heading">
                     <CalendarCheck className="w-4 h-4 text-[#0066FF]" /> Lịch Sử Tham Dự Sự Kiện
                   </span>
-                  <Badge className="bg-blue-50 text-[#0066FF] border-blue-200 text-[11px] font-bold">
+                  <Badge className="bg-blue-50 text-[#0066FF] border-blue-200 text-[10px] font-bold">
                     {JOINED_EVENTS.length} Sự Kiện
                   </Badge>
                 </div>
 
-                <div className="space-y-2.5">
+                <div className="space-y-2">
                   {JOINED_EVENTS.map((ev) => (
                     <div
                       key={ev.id}
-                      className="p-3.5 rounded-2xl bg-slate-50/80 border border-slate-200/80 space-y-1.5 hover:bg-slate-100/80 transition-colors"
+                      className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/80 space-y-1 hover:bg-slate-100 transition-colors text-left"
                     >
                       <div className="flex items-start justify-between gap-2">
-                        <h4 className="font-bold text-slate-900 text-[13.5px] sm:text-[14px] leading-snug">
+                        <h4 className="font-bold text-slate-900 text-[13px] leading-snug">
                           {ev.title}
                         </h4>
-                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border shrink-0 ${ev.statusColor}`}>
+                        <span className={`text-[9.5px] font-bold px-1.5 py-0.5 rounded-full border shrink-0 ${ev.statusColor}`}>
                           {ev.status}
                         </span>
                       </div>
 
-                      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[12px] text-slate-500">
+                      <div className="flex flex-wrap items-center gap-x-2.5 gap-y-0.5 text-[11.5px] text-slate-500">
                         <div className="flex items-center gap-1 font-semibold text-[#0066FF]">
-                          <Award className="w-3.5 h-3.5" />
+                          <Award className="w-3 h-3" />
                           <span>{ev.role}</span>
                         </div>
                         <div className="flex items-center gap-1 font-mono">
-                          <Calendar className="w-3.5 h-3.5 text-slate-400" />
+                          <Calendar className="w-3 h-3 text-slate-400" />
                           <span>{ev.date}</span>
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-1 text-[11.5px] text-slate-600 pt-0.5">
+                      <div className="flex items-center gap-1 text-[11px] text-slate-600">
                         <MapPin className="w-3 h-3 text-[#FF6B00] shrink-0" />
                         <span className="truncate">{ev.location}</span>
                       </div>
@@ -1083,29 +1058,29 @@ END:VCARD`;
               </div>
             </TabsContent>
           </Tabs>
+        </div>
 
-          {/* SECONDARY BOTTOM INLINE ACTION BUTTONS */}
-          <div className="pt-2">
-            <div className="flex items-center gap-2">
-              <Button
-                type="button"
-                onClick={handleSaveContact}
-                size="lg"
-                className="flex-1 bg-slate-900 hover:bg-slate-800 text-white font-extrabold rounded-2xl text-[14px] sm:text-[15px] py-5 shadow-sm active:scale-98 transition-all cursor-pointer touch-manipulation"
-              >
-                <Download className="w-4.5 h-4.5 mr-1.5" /> Lưu Danh Bạ
-              </Button>
+        {/* 4. FLOATING BOTTOM ACTION DOCK (Thao tác 1 chạm luôn hiển thị cố định ở chân trang) */}
+        <div className="fixed bottom-0 inset-x-0 z-40 bg-white/95 backdrop-blur-lg border-t border-slate-200/90 py-2.5 px-4 shadow-[0_-4px_20px_rgba(0,0,0,0.08)] max-w-md mx-auto">
+          <div className="flex items-center gap-2">
+            <Button
+              type="button"
+              onClick={handleSaveContact}
+              size="sm"
+              className="flex-1 bg-slate-900 hover:bg-slate-800 text-white font-extrabold rounded-xl text-[13px] py-3 shadow-2xs active:scale-98 transition-all cursor-pointer"
+            >
+              <Download className="w-3.5 h-3.5 mr-1" /> Lưu Danh Bạ
+            </Button>
 
-              <Button
-                type="button"
-                onClick={handleRequestConnection}
-                size="lg"
-                className="flex-1 bg-gradient-to-r from-[#0066FF] to-[#FF6B00] hover:opacity-90 text-white font-extrabold rounded-2xl text-[14px] sm:text-[15px] py-5 shadow-sm active:scale-98 transition-all cursor-pointer touch-manipulation"
-              >
-                <UserCheck className="w-4.5 h-4.5 mr-1.5" />
-                {isConnRequested ? 'Đã Gửi Kết Nối' : 'Kết Nối B2B'}
-              </Button>
-            </div>
+            <Button
+              type="button"
+              onClick={handleRequestConnection}
+              size="sm"
+              className="flex-1 bg-gradient-to-r from-[#0066FF] to-[#FF6B00] hover:opacity-95 text-white font-extrabold rounded-xl text-[13px] py-3 shadow-2xs active:scale-98 transition-all cursor-pointer"
+            >
+              <UserCheck className="w-3.5 h-3.5 mr-1" />
+              {isConnRequested ? 'Đã Gửi' : 'Kết Nối B2B'}
+            </Button>
           </div>
         </div>
 
