@@ -308,19 +308,43 @@ function DigitalProfileContent() {
 
 
 
-  // Convert exact profile image to Base64 reliably for vCard export
+  // Convert exact profile image to Base64 reliably using Canvas for vCard export
   const getAvatarBase64 = async (): Promise<string> => {
     try {
-      const res = await fetch(profile.avatarUrl);
-      const blob = await res.blob();
       return new Promise((resolve) => {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          const str = (reader.result as string) || '';
-          resolve(str.split(',')[1] || '');
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = () => {
+          try {
+            const canvas = document.createElement('canvas');
+            const targetDim = 320;
+            canvas.width = targetDim;
+            canvas.height = targetDim;
+            const ctx = canvas.getContext('2d');
+            if (!ctx) {
+              resolve('');
+              return;
+            }
+            // Center-crop square
+            const minSide = Math.min(img.naturalWidth || img.width, img.naturalHeight || img.height);
+            const sx = ((img.naturalWidth || img.width) - minSide) / 2;
+            const sy = ((img.naturalHeight || img.height) - minSide) / 2;
+            ctx.drawImage(img, sx, sy, minSide, minSide, 0, 0, targetDim, targetDim);
+            const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+            const base64 = dataUrl.replace(/^data:image\/jpeg;base64,/, '');
+            resolve(base64);
+          } catch {
+            resolve('');
+          }
         };
-        reader.onerror = () => resolve('');
-        reader.readAsDataURL(blob);
+        img.onerror = () => resolve('');
+        // Handle both relative & absolute URLs
+        const srcUrl = profile.avatarUrl.startsWith('http')
+          ? profile.avatarUrl
+          : typeof window !== 'undefined'
+          ? `${window.location.origin}${profile.avatarUrl}`
+          : profile.avatarUrl;
+        img.src = srcUrl;
       });
     } catch {
       return '';
@@ -332,18 +356,27 @@ function DigitalProfileContent() {
     const now = new Date();
     const formattedDateTime = `${now.toLocaleDateString('vi-VN')} lúc ${now.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}`;
 
+    // Clean Phone number without 'tel:' prefix (0794677369)
+    const rawPhone = profile.phone || '0794677369';
+    const cleanPhone = rawPhone.replace(/[^0-9+]/g, '');
+
+    // Parse Vietnamese Name parts (Họ / Tên đệm & Tên)
+    const nameParts = profile.fullName.trim().split(' ');
+    const lastName = nameParts[0] || 'Hồ';
+    const firstName = nameParts.slice(1).join(' ') || 'Hoàng Long';
+
     // Get Avatar Base64 of profile
     const photoBase64 = await getAvatarBase64();
-    const photoField = photoBase64 ? `PHOTO;ENCODING=b;TYPE=JPEG:${photoBase64}\n` : '';
+    const photoField = photoBase64 ? `PHOTO;TYPE=JPEG;ENCODING=B:${photoBase64}\n` : '';
 
-    // Standard vCard 3.0 format compatible with iOS, Android & Windows Outlook
+    // Standard RFC 2426 vCard 3.0 format 100% compatible with iOS & Android
     const vCardData = `BEGIN:VCARD
 VERSION:3.0
-N:Hồ;Hoàng Long;;;
+N:${lastName};${firstName};;;
 FN:${profile.fullName} (${profile.displayName})
 ORG:${profile.company}
 TITLE:${profile.roleVietnamese}
-TEL;TYPE=CELL,VOICE,PREF;VALUE=uri:tel:${profile.phone}
+TEL;TYPE=CELL,VOICE,PREF:${cleanPhone}
 EMAIL;TYPE=WORK,INTERNET:${profile.email}
 URL:${profile.website}
 ADR;TYPE=WORK:;;${profile.address};;;;
