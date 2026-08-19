@@ -29,7 +29,7 @@ import {
   INITIAL_AUDIT_LOGS
 } from './mock-data';
 
-const STORAGE_KEY = 'one_connect_app_state_v1';
+const STORAGE_KEY = 'one_connect_app_state_v2';
 
 export interface AppState {
   currentRole: RoleType;
@@ -67,8 +67,40 @@ export function useOneConnectStore() {
   const [state, setState] = useState<AppState>(() => {
     if (typeof window === 'undefined') return defaultState;
     try {
+      // Clear legacy storage v1 if present
+      localStorage.removeItem('one_connect_app_state_v1');
       const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) return JSON.parse(saved);
+      if (saved) {
+        const parsed: AppState = JSON.parse(saved);
+        // Ensure id-001 and card-1 are strictly synced with official values
+        parsed.identities = parsed.identities.map((idnt) => {
+          if (idnt.id === 'id-001') {
+            return {
+              ...idnt,
+              username: 'johnnylongho',
+              fullName: 'Hồ Hoàng Long',
+              displayName: 'Johnny Long Hồ',
+              phone: '0794677369',
+              email: 'contact.johnnylongho@gmail.com',
+              website: 'https://aplusvn.net',
+            };
+          }
+          return idnt;
+        });
+        parsed.cards = parsed.cards.map((c) => {
+          if (c.personIdentityId === 'id-001') {
+            return {
+              ...c,
+              cardUid: '04:8F:2A:1B:9C:5D:80',
+              nfcIdentifier: 'NFC-2026-APLUS-001',
+              dynamicUrl: 'https://one-connect-network.vercel.app/p/johnnylongho',
+              qrValue: 'https://one-connect-network.vercel.app/p/johnnylongho',
+            };
+          }
+          return c;
+        });
+        return parsed;
+      }
     } catch (e) {
       console.error('Failed to load state from localStorage', e);
     }
@@ -82,7 +114,7 @@ export function useOneConnectStore() {
   }, [state]);
 
   const currentIdentity = state.identities.find(i => i.id === state.currentIdentityId) || state.identities[0];
-  const currentCard = state.cards.find(c => c.personIdentityId === state.currentIdentityId && c.status === 'ACTIVE');
+  const currentCard = state.cards.find(c => c.personIdentityId === state.currentIdentityId && c.status === 'ACTIVE') || state.cards[0];
 
   // Actions
   const setCurrentRole = (role: RoleType) => {

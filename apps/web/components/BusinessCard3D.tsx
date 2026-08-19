@@ -180,14 +180,17 @@ export default function BusinessCard3D({
                 </span>
               </div>
 
-              <div className="min-w-0 flex-1 space-y-1">
-                <h3 className="text-lg sm:text-xl font-black text-white tracking-tight font-heading truncate drop-shadow-sm">
-                  {identity.fullName || 'Hồ Hoàng Long (Johnny Long Hồ)'}
+              <div className="min-w-0 flex-1 space-y-0.5">
+                <h3 className="text-lg sm:text-xl font-black bg-gradient-to-r from-white via-slate-50 to-amber-200 bg-clip-text text-transparent tracking-tight font-heading truncate drop-shadow-md">
+                  {identity.fullName || 'Hồ Hoàng Long'}
                 </h3>
-                <p className={`text-xs ${currentTheme.accentText} truncate`}>
+                <p className="text-[12px] font-bold text-slate-200 truncate">
+                  {identity.displayName || 'Johnny Long Hồ'}
+                </p>
+                <p className={`text-xs ${currentTheme.accentText} truncate pt-0.5`}>
                   {identity.title || 'Quản lý & Triển khai Dự án kiêm Media'}
                 </p>
-                <p className="text-xs text-slate-200 font-medium flex items-center gap-1.5 truncate">
+                <p className="text-xs text-slate-200 font-medium flex items-center gap-1.5 truncate pt-0.5">
                   <Building2 className="w-3.5 h-3.5 text-slate-300 shrink-0" />
                   <span className="truncate">
                     {primaryBiz?.businessName || identity.businesses?.[0]?.businessName || 'Tập đoàn Công nghệ số A+ (Aplusvn)'}
@@ -199,10 +202,10 @@ export default function BusinessCard3D({
             {/* Bottom Bar on Front */}
             <div className="relative z-10 pt-3 border-t border-white/15 flex items-center justify-between text-xs">
               <div>
-                <p className="text-[9px] font-mono uppercase tracking-widest text-slate-300 font-bold">
-                  Digital Identity ID
+                <p className="text-[9px] font-mono uppercase tracking-widest text-slate-400 font-bold">
+                  ONE CONNECT ID
                 </p>
-                <p className="text-xs font-mono font-bold text-white mt-0.5">
+                <p className="text-xs font-mono font-bold text-[#00C2FF] mt-0.5">
                   @{canonicalUsername}
                 </p>
               </div>
