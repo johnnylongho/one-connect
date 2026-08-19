@@ -1,6 +1,5 @@
 @echo off
 chcp 65001 >nul
-setlocal enabledelayedexpansion
 title ONE CONNECT - KET THUC VA DONG BO CLOUD
 color 0A
 
@@ -39,7 +38,7 @@ for /f "usebackq delims=" %%A in ("%temp%\oc_git_status.tmp") do (
 )
 if exist "%temp%\oc_git_status.tmp" del "%temp%\oc_git_status.tmp" >nul 2>nul
 
-if "!HAS_CHANGES!"=="0" goto NO_LOCAL_CHANGES
+if "%HAS_CHANGES%"=="0" goto NO_LOCAL_CHANGES
 
 :HAS_LOCAL_CHANGES
 echo Danh sach cac file vua duoc thay doi:
@@ -51,18 +50,14 @@ echo [2/3] Dang dong goi cac thay doi (git add)...
 git add -A
 
 echo.
-set "CUSTOM_MSG=Dong bo tu %COMPUTERNAME% luc %DATE% %TIME%"
 set "USER_INPUT="
 set /p USER_INPUT="Nhap ghi chu cho phien lam viec (Nhan Enter de dung mac dinh): "
 
-if defined USER_INPUT (
-    if not "!USER_INPUT!"=="" set "CUSTOM_MSG=!USER_INPUT!"
-)
-if "!CUSTOM_MSG!"=="" (
-    set "CUSTOM_MSG=Dong bo tu %COMPUTERNAME% luc %DATE% %TIME%"
+if "%USER_INPUT%"=="" (
+    set "USER_INPUT=Dong bo tu %COMPUTERNAME% luc %TIME%"
 )
 
-git commit -m "!CUSTOM_MSG!"
+git commit -m "%USER_INPUT%"
 goto DO_PUSH
 
 :NO_LOCAL_CHANGES
@@ -106,7 +101,7 @@ echo    2. Tren GitHub dang co ban moi hon chua duoc keo ve (Conflict).
 echo    3. Quyen dang nhap hoac token GitHub can duoc xac thuc lai.
 echo.
 set /p RETRY="Go Y de thu dong bo lai (hoac nhan Enter de thoat): "
-if /i "!RETRY!"=="Y" goto SYNC_PROCESS
+if /i "%RETRY%"=="Y" goto SYNC_PROCESS
 
 echo.
 echo Nhan phim bat ky de dong cua so nay...
