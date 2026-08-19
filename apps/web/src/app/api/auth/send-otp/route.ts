@@ -1,8 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
+import nodemailer from 'nodemailer';
 
 const resendApiKey = process.env.RESEND_API_KEY;
 const resend = resendApiKey ? new Resend(resendApiKey) : null;
+
+// Gmail SMTP Transporter (Alternative Free Option)
+const gmailUser = process.env.GMAIL_USER || process.env.SMTP_USER;
+const gmailPass = process.env.GMAIL_APP_PASSWORD || process.env.SMTP_PASSWORD;
+
+const smtpTransporter = (gmailUser && gmailPass)
+  ? nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: gmailUser,
+        pass: gmailPass,
+      },
+    })
+  : null;
 
 export async function POST(req: NextRequest) {
   try {
@@ -102,7 +117,29 @@ export async function POST(req: NextRequest) {
       </html>
     `;
 
-    // If Resend API Key is configured, send real email!
+    // 1. OPTION 1: Send via Gmail SMTP (Direct from your personal/work Gmail)
+    if (smtpTransporter && gmailUser) {
+      try {
+        await smtpTransporter.sendMail({
+          from: `"One Connect Network" <${gmailUser}>`,
+          to: email,
+          subject,
+          html: htmlContent,
+        });
+
+        return NextResponse.json({
+          success: true,
+          delivered: true,
+          provider: 'GMAIL_SMTP',
+          otp: otpCode,
+          message: `Mã OTP đã được gửi thành công từ ${gmailUser} đến ${email}`,
+        });
+      } catch (smtpErr: any) {
+        console.error('SMTP send error:', smtpErr);
+      }
+    }
+
+    // 2. OPTION 2: Send via Resend API
     if (resend) {
       const fromEmail = process.env.RESEND_FROM_EMAIL || 'One Connect <onboarding@resend.dev>';
       const { data, error } = await resend.emails.send({
@@ -118,7 +155,7 @@ export async function POST(req: NextRequest) {
           success: true,
           delivered: false,
           otp: otpCode,
-          message: 'Đã sinh mã OTP (Lưu ý: Cần verify domain trên Resend để gửi ngoài email test)',
+          message: 'Lỗi gửi qua Resend (Cần kiểm tra API Key hoặc Domain)',
           resendError: error.message,
         });
       }
@@ -126,18 +163,19 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({
         success: true,
         delivered: true,
+        provider: 'RESEND',
         otp: otpCode,
-        message: `Mã OTP đã được gửi thành công đến hòm thư ${email}`,
+        message: `Mã OTP đã được gửi thành công qua Resend đến ${email}`,
         data,
       });
     }
 
-    // Fallback when Resend API Key is not set yet
+    // 3. Fallback when neither key is configured yet
     return NextResponse.json({
       success: true,
       delivered: false,
       otp: otpCode,
-      message: `Đã sinh mã OTP thành công: ${otpCode} (Chưa cấu hình RESEND_API_KEY)`,
+      message: `Đã sinh mã OTP: ${otpCode}. (Chưa cấu hình RESEND_API_KEY hoặc GMAIL_APP_PASSWORD)`,
     });
   } catch (err: any) {
     console.error('API send-otp error:', err);
