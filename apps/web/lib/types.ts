@@ -53,6 +53,7 @@ export interface PersonIdentity {
   phone?: string;
   email?: string;
   password?: string;
+  role?: RoleType;
   website?: string;
   taxCode?: string;
   address?: string;

@@ -472,6 +472,7 @@ export function useOneConnectStore() {
     password?: string;
     cardType?: 'NFC_EXECUTIVE' | 'NFC_BUSINESS_PRO' | 'NFC_STANDARD';
     bio?: string;
+    role?: RoleType;
   }) => {
     const slugify = (str: string) => {
       return str
@@ -487,6 +488,7 @@ export function useOneConnectStore() {
     const newId = `id-${Date.now()}`;
     const newCardUid = `NFC-${cleanUsername.toUpperCase().slice(0, 8)}-${Math.floor(100 + Math.random() * 900)}`;
     const avatar = `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(data.fullName)}&backgroundColor=0066ff,00c2ff,10b981,f59e0b`;
+    const userRole: RoleType = data.role || 'MEMBER';
 
     const newIdentity: PersonIdentity = {
       id: newId,
@@ -498,6 +500,7 @@ export function useOneConnectStore() {
       phone: data.phone || '0794677369',
       email: data.email,
       password: data.password || '123456',
+      role: userRole,
       taxCode: data.taxCode || '4201888999',
       association: data.association || 'Hội Viên One Connect Network',
       address: data.address || 'Việt Nam',
@@ -563,7 +566,7 @@ export function useOneConnectStore() {
 
     setState(prev => ({
       ...prev,
-      currentRole: 'ORGANIZER',
+      currentRole: userRole,
       currentIdentityId: newId,
       identities: [newIdentity, ...prev.identities],
       cards: [newCard, ...prev.cards],
@@ -766,7 +769,7 @@ export function useOneConnectStore() {
         return null;
       }
       const isSuperAdmin = found.username === 'johnnylongho' || found.id === 'id-001' || clean.includes('johnny');
-      const determinedRole: RoleType = isSuperAdmin ? 'SUPER_ADMIN' : 'ORGANIZER';
+      const determinedRole: RoleType = found.role || (isSuperAdmin ? 'SUPER_ADMIN' : 'MEMBER');
 
       setState(prev => ({
         ...prev,
@@ -787,6 +790,27 @@ export function useOneConnectStore() {
     }
 
     return null;
+  };
+
+  // Change specific user role (Super Admin action)
+  const changeUserRole = (identityId: string, newRole: RoleType) => {
+    setState(prev => ({
+      ...prev,
+      identities: prev.identities.map(i => i.id === identityId ? { ...i, role: newRole } : i),
+      currentRole: prev.currentIdentityId === identityId ? newRole : prev.currentRole,
+      auditLogs: [
+        {
+          id: `log-${Date.now()}`,
+          actorUserId: prev.currentIdentityId,
+          actorName: currentIdentity?.fullName || 'Super Admin',
+          action: 'RBAC_ROLE_UPDATED',
+          objectType: 'PERSON_IDENTITY',
+          objectId: identityId,
+          createdAt: new Date().toISOString(),
+        },
+        ...prev.auditLogs,
+      ],
+    }));
   };
 
   // Quick Workspace & Role Switcher
@@ -815,6 +839,7 @@ export function useOneConnectStore() {
     registerIdentity,
     registerOrganization,
     loginUser,
+    changeUserRole,
     switchWorkspace,
     updateIdentity,
     resetState,

@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import Navbar from '@/components/Navbar';
 import { useOneConnectStore } from '@/lib/store';
+import { RoleType } from '@/lib/types';
 import {
   Users,
   ShieldCheck,
@@ -17,14 +18,15 @@ import {
   Mail,
   Award,
   Filter,
+  UserCheck,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 
 export default function MemberDirectoryAdminPage() {
-  const { state, registerIdentity } = useOneConnectStore();
+  const { state, registerIdentity, changeUserRole } = useOneConnectStore();
   const [searchTerm, setSearchTerm] = useState('');
-  const [filterRole, setFilterRole] = useState('ALL');
+  const [filterRole, setFilterRole] = useState<string>('ALL');
   const [showAddModal, setShowAddModal] = useState(false);
 
   // Form states for new member
@@ -32,6 +34,7 @@ export default function MemberDirectoryAdminPage() {
   const [title, setTitle] = useState('Giám Đốc Điều Hành');
   const [businessName, setBusinessName] = useState('');
   const [association, setAssociation] = useState('Ủy Viên Ban Chấp Hành');
+  const [selectedRole, setSelectedRole] = useState<RoleType>('MEMBER');
   const [cardType, setCardType] = useState<'NFC_EXECUTIVE' | 'NFC_BUSINESS_PRO' | 'NFC_STANDARD'>('NFC_EXECUTIVE');
   const [address, setAddress] = useState('TP. Nha Trang, Khánh Hòa');
   const [phone, setPhone] = useState('');
@@ -40,6 +43,7 @@ export default function MemberDirectoryAdminPage() {
   const [successToast, setSuccessToast] = useState('');
 
   const filteredMembers = state.identities.filter(m => {
+    const roleMatches = filterRole === 'ALL' || (m.role || 'MEMBER') === filterRole;
     const matchesSearch =
       m.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (m.displayName && m.displayName.toLowerCase().includes(searchTerm.toLowerCase())) ||
@@ -47,7 +51,7 @@ export default function MemberDirectoryAdminPage() {
       (m.association && m.association.toLowerCase().includes(searchTerm.toLowerCase())) ||
       (m.businesses && m.businesses[0]?.businessName.toLowerCase().includes(searchTerm.toLowerCase()));
     
-    return matchesSearch;
+    return roleMatches && matchesSearch;
   });
 
   const handleCreateMember = (e: React.FormEvent) => {
@@ -59,6 +63,7 @@ export default function MemberDirectoryAdminPage() {
       title: title || 'Giám Đốc Doanh Nghiệp',
       businessName,
       association,
+      role: selectedRole,
       cardType,
       address,
       phone: phone || '0903.888.999',
@@ -66,7 +71,7 @@ export default function MemberDirectoryAdminPage() {
       taxCode: taxCode || '4201888999',
     });
 
-    setSuccessToast(`Đã thêm thành công hội viên "${fullName}" (${association}) & tự động kích hoạt Thẻ NFC Số!`);
+    setSuccessToast(`Đã thêm thành công hội viên "${fullName}" với vai trò [${selectedRole}] & tự động kích hoạt Thẻ NFC Số!`);
     setShowAddModal(false);
 
     // Reset form
@@ -74,6 +79,7 @@ export default function MemberDirectoryAdminPage() {
     setTitle('Giám Đốc Điều Hành');
     setBusinessName('');
     setAssociation('Ủy Viên Ban Chấp Hành');
+    setSelectedRole('MEMBER');
     setCardType('NFC_EXECUTIVE');
     setAddress('TP. Nha Trang, Khánh Hòa');
     setPhone('');
@@ -174,8 +180,20 @@ export default function MemberDirectoryAdminPage() {
           </div>
 
           <div className="flex items-center gap-2 w-full sm:w-auto">
-            <span className="text-xs font-bold text-slate-500 whitespace-nowrap">Tổng số:</span>
-            <Badge className="bg-slate-100 text-slate-700 border-slate-300 font-mono text-xs">
+            <Filter className="w-4 h-4 text-slate-400 shrink-0" />
+            <select
+              value={filterRole}
+              onChange={e => setFilterRole(e.target.value)}
+              className="px-3 py-2 rounded-2xl bg-slate-50 border border-slate-200 text-xs font-bold text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#0066FF]/20"
+            >
+              <option value="ALL">Tất cả vai trò</option>
+              <option value="SUPER_ADMIN">👑 Quản trị Hệ thống (SUPER_ADMIN)</option>
+              <option value="ORG_ADMIN">🏛️ Quản trị Hiệp hội (ORG_ADMIN)</option>
+              <option value="EVENT_OPERATOR">📱 Lễ tân Check-in (EVENT_OPERATOR)</option>
+              <option value="MEMBER">💼 Hội viên / Doanh nhân (MEMBER)</option>
+            </select>
+
+            <Badge className="bg-slate-100 text-slate-700 border-slate-300 font-mono text-xs shrink-0">
               {filteredMembers.length} Hội Viên
             </Badge>
           </div>
@@ -187,6 +205,17 @@ export default function MemberDirectoryAdminPage() {
             const companyName = m.businesses && m.businesses[0] ? m.businesses[0].businessName : 'Tập đoàn Công nghệ Số A+ (APLUSVN)';
             const profileLink = `/p/${m.username || m.id}`;
             const memberCard = state.cards.find(c => c.personIdentityId === m.id && c.status === 'ACTIVE') || state.cards.find(c => c.personIdentityId === m.id);
+            const currentMemberRole: RoleType = m.role || (m.id === 'id-001' ? 'SUPER_ADMIN' : 'MEMBER');
+
+            const roleBadgeConfig: Record<string, { label: string; bg: string }> = {
+              SUPER_ADMIN: { label: '👑 SUPER ADMIN', bg: 'bg-purple-50 text-purple-700 border-purple-200' },
+              ORG_ADMIN: { label: '🏛️ ORG ADMIN', bg: 'bg-blue-50 text-[#0066FF] border-blue-200' },
+              ORGANIZER: { label: '🏛️ BAN TỔ CHỨC', bg: 'bg-blue-50 text-[#0066FF] border-blue-200' },
+              EVENT_OPERATOR: { label: '📱 LỄ TÂN CHECK-IN', bg: 'bg-amber-50 text-amber-700 border-amber-200' },
+              MEMBER: { label: '💼 HỘI VIÊN', bg: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
+              GUEST: { label: '👤 KHÁCH MỜI', bg: 'bg-slate-50 text-slate-600 border-slate-200' },
+            };
+            const currentBadge = roleBadgeConfig[currentMemberRole] || { label: currentMemberRole, bg: 'bg-slate-50 text-slate-600 border-slate-200' };
 
             return (
               <div
@@ -194,19 +223,19 @@ export default function MemberDirectoryAdminPage() {
                 className="p-5 rounded-3xl bg-white border border-slate-200 shadow-xs hover:shadow-md transition-all flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 group"
               >
                 {/* Member Info */}
-                <div className="flex items-center gap-4 min-w-0">
+                <div className="flex items-center gap-4 min-w-0 flex-1">
                   <img
                     src={m.avatarUrl || '/avatar-johnny-long.jpg'}
                     alt={m.fullName}
                     className="w-14 h-14 rounded-2xl object-cover shadow-sm bg-slate-100 shrink-0 group-hover:scale-105 transition-transform"
                   />
-                  <div className="space-y-1 min-w-0">
+                  <div className="space-y-1 min-w-0 flex-1">
                     <div className="flex items-center gap-2 flex-wrap">
                       <h3 className="font-bold text-base text-slate-900 font-heading">
                         {m.fullName}
                       </h3>
-                      <Badge className="bg-blue-50 text-[#0066FF] border-blue-200 text-[10.5px] font-bold">
-                        {index === 0 ? 'Ủy Viên BCH' : 'Hội Viên Chính Thức'}
+                      <Badge className={`${currentBadge.bg} text-[10px] font-extrabold uppercase`}>
+                        {currentBadge.label}
                       </Badge>
                       <Badge className="bg-emerald-50 text-emerald-700 border-emerald-200 text-[10px] font-mono">
                         {memberCard?.cardUid || 'NFC-ACTIVE'}
@@ -225,12 +254,33 @@ export default function MemberDirectoryAdminPage() {
                 </div>
 
                 {/* Quick Contact & Action Buttons */}
-                <div className="flex items-center gap-2 w-full sm:w-auto pt-3 sm:pt-0 border-t sm:border-t-0 border-slate-100 justify-end">
+                <div className="flex flex-wrap sm:flex-nowrap items-center gap-2 w-full sm:w-auto pt-3 sm:pt-0 border-t sm:border-t-0 border-slate-100 justify-end">
+                  {/* Inline Role Changer */}
+                  <div className="flex items-center gap-1">
+                    <UserCheck className="w-3.5 h-3.5 text-slate-400" />
+                    <select
+                      value={currentMemberRole}
+                      onChange={(e) => {
+                        const newR = e.target.value as RoleType;
+                        changeUserRole(m.id, newR);
+                        setSuccessToast(`Đã đổi phân quyền của "${m.fullName}" thành [${newR}] thành công!`);
+                        setTimeout(() => setSuccessToast(''), 3500);
+                      }}
+                      className="px-2.5 py-1.5 rounded-xl bg-slate-50 border border-slate-200 text-xs font-bold text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#0066FF]/20 cursor-pointer"
+                      title="Phân quyền tài khoản này"
+                    >
+                      <option value="MEMBER">💼 MEMBER (Hội viên)</option>
+                      <option value="EVENT_OPERATOR">📱 EVENT_OPERATOR (Lễ tân)</option>
+                      <option value="ORG_ADMIN">🏛️ ORG_ADMIN (Quản trị Hiệp hội)</option>
+                      <option value="SUPER_ADMIN">👑 SUPER_ADMIN (Quản trị Hệ thống)</option>
+                    </select>
+                  </div>
+
                   <Link
                     href={profileLink}
                     className="px-3.5 py-2 rounded-xl bg-blue-50 text-[#0066FF] hover:bg-blue-100 border border-blue-200 text-xs font-bold transition-all flex items-center gap-1 shadow-2xs"
                   >
-                    <ExternalLink className="w-3.5 h-3.5" /> Xem Profile Số
+                    <ExternalLink className="w-3.5 h-3.5" /> Profile
                   </Link>
 
                   <Button
@@ -251,15 +301,15 @@ export default function MemberDirectoryAdminPage() {
         {/* Modal: Thêm Hội Viên Mới */}
         {showAddModal && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-xs animate-in fade-in duration-200">
-            <div className="bg-white w-full max-w-lg rounded-3xl p-6 sm:p-8 shadow-2xl border border-slate-200 space-y-5 animate-in zoom-in-95 duration-200">
+            <div className="bg-white w-full max-w-lg rounded-3xl p-6 sm:p-8 shadow-2xl border border-slate-200 space-y-5 animate-in zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto">
               <div className="flex items-center justify-between border-b border-slate-100 pb-3">
                 <div className="flex items-center gap-2.5">
                   <div className="p-2 rounded-xl bg-blue-50 text-[#0066FF]">
                     <Users className="w-5 h-5" />
                   </div>
                   <div>
-                    <h2 className="text-lg font-black text-slate-900 font-heading">Thêm & Cấp Thẻ Hội Viên Mới</h2>
-                    <p className="text-xs text-slate-500">Khởi tạo định danh số & liên kết chip NFC</p>
+                    <h2 className="text-lg font-black text-slate-900 font-heading">Thêm & Cấp Phân Quyền Hội Viên</h2>
+                    <p className="text-xs text-slate-500">Khởi tạo tài khoản, gán vai trò & phát hành Thẻ NFC</p>
                   </div>
                 </div>
                 <button
@@ -281,6 +331,34 @@ export default function MemberDirectoryAdminPage() {
                     onChange={e => setFullName(e.target.value)}
                     className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#0066FF]/20 focus:border-[#0066FF]"
                   />
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="text-xs font-bold text-slate-700 block mb-1">Vai Trò / Phân Quyền <span className="text-[#0066FF]">*</span></label>
+                    <select
+                      value={selectedRole}
+                      onChange={e => setSelectedRole(e.target.value as RoleType)}
+                      className="w-full px-3.5 py-2.5 rounded-xl border-2 border-[#0066FF]/40 text-sm font-bold text-slate-900 bg-blue-50/50 focus:outline-none focus:ring-2 focus:ring-[#0066FF]/20"
+                    >
+                      <option value="MEMBER">💼 MEMBER (Hội viên / Doanh nhân)</option>
+                      <option value="EVENT_OPERATOR">📱 EVENT_OPERATOR (Lễ tân Điểm danh)</option>
+                      <option value="ORG_ADMIN">🏛️ ORG_ADMIN (Quản trị Hiệp hội / CLB)</option>
+                      <option value="SUPER_ADMIN">👑 SUPER_ADMIN (Quản trị Hệ thống)</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="text-xs font-bold text-slate-700 block mb-1">Hạng Thẻ NFC Cấp Phát</label>
+                    <select
+                      value={cardType}
+                      onChange={e => setCardType(e.target.value as any)}
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-[#0066FF]/20 focus:border-[#0066FF]"
+                    >
+                      <option value="NFC_EXECUTIVE">Thẻ Kim Loại Đen VIP (NFC Executive)</option>
+                      <option value="NFC_BUSINESS_PRO">Thẻ Doanh Nhân Pro (Business Pro)</option>
+                      <option value="NFC_STANDARD">Thẻ Tiêu Chuẩn (Standard Member)</option>
+                    </select>
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -320,7 +398,7 @@ export default function MemberDirectoryAdminPage() {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="text-xs font-bold text-slate-700 block mb-1">Vị trí / Vai trò Hiệp Hội</label>
+                    <label className="text-xs font-bold text-slate-700 block mb-1">Vị trí trong Hiệp Hội</label>
                     <select
                       value={association}
                       onChange={e => setAssociation(e.target.value)}
@@ -336,16 +414,14 @@ export default function MemberDirectoryAdminPage() {
                     </select>
                   </div>
                   <div>
-                    <label className="text-xs font-bold text-slate-700 block mb-1">Hạng Thẻ NFC Cấp Phát</label>
-                    <select
-                      value={cardType}
-                      onChange={e => setCardType(e.target.value as any)}
-                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-[#0066FF]/20 focus:border-[#0066FF]"
-                    >
-                      <option value="NFC_EXECUTIVE">Thẻ Kim Loại Đen VIP (NFC Executive)</option>
-                      <option value="NFC_BUSINESS_PRO">Thẻ Doanh Nhân Pro (Business Pro)</option>
-                      <option value="NFC_STANDARD">Thẻ Tiêu Chuẩn (Standard Member)</option>
-                    </select>
+                    <label className="text-xs font-bold text-slate-700 block mb-1">Mã số thuế</label>
+                    <input
+                      type="text"
+                      placeholder="VD: 4201998877"
+                      value={taxCode}
+                      onChange={e => setTaxCode(e.target.value)}
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#0066FF]/20 focus:border-[#0066FF]"
+                    />
                   </div>
                 </div>
 
@@ -360,30 +436,17 @@ export default function MemberDirectoryAdminPage() {
                   />
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div>
-                    <label className="text-xs font-bold text-slate-700 block mb-1">Email làm việc <span className="text-red-500">*</span></label>
-                    <input
-                      type="email"
-                      required
-                      placeholder="VD: minh.tran@bienxanh.vn"
-                      value={email}
-                      onChange={e => setEmail(e.target.value)}
-                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#0066FF]/20 focus:border-[#0066FF]"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-xs font-bold text-slate-700 block mb-1">Mã số thuế</label>
-                    <input
-                      type="text"
-                      placeholder="VD: 4201998877"
-                      value={taxCode}
-                      onChange={e => setTaxCode(e.target.value)}
-                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#0066FF]/20 focus:border-[#0066FF]"
-                    />
-                  </div>
+                <div>
+                  <label className="text-xs font-bold text-slate-700 block mb-1">Email làm việc <span className="text-red-500">*</span></label>
+                  <input
+                    type="email"
+                    required
+                    placeholder="VD: minh.tran@bienxanh.vn"
+                    value={email}
+                    onChange={e => setEmail(e.target.value)}
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#0066FF]/20 focus:border-[#0066FF]"
+                  />
                 </div>
-
 
                 <div className="pt-2 flex items-center justify-end gap-3">
                   <Button

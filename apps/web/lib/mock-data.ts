@@ -25,6 +25,8 @@ export const INITIAL_IDENTITIES: PersonIdentity[] = [
     bio: 'Chuyên gia triển khai giải pháp hạ tầng danh thiếp số NFC, định danh doanh nghiệp và tự động hóa giao thương B2B sự kiện.',
     phone: '0794677369',
     email: 'contact.johnnylongho@gmail.com',
+    password: 'password123',
+    role: 'SUPER_ADMIN',
     website: 'https://aplusvn.net',
     taxCode: '0316888999',
     address: 'Tầng 8, Tòa nhà ASIA, 25 Lê Lợi, TP. Nha Trang, Khánh Hòa',
@@ -51,8 +53,6 @@ export const INITIAL_IDENTITIES: PersonIdentity[] = [
         isPrimary: true,
         status: 'ACTIVE',
       }
-
-
     ],
     createdAt: '2026-08-01T08:00:00Z',
     updatedAt: '2026-08-12T10:00:00Z',
@@ -69,6 +69,8 @@ export const INITIAL_IDENTITIES: PersonIdentity[] = [
     bio: 'Chuyên sản xuất và xuất khẩu cà phê nông sản chất lượng cao. Đang tìm kiếm đối tác mở rộng thị trường Đông Nam Á và Châu Âu.',
     phone: '0912 345 678',
     email: 'ha.nguyen@vinacoffee.vn',
+    password: 'password123',
+    role: 'ORG_ADMIN',
     website: 'https://vinacoffee.vn',
     socialLinks: [
       { id: 's-5', identityId: 'id-002', platform: 'linkedin', url: 'https://linkedin.com/in/thuha-vinacoffee', isPublic: true, sortOrder: 1 },
@@ -101,6 +103,8 @@ export const INITIAL_IDENTITIES: PersonIdentity[] = [
     bio: 'Cung cấp giải pháp phần mềm doanh nghiệp, Cloud Infrastructure & AI Security. Hơn 12 năm kinh nghiệm tư vấn kiến trúc phần mềm.',
     phone: '0988 777 666',
     email: 'bao.tran@techcorp.asia',
+    password: 'password123',
+    role: 'EVENT_OPERATOR',
     website: 'https://techcorp.asia',
     socialLinks: [
       { id: 's-7', identityId: 'id-003', platform: 'linkedin', url: 'https://linkedin.com/in/baotran-cto', isPublic: true, sortOrder: 1 },
