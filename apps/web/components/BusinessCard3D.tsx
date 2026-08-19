@@ -181,7 +181,10 @@ export default function BusinessCard3D({
               </div>
 
               <div className="min-w-0 flex-1 space-y-1">
-                <h3 className="text-xl sm:text-2xl font-black text-white tracking-tight font-heading truncate drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)]">
+                <h3
+                  style={{ color: '#FFFFFF' }}
+                  className="text-xl sm:text-2xl font-black !text-white tracking-tight font-heading truncate drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)]"
+                >
                   {identity.fullName || 'Hồ Hoàng Long'}
                 </h3>
                 <p className="text-xs sm:text-[13px] font-bold text-amber-300 tracking-wide truncate">

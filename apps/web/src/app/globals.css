@@ -75,10 +75,9 @@ body::after {
   z-index: 0;
 }
 
-h1, h2, h3, h4, h5, h6, .font-heading, [class*="font-['Outfit']"] {
-  font-family: var(--font-heading) !important;
+:where(h1, h2, h3, h4, h5, h6, .font-heading, [class*="font-['Outfit']"]) {
+  font-family: var(--font-heading);
   letter-spacing: -0.02em;
-  color: var(--text-primary);
 }
 
 a {
