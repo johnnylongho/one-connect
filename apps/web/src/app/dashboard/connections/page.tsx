@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { PageHeader } from '@/components/shared/PageHeader';
 import { useOneConnectStore } from '@/lib/store';
 import {
   Users,
@@ -192,57 +193,34 @@ export default function MyConnectionsPage() {
   };
 
   return (
-    <div className="space-y-4 max-w-6xl mx-auto pb-12 antialiased">
-      
-      {/* 1. COMPACT EXECUTIVE HERO BANNER */}
-      <section className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-white via-blue-50/20 to-slate-50 border border-slate-200/90 p-4 sm:p-5 shadow-2xs">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          
-          {/* Left Title & Breadcrumb */}
-          <div className="space-y-1">
-            <div className="flex items-center gap-2">
-              <Link
-                href="/dashboard"
-                className="p-1.5 rounded-lg bg-slate-50 border border-slate-200 hover:bg-slate-100 text-slate-600 transition-all"
-                title="Quay lại Dashboard"
-              >
-                <ArrowLeft className="w-3.5 h-3.5" />
-              </Link>
-              <div className="p-1.5 rounded-lg bg-blue-50 text-[#0066FF] border border-blue-100">
-                <Users className="w-4 h-4" />
-              </div>
-              <h1 className="text-base sm:text-lg font-extrabold text-slate-900 tracking-tight font-heading">
-                Mạng Lưới B2B & Quản Trị Consent
-              </h1>
-              <Badge className="bg-emerald-50 text-emerald-700 border-emerald-300 text-[10px] font-bold px-2 py-0.5">
-                <ShieldCheck className="w-3 h-3 text-emerald-600 mr-1" /> PDPL 91/2025
-              </Badge>
-            </div>
-            <p className="text-xs text-slate-500 pl-8">
-              Lưu vết lịch sử gặp gỡ & Quản lý cấp quyền dữ liệu số 2 chiều (Pre-CRM Engine)
-            </p>
-          </div>
-
-          {/* Right Metrics Cluster (Compact) */}
-          <div className="flex items-center gap-2 shrink-0">
+    <div className="space-y-6 w-full pb-12 antialiased">
+      {/* 1. STANDARDIZED PAGE HEADER */}
+      <PageHeader
+        supertitle="ONE CONNECT NETWORK • MODULE 1: DOANH NHÂN & B2B"
+        title="Mạng Lưới B2B & Quản Trị Consent"
+        description="Lưu vết lịch sử gặp gỡ & Quản lý cấp quyền dữ liệu số 2 chiều (Pre-CRM Relationship Memory)"
+        icon={Users}
+        badge="PDPL 91/2025"
+        badgeVariant="emerald"
+        backHref="/dashboard"
+        backLabel="Về Tổng quan"
+        actions={
+          <div className="flex items-center gap-2">
             <div className="px-3.5 py-1.5 rounded-xl bg-white border border-slate-200 shadow-2xs text-center">
               <span className="text-[10px] font-bold text-slate-400 uppercase block">Tổng</span>
               <strong className="text-sm font-black text-slate-900 font-mono">{connectionsList.length}</strong>
             </div>
-
-            <div className="px-3.5 py-1.5 rounded-xl bg-emerald-50/80 border border-emerald-200 shadow-2xs text-center">
-              <span className="text-[10px] font-bold text-emerald-700 uppercase block">Mutual</span>
+            <div className="px-3.5 py-1.5 rounded-xl bg-emerald-50 border border-emerald-200 text-center">
+              <span className="text-[10px] font-bold text-emerald-700 uppercase block">Đã Kết Nối</span>
               <strong className="text-sm font-black text-emerald-700 font-mono">{totalConnected}</strong>
             </div>
-
-            <div className="px-3.5 py-1.5 rounded-xl bg-amber-50/80 border border-amber-200 shadow-2xs text-center">
-              <span className="text-[10px] font-bold text-amber-700 uppercase block">Chờ Duyệt</span>
+            <div className="px-3.5 py-1.5 rounded-xl bg-amber-50 border border-amber-200 text-center">
+              <span className="text-[10px] font-bold text-amber-700 uppercase block">Chờ Đồng Ý</span>
               <strong className="text-sm font-black text-amber-700 font-mono">{totalPending}</strong>
             </div>
           </div>
-
-        </div>
-      </section>
+        }
+      />
 
       {/* 2. SEARCH & SEGMENTED CONTROLS */}
       <section className="p-2.5 rounded-xl bg-white border border-slate-200/90 shadow-2xs flex flex-col sm:flex-row items-center gap-2.5">

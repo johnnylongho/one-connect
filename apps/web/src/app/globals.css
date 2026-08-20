@@ -149,3 +149,142 @@ a {
 button, a, input, select, textarea {
   touch-action: manipulation;
 }
+
+/* ==========================================================================
+   STANDARDIZED PAGE LAYOUT CONTAINERS
+   ========================================================================== */
+.app-container-mobile {
+  max-width: 28rem; /* 448px (max-w-md) */
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  padding-top: 1.5rem;
+  padding-bottom: 2rem;
+}
+
+.app-container-desktop {
+  max-width: 72rem; /* 1152px (max-w-6xl) */
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  padding-top: 1.5rem;
+  padding-bottom: 2.5rem;
+}
+
+@media (min-width: 640px) {
+  .app-container-desktop {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .app-container-desktop {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+}
+
+.app-container-admin {
+  max-width: 80rem; /* 1280px (max-w-7xl) */
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  padding-top: 1.5rem;
+  padding-bottom: 2.5rem;
+}
+
+@media (min-width: 640px) {
+  .app-container-admin {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}
+
+/* ==========================================================================
+   STANDARDIZED TYPOGRAPHY SCALE
+   ========================================================================== */
+.page-title {
+  font-family: var(--font-heading);
+  font-size: 1.5rem; /* 24px */
+  line-height: 2rem;
+  font-weight: 800;
+  color: #0F172A;
+  letter-spacing: -0.025em;
+}
+
+@media (min-width: 640px) {
+  .page-title {
+    font-size: 1.875rem; /* 30px */
+    line-height: 2.25rem;
+  }
+}
+
+.section-title {
+  font-family: var(--font-heading);
+  font-size: 1.125rem; /* 18px */
+  line-height: 1.75rem;
+  font-weight: 700;
+  color: #1E293B;
+  letter-spacing: -0.02em;
+}
+
+@media (min-width: 640px) {
+  .section-title {
+    font-size: 1.25rem; /* 20px */
+    line-height: 1.75rem;
+  }
+}
+
+.card-title {
+  font-family: var(--font-heading);
+  font-size: 1rem; /* 16px */
+  line-height: 1.5rem;
+  font-weight: 600;
+  color: #0F172A;
+}
+
+.page-subtitle {
+  font-size: 0.875rem; /* 14px */
+  line-height: 1.25rem;
+  color: #64748B;
+  font-weight: 500;
+}
+
+/* ==========================================================================
+   STANDARDIZED BADGE & FEATURE TAGS
+   ========================================================================== */
+.badge-core {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.125rem 0.5rem;
+  border-radius: 9999px;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  background-color: #EFF6FF;
+  color: #2563EB;
+  border: 1px solid #BFDBFE;
+}
+
+.badge-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.125rem 0.5rem;
+  border-radius: 9999px;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  background-color: #F1F5F9;
+  color: #475569;
+  border: 1px solid #E2E8F0;
+}
+

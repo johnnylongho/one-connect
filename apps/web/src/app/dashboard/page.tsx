@@ -155,37 +155,37 @@ export default async function OrganizerDashboardPage() {
     totalDelegates > 0 ? Math.round((checkedInDelegates / totalDelegates) * 100) : 0;
 
   return (
-    <div className="space-y-4 max-w-7xl mx-auto pb-10">
+    <div className="space-y-6 w-full pb-12">
       {/* 1. HEADER EXECUTIVE BANNER WITH ONE CONNECT LOGO & LIGHT THEME ELEVATION */}
-      <div className="relative overflow-hidden rounded-2xl bg-white border border-slate-200 p-4 sm:p-5 lg:p-6 shadow-2xs">
+      <div className="relative overflow-hidden rounded-2xl bg-white border border-slate-200/90 p-5 sm:p-6 shadow-2xs w-full">
         {/* Soft Ambient glow for Light Theme */}
-        <div className="absolute top-0 right-0 w-80 h-80 bg-[#0066FF]/5 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-80 h-80 bg-[#FF6B00]/5 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute top-0 right-0 w-72 h-72 bg-[#0066FF]/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-72 h-72 bg-[#FF6B00]/5 rounded-full blur-3xl pointer-events-none" />
 
         <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-4">
           {/* Left Header Info with Logo */}
-          <div className="space-y-2">
-            <div className="flex items-center gap-3">
-              <div className="p-2 rounded-xl bg-blue-50 text-[#0066FF] border border-blue-100 shrink-0">
+          <div className="space-y-2 min-w-0 flex-1">
+            <div className="flex items-start sm:items-center gap-3.5">
+              <div className="w-11 h-11 rounded-2xl bg-blue-50 text-[#0066FF] border border-blue-100 flex items-center justify-center shrink-0 shadow-2xs">
                 <Building2 className="w-5 h-5 text-[#0066FF]" />
               </div>
 
-              <div>
+              <div className="space-y-0.5 min-w-0 flex-1">
                 <div className="flex items-center gap-2">
-                  <span className="text-[11px] font-black tracking-widest text-[#0066FF] uppercase font-mono">
-                    ONE CONNECT NETWORK • DASHBOARD QUẢN LÝ
+                  <span className="text-[10.5px] sm:text-[11px] font-black tracking-widest text-[#0066FF] uppercase font-mono">
+                    ONE CONNECT NETWORK • MODULE 1: DOANH NHÂN & B2B
                   </span>
                   <Badge variant="outline" className="text-[9.5px] bg-blue-50 text-[#0066FF] border-blue-200 font-bold px-1.5 py-0.2">
                     LIVE EVENT
                   </Badge>
                 </div>
 
-                <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight text-slate-900 mt-0.5 font-heading">
-                  Trang Quản Lý Sự Kiện & Hiệp Hội
+                <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight font-heading leading-tight">
+                  Tổng Quan Cá Nhân & Quản Trị Sự Kiện
                 </h1>
 
-                <p className="text-[11.5px] font-medium text-slate-500 italic">
-                  "One Identity, Connect Everywhere."
+                <p className="text-xs sm:text-sm text-slate-500 font-medium leading-normal">
+                  "One Identity, Connect Everywhere." — Nền tảng định danh số & ghi nhớ quan hệ doanh nghiệp
                 </p>
               </div>
             </div>

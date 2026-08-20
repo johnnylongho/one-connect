@@ -2,6 +2,7 @@
 
 import React, { useState, useRef } from 'react';
 import Link from 'next/link';
+import { PageHeader } from '@/components/shared/PageHeader';
 import { useOneConnectStore } from '@/lib/store';
 import {
   Settings,
@@ -151,34 +152,18 @@ export default function SettingsAndPrivacyPage() {
   };
 
   return (
-    <div className="space-y-6 pb-12 max-w-5xl mx-auto">
-      {/* 1. TOP HEADER & BREADCRUMB */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-slate-200 pb-5">
-        <div>
-          <div className="flex items-center gap-2 text-xs font-semibold text-slate-500 mb-1">
-            <Link href="/dashboard" className="hover:text-blue-600 transition-colors">
-              Tổng quan
-            </Link>
-            <span>/</span>
-            <span className="text-blue-600">Cài đặt Quyền riêng tư & Dữ liệu</span>
-          </div>
-          <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight font-heading flex items-center gap-2.5">
-            <div className="p-2 rounded-2xl bg-blue-50 text-blue-600 border border-blue-200">
-              <ShieldCheck className="w-6 h-6 text-emerald-600" />
-            </div>
-            Quyền Riêng Tư & Chủ Quyền Dữ Liệu (PDPL)
-          </h1>
-          <p className="text-xs sm:text-sm text-slate-600 mt-1">
-            Thiết lập hiển thị công khai hồ sơ, quản lý xác thực 2 chiều, xuất gói dữ liệu và quyền được lãng quên theo Luật 91/2025/QH15
-          </p>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <Badge className="bg-emerald-100 text-emerald-800 border-emerald-300 text-xs font-bold px-3 py-1">
-            <ShieldCheck className="w-4 h-4 mr-1 inline" /> PDPL 91/2025 VERIFIED
-          </Badge>
-        </div>
-      </div>
+    <div className="space-y-6 w-full pb-12">
+      {/* 1. STANDARDIZED PAGE HEADER */}
+      <PageHeader
+        supertitle="ONE CONNECT NETWORK • MODULE 1: DOANH NHÂN & B2B"
+        title="Quyền Riêng Tư & Chủ Quyền Dữ Liệu (PDPL)"
+        description="Thiết lập hiển thị công khai hồ sơ, quản lý xác thực 2 chiều, xuất gói dữ liệu và quyền được lãng quên theo Luật 91/2025/QH15"
+        icon={ShieldCheck}
+        badge="PDPL 91/2025 VERIFIED"
+        badgeVariant="emerald"
+        backHref="/dashboard"
+        backLabel="Về Tổng quan"
+      />
 
       {/* ALERT NOTIFICATION */}
       {alertNotice && (

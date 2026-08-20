@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { PageHeader } from '@/components/shared/PageHeader';
 import {
   Users,
   CheckCircle2,
@@ -246,44 +247,27 @@ export function B2BMatchmakingView({ initialMatchings }: B2BMatchmakingViewProps
   };
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto pb-16">
-      {/* HEADER BANNER WITH LIGHT THEME */}
-      <div className="rounded-3xl bg-white border border-slate-200 p-6 sm:p-8 shadow-sm">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div className="space-y-2">
-            <div className="flex items-center gap-3">
-              <div className="p-3 rounded-2xl bg-orange-50 border border-orange-200">
-                <Zap className="w-6 h-6 text-[#FF6B00]" />
-              </div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <span className="text-xs font-black tracking-widest text-[#FF6B00] uppercase font-mono">
-                    ONE CONNECT NETWORK • GIAO THƯƠNG 1:1
-                  </span>
-                  <Badge variant="outline" className="text-[10px] bg-orange-50 text-[#FF6B00] border-orange-200 font-bold">
-                    SCR-B05 & 2-WAY CONSENT
-                  </Badge>
-                </div>
-                <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-slate-900 font-heading font-extrabold mt-0.5">
-                  B2B Matchmaking & Xếp Bàn Giao Thương
-                </h1>
-              </div>
-            </div>
-
-            <p className="text-xs sm:text-sm text-slate-600 max-w-2xl pt-1 leading-relaxed">
-              Khởi tạo cuộc hẹn giao thương 1:1 trực tiếp giữa các Doanh chủ, Chủ tịch & CEO tại khu vực sảnh VIP B2B. Tuân thủ 100% cơ chế Consent 2 chiều.
-            </p>
-          </div>
-
+    <div className="space-y-6 w-full pb-16">
+      {/* 1. STANDARDIZED PAGE HEADER */}
+      <PageHeader
+        supertitle="ONE CONNECT NETWORK • MODULE 1: DOANH NHÂN & B2B"
+        title="B2B Matchmaking & Xếp Bàn Giao Thương"
+        description="Khởi tạo cuộc hẹn giao thương 1:1 trực tiếp giữa các Doanh chủ, Chủ tịch & CEO tại khu vực sảnh VIP B2B. Tuân thủ 100% cơ chế Consent 2 chiều."
+        icon={Users}
+        badge="SCR-B05 & 2-WAY CONSENT"
+        badgeVariant="orange"
+        backHref="/dashboard"
+        backLabel="Về Tổng quan"
+        actions={
           <Button
             onClick={() => setIsDialogOpen(true)}
-            size="lg"
-            className="gap-2 bg-gradient-to-r from-[#0066FF] to-[#FF6B00] hover:opacity-90 text-white font-bold shadow-md shadow-orange-500/20 rounded-xl self-start md:self-center shrink-0 cursor-pointer"
+            size="default"
+            className="gap-2 bg-gradient-to-r from-[#0066FF] to-[#FF6B00] hover:opacity-90 text-white font-bold text-xs shadow-xs rounded-xl self-start md:self-center shrink-0 cursor-pointer"
           >
-            <Plus className="w-5 h-5" /> Tạo Yêu Cầu Kết Nối
+            <Plus className="w-4 h-4" /> Tạo Yêu Cầu Kết Nối
           </Button>
-        </div>
-      </div>
+        }
+      />
 
       {/* 1. HEADER METRICS */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">

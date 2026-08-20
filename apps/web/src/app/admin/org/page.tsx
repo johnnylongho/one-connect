@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
+import { PageHeader } from '@/components/shared/PageHeader';
 import { useOneConnectStore } from '@/lib/store';
 import {
   Building2,
@@ -28,50 +29,34 @@ export default function AssociationAdminDashboard() {
   const org = state.organizations[0] || { name: 'Hiệp hội Doanh nhân Trẻ Khánh Hòa', memberCount: 150 };
 
   return (
-    <div className="space-y-6 max-w-6xl mx-auto pb-16 antialiased">
-      
-      {/* 1. TOP HEADER BANNER */}
-      <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-white via-purple-50/20 to-slate-50 border border-slate-200/90 p-5 sm:p-7 shadow-xs">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-purple-500/5 rounded-full blur-3xl pointer-events-none" />
-        
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-5">
-          <div className="flex items-center gap-4">
-            <div className="p-3.5 rounded-2xl bg-purple-50 text-purple-700 border border-purple-200 shrink-0 shadow-2xs">
-              <Building2 className="w-7 h-7" />
-            </div>
-
-            <div className="space-y-1">
-              <div className="flex flex-wrap items-center gap-2">
-                <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight font-heading">
-                  Quản Trị Hiệp Hội & Câu Lạc Bộ Doanh Nghiệp
-                </h1>
-                <Badge className="bg-purple-50 text-purple-700 border-purple-200 text-xs font-bold">
-                  OFFICIAL PORTAL
-                </Badge>
-              </div>
-
-              <p className="text-xs sm:text-sm text-slate-600 font-medium">
-                Đơn vị chủ quản: <span className="font-bold text-slate-900">{org.name}</span>
-              </p>
-            </div>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-2.5 shrink-0">
+    <div className="space-y-6 w-full pb-16 antialiased">
+      {/* 1. STANDARDIZED PAGE HEADER */}
+      <PageHeader
+        supertitle="ONE CONNECT NETWORK • MODULE 3: QUẢN TRỊ HIỆP HỘI"
+        title="Quản Trị Hiệp Hội & Câu Lạc Bộ Doanh Nghiệp"
+        description={`Đơn vị chủ quản: ${org.name} — Quản trị hội viên, điều phối sự kiện và số hóa danh bạ B2B`}
+        icon={Building2}
+        badge="OFFICIAL PORTAL"
+        badgeVariant="purple"
+        backHref="/dashboard"
+        backLabel="Về Tổng quan"
+        actions={
+          <div className="flex flex-wrap items-center gap-2">
             <Link
               href="/admin/org/members"
-              className="px-4 py-2.5 rounded-xl bg-blue-50 text-[#0066FF] hover:bg-blue-100 border border-blue-200/80 text-xs sm:text-sm font-bold transition-all flex items-center gap-1.5 active:scale-95 shadow-2xs"
+              className="px-3.5 py-2 rounded-xl bg-blue-50 text-[#0066FF] hover:bg-blue-100 border border-blue-200 text-xs font-bold transition-all flex items-center gap-1.5 active:scale-95 shadow-2xs"
             >
               <Users className="w-4 h-4" /> Quản Lý Hội Viên ({state.identities.length})
             </Link>
             <Link
               href="/admin/events"
-              className="px-4 py-2.5 rounded-xl bg-[#0066FF] hover:bg-blue-700 text-white text-xs sm:text-sm font-bold transition-all flex items-center gap-1.5 active:scale-95 shadow-xs shadow-blue-500/20"
+              className="px-3.5 py-2 rounded-xl bg-[#0066FF] hover:bg-blue-700 text-white text-xs font-bold transition-all flex items-center gap-1.5 active:scale-95 shadow-xs shadow-blue-500/20"
             >
               <Plus className="w-4 h-4" /> Tạo Sự Kiện Mới
             </Link>
           </div>
-        </div>
-      </section>
+        }
+      />
 
       {/* 2. EXECUTIVE KPI METRICS */}
       <section className="grid grid-cols-1 sm:grid-cols-3 gap-4">

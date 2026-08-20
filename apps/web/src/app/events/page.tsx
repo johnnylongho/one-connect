@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { PageHeader } from '@/components/shared/PageHeader';
 import { useOneConnectStore } from '@/lib/store';
 import {
   Calendar,
@@ -56,32 +57,18 @@ export default function MemberEventHubPage() {
   };
 
   return (
-    <div className="space-y-6 max-w-5xl mx-auto pb-16">
-      {/* TOP BRAND HEADER */}
-      <div className="bg-white border border-slate-200 rounded-3xl p-4 sm:p-6 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <Link href="/dashboard" className="p-2 rounded-xl bg-slate-50 border border-slate-200 hover:bg-slate-100 transition-colors text-slate-600">
-            <ArrowLeft className="w-4 h-4" />
-          </Link>
-
-          <div className="p-2 rounded-xl bg-orange-50 text-[#FF6B00] border border-orange-100 shrink-0">
-            <Calendar className="w-5 h-5" />
-          </div>
-
-          <div>
-            <h1 className="text-base sm:text-lg font-extrabold text-slate-900 tracking-tight font-heading">
-              Event Hub & Đăng Ký Vé
-            </h1>
-            <p className="text-[11px] text-slate-500 font-medium italic">
-              One Identity, Connect Everywhere.
-            </p>
-          </div>
-        </div>
-
-        <Badge className="bg-blue-50 text-[#0066FF] border-blue-200 text-[10px] font-bold">
-          SCR-B04 & TICKET HUB
-        </Badge>
-      </div>
+    <div className="space-y-6 w-full pb-16">
+      {/* 1. STANDARDIZED PAGE HEADER */}
+      <PageHeader
+        supertitle="ONE CONNECT NETWORK • MODULE 2: QUẢN LÝ EVENT"
+        title="Lịch Trình & Đăng Ký Sự Kiện"
+        description="Đăng ký tham gia các sự kiện kết nối doanh nghiệp và quản lý vé NFC/QR 1-Click"
+        icon={Calendar}
+        badge="EVENT HUB"
+        badgeVariant="orange"
+        backHref="/dashboard"
+        backLabel="Về Tổng quan"
+      />
 
       <main className="space-y-6">
         <div className="flex items-center justify-between">

@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { PageHeader } from '@/components/shared/PageHeader';
 import {
   BarChart3,
   Printer,
@@ -101,57 +102,40 @@ export function EventKpiReportView() {
   };
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto pb-16">
-      {/* 1. HEADER EXECUTIVE BANNER (LIGHT THEME) */}
-      <div className="rounded-3xl bg-white border border-slate-200 p-6 sm:p-8 shadow-sm">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div className="space-y-2">
-            <div className="flex items-center gap-3">
-              <div className="p-3 rounded-2xl bg-blue-50 border border-blue-200">
-                <BarChart3 className="w-6 h-6 text-[#0066FF]" />
-              </div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <span className="text-xs font-black tracking-widest text-[#0066FF] uppercase font-mono">
-                    ONE CONNECT NETWORK • BÁO CÁO SỰ KIỆN LIVE
-                  </span>
-                  <Badge variant="outline" className="text-[10px] bg-blue-50 text-[#0066FF] border-blue-200 font-bold">
-                    SCR-B07 & KPI ANALYTICS
-                  </Badge>
-                </div>
-                <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-slate-900 font-heading font-extrabold mt-0.5">
-                  Báo Cáo Hiệu Quả & Chỉ Số KPI Sự Kiện
-                </h1>
-              </div>
-            </div>
-
-            <p className="text-xs sm:text-sm text-slate-600 max-w-2xl pt-1 leading-relaxed">
-              Theo dõi tỉ lệ tham dự thực tế, tốc độ check-in, hiệu quả giao thương B2B Matchmaking và mức độ tuân thủ PDPL 91/2025 theo thời gian thực.
-            </p>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-3 self-start md:self-center shrink-0">
+    <div className="space-y-6 w-full pb-16">
+      {/* 1. STANDARDIZED PAGE HEADER */}
+      <PageHeader
+        supertitle="ONE CONNECT NETWORK • MODULE 2: QUẢN LÝ EVENT"
+        title="Báo Cáo Hiệu Quả & Chỉ Số KPI Sự Kiện"
+        description="Theo dõi tỉ lệ tham dự thực tế, tốc độ check-in, hiệu quả giao thương B2B Matchmaking và mức độ tuân thủ PDPL 91/2025 theo thời gian thực."
+        icon={BarChart3}
+        badge="SCR-B07 & KPI ANALYTICS"
+        badgeVariant="blue"
+        backHref="/dashboard"
+        backLabel="Về Tổng quan"
+        actions={
+          <div className="flex flex-wrap items-center gap-2">
             <Button
               onClick={handleExportCSV}
               disabled={isExporting}
               variant="outline"
-              size="lg"
-              className="gap-2 border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100 rounded-xl cursor-pointer"
+              size="default"
+              className="gap-1.5 border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100 rounded-xl text-xs font-bold cursor-pointer"
             >
               <FileSpreadsheet className="w-4 h-4 text-emerald-600" />
-              {isExporting ? 'Đang xuất CSV...' : 'Xuất File CSV (Guarded)'}
+              {isExporting ? 'Đang xuất CSV...' : 'Xuất File CSV'}
             </Button>
 
             <Button
               onClick={() => window.print()}
-              size="lg"
-              className="gap-2 bg-gradient-to-r from-[#0066FF] to-[#FF6B00] hover:opacity-90 text-white font-bold shadow-md shadow-orange-500/20 rounded-xl cursor-pointer"
+              size="default"
+              className="gap-1.5 bg-gradient-to-r from-[#0066FF] to-[#FF6B00] hover:opacity-90 text-white font-bold text-xs shadow-xs rounded-xl cursor-pointer"
             >
               <Printer className="w-4 h-4" /> In Báo Cáo PDF
             </Button>
           </div>
-        </div>
-      </div>
+        }
+      />
 
       {/* 2. FOUR KEY EXECUTIVE KPI CARDS */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">

@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { PageHeader } from '@/components/shared/PageHeader';
 import { useOneConnectStore } from '@/lib/store';
 import {
   Users,
@@ -47,47 +48,26 @@ export default function RealtimeAttendeeDirectory() {
   });
 
   return (
-    <div className="space-y-6 max-w-5xl mx-auto pb-16 antialiased">
-      
-      {/* 1. TOP HEADER BANNER */}
-      <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-white via-orange-50/20 to-slate-50 border border-slate-200/90 p-5 sm:p-7 shadow-xs">
-        <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div className="flex items-center gap-3.5">
-            <Link
-              href="/operator/checkin"
-              className="p-2 rounded-xl bg-slate-50 border border-slate-200 hover:bg-slate-100 text-slate-700 hover:text-slate-900 transition-all active:scale-95 shadow-2xs"
-              title="Quay lại Trạm Soát Vé"
-            >
-              <ArrowLeft className="w-4 h-4" />
-            </Link>
-
-            <div className="p-3 rounded-2xl bg-orange-50 text-[#FF6B00] border border-orange-100 shrink-0">
-              <Users className="w-6 h-6" />
-            </div>
-
-            <div>
-              <div className="flex items-center gap-2">
-                <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
-                  Danh Sách Đại Biểu Tham Dự Realtime
-                </h1>
-                <Badge className="bg-emerald-50 text-emerald-700 border-emerald-200 text-xs font-bold">
-                  LIVE SYNC
-                </Badge>
-              </div>
-              <p className="text-xs sm:text-sm text-slate-500 font-medium mt-0.5">
-                {activeEvent?.name || 'Sự kiện MICE'} • Cập nhật điểm danh thời gian thực tại các cổng
-              </p>
-            </div>
-          </div>
-
+    <div className="space-y-6 w-full pb-16 antialiased">
+      {/* 1. STANDARDIZED PAGE HEADER */}
+      <PageHeader
+        supertitle="ONE CONNECT NETWORK • MODULE 2: QUẢN LÝ EVENT"
+        title="Danh Sách Điểm Danh Realtime"
+        description={`${activeEvent?.name || 'Sự kiện MICE'} — Cập nhật trạng thái điểm danh đại biểu thời gian thực tại các cổng`}
+        icon={Users}
+        badge="LIVE SYNC"
+        badgeVariant="emerald"
+        backHref="/operator/checkin"
+        backLabel="Về Trạm Check-in"
+        actions={
           <Link
             href="/operator/checkin"
-            className="px-4 py-2.5 rounded-xl bg-[#FF6B00] hover:bg-orange-600 text-white text-xs sm:text-sm font-bold transition-all flex items-center gap-1.5 active:scale-95 shadow-xs shadow-orange-500/20 shrink-0"
+            className="px-4 py-2 rounded-xl bg-[#0066FF] hover:bg-blue-600 text-white text-xs font-bold transition-all flex items-center gap-1.5 active:scale-95 shadow-xs cursor-pointer"
           >
-            <Zap className="w-4 h-4" /> Mở Trạm Soát Vé (&lt;0.5s)
+            <Zap className="w-4 h-4" /> Mở Trạm Check-in (&lt;1s)
           </Link>
-        </div>
-      </section>
+        }
+      />
 
       {/* 2. SEARCH & ATTENDEE COUNT */}
       <section className="p-3.5 rounded-2xl bg-white border border-slate-200/90 shadow-xs flex flex-col sm:flex-row items-center gap-3">

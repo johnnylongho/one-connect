@@ -59,6 +59,10 @@ export interface PersonIdentity {
   address?: string;
   association?: string;
   slogan?: string;
+  seekingNeeds?: string[]; // Nhu cầu tìm kiếm / Cần hợp tác (Seeking)
+  offeringServices?: string[]; // Năng lực cung cấp / Giải pháp (Offering)
+  brochureUrl?: string; // Tài liệu Catalogue / Profile công ty (PDF/Link)
+  membershipTier?: 'MEMBER' | 'VIP_DIAMOND' | 'EXECUTIVE_BOARD'; // Cấp bậc hội viên
   socialLinks: IdentitySocialLink[];
   businesses: PersonBusiness[];
   createdAt: string;

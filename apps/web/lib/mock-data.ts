@@ -32,6 +32,10 @@ export const INITIAL_IDENTITIES: PersonIdentity[] = [
     address: 'Tầng 8, Tòa nhà ASIA, 25 Lê Lợi, TP. Nha Trang, Khánh Hòa',
     association: 'Hội Doanh Nhân Trẻ Khánh Hòa (YBA) • Ban Công Nghệ',
     slogan: 'Bứt Phá Giao Thương - Chuyển Hóa Mối Quan Hệ Kinh Doanh Số',
+    seekingNeeds: ['Đối tác Chuỗi Khách sạn/Resort MICE', 'Các Hiệp hội Doanh nghiệp Tỉnh/Thành', 'Nhà phân phối phôi thẻ thông minh'],
+    offeringServices: ['Hạ tầng Định danh số NFC Doanh nghiệp', 'Hệ thống Check-in Sự kiện <1s', 'Giải pháp CRM Sổ tay quan hệ B2B'],
+    brochureUrl: 'https://aplusvn.net/company-profile-2026.pdf',
+    membershipTier: 'EXECUTIVE_BOARD',
     socialLinks: [
       { id: 's-1', identityId: 'id-001', platform: 'linkedin', url: 'https://linkedin.com/in/johnnylongho', isPublic: true, sortOrder: 1 },
       { id: 's-2', identityId: 'id-001', platform: 'zalo', url: 'https://zalo.me/0794677369', isPublic: true, sortOrder: 2 },

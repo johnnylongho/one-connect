@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { PageHeader } from '@/components/shared/PageHeader';
 import { useOneConnectStore } from '@/lib/store';
 import { RoleType } from '@/lib/types';
 import {
@@ -29,6 +30,8 @@ export default function MemberDirectoryAdminPage() {
   const { state, registerIdentity, changeUserRole } = useOneConnectStore();
   const [searchTerm, setSearchTerm] = useState('');
   const [filterRole, setFilterRole] = useState<string>('ALL');
+  const [filterIndustry, setFilterIndustry] = useState<string>('ALL');
+  const [selectedMemberForCard, setSelectedMemberForCard] = useState<any | null>(null);
   const [showAddModal, setShowAddModal] = useState(false);
 
   // Form states for new member
@@ -46,6 +49,10 @@ export default function MemberDirectoryAdminPage() {
 
   const filteredMembers = state.identities.filter((m) => {
     const roleMatches = filterRole === 'ALL' || (m.role || 'MEMBER') === filterRole;
+    const industryMatches = filterIndustry === 'ALL' || 
+      (m.title && m.title.toLowerCase().includes(filterIndustry.toLowerCase())) ||
+      (m.bio && m.bio.toLowerCase().includes(filterIndustry.toLowerCase())) ||
+      (m.businesses && m.businesses[0]?.businessName.toLowerCase().includes(filterIndustry.toLowerCase()));
     const matchesSearch =
       m.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (m.displayName && m.displayName.toLowerCase().includes(searchTerm.toLowerCase())) ||
@@ -53,7 +60,7 @@ export default function MemberDirectoryAdminPage() {
       (m.association && m.association.toLowerCase().includes(searchTerm.toLowerCase())) ||
       (m.businesses && m.businesses[0]?.businessName.toLowerCase().includes(searchTerm.toLowerCase()));
 
-    return roleMatches && matchesSearch;
+    return roleMatches && industryMatches && matchesSearch;
   });
 
   const handleCreateMember = (e: React.FormEvent) => {
@@ -94,7 +101,7 @@ export default function MemberDirectoryAdminPage() {
   };
 
   return (
-    <div className="space-y-6 max-w-6xl mx-auto pb-16 antialiased">
+    <div className="space-y-6 w-full pb-16 antialiased">
       
       {/* Success Toast */}
       {successToast && (
@@ -107,47 +114,25 @@ export default function MemberDirectoryAdminPage() {
         </div>
       )}
 
-      {/* 1. TOP HEADER BLOCK */}
-      <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-white via-blue-50/20 to-slate-50 border border-slate-200/90 p-5 sm:p-7 shadow-xs">
-        <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div className="flex items-center gap-3.5">
-            <Link
-              href="/admin/org"
-              className="p-2 rounded-xl bg-slate-50 border border-slate-200 hover:bg-slate-100 text-slate-700 hover:text-slate-900 transition-all active:scale-95 shadow-2xs"
-              title="Quay lại Tổng Quan Hiệp Hội"
-            >
-              <ArrowLeft className="w-4 h-4" />
-            </Link>
-
-            <div className="p-3 rounded-2xl bg-blue-50 text-[#0066FF] border border-blue-100 shrink-0">
-              <Users className="w-6 h-6" />
-            </div>
-
-            <div>
-              <div className="flex items-center gap-2">
-                <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight font-heading">
-                  Quản Lý Danh Bạ Đại Biểu & Hội Viên
-                </h1>
-                <Badge className="bg-blue-50 text-[#0066FF] border-blue-200 text-xs font-bold">
-                  MEMBER DIRECTORY
-                </Badge>
-              </div>
-              <p className="text-xs sm:text-sm text-slate-500 font-medium mt-0.5">
-                Quản trị hồ sơ doanh nhân, cấp phát thẻ số NFC và quản lý sinh hoạt Hội
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2 shrink-0">
-            <Button
-              onClick={() => setShowAddModal(true)}
-              className="bg-[#0066FF] hover:bg-blue-700 text-white font-bold rounded-xl text-xs sm:text-sm py-2.5 px-4 shadow-xs cursor-pointer flex items-center gap-1.5 active:scale-95"
-            >
-              <Plus className="w-4 h-4" /> Thêm & Cấp Thẻ Hội Viên
-            </Button>
-          </div>
-        </div>
-      </section>
+      {/* 1. STANDARDIZED PAGE HEADER */}
+      <PageHeader
+        supertitle="ONE CONNECT NETWORK • MODULE 3: QUẢN TRỊ HIỆP HỘI"
+        title="Quản Lý Danh Bạ Đại Biểu & Hội Viên"
+        description="Quản trị hồ sơ doanh nhân, cấp phát thẻ số NFC và quản lý sinh hoạt Hội"
+        icon={Users}
+        badge="MEMBER DIRECTORY"
+        badgeVariant="blue"
+        backHref="/admin/org"
+        backLabel="Về Tổng quan Hiệp Hội"
+        actions={
+          <Button
+            onClick={() => setShowAddModal(true)}
+            className="bg-[#0066FF] hover:bg-blue-700 text-white font-bold rounded-xl text-xs py-2 px-3.5 shadow-xs cursor-pointer flex items-center gap-1.5 active:scale-95"
+          >
+            <Plus className="w-4 h-4" /> Thêm & Cấp Thẻ Hội Viên
+          </Button>
+        }
+      />
 
       {/* 2. 3 METRIC OVERVIEW CARDS */}
       <section className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -211,6 +196,32 @@ export default function MemberDirectoryAdminPage() {
           <Badge className="bg-slate-100 text-slate-700 border-slate-300 font-mono text-xs shrink-0">
             {filteredMembers.length} Đại Biểu
           </Badge>
+        </div>
+
+        {/* Industry Filter Pills */}
+        <div className="w-full flex items-center gap-1.5 overflow-x-auto pt-2 border-t border-slate-100">
+          <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider shrink-0 mr-1">
+            Ngành Nghề:
+          </span>
+          {[
+            { id: 'ALL', label: 'Tất Cả' },
+            { id: 'Công nghệ', label: '💻 Công Nghệ' },
+            { id: 'Vinacoffee', label: '☕ Nông Sản & F&B' },
+            { id: 'TechCorp', label: '⚙️ Phần Mềm & Cloud' },
+            { id: 'Aplusvn', label: '🚀 Media & Định Danh' },
+          ].map((ind) => (
+            <button
+              key={ind.id}
+              onClick={() => setFilterIndustry(ind.id)}
+              className={`px-2.5 py-1 rounded-xl text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
+                filterIndustry === ind.id
+                  ? 'bg-[#0066FF] text-white shadow-xs'
+                  : 'bg-slate-50 text-slate-600 hover:bg-slate-100 border border-slate-200/80'
+              }`}
+            >
+              {ind.label}
+            </button>
+          ))}
         </div>
       </section>
 
@@ -305,6 +316,15 @@ export default function MemberDirectoryAdminPage() {
                 <Button
                   size="sm"
                   variant="outline"
+                  onClick={() => setSelectedMemberForCard(m)}
+                  className="rounded-xl border-blue-200 text-blue-700 bg-blue-50/60 hover:bg-blue-100 text-xs font-bold py-1.5 cursor-pointer shadow-2xs"
+                >
+                  <Award className="w-3.5 h-3.5 mr-1 text-[#0066FF]" /> Thẻ Hội Viên
+                </Button>
+
+                <Button
+                  size="sm"
+                  variant="outline"
                   onClick={() => alert(`Thẻ NFC ${memberCard?.cardUid || 'NFC-EXECUTIVE'} của hội viên ${m.fullName} đang hoạt động bình thường!`)}
                   className="rounded-xl border-slate-200 text-slate-700 hover:bg-slate-50 text-xs font-bold py-1.5 cursor-pointer shadow-2xs"
                 >
@@ -315,6 +335,70 @@ export default function MemberDirectoryAdminPage() {
           );
         })}
       </section>
+
+      {/* MODAL: THẺ HỘI VIÊN SỐ (E-MEMBERSHIP CARD) */}
+      {selectedMemberForCard && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-xs animate-in fade-in duration-200">
+          <div className="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl border border-slate-200 space-y-4 animate-in zoom-in-95 duration-200 text-center relative">
+            <button
+              onClick={() => setSelectedMemberForCard(null)}
+              className="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center text-sm font-bold cursor-pointer"
+            >
+              ✕
+            </button>
+
+            <div className="pt-2">
+              <span className="text-[10px] font-extrabold text-blue-700 bg-blue-50 px-2.5 py-1 rounded-full border border-blue-200 uppercase tracking-wider inline-flex items-center gap-1">
+                <Sparkles className="w-3 h-3 text-[#FF6B00]" /> THẺ HỘI VIÊN CHÍNH THỨC
+              </span>
+            </div>
+
+            {/* Association e-Card Visual */}
+            <div className="p-5 rounded-2xl bg-gradient-to-br from-slate-900 via-blue-950 to-indigo-950 text-white space-y-4 shadow-lg text-left relative overflow-hidden">
+              <div className="flex items-center justify-between border-b border-white/10 pb-2">
+                <div className="flex items-center gap-2">
+                  <img src="/one_connect_final_logo_orange.png" alt="Logo" className="h-6 w-auto brightness-200" />
+                  <span className="text-[11px] font-bold text-white uppercase tracking-wider">HỘI DOANH NHÂN</span>
+                </div>
+                <Badge className="bg-amber-500/20 text-amber-300 border-amber-400/30 text-[9.5px]">
+                  2026 - 2027
+                </Badge>
+              </div>
+
+              <div className="flex items-center gap-3 pt-1">
+                <img
+                  src={selectedMemberForCard.avatarUrl || '/avatar-johnny-long.jpg'}
+                  alt={selectedMemberForCard.fullName}
+                  className="w-14 h-14 rounded-xl object-cover border-2 border-[#00C2FF] shadow-md bg-white shrink-0"
+                />
+                <div className="min-w-0 flex-1">
+                  <h4 className="font-extrabold text-sm text-white truncate">
+                    {selectedMemberForCard.fullName}
+                  </h4>
+                  <p className="text-[11px] text-[#00C2FF] font-semibold truncate">
+                    {selectedMemberForCard.title}
+                  </p>
+                  <p className="text-[10px] text-slate-300 truncate">
+                    {selectedMemberForCard.businesses?.[0]?.businessName || 'Doanh Nghiệp Hội Viên'}
+                  </p>
+                </div>
+              </div>
+
+              <div className="pt-2 border-t border-white/10 flex items-center justify-between text-[10px] text-slate-400 font-mono">
+                <span>MÃ HỘI VIÊN: <strong>ONEC-{selectedMemberForCard.id.toUpperCase()}</strong></span>
+                <span className="text-emerald-400">● ĐÃ ĐÓNG PHÍ</span>
+              </div>
+            </div>
+
+            <Button
+              onClick={() => setSelectedMemberForCard(null)}
+              className="w-full bg-[#0066FF] hover:bg-blue-600 text-white font-bold rounded-xl text-xs py-2.5 cursor-pointer shadow-xs"
+            >
+              Đóng Thẻ Hội Viên
+            </Button>
+          </div>
+        </div>
+      )}
 
       {/* MODAL: THÊM HỘI VIÊN MỚI */}
       {showAddModal && (

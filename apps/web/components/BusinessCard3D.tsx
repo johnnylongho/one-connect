@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { PersonIdentity, AccessCard } from '@/lib/types';
 import {
   CreditCard,
@@ -86,14 +86,18 @@ export default function BusinessCard3D({
   const [copied, setCopied] = useState(false);
   const [isTapping, setIsTapping] = useState(false);
   const [activeTheme, setActiveTheme] = useState<'obsidian' | 'sapphire' | 'gold' | 'emerald'>(theme);
+  const [origin, setOrigin] = useState('https://one-connect-network.vercel.app');
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setOrigin(window.location.origin);
+    }
+  }, []);
 
   const currentTheme = THEME_STYLES[activeTheme];
   const primaryBiz = identity.businesses?.find((b) => b.isPrimary) || identity.businesses?.[0];
   const canonicalUsername = identity.username || 'johnnylongho';
-  const profileUrl =
-    typeof window !== 'undefined'
-      ? `${window.location.origin}/p/${canonicalUsername}`
-      : `https://one-connect-network.vercel.app/p/${canonicalUsername}`;
+  const profileUrl = `${origin}/p/${canonicalUsername}`;
 
   const copyLink = () => {
     navigator.clipboard.writeText(profileUrl);
@@ -317,7 +321,10 @@ export default function BusinessCard3D({
 
             {/* Bottom Bar on Back */}
             <div className="relative z-10 pt-2 border-t border-white/15 flex items-center justify-between text-[10px] text-slate-300">
-              <span className="font-mono font-bold text-white truncate max-w-[240px]">
+              <span
+                className="font-mono font-bold text-white truncate max-w-[240px]"
+                suppressHydrationWarning
+              >
                 {profileUrl}
               </span>
               <span className="text-cyan-300 font-bold flex items-center gap-1 shrink-0">
@@ -467,7 +474,12 @@ export default function BusinessCard3D({
 
             <div className="space-y-1 text-center">
               <p className="text-sm font-bold text-slate-900">{identity.fullName}</p>
-              <p className="text-xs text-blue-600 font-mono font-medium truncate">{profileUrl}</p>
+              <p
+                className="text-xs text-blue-600 font-mono font-medium truncate"
+                suppressHydrationWarning
+              >
+                {profileUrl}
+              </p>
               <p className="text-[11px] text-slate-500 leading-relaxed pt-1">
                 Bất kỳ camera smartphone nào quét mã QR này sẽ tự động mở trang Định danh Số với cơ chế bảo mật PDPL 91/2025.
               </p>

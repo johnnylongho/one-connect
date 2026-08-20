@@ -277,6 +277,18 @@ function DigitalProfileContent() {
     ticketTier: 'VIP Executive Pass',
     seatLocation: 'Khu A - Bàn Đại Biểu VIP #01',
     skills: ['NFC Infrastructure', 'Event Tech', 'B2B Matchmaking', 'Digital Identity', 'Automation n8n'],
+    seekingNeeds: matchedIdentity?.seekingNeeds || [
+      'Đối tác Chuỗi Khách sạn/Resort MICE',
+      'Các Hiệp hội Doanh nghiệp Tỉnh/Thành',
+      'Nhà phân phối phôi thẻ thông minh'
+    ],
+    offeringServices: matchedIdentity?.offeringServices || [
+      'Hạ tầng Định danh số NFC Doanh nghiệp',
+      'Hệ thống Check-in Sự kiện <1s',
+      'Giải pháp CRM Sổ tay quan hệ B2B'
+    ],
+    brochureUrl: matchedIdentity?.brochureUrl || 'https://aplusvn.net/company-profile-2026.pdf',
+    membershipTier: matchedIdentity?.membershipTier || 'EXECUTIVE_BOARD',
     experienceYears: '8+',
     b2bMatchesCount: '350+',
     trustRating: 'Hạng A+',
@@ -900,6 +912,67 @@ END:VCARD`;
                     ))}
                   </div>
                 </div>
+              </div>
+
+              {/* SÀN CUNG & CẦU GIAO THƯƠNG B2B (GIVE & ASK) */}
+              <div className="p-3.5 rounded-2xl bg-gradient-to-br from-blue-50/80 via-white to-orange-50/60 border border-blue-200/90 shadow-xs space-y-3">
+                <div className="flex items-center justify-between border-b border-slate-100 pb-2">
+                  <h3 className="font-black text-slate-900 text-[13.5px] sm:text-[14px] uppercase tracking-wider flex items-center gap-1.5 font-heading">
+                    <Sparkles className="w-4 h-4 text-[#FF6B00]" /> Cung & Cầu Giao Thương B2B
+                  </h3>
+                  <span className="text-[10px] font-bold text-blue-700 bg-blue-100 px-2 py-0.5 rounded-full border border-blue-200">
+                    AI Match Ready
+                  </span>
+                </div>
+
+                {/* 🔍 ĐANG TÌM KIẾM (SEEKING) */}
+                <div className="space-y-1.5">
+                  <span className="text-[11px] font-extrabold text-[#FF6B00] uppercase tracking-wider flex items-center gap-1">
+                    🔍 ĐANG TÌM KIẾM ĐỐI TÁC (SEEKING):
+                  </span>
+                  <div className="flex flex-wrap gap-1.5">
+                    {profile.seekingNeeds.map((need, idx) => (
+                      <span
+                        key={idx}
+                        className="px-2.5 py-1 rounded-xl bg-orange-50/90 border border-orange-200 text-[#FF6B00] text-[11.5px] font-bold shadow-2xs"
+                      >
+                        • {need}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                {/* 💡 NĂNG LỰC CUNG CẤP (OFFERING) */}
+                <div className="space-y-1.5 pt-1">
+                  <span className="text-[11px] font-extrabold text-[#0066FF] uppercase tracking-wider flex items-center gap-1">
+                    💡 NĂNG LỰC CUNG CẤP (OFFERING):
+                  </span>
+                  <div className="flex flex-wrap gap-1.5">
+                    {profile.offeringServices.map((offer, idx) => (
+                      <span
+                        key={idx}
+                        className="px-2.5 py-1 rounded-xl bg-blue-50/90 border border-blue-200 text-[#0066FF] text-[11.5px] font-bold shadow-2xs"
+                      >
+                        ✓ {offer}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                {/* 📄 TÀI LIỆU NĂNG LỰC / BROCHURE */}
+                {profile.brochureUrl && (
+                  <div className="pt-2 border-t border-slate-100">
+                    <a
+                      href={profile.brochureUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="w-full flex items-center justify-center gap-2 p-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-[12px] font-bold transition-all shadow-xs"
+                    >
+                      <Download className="w-4 h-4 text-[#00C2FF]" />
+                      <span>Xem Profile & Brochure Doanh Nghiệp (PDF)</span>
+                    </a>
+                  </div>
+                )}
               </div>
 
               {/* Bối cảnh gặp gỡ */}

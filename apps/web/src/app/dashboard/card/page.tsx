@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 
 import Link from 'next/link';
 import BusinessCard3D from '@/components/BusinessCard3D';
+import { PageHeader } from '@/components/shared/PageHeader';
 import { useOneConnectStore } from '@/lib/store';
 import {
   CreditCard,
@@ -382,59 +383,50 @@ export default function DigitalNfcCardPage() {
   const unassignedCount = cards.filter((c) => c.status === 'UNASSIGNED').length;
 
   return (
-    <div className="space-y-6 pb-12">
+    <div className="space-y-6 w-full pb-12">
       {/* ===================================================================== */}
-      {/* 1. TOP HEADER & BREADCRUMB */}
+      {/* 1. TOP HEADER (STANDARDIZED PAGE HEADER) */}
       {/* ===================================================================== */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-slate-200 pb-5">
-        <div>
-          <div className="flex items-center gap-2 text-xs font-semibold text-slate-500 mb-1">
-            <Link href="/dashboard" className="hover:text-blue-600 transition-colors">
-              Tổng quan
-            </Link>
-            <span>/</span>
-            <span className="text-blue-600">Thẻ NFC Doanh Nhân</span>
-          </div>
-          <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight font-heading flex items-center gap-2.5">
-            <div className="p-2 rounded-2xl bg-blue-50 text-blue-600 border border-blue-200">
-              <CreditCard className="w-6 h-6" />
-            </div>
-            Thẻ NFC Doanh Nhân & Trạm Cấp Phát
-          </h1>
-          <p className="text-xs sm:text-sm text-slate-600 mt-1">
-            Quản lý thẻ số cá nhân, kho thẻ vật lý NTAG215/216, cấp phát ghép thẻ và phân tích tương tác NFC 1-chạm
-          </p>
-        </div>
+      <PageHeader
+        supertitle="ONE CONNECT NETWORK • MODULE 1: DOANH NHÂN & B2B"
+        title="Thẻ NFC Doanh Nhân & Trạm Cấp Phát"
+        description="Quản lý thẻ số cá nhân, kho thẻ vật lý NTAG215/216, cấp phát ghép thẻ và phân tích tương tác NFC 1-chạm"
+        icon={CreditCard}
+        badge="CORE MVP"
+        badgeVariant="blue"
+        backHref="/dashboard"
+        backLabel="Về Tổng quan"
+        actions={
+          <>
+            <Button
+              onClick={handleOpenEditModal}
+              className="gap-2 border-blue-200 bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold text-xs rounded-xl shadow-2xs cursor-pointer"
+            >
+              <Edit3 className="w-4 h-4 text-blue-600" />
+              Chỉnh Sửa Hồ Sơ
+            </Button>
 
-        <div className="flex items-center gap-2.5 flex-wrap">
-          <Button
-            onClick={handleOpenEditModal}
-            className="gap-2 border-blue-200 bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold text-xs rounded-xl shadow-xs cursor-pointer"
-          >
-            <Edit3 className="w-4 h-4 text-blue-600" />
-            Chỉnh Sửa Hồ Sơ
-          </Button>
+            <Button
+              onClick={handleTriggerSimulatedTap}
+              variant="outline"
+              className="gap-2 border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs rounded-xl shadow-2xs cursor-pointer"
+            >
+              <Zap className="w-4 h-4 text-amber-500" />
+              {isSimulatingTap ? 'Đang chạm NFC...' : 'Mô Phỏng Chạm Thẻ'}
+            </Button>
 
-          <Button
-            onClick={handleTriggerSimulatedTap}
-            variant="outline"
-            className="gap-2 border-slate-300 bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs rounded-xl shadow-sm cursor-pointer"
-          >
-            <Zap className="w-4 h-4 text-amber-500" />
-            {isSimulatingTap ? 'Đang chạm NFC...' : 'Mô Phỏng Chạm Thẻ'}
-          </Button>
-
-          <Button
-            onClick={() => {
-              setActiveTab('inventory');
-              setIsAssignModalOpen(true);
-            }}
-            className="gap-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white font-extrabold text-xs shadow-md shadow-blue-500/20 rounded-xl cursor-pointer"
-          >
-            <Plus className="w-4 h-4" /> Gán Thẻ NFC Mới
-          </Button>
-        </div>
-      </div>
+            <Button
+              onClick={() => {
+                setActiveTab('inventory');
+                setIsAssignModalOpen(true);
+              }}
+              className="gap-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white font-extrabold text-xs shadow-md shadow-blue-500/20 rounded-xl cursor-pointer"
+            >
+              <Plus className="w-4 h-4" /> Gán Thẻ NFC Mới
+            </Button>
+          </>
+        }
+      />
 
 
       {/* ALERT NOTIFICATION */}
@@ -718,6 +710,60 @@ export default function DigitalNfcCardPage() {
                   <span className="font-mono font-bold text-slate-800">
                     {currentIdentity?.website || 'https://aplusvn.net'}
                   </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Sàn Cung - Cầu Give & Ask của Doanh Nhân */}
+            <div className="glass-panel p-6 space-y-4">
+              <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                <h3 className="text-sm font-extrabold text-slate-900 flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-[#FF6B00]" /> Cung & Cầu Giao Thương B2B
+                </h3>
+                <span className="text-[10px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded border border-blue-200 uppercase">
+                  AI Match
+                </span>
+              </div>
+
+              <div className="space-y-3 text-xs">
+                <div className="space-y-1.5">
+                  <span className="text-[11px] font-extrabold text-[#FF6B00] uppercase tracking-wider flex items-center gap-1">
+                    🔍 ĐANG TÌM KIẾM ĐỐI TÁC:
+                  </span>
+                  <div className="flex flex-wrap gap-1.5">
+                    {(currentIdentity?.seekingNeeds || [
+                      'Đối tác Chuỗi Khách sạn/Resort MICE',
+                      'Các Hiệp hội Doanh nghiệp Tỉnh/Thành',
+                      'Nhà phân phối phôi thẻ thông minh'
+                    ]).map((item, idx) => (
+                      <span
+                        key={idx}
+                        className="px-2.5 py-1 rounded-xl bg-orange-50 border border-orange-200 text-[#FF6B00] text-[11px] font-bold"
+                      >
+                        • {item}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="space-y-1.5 pt-1">
+                  <span className="text-[11px] font-extrabold text-[#0066FF] uppercase tracking-wider flex items-center gap-1">
+                    💡 NĂNG LỰC CUNG CẤP:
+                  </span>
+                  <div className="flex flex-wrap gap-1.5">
+                    {(currentIdentity?.offeringServices || [
+                      'Hạ tầng Định danh số NFC Doanh nghiệp',
+                      'Hệ thống Check-in Sự kiện <1s',
+                      'Giải pháp CRM Sổ tay quan hệ B2B'
+                    ]).map((item, idx) => (
+                      <span
+                        key={idx}
+                        className="px-2.5 py-1 rounded-xl bg-blue-50 border border-blue-200 text-[#0066FF] text-[11px] font-bold"
+                      >
+                        ✓ {item}
+                      </span>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
