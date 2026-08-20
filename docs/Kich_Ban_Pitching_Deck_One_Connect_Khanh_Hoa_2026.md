@@ -47,21 +47,21 @@ journey
 ## SLIDE 2: BÀI TOÁN THỰC TIỄN & 3 ĐIỂM NGHẼN LỚN (THE PROBLEM)
 
 ### 📌 Nội dung Slide:
-1. **Lãng phí in ấn & Rác thải carbon (Trái định hướng Kinh tế Xanh):**
-   * Hơn **88% danh thiếp giấy bị vứt bỏ** trong vòng 7 ngày đầu tiên sau sự kiện.
-   * Lãng phí hàng trăm triệu đồng chi phí in ấn tài liệu cho mỗi mùa sự kiện MICE.
-2. **Đứt gãy bối cảnh quan hệ sau sự kiện (Relationship Disconnection):**
-   * Sau sự kiện, **hơn 70% doanh nhân không theo dõi (follow-up) được đối tác** vì không nhớ bối cảnh cuộc gặp, không có ghi chú tập trung.
-3. **Rủi ro Pháp lý Dữ liệu Cá nhân (Luật PDPL 91/2025/QH15):**
-   * Danh sách đại biểu bị chia sẻ tràn lan, không có cơ chế đồng ý tự nguyện (Explicit Consent), dẫn đến nạn gọi điện telesale/spam quấy rối và nguy cơ vi phạm pháp luật.
+1. **Lãng phí in ấn & Rác thải sự kiện (Trái định hướng Kinh tế Xanh / ESG):**
+   * Hàng vạn danh thiếp và tài liệu giấy dùng một lần nhanh chóng bị thất lạc hoặc vứt bỏ sau sự kiện do tính chất tĩnh và không cập nhật được.
+   * Lãng phí ngân sách in ấn đáng kể cho mỗi mùa sự kiện MICE.
+2. **Đứt gãy bối cảnh quan hệ sau sự kiện (Post-Event Relationship Gap):**
+   * Sau sự kiện, đa số doanh nhân gặp khó khăn trong việc theo dõi (follow-up) đối tác vì không nhớ bối cảnh cuộc gặp, thiếu công cụ ghi chú tập trung.
+3. **Thách thức Quản trị Dữ liệu & Quyền riêng tư (Luật PDPL 91/2025/QH15):**
+   * Danh sách đại biểu trao đổi thủ công hoặc chia sẻ thiếu kiểm soát, không có cơ chế đồng thuận 2 chiều minh bạch (Consent-driven), tiềm ẩn rủi ro về bảo mật thông tin cá nhân.
 
 ### 📚 Căn cứ & Dữ liệu đối chiếu:
-* *Thống kê lãng phí danh thiếp:* Nghiên cứu của **Statistic Brain Research Institute & Adobe Insights** (88% business cards thrown away within a week).
+* *Thói quen Networking thực tế:* Khảo sát nhu cầu quản lý danh bạ và theo dõi sau sự kiện của doanh nhân B2B.
 * *Bối cảnh địa phương:* **Báo cáo Phát triển Du lịch MICE tỉnh Khánh Hòa & Nghị quyết số 09-NQ/TW của Bộ Chính trị** về định hướng phát triển Khánh Hòa thành trung tâm kinh tế biển và dịch vụ chất lượng cao.
-* *Cơ sở pháp lý:* **Luật Bảo vệ Dữ liệu Cá nhân số 91/2025/QH15** (Quốc hội khóa XV ban hành).
+* *Cơ sở pháp lý:* **Luật Bảo vệ Dữ liệu Cá nhân số 91/2025/QH15** (có hiệu lực từ 01/01/2026) và **Nghị định 13/2023/NĐ-CP**.
 
 ### 🎙️ Lời thoại Thuyết trình (Speech - 45 giây):
-> *"Nghiên cứu thị trường chỉ ra rằng: 88% danh thiếp giấy in ra bị vứt bỏ sau 1 tuần. Tại một thành phố du lịch MICE lớn như Nha Trang, việc này không chỉ gây lãng phí hàng trăm triệu đồng tiền in ấn mỗi sự kiện mà còn tạo ra lượng rác thải giấy không cần thiết. Đáng lo ngại hơn, dữ liệu liên hệ đại biểu bị chia sẻ công khai không qua đồng ý 2 chiều, vi phạm nghiêm trọng Luật Dữ liệu Cá nhân 91/2025/QH15. Doanh nghiệp Khánh Hòa đang thiếu một công cụ số vừa hiện đại, vừa xanh, vừa bảo mật tuyệt đối."*
+> *"Tại một trung tâm du lịch MICE và xúc tiến thương mại sôi động như Nha Trang, hàng vạn chiếc danh thiếp giấy và tài liệu in ấn đang được trao tay mỗi tuần. Nhưng phần lớn trong số đó nhanh chóng bị lãng quên hoặc vứt bỏ, gây lãng phí ngân sách và phát sinh rác thải. Đáng tiếc hơn, doanh nhân rời sự kiện mà không có công cụ ghi nhớ ai có nhu cầu gì để hợp tác kinh doanh. Đồng thời, trong bối cảnh Luật Bảo vệ Dữ liệu Cá nhân 91/2025/QH15 đã có hiệu lực, việc chia sẻ thông tin thiếu cơ chế đồng thuận minh bạch đang là một rào cản lớn. Doanh nghiệp và Hiệp hội tại Khánh Hòa đang rất cần một hạ tầng kết nối số: Hiện đại – Xanh – và Quản trị niềm tin bảo mật tuyệt đối!"*
 
 ---
 

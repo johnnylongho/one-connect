@@ -60,17 +60,17 @@ export interface NavItem {
 }
 
 export const ALL_NAV_ITEMS: NavItem[] = [
-  // 📱 MODULE 1: DOANH NHÂN & B2B (Personal & Business Identity)
+  // 📱 TRỤ CỘT 1: ĐỊNH DANH DOANH NHÂN (Identity Layer)
   {
     href: '/dashboard',
-    label: 'Tổng Quan Cá Nhân',
+    label: 'Tổng Quan Bảng Điều Khiển',
     icon: LayoutDashboard,
     allowedRoles: ['SUPER_ADMIN', 'ORG_ADMIN', 'EVENT_OPERATOR', 'MEMBER', 'GUEST'],
     section: 'PERSONAL',
   },
   {
     href: '/dashboard/card',
-    label: 'Thẻ NFC & Dynamic QR',
+    label: 'Thẻ Định Danh 3D & NFC',
     icon: CreditCard,
     isCoreFeature: true,
     badge: 'CORE',
@@ -79,32 +79,14 @@ export const ALL_NAV_ITEMS: NavItem[] = [
     deviceTag: '📱',
   },
   {
-    href: '/dashboard/connections',
-    label: 'Danh Bạ B2B & Follow-up',
-    icon: UserCheck,
-    isCoreFeature: true,
-    badge: 'CORE',
-    allowedRoles: ['SUPER_ADMIN', 'ORG_ADMIN', 'MEMBER'],
-    section: 'PERSONAL',
-  },
-  {
-    href: '/matching',
-    label: 'AI Ghép Nối Cung - Cầu',
-    icon: Zap,
-    isCoreFeature: true,
-    badge: 'CORE AI',
-    allowedRoles: ['SUPER_ADMIN', 'ORG_ADMIN', 'EVENT_OPERATOR', 'MEMBER'],
-    section: 'PERSONAL',
-  },
-  {
     href: '/dashboard/settings',
-    label: 'Cài Đặt & Quyền Riêng Tư',
+    label: 'Quyền Riêng Tư PDPL 91/2025',
     icon: ShieldCheck,
     allowedRoles: ['SUPER_ADMIN', 'ORG_ADMIN', 'MEMBER'],
     section: 'PERSONAL',
   },
 
-  // 🎪 MODULE 2: QUẢN LÝ SỰ KIỆN (Event Operations & Check-in)
+  // 🎪 TRỤ CỘT 2: SỰ KIỆN & CHECK-IN (Event Operations & Check-in)
   {
     href: '/events',
     label: 'Lịch Trình & Sự Kiện',
@@ -124,50 +106,54 @@ export const ALL_NAV_ITEMS: NavItem[] = [
   },
   {
     href: '/operator/attendees',
-    label: 'Danh Sách Điểm Danh',
+    label: 'Danh Sách Điểm Danh Live',
     icon: UserCheck,
     allowedRoles: ['SUPER_ADMIN', 'ORG_ADMIN', 'EVENT_OPERATOR'],
     section: 'OPERATION',
   },
+
+  // 🤝 TRỤ CỘT 3: KẾT NỐI & BỘ NHỚ QUAN HỆ (Connection & Relationship Memory)
   {
-    href: '/reports',
-    label: 'Báo Cáo Kết Nối Sự Kiện',
-    icon: BarChart3,
-    allowedRoles: ['SUPER_ADMIN', 'ORG_ADMIN'],
-    section: 'OPERATION',
-    deviceTag: '💻',
+    href: '/dashboard/connections',
+    label: 'Danh Bạ B2B & Ghi Chú Riêng Tư',
+    icon: UserCheck,
+    isCoreFeature: true,
+    badge: 'CORE',
+    allowedRoles: ['SUPER_ADMIN', 'ORG_ADMIN', 'MEMBER'],
+    section: 'ADMIN',
+  },
+  {
+    href: '/matching',
+    label: 'Kết Nối Cung - Cầu Giao Thương',
+    icon: Zap,
+    isCoreFeature: true,
+    badge: 'CORE',
+    allowedRoles: ['SUPER_ADMIN', 'ORG_ADMIN', 'EVENT_OPERATOR', 'MEMBER'],
+    section: 'ADMIN',
   },
 
-  // 🏢 MODULE 3: QUẢN TRỊ HIỆP HỘI (Association Management)
-  {
-    href: '/admin/org',
-    label: 'Tổng Quan Hiệp Hội & CLB',
-    icon: Users,
-    allowedRoles: ['SUPER_ADMIN', 'ORG_ADMIN'],
-    section: 'ADMIN',
-    deviceTag: '💻',
-  },
+  // 🏢 TRỤ CỘT 4: QUẢN TRỊ HIỆP HỘI & BÁO CÁO (Association Hub)
   {
     href: '/admin/org/members',
-    label: 'Danh Bạ & Cấp Bậc Hội Viên',
+    label: 'Danh Bạ Hội Viên Hiệp Hội',
     icon: Users,
     allowedRoles: ['SUPER_ADMIN', 'ORG_ADMIN'],
-    section: 'ADMIN',
+    section: 'PITCHING',
     deviceTag: '💻',
   },
   {
-    href: '/admin/nfc-cards',
-    label: 'Kho Phôi Thẻ & Cấp Phát',
-    icon: Layers,
-    allowedRoles: ['SUPER_ADMIN'],
-    section: 'ADMIN',
+    href: '/reports',
+    label: 'Đo Lường Tương Tác & KPI',
+    icon: BarChart3,
+    allowedRoles: ['SUPER_ADMIN', 'ORG_ADMIN'],
+    section: 'PITCHING',
     deviceTag: '💻',
   },
 
   // ✨ TIỆN ÍCH: DEMO HUB
   {
     href: '/demo',
-    label: 'Live Pitching Demo Hub',
+    label: 'Live Pitching Prototype',
     icon: Sparkles,
     highlight: true,
     allowedRoles: ['SUPER_ADMIN', 'ORG_ADMIN', 'EVENT_OPERATOR', 'MEMBER', 'GUEST'],
@@ -503,10 +489,10 @@ export default function RootLayout({
 
                 {/* Categorized RBAC Navigation Groups (Starts with Overview) */}
                 <div className="space-y-2">
-                  {renderNavGroup(personalItems, '📱 MODULE 1: DOANH NHÂN & B2B', 'Cá nhân')}
-                  {renderNavGroup(operationItems, '🎪 MODULE 2: QUẢN LÝ EVENT', 'Sự kiện')}
-                  {renderNavGroup(adminItems, '🏢 MODULE 3: QUẢN TRỊ HIỆP HỘI', 'Quản trị')}
-                  {renderNavGroup(pitchingItems, '✨ DEMO HUB')}
+                  {renderNavGroup(personalItems, '📱 1. ĐỊNH DANH (IDENTITY)', 'Profile')}
+                  {renderNavGroup(operationItems, '🎪 2. SỰ KIỆN & CHECK-IN', 'Sự kiện')}
+                  {renderNavGroup(adminItems, '🤝 3. KẾT NỐI & BỘ NHỚ QUAN HỆ', 'Mạng lưới')}
+                  {renderNavGroup(pitchingItems, '🏢 4. HIỆP HỘI & PROTOTYPE', 'Cộng đồng')}
                 </div>
               </div>
 

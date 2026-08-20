@@ -29,12 +29,12 @@
 * TP. Nha Trang và tỉnh Khánh Hòa là **thủ phủ du lịch MICE (Hội nghị, Hội thảo, Triển lãm)**, xúc tiến thương mại, các diễn đàn liên kết vùng và TECHFEST hàng năm, quy tụ hàng vạn lượt doanh nhân, nhà đầu tư, hiệp hội doanh nghiệp trong nước và quốc tế.
 
 ### 1.2. Ba "Điểm Nghẽn" (Pain Points) Lớn Cần Giải Quyết:
-1. **Lãng phí in ấn & Ô nhiễm môi trường (Trái với định hướng Chuyển đổi Xanh):**
-   * Mỗi sự kiện MICE in hàng chục ngàn danh thiếp giấy và tài liệu giấy. Sau sự kiện, hơn 88% danh thiếp giấy bị thất lạc hoặc vứt bỏ, gây lãng phí ngân sách và phát sinh rác thải.
-2. **Đứt gãy bối cảnh quan hệ sau sự kiện (Relationship Disconnection):**
-   * Doanh nhân gặp gỡ, trao đổi rất nhiều người tại sự kiện nhưng sau khi về thì không nhớ ai với ai, gặp trong bối cảnh nào, nhu cầu hợp tác là gì do không có lớp *"Relationship Memory"* ghi nhớ tự động.
-3. **Nguy cơ rủi ro pháp lý về Dữ liệu Cá nhân (Luật PDPL Số 91/2025/QH15):**
-   * Các hội nghị hiện nay thu thập và chia sẻ danh sách SĐT, Email đại biểu một cách công khai, không có cơ chế **Đồng ý Tự nguyện (Explicit Consent)**, tiềm ẩn rủi ro vi phạm pháp luật và quấy rối thông tin.
+1. **Lãng phí in ấn & Rác thải sự kiện (Trái với định hướng Chuyển đổi Xanh / Net-Zero):**
+   * Mỗi sự kiện MICE in hàng chục ngàn danh thiếp giấy và tài liệu dùng một lần. Sau sự kiện, phần lớn tài liệu và danh thiếp bị thất lạc hoặc vứt bỏ do tính chất tĩnh và không cập nhật được, gây lãng phí ngân sách và phát sinh rác thải.
+2. **Đứt gãy bối cảnh quan hệ sau sự kiện (Post-Event Relationship Gap):**
+   * Doanh nhân gặp gỡ, trao đổi rất nhiều người tại sự kiện nhưng sau khi về thì không nhớ ai với ai, gặp trong bối cảnh nào, nhu cầu hợp tác Cung - Cầu là gì do thiếu công cụ *"Relationship Memory"* ghi nhớ và phân loại quan hệ.
+3. **Thách thức Quản trị Dữ liệu & Quyền riêng tư (Luật PDPL Số 91/2025/QH15):**
+   * Trong bối cảnh Luật Bảo vệ Dữ liệu Cá nhân 91/2025/QH15 và Nghị định 13/2023/NĐ-CP được thực thi, các hội nghị truyền thống thường thu thập và chia sẻ danh sách SĐT, Email đại biểu thủ công thiếu cơ chế **Đồng thuận 2 chiều (2-Way Consent)**, tiềm ẩn nhiều rủi ro về bảo mật thông tin.
 
 ---
 

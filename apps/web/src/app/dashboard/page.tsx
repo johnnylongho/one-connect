@@ -11,6 +11,10 @@ import {
   Sparkles,
   Clock,
   ShieldCheck,
+  CreditCard,
+  Smartphone,
+  UserCheck,
+  ArrowRight,
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -302,6 +306,124 @@ export default async function OrganizerDashboardPage() {
             </p>
           </CardContent>
         </Card>
+      </div>
+
+      {/* 2.5. VÒNG LẶP PROTOTYPE LÕI (CORE FLYWHEEL): IDENTITY ➔ EVENT ➔ CONNECTION */}
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-50/70 via-white to-orange-50/50 border border-blue-100 p-5 sm:p-6 shadow-xs">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 border-b border-blue-100/80">
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="text-[10.5px] font-black tracking-widest text-[#0066FF] uppercase font-mono">
+                ONE CONNECT PROTOTYPE FLOW • PHASE 1
+              </span>
+              <Badge className="bg-[#0066FF] text-white text-[9.5px] font-bold px-2 py-0.2 rounded-full">
+                CORE FLYWHEEL
+              </Badge>
+            </div>
+            <h2 className="text-base sm:text-lg font-black text-slate-900 tracking-tight font-heading mt-0.5">
+              Vòng Lặp Nguyên Mẫu Lõi: Định Danh ➔ Sự Kiện ➔ Kết Nối & Ghi Nhớ
+            </h2>
+            <p className="text-xs text-slate-600 mt-0.5">
+              Quy trình 3 bước khép kín giúp biến mỗi lần chạm mặt tại sự kiện thành mối quan hệ kinh doanh có thể ghi nhớ và phát triển.
+            </p>
+          </div>
+
+          <Link href="/demo">
+            <Button size="sm" variant="outline" className="gap-1.5 text-xs font-bold border-blue-300 text-[#0066FF] bg-white hover:bg-blue-50 rounded-xl cursor-pointer shrink-0">
+              <Sparkles className="w-3.5 h-3.5 text-[#FF6B00]" /> Trình Diễn Live Pitching
+            </Button>
+          </Link>
+        </div>
+
+        {/* 3 Step Cards Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4">
+          {/* Step 1: Identity */}
+          <Link href="/dashboard/card" className="group block">
+            <div className="h-full p-4 rounded-xl bg-white border border-slate-200 group-hover:border-blue-400 group-hover:shadow-md transition-all flex flex-col justify-between space-y-3">
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="w-7 h-7 rounded-lg bg-blue-100 text-[#0066FF] font-black text-xs flex items-center justify-center font-mono">
+                    01
+                  </span>
+                  <Badge variant="outline" className="text-[9.5px] font-bold text-blue-700 bg-blue-50 border-blue-200">
+                    IDENTITY
+                  </Badge>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CreditCard className="w-4 h-4 text-[#0066FF]" />
+                  <h3 className="font-bold text-slate-900 text-sm group-hover:text-[#0066FF] transition-colors">
+                    Định Danh & Thẻ 3D NFC
+                  </h3>
+                </div>
+                <p className="text-xs text-slate-500 leading-relaxed">
+                  Thiết lập hồ sơ doanh nhân, pháp nhân công ty, thẻ 3D Smart Card xoay lật và bảo mật PDPL 91/2025.
+                </p>
+              </div>
+              <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-[#0066FF] group-hover:translate-x-0.5 transition-transform">
+                <span>Xem Thẻ & QR Động</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </div>
+            </div>
+          </Link>
+
+          {/* Step 2: Event Check-in */}
+          <Link href="/operator/checkin" className="group block">
+            <div className="h-full p-4 rounded-xl bg-white border border-slate-200 group-hover:border-blue-400 group-hover:shadow-md transition-all flex flex-col justify-between space-y-3">
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="w-7 h-7 rounded-lg bg-blue-100 text-[#0066FF] font-black text-xs flex items-center justify-center font-mono">
+                    02
+                  </span>
+                  <Badge variant="outline" className="text-[9.5px] font-bold text-emerald-700 bg-emerald-50 border-emerald-200">
+                    EVENT &lt;1S
+                  </Badge>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Smartphone className="w-4 h-4 text-[#0066FF]" />
+                  <h3 className="font-bold text-slate-900 text-sm group-hover:text-[#0066FF] transition-colors">
+                    Sự Kiện & Check-in &lt;1s
+                  </h3>
+                </div>
+                <p className="text-xs text-slate-500 leading-relaxed">
+                  Trạm quét điểm danh tức thì tại cửa bằng thẻ NFC hoặc camera QR, đếm số lượng đại biểu có mặt thời gian thực.
+                </p>
+              </div>
+              <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-[#0066FF] group-hover:translate-x-0.5 transition-transform">
+                <span>Vào Trạm Check-in Live</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </div>
+            </div>
+          </Link>
+
+          {/* Step 3: Connection & Relationship Memory */}
+          <Link href="/dashboard/connections" className="group block">
+            <div className="h-full p-4 rounded-xl bg-white border border-slate-200 group-hover:border-orange-400 group-hover:shadow-md transition-all flex flex-col justify-between space-y-3">
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="w-7 h-7 rounded-lg bg-orange-100 text-[#FF6B00] font-black text-xs flex items-center justify-center font-mono">
+                    03
+                  </span>
+                  <Badge variant="outline" className="text-[9.5px] font-bold text-orange-700 bg-orange-50 border-orange-200">
+                    RELATIONSHIP
+                  </Badge>
+                </div>
+                <div className="flex items-center gap-2">
+                  <UserCheck className="w-4 h-4 text-[#FF6B00]" />
+                  <h3 className="font-bold text-slate-900 text-sm group-hover:text-[#FF6B00] transition-colors">
+                    Kết Nối & Ghi Nhớ Quan Hệ
+                  </h3>
+                </div>
+                <p className="text-xs text-slate-500 leading-relaxed">
+                  Chạm kết nối 2-Way Consent, lưu ghi chú riêng tư (Private Note), gắn tag Lead (HOT/WARM) và lịch sử gặp gỡ.
+                </p>
+              </div>
+              <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-[#FF6B00] group-hover:translate-x-0.5 transition-transform">
+                <span>Xem Mạng Lưới B2B & Ghi Chú</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </div>
+            </div>
+          </Link>
+        </div>
       </div>
 
       {/* 3. DELEGATES TABLE WITH LIGHT THEME */}
