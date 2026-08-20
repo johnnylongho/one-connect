@@ -45,18 +45,18 @@ export default function Home() {
           {/* Left Text & Actions */}
           <div className="lg:col-span-7 space-y-4 sm:space-y-6">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 border border-blue-200/80 text-[#0066FF] text-xs font-bold tracking-wide">
-              <Sparkles className="w-3.5 h-3.5 text-[#FF6B00]" /> Hạ Tầng Định Danh & Kết Nối Giao Thương Số
+              <Sparkles className="w-3.5 h-3.5 text-[#FF6B00]" /> Nền Tảng Định Danh Số & AI B2B Matchmaking
             </div>
 
             <h1 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 tracking-tight leading-tight">
-              Chuyển Hóa Sự Kiện Thành <br className="hidden sm:inline" />
+              Hạ Tầng Giao Thương B2B <br className="hidden sm:inline" />
               <span className="bg-gradient-to-r from-[#0066FF] to-[#00C2FF] bg-clip-text text-transparent">
-                Mối Quan Hệ Kinh Doanh Có Cấu Trúc
+                Ứng Dụng Trí Tuệ Nhân Tạo (AI)
               </span>
             </h1>
 
             <p className="text-xs sm:text-sm text-slate-600 leading-relaxed max-w-2xl">
-              <strong>One Connect Network</strong> cung cấp tầng hạ tầng quản lý quan hệ (Relationship Layer) kết hợp giao diện chạm NFC/QR ma sát bằng 0 và cơ chế đồng ý 2 chiều tuân thủ nghiêm ngặt <strong>Luật Bảo vệ Dữ liệu Cá nhân 91/2025/QH15</strong>.
+              <strong>One Connect Network</strong> là hệ sinh thái định danh số và tối ưu hóa giao thương B2B bằng thuật toán AI Matchmaking ghép cặp Cung - Cầu, kết hợp trạm check-in IoT siêu tốc và cơ chế bảo mật 2 chiều tuân thủ nghiêm ngặt <strong>Luật Bảo vệ Dữ liệu Cá nhân số 91/2025/QH15</strong>.
             </p>
 
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3 pt-1">

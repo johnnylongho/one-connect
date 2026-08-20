@@ -607,9 +607,9 @@ export default function DigitalNfcCardPage() {
                     <Smartphone className="w-3.5 h-3.5 text-[#FF6B00]" /> 3 Bước Ghi Thẻ Bằng App NFC Tools (iPhone & Android):
                   </p>
                   <ol className="list-decimal list-inside space-y-1 pl-1 text-slate-300 text-[10.5px]">
-                    <li>Mở app <strong>NFC Tools</strong> $\rightarrow$ Chọn tab <strong>Write</strong>.</li>
-                    <li>Chọn <strong>Add a record</strong> $\rightarrow$ <strong>Custom URL / URI</strong> $\rightarrow$ Dán link vừa sao chép.</li>
-                    <li>Bấm nút <strong>Write</strong> $\rightarrow$ Áp thẻ NFC vào lưng điện thoại trong 1 giây là xong!</li>
+                    <li>Mở app <strong>NFC Tools</strong> → Chọn tab <strong>Write</strong>.</li>
+                    <li>Chọn <strong>Add a record</strong> → <strong>Custom URL / URI</strong> → Dán link vừa sao chép.</li>
+                    <li>Bấm nút <strong>Write</strong> → Áp thẻ NFC vào lưng điện thoại trong 1 giây là xong!</li>
                   </ol>
                 </div>
               </div>

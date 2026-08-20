@@ -33,7 +33,7 @@ Tài liệu này hướng dẫn chi tiết quy trình thiết lập cơ sở d�
 
 ### 🔑 BƯỚC 3: LẤY KHÓA API & ĐIỀN VÀO FILE `.env.local`
 
-1. Trên Supabase Dashboard, vào menu **Project Settings (⚙️) $\rightarrow$ API**.
+1. Trên Supabase Dashboard, vào menu **Project Settings (⚙️) → API**.
 2. Copy 2 thông số sau:
    * **Project URL** (VD: `https://xyzcompany.supabase.co`)
    * **Project API Keys:** `anon` (Public) và `service_role` (Secret)
@@ -68,6 +68,6 @@ Sau khi cấu hình, bạn có thể kiểm tra trực tiếp các Endpoint ph�
 ### 🌐 BƯỚC 5: DEPLOY LÊN VERCEL / DOMAIN CHÍNH THỨC
 
 1. Đẩy code lên GitHub repository `one-connect`.
-2. Đăng nhập [https://vercel.com](https://vercel.com) $\rightarrow$ **Add New Project** $\rightarrow$ Chọn repo `one-connect`.
+2. Đăng nhập [https://vercel.com](https://vercel.com) → **Add New Project** → Chọn repo `one-connect`.
 3. Trong phần **Environment Variables**, dán toàn bộ các biến trong file `.env.example` vào.
 4. Bấm **Deploy**. Sau ~1 phút, bạn sẽ có đường link production `https://oneconnect.network` sẵn sàng cho đại biểu chạm thẻ!
