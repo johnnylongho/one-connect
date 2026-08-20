@@ -374,6 +374,17 @@ function DigitalProfileContent() {
       avatarUrl: editAvatarUrl || undefined,
     });
 
+    DbService.updateIdentity(matchedIdentity.id, {
+      fullName: editFullName,
+      displayName: editDisplayName,
+      title: editTitle,
+      businessName: editCompany,
+      phone: editPhone,
+      email: editEmail,
+      bio: editBio,
+      website: editWebsite,
+    }).catch((err) => console.warn('Cloud sync background error:', err));
+
     setIsEditModalOpen(false);
     toast({
       title: 'ĐÃ CẬP NHẬT HỒ SƠ THÀNH CÔNG! ✨',

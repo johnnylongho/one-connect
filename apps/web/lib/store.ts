@@ -78,12 +78,12 @@ export function useOneConnectStore() {
           if (idnt.id === 'id-001' || idnt.username === 'johnnylongho') {
             return {
               ...idnt,
-              username: 'johnnylongho',
-              fullName: 'Hồ Hoàng Long',
-              displayName: 'Johnny Long Hồ',
-              phone: '0794677369',
-              email: 'contact.johnnylongho@gmail.com',
-              website: 'https://aplusvn.net',
+              username: idnt.username || 'johnnylongho',
+              fullName: idnt.fullName || 'Hồ Hoàng Long',
+              displayName: idnt.displayName || idnt.fullName || 'Johnny Long Hồ',
+              phone: idnt.phone || '0794677369',
+              email: idnt.email || 'contact.johnnylongho@gmail.com',
+              website: idnt.website || 'https://aplusvn.net',
               avatarUrl: (idnt.avatarUrl && !idnt.avatarUrl.startsWith('blob:') && idnt.avatarUrl.trim() !== '') ? idnt.avatarUrl : '/avatar-johnny-long.jpg',
             };
           }

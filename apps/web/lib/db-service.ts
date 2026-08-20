@@ -313,8 +313,10 @@ export const DbService = {
     if (!isSupabaseConfigured) return () => {};
 
     try {
-      const channel = supabase
-        .channel('one_connect_realtime_channel')
+      const channelName = `one_connect_rt_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
+      const channel = supabase.channel(channelName);
+
+      channel
         .on(
           'postgres_changes',
           { event: '*', schema: 'public', table: 'check_ins' },
@@ -339,7 +341,11 @@ export const DbService = {
         .subscribe();
 
       return () => {
-        supabase.removeChannel(channel);
+        try {
+          supabase.removeChannel(channel);
+        } catch (e) {
+          // cleanup safe
+        }
       };
     } catch (err) {
       console.warn('Supabase Realtime subscription error:', err);
