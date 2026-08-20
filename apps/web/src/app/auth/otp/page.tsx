@@ -31,7 +31,7 @@ export default function OtpAuthPage() {
           </div>
 
           <div>
-            <h2 className="text-2xl font-bold text-white font-['Outfit']">Xác Thực OTP (SCR-A02)</h2>
+            <h2 className="text-2xl font-extrabold text-white font-heading">Xác Thực OTP (SCR-A02)</h2>
             <p className="text-xs text-gray-400 mt-1">
               Đăng nhập ma sát tối thiểu với Mã Xác Thực OTP gửi qua Zalo / SMS
             </p>

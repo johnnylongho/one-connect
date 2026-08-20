@@ -22,6 +22,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { useToast } from '@/components/ui/toast';
 import { INITIAL_IDENTITIES, INITIAL_CARDS } from '@/lib/mock-data';
 import { PersonIdentity, AccessCard } from '@/lib/types';
+import { useOneConnectStore } from '@/lib/store';
 
 interface StreamLog {
   id: string;
@@ -66,13 +67,85 @@ const defaultCard: AccessCard = INITIAL_CARDS[0] || {
 
 export default function SimulationAndDemoHub() {
   const { toast } = useToast();
+  const { state, setCurrentRole } = useOneConnectStore();
   const [mounted, setMounted] = React.useState(false);
   const [selectedIdentity, setSelectedIdentity] = useState<PersonIdentity>(defaultIdentity);
   const [selectedCard, setSelectedCard] = useState<AccessCard>(defaultCard);
-  const [activeTab, setActiveTab] = useState<'NFC' | 'CHECKIN' | 'MATCH' | 'STRESS'>('NFC');
+  const [activeTab, setActiveTab] = useState<'NFC' | 'CHECKIN' | 'CONSENT' | 'MATCH' | 'STRESS'>('CONSENT');
   const [isProcessing, setIsProcessing] = useState(false);
   const [measuredLatency, setMeasuredLatency] = useState<number | null>(null);
   const [stressCount, setStressCount] = useState(0);
+  
+  // 2-Way Consent Simulation State
+  const [consentStep, setConsentStep] = useState<'INITIAL' | 'REQUEST_SENT' | 'MUTUAL_ACCEPTED'>('INITIAL');
+  const [consentAuditRecord, setConsentAuditRecord] = useState<any>(null);
+
+  // Send Consent Request Handler (Delegate A -> B)
+  const handleSendConsentRequest = async () => {
+    setIsProcessing(true);
+    const startTime = performance.now();
+    await new Promise((r) => setTimeout(r, 400));
+    setConsentStep('REQUEST_SENT');
+    setIsProcessing(false);
+    const endTime = performance.now();
+    setMeasuredLatency(Math.round(endTime - startTime));
+
+    addLog(
+      'PDPL_CONSENT_REQUEST_SENT',
+      'Johnny Long Hồ → Trần Minh Đức',
+      'Tạo yêu cầu đồng thuận số • SĐT bị ẩn mã hóa 0903.***.***',
+      'n8n gửi thông báo đẩy (Push Notification) đến điện thoại Đối tác B'
+    );
+
+    toast({
+      title: 'ĐÃ GỬI YÊU CẦU CONSENT B2B! 🤝',
+      description: 'Lời mời kết nối và đề nghị cấp quyền số đã được gửi tới đối tác.',
+      variant: 'success',
+    });
+  };
+
+  // Accept Mutual Consent Handler (Delegate B accepts)
+  const handleAcceptMutualConsent = async () => {
+    setIsProcessing(true);
+    const startTime = performance.now();
+    await new Promise((r) => setTimeout(r, 350));
+    const now = new Date();
+    const formatted = `${now.toLocaleDateString('vi-VN')} ${now.toLocaleTimeString('vi-VN')}`;
+    const hash = 'SHA256:' + Math.random().toString(16).substring(2, 8).toUpperCase() + '...MUTUAL_CONSENT';
+
+    setConsentAuditRecord({
+      requester: 'Johnny Long Hồ (Aplusvn Media & Tech)',
+      receiver: 'Trần Minh Đức (Chủ Tịch HĐQT TechCorp Vietnam)',
+      timestamp: formatted,
+      hash,
+      context: 'Diễn Đàn Doanh Nhân Trẻ Khánh Hòa 2026 • Bàn VIP A12',
+      lawClause: 'Điều 9, Điều 11 & Điều 16 Luật Bảo vệ Dữ liệu Cá nhân số 91/2025/QH15',
+    });
+
+    setConsentStep('MUTUAL_ACCEPTED');
+    setIsProcessing(false);
+    const endTime = performance.now();
+    setMeasuredLatency(Math.round(endTime - startTime));
+
+    addLog(
+      'MUTUAL_CONSENT_ESTABLISHED',
+      'Trần Minh Đức (Accepted)',
+      `Đã giải mã SĐT 2 chiều • Hash: ${hash}`,
+      'One Connect lưu vết bất biến Audit Trail & Tự động đồng bộ vCard 3.0'
+    );
+
+    toast({
+      title: 'MUTUAL CONSENT XÁC LẬP THÀNH CÔNG! 🛡️',
+      description: 'Số điện thoại 2 chiều đã mở khóa và cấp Chứng chỉ kiểm toán số.',
+      variant: 'success',
+    });
+  };
+
+  // Reset Consent Simulation
+  const handleResetConsent = () => {
+    setConsentStep('INITIAL');
+    setConsentAuditRecord(null);
+  };
 
   React.useEffect(() => {
     setMounted(true);
@@ -280,19 +353,13 @@ export default function SimulationAndDemoHub() {
       {/* 1. TOP HEADER BRAND BANNER (LIGHT THEME) */}
       <div className="bg-white border border-slate-200 rounded-3xl p-5 sm:p-6 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <div className="relative p-[1.5px] rounded-xl bg-gradient-to-r from-[#0066FF] to-[#FF6B00] shadow-sm shrink-0">
-            <div className="bg-white rounded-[10px] p-1.5 flex items-center justify-center">
-              <img
-                src="/one_connect_final_logo_orange.png"
-                alt="One Connect Logo"
-                className="h-8 sm:h-9 w-auto object-contain"
-              />
-            </div>
+          <div className="p-2.5 rounded-xl bg-gradient-to-br from-blue-50 to-orange-50 text-[#0066FF] border border-blue-100 shrink-0">
+            <Sparkles className="w-6 h-6 text-[#FF6B00]" />
           </div>
 
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-base sm:text-xl font-black text-slate-900 tracking-tight font-['Outfit']">
+              <h1 className="text-base sm:text-xl font-extrabold text-slate-900 tracking-tight font-heading">
                 Trung Tâm Mô Phỏng & Trình Diễn Giải Pháp
               </h1>
               <Badge className="bg-blue-50 text-[#0066FF] border-blue-200 text-[10px] font-bold">
@@ -319,7 +386,40 @@ export default function SimulationAndDemoHub() {
         </div>
       </div>
 
-      {/* 2. THREE-PANEL COCKPIT GRID (RESPONSIVE FOR MOBILE/TABLET/DESKTOP) */}
+      {/* 2. INTERACTIVE RBAC ROLE SWITCHER DEMO BAR */}
+      <div className="p-3 rounded-2xl bg-gradient-to-r from-blue-50/80 via-white to-orange-50/80 border border-slate-200/90 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-2xs">
+        <div className="flex items-center gap-2">
+          <span className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+            <ShieldCheck className="w-4 h-4 text-[#0066FF]" /> Trình Diễn Phân Quyền Vai Trò (RBAC):
+          </span>
+          <span className="text-[11px] text-slate-500 hidden md:inline">
+            (Bấm để xem menu & giao diện thích ứng tức thì)
+          </span>
+        </div>
+        <div className="flex flex-wrap items-center gap-1.5">
+          {[
+            { role: 'SUPER_ADMIN', label: '👑 SUPER_ADMIN' },
+            { role: 'ORG_ADMIN', label: '🏛️ ORG_ADMIN' },
+            { role: 'EVENT_OPERATOR', label: '📱 EVENT_OPERATOR' },
+            { role: 'MEMBER', label: '💼 MEMBER' },
+            { role: 'GUEST', label: '👤 GUEST' },
+          ].map((r) => (
+            <button
+              key={r.role}
+              onClick={() => setCurrentRole(r.role as any)}
+              className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                state?.currentRole === r.role
+                  ? 'bg-[#0066FF] text-white shadow-2xs'
+                  : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-100'
+              }`}
+            >
+              {r.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* 3. THREE-PANEL COCKPIT GRID (RESPONSIVE FOR MOBILE/TABLET/DESKTOP) */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         
         {/* PANEL 1: INTERACTIVE DEMO CONTROLLER (5 Cols on Desktop) */}
@@ -345,8 +445,8 @@ export default function SimulationAndDemoHub() {
             </CardHeader>
 
             <CardContent className="p-4 space-y-4">
-              {/* Scenario Tabs */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 p-1 bg-slate-100 rounded-xl text-center text-xs font-semibold">
+              {/* Scenario Tabs (5 Options) */}
+              <div className="grid grid-cols-2 sm:grid-cols-5 gap-1.5 p-1 bg-slate-100 rounded-xl text-center text-xs font-semibold">
                 <button
                   onClick={() => setActiveTab('NFC')}
                   className={`py-2 rounded-lg transition-all cursor-pointer ${
@@ -364,12 +464,20 @@ export default function SimulationAndDemoHub() {
                   2. Check-in
                 </button>
                 <button
+                  onClick={() => setActiveTab('CONSENT')}
+                  className={`py-2 rounded-lg transition-all cursor-pointer ${
+                    activeTab === 'CONSENT' ? 'bg-white text-emerald-600 shadow-sm font-bold' : 'text-slate-600 hover:text-slate-900'
+                  }`}
+                >
+                  3. 2-Way Consent
+                </button>
+                <button
                   onClick={() => setActiveTab('MATCH')}
                   className={`py-2 rounded-lg transition-all cursor-pointer ${
                     activeTab === 'MATCH' ? 'bg-white text-[#FF6B00] shadow-sm font-bold' : 'text-slate-600 hover:text-slate-900'
                   }`}
                 >
-                  3. Ghép B2B
+                  4. Ghép B2B
                 </button>
                 <button
                   onClick={() => setActiveTab('STRESS')}
@@ -377,51 +485,65 @@ export default function SimulationAndDemoHub() {
                     activeTab === 'STRESS' ? 'bg-white text-purple-600 shadow-sm font-bold' : 'text-slate-600 hover:text-slate-900'
                   }`}
                 >
-                  4. Tải 50x
+                  5. Tải 50x
                 </button>
               </div>
 
-              {/* Delegate Selector Bar */}
-              <div className="space-y-2">
-                <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">
-                  Chọn Đại Biểu Doanh Nhân Trình Diễn:
-                </label>
-                <div className="space-y-1.5 max-h-56 overflow-y-auto">
-                  {INITIAL_IDENTITIES.map((iden) => {
-                    const isSelected = selectedIdentity.id === iden.id;
-                    const card = INITIAL_CARDS.find((c) => c.personIdentityId === iden.id) || defaultCard;
-                    return (
-                      <div
-                        key={iden.id}
-                        onClick={() => {
-                          setSelectedIdentity(iden);
-                          setSelectedCard(card);
-                        }}
-                        className={`p-2.5 rounded-xl border flex items-center justify-between transition-all cursor-pointer ${
-                          isSelected
-                            ? 'bg-blue-50 border-blue-300 shadow-sm'
-                            : 'bg-white border-slate-200 hover:bg-slate-50'
-                        }`}
-                      >
-                        <div className="flex items-center gap-2.5">
-                          <img
-                            src={iden.avatarUrl}
-                            alt={iden.fullName}
-                            className="w-8 h-8 rounded-full object-cover border border-slate-200"
-                          />
-                          <div>
-                            <p className="text-xs font-bold text-slate-900">{iden.fullName}</p>
-                            <p className="text-[10px] text-slate-500">{iden.title}</p>
+              {/* Delegate Selector Bar (when not in consent) */}
+              {activeTab !== 'CONSENT' ? (
+                <div className="space-y-2">
+                  <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">
+                    Chọn Đại Biểu Doanh Nhân Trình Diễn:
+                  </label>
+                  <div className="space-y-1.5 max-h-56 overflow-y-auto">
+                    {INITIAL_IDENTITIES.map((iden) => {
+                      const isSelected = selectedIdentity.id === iden.id;
+                      const card = INITIAL_CARDS.find((c) => c.personIdentityId === iden.id) || defaultCard;
+                      return (
+                        <div
+                          key={iden.id}
+                          onClick={() => {
+                            setSelectedIdentity(iden);
+                            setSelectedCard(card);
+                          }}
+                          className={`p-2.5 rounded-xl border flex items-center justify-between transition-all cursor-pointer ${
+                            isSelected
+                              ? 'bg-blue-50 border-blue-300 shadow-sm'
+                              : 'bg-white border-slate-200 hover:bg-slate-50'
+                          }`}
+                        >
+                          <div className="flex items-center gap-2.5">
+                            <img
+                              src={iden.avatarUrl}
+                              alt={iden.fullName}
+                              className="w-8 h-8 rounded-full object-cover border border-slate-200"
+                            />
+                            <div>
+                              <p className="text-xs font-bold text-slate-900">{iden.fullName}</p>
+                              <p className="text-[10px] text-slate-500">{iden.title}</p>
+                            </div>
                           </div>
+                          <Badge variant="outline" className="text-[10px] font-mono text-blue-600 border-blue-200 bg-white">
+                            {card.cardUid}
+                          </Badge>
                         </div>
-                        <Badge variant="outline" className="text-[10px] font-mono text-blue-600 border-blue-200 bg-white">
-                          {card.cardUid}
-                        </Badge>
-                      </div>
-                    );
-                  })}
+                      );
+                    })}
+                  </div>
                 </div>
-              </div>
+              ) : (
+                <div className="p-3.5 rounded-2xl bg-emerald-50/70 border border-emerald-200/80 space-y-2 text-xs">
+                  <div className="flex items-center gap-2 text-emerald-800 font-bold">
+                    <ShieldCheck className="w-4 h-4 text-emerald-600" />
+                    <span>Quy Trình 3 Bước Mô Phỏng Bảo Mật 2 Chiều:</span>
+                  </div>
+                  <ol className="list-decimal pl-4 space-y-1 text-slate-700 text-[11.5px]">
+                    <li><strong>Bước 1:</strong> Đại biểu A quét danh thiếp B nhưng SĐT bị ẩn <code>0903.***.***</code> (Privacy-by-Design).</li>
+                    <li><strong>Bước 2:</strong> Đại biểu A bấm gửi Consent Request có gắn mã bối cảnh sự kiện.</li>
+                    <li><strong>Bước 3:</strong> Đại biểu B duyệt chấp thuận $\rightarrow$ Mở khóa SĐT 2 chiều và cấp Chứng chỉ số.</li>
+                  </ol>
+                </div>
+              )}
 
               {/* Scenario Trigger Buttons */}
               <div className="pt-2 border-t border-slate-100 space-y-2">
@@ -445,13 +567,52 @@ export default function SimulationAndDemoHub() {
                   </Button>
                 )}
 
+                {activeTab === 'CONSENT' && (
+                  <div className="space-y-2">
+                    {consentStep === 'INITIAL' && (
+                      <Button
+                        onClick={handleSendConsentRequest}
+                        disabled={isProcessing}
+                        className="w-full bg-gradient-to-r from-[#0066FF] to-[#00C2FF] hover:from-blue-700 hover:to-cyan-600 text-white font-bold py-5 rounded-xl shadow-md shadow-blue-500/20 cursor-pointer"
+                      >
+                        <Users className="w-4 h-4 mr-2" /> Bước 1: Gửi Lời Mời Kết Nối & Đề Nghị Consent
+                      </Button>
+                    )}
+
+                    {consentStep === 'REQUEST_SENT' && (
+                      <Button
+                        onClick={handleAcceptMutualConsent}
+                        disabled={isProcessing}
+                        className="w-full bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 text-white font-bold py-5 rounded-xl shadow-md shadow-emerald-500/25 cursor-pointer animate-pulse"
+                      >
+                        <CheckCircle2 className="w-4 h-4 mr-2" /> Bước 2: Đại Biểu B Bấm "Chấp Nhận Consent"
+                      </Button>
+                    )}
+
+                    {consentStep === 'MUTUAL_ACCEPTED' && (
+                      <div className="flex items-center gap-2">
+                        <Button
+                          onClick={handleResetConsent}
+                          variant="outline"
+                          className="flex-1 border-slate-300 text-slate-700 font-bold py-4 rounded-xl cursor-pointer"
+                        >
+                          🔄 Mô Phỏng Lại Từ Đầu
+                        </Button>
+                        <Badge className="bg-emerald-50 text-emerald-700 border-emerald-200 px-3 py-2 text-xs font-bold shrink-0">
+                          ✅ ĐÃ HOÀN TẤT
+                        </Badge>
+                      </div>
+                    )}
+                  </div>
+                )}
+
                 {activeTab === 'MATCH' && (
                   <Button
                     onClick={handleSimulateMatching}
                     disabled={isProcessing}
                     className="w-full bg-gradient-to-r from-[#FF6B00] to-[#FF9900] hover:from-orange-600 hover:to-amber-500 text-white font-bold py-5 rounded-xl shadow-md shadow-orange-500/20 cursor-pointer"
                   >
-                    <Users className="w-4 h-4 mr-2" /> Khởi Tạo Kết Nối B2B & Gửi Consent
+                    <Users className="w-4 h-4 mr-2" /> Khởi Tạo Ghép Cặp AI Cung - Cầu
                   </Button>
                 )}
 
@@ -469,71 +630,149 @@ export default function SimulationAndDemoHub() {
           </Card>
         </div>
 
-        {/* PANEL 2: LIVE PHONE SIMULATOR VIEWPORT (4 Cols on Desktop) */}
+        {/* PANEL 2: LIVE SIMULATION VIEWPORT (CONSENT OR NFC CARD) */}
         <div className="lg:col-span-4 flex justify-center">
-          <div className="w-full max-w-[320px] rounded-[36px] bg-slate-900 border-4 border-slate-700 shadow-xl overflow-hidden relative p-3 flex flex-col justify-between">
-            {/* Dynamic Island / Notch */}
-            <div className="w-24 h-4 bg-slate-800 rounded-full mx-auto mb-2 flex items-center justify-center">
-              <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-            </div>
-
-            {/* Mobile Screen Content */}
-            <div className="bg-white rounded-[24px] p-4 flex-1 border border-slate-200 space-y-3.5 overflow-y-auto text-slate-900">
-              <div className="flex items-center justify-between">
-                <Badge className="bg-blue-50 text-[#0066FF] text-[9px] border-blue-200 font-mono">
-                  NFC: {selectedCard.cardUid}
-                </Badge>
-                <span className="text-[10px] text-emerald-600 flex items-center gap-1 font-bold">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" /> Online
-                </span>
+          {activeTab === 'CONSENT' ? (
+            <div className="w-full max-w-[340px] rounded-[36px] bg-slate-900 border-4 border-slate-700 shadow-2xl overflow-hidden relative p-3 flex flex-col justify-between">
+              {/* Top Dynamic Island */}
+              <div className="w-24 h-4 bg-slate-800 rounded-full mx-auto mb-2 flex items-center justify-center">
+                <div className={`w-2 h-2 rounded-full ${consentStep === 'MUTUAL_ACCEPTED' ? 'bg-emerald-400 animate-ping' : 'bg-amber-400 animate-pulse'}`} />
               </div>
 
-              <div className="text-center space-y-2">
-                <div className="relative inline-block">
+              {/* Consent Simulation Mobile Screen */}
+              <div className="bg-white rounded-[24px] p-4 flex-1 border border-slate-200 space-y-3 overflow-y-auto text-slate-900">
+                <div className="flex items-center justify-between">
+                  <Badge className="bg-blue-50 text-[#0066FF] text-[9px] border-blue-200 font-mono">
+                    PDPL 91/2025 SIMULATOR
+                  </Badge>
+                  <span className={`text-[10px] font-bold flex items-center gap-1 ${consentStep === 'MUTUAL_ACCEPTED' ? 'text-emerald-600' : 'text-amber-600'}`}>
+                    <span className={`w-1.5 h-1.5 rounded-full ${consentStep === 'MUTUAL_ACCEPTED' ? 'bg-emerald-500' : 'bg-amber-500'}`} />
+                    {consentStep === 'MUTUAL_ACCEPTED' ? 'Mutual Consent' : consentStep === 'REQUEST_SENT' ? 'Pending B' : 'Locked'}
+                  </span>
+                </div>
+
+                {/* Target Partner Card */}
+                <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200 text-center space-y-1.5">
                   <img
-                    src={selectedIdentity.avatarUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300'}
-                    alt={selectedIdentity.fullName}
-                    className="w-16 h-16 rounded-full mx-auto object-cover border-2 border-blue-500 shadow-md"
+                    src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150"
+                    alt="Trần Minh Đức"
+                    className="w-14 h-14 rounded-full mx-auto object-cover border-2 border-slate-300"
                   />
-                  <div className="absolute -bottom-1 -right-1 p-1 rounded-full bg-[#0066FF] text-white shadow-sm">
-                    <ShieldCheck className="w-3 h-3" />
+                  <div>
+                    <h4 className="font-extrabold text-xs text-slate-900">Trần Minh Đức</h4>
+                    <p className="text-[10px] text-[#0066FF] font-semibold">Chủ Tịch HĐQT TechCorp</p>
+                  </div>
+
+                  {/* Phone Masking Status */}
+                  <div className={`p-2 rounded-xl border text-center transition-all ${
+                    consentStep === 'MUTUAL_ACCEPTED'
+                      ? 'bg-emerald-50 border-emerald-300 text-emerald-700 shadow-xs'
+                      : 'bg-amber-50/80 border-amber-200 text-amber-800'
+                  }`}>
+                    <span className="text-[9px] font-bold uppercase block tracking-wider text-slate-400">Số Điện Thoại Cá Nhân:</span>
+                    <span className="font-mono font-bold text-sm tracking-wide">
+                      {consentStep === 'MUTUAL_ACCEPTED' ? '0923.456.789' : '0923.***.*** (Đang Khóa)'}
+                    </span>
                   </div>
                 </div>
-                <div>
-                  <h3 className="text-sm font-extrabold text-slate-900">{selectedIdentity.fullName}</h3>
-                  <p className="text-[10px] text-[#0066FF] font-semibold">{selectedIdentity.title}</p>
-                  <p className="text-[9px] text-slate-500 mt-0.5">{selectedIdentity.businesses[0]?.businessName}</p>
-                </div>
+
+                {/* Status Indicator inside Phone */}
+                {consentStep === 'INITIAL' && (
+                  <div className="p-2.5 rounded-xl bg-blue-50/80 border border-blue-100 text-[10.5px] text-blue-900 text-center leading-snug">
+                    🔒 SĐT bị ẩn để ngăn chặn cuộc gọi rác và cào dữ liệu trái phép theo Luật PDPL 91/2025.
+                  </div>
+                )}
+
+                {consentStep === 'REQUEST_SENT' && (
+                  <div className="p-2.5 rounded-xl bg-amber-50 border border-amber-200 text-[10.5px] text-amber-900 text-center leading-snug animate-pulse font-semibold">
+                    ⏳ Đã gửi thông báo tới điện thoại của anh Đức. Đang đợi anh Đức bấm "Chấp Nhận Consent"...
+                  </div>
+                )}
+
+                {consentStep === 'MUTUAL_ACCEPTED' && (
+                  <div className="space-y-2">
+                    <div className="p-2.5 rounded-xl bg-emerald-50 border border-emerald-300 text-[10.5px] text-emerald-900 text-center leading-snug font-bold">
+                      🎉 Hai bên đã đồng thuận 2 chiều! Số điện thoại và danh bạ vCard đã tự động đồng bộ.
+                    </div>
+                    {consentAuditRecord && (
+                      <div className="p-2 rounded-xl bg-slate-900 text-slate-100 text-[9px] font-mono space-y-0.5">
+                        <div className="text-emerald-400 font-bold">✓ IMMUTABLE AUDIT CERTIFICATE:</div>
+                        <div className="truncate text-slate-300">Hash: {consentAuditRecord.hash}</div>
+                        <div className="text-slate-400">{consentAuditRecord.timestamp}</div>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
 
-              {/* Quick Info Badges */}
-              <div className="grid grid-cols-2 gap-1.5 text-left text-[10px]">
-                <div className="p-2 rounded-lg bg-slate-50 border border-slate-100">
-                  <span className="text-slate-400 block text-[8px]">HIỆP HỘI</span>
-                  <span className="font-bold text-slate-800 truncate block">Aplusvn Tech</span>
-                </div>
-                <div className="p-2 rounded-lg bg-slate-50 border border-slate-100">
-                  <span className="text-slate-400 block text-[8px]">TRẠNG THÁI VÉ</span>
-                  <span className="font-bold text-emerald-600 block">VIP • Check-in OK</span>
-                </div>
-              </div>
-
-              {/* Actions inside Phone */}
-              <div className="space-y-1.5 pt-1">
-                <Link href={`/p/${selectedIdentity.username || 'hoanglong'}`} target="_blank">
-                  <Button size="sm" className="w-full bg-[#0066FF] hover:bg-blue-700 text-white text-[11px] font-bold h-8 rounded-lg shadow-sm">
-                    Xem Trang Thẻ Số <ExternalLink className="w-3 h-3 ml-1" />
-                  </Button>
-                </Link>
-                <Button size="sm" variant="outline" className="w-full border-slate-200 text-slate-700 text-[10px] h-7 rounded-lg bg-slate-50 hover:bg-slate-100">
-                  Lưu Danh Bạ vCard (.vcf)
-                </Button>
-              </div>
+              {/* Bottom Home Indicator */}
+              <div className="w-24 h-1 bg-slate-600 rounded-full mx-auto mt-2" />
             </div>
+          ) : (
+            <div className="w-full max-w-[320px] rounded-[36px] bg-slate-900 border-4 border-slate-700 shadow-xl overflow-hidden relative p-3 flex flex-col justify-between">
+              {/* Dynamic Island / Notch */}
+              <div className="w-24 h-4 bg-slate-800 rounded-full mx-auto mb-2 flex items-center justify-center">
+                <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              </div>
 
-            {/* Bottom Home Indicator */}
-            <div className="w-24 h-1 bg-slate-600 rounded-full mx-auto mt-2" />
-          </div>
+              {/* Mobile Screen Content */}
+              <div className="bg-white rounded-[24px] p-4 flex-1 border border-slate-200 space-y-3.5 overflow-y-auto text-slate-900">
+                <div className="flex items-center justify-between">
+                  <Badge className="bg-blue-50 text-[#0066FF] text-[9px] border-blue-200 font-mono">
+                    NFC: {selectedCard.cardUid}
+                  </Badge>
+                  <span className="text-[10px] text-emerald-600 flex items-center gap-1 font-bold">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" /> Online
+                  </span>
+                </div>
+
+                <div className="text-center space-y-2">
+                  <div className="relative inline-block">
+                    <img
+                      src={selectedIdentity.avatarUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300'}
+                      alt={selectedIdentity.fullName}
+                      className="w-16 h-16 rounded-full mx-auto object-cover border-2 border-blue-500 shadow-md"
+                    />
+                    <div className="absolute -bottom-1 -right-1 p-1 rounded-full bg-[#0066FF] text-white shadow-sm">
+                      <ShieldCheck className="w-3 h-3" />
+                    </div>
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-extrabold text-slate-900">{selectedIdentity.fullName}</h3>
+                    <p className="text-[10px] text-[#0066FF] font-semibold">{selectedIdentity.title}</p>
+                    <p className="text-[9px] text-slate-500 mt-0.5">{selectedIdentity.businesses[0]?.businessName}</p>
+                  </div>
+                </div>
+
+                {/* Quick Info Badges */}
+                <div className="grid grid-cols-2 gap-1.5 text-left text-[10px]">
+                  <div className="p-2 rounded-lg bg-slate-50 border border-slate-100">
+                    <span className="text-slate-400 block text-[8px]">HIỆP HỘI</span>
+                    <span className="font-bold text-slate-800 truncate block">Aplusvn Tech</span>
+                  </div>
+                  <div className="p-2 rounded-lg bg-slate-50 border border-slate-100">
+                    <span className="text-slate-400 block text-[8px]">TRẠNG THÁI VÉ</span>
+                    <span className="font-bold text-emerald-600 block">VIP • Check-in OK</span>
+                  </div>
+                </div>
+
+                {/* Actions inside Phone */}
+                <div className="space-y-1.5 pt-1">
+                  <Link href={`/p/${selectedIdentity.username || 'hoanglong'}`} target="_blank">
+                    <Button size="sm" className="w-full bg-[#0066FF] hover:bg-blue-700 text-white text-[11px] font-bold h-8 rounded-lg shadow-sm">
+                      Xem Trang Thẻ Số <ExternalLink className="w-3 h-3 ml-1" />
+                    </Button>
+                  </Link>
+                  <Button size="sm" variant="outline" className="w-full border-slate-200 text-slate-700 text-[10px] h-7 rounded-lg bg-slate-50 hover:bg-slate-100">
+                    Lưu Danh Bạ vCard (.vcf)
+                  </Button>
+                </div>
+              </div>
+
+              {/* Bottom Home Indicator */}
+              <div className="w-24 h-1 bg-slate-600 rounded-full mx-auto mt-2" />
+            </div>
+          )}
         </div>
 
         {/* PANEL 3: LIVE AUTOMATION & N8N WEBHOOK STREAM (3 Cols on Desktop) */}

@@ -155,74 +155,78 @@ export default async function OrganizerDashboardPage() {
     totalDelegates > 0 ? Math.round((checkedInDelegates / totalDelegates) * 100) : 0;
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto pb-12">
+    <div className="space-y-4 max-w-7xl mx-auto pb-10">
       {/* 1. HEADER EXECUTIVE BANNER WITH ONE CONNECT LOGO & LIGHT THEME ELEVATION */}
-      <div className="relative overflow-hidden rounded-3xl bg-white border border-slate-200 p-6 sm:p-8 shadow-sm">
+      <div className="relative overflow-hidden rounded-2xl bg-white border border-slate-200 p-4 sm:p-5 lg:p-6 shadow-2xs">
         {/* Soft Ambient glow for Light Theme */}
-        <div className="absolute top-0 right-0 w-96 h-96 bg-[#0066FF]/5 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-96 h-96 bg-[#FF6B00]/5 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute top-0 right-0 w-80 h-80 bg-[#0066FF]/5 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-80 h-80 bg-[#FF6B00]/5 rounded-full blur-3xl pointer-events-none" />
 
-        <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-4">
           {/* Left Header Info with Logo */}
-          <div className="space-y-3">
-            <div className="flex items-center gap-4">
-              <div className="relative p-[1.5px] rounded-2xl bg-gradient-to-r from-[#0066FF] to-[#FF6B00] shadow-md shadow-blue-500/10 shrink-0">
-                <div className="bg-white p-2 rounded-[14px] flex items-center justify-center">
-                  <img
-                    src="/one_connect_final_logo_orange.png"
-                    alt="One Connect Logo"
-                    className="h-10 sm:h-12 w-auto object-contain"
-                  />
-                </div>
+          <div className="space-y-2">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-xl bg-blue-50 text-[#0066FF] border border-blue-100 shrink-0">
+                <Building2 className="w-5 h-5 text-[#0066FF]" />
               </div>
 
               <div>
                 <div className="flex items-center gap-2">
-                  <span className="text-xs font-black tracking-widest text-[#0066FF] uppercase font-mono">
+                  <span className="text-[11px] font-black tracking-widest text-[#0066FF] uppercase font-mono">
                     ONE CONNECT NETWORK • DASHBOARD QUẢN LÝ
                   </span>
-                  <Badge variant="outline" className="text-[10px] bg-blue-50 text-[#0066FF] border-blue-200 font-bold">
+                  <Badge variant="outline" className="text-[9.5px] bg-blue-50 text-[#0066FF] border-blue-200 font-bold px-1.5 py-0.2">
                     LIVE EVENT
                   </Badge>
                 </div>
 
-                <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-slate-900 mt-0.5 font-['Outfit']">
+                <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight text-slate-900 mt-0.5 font-heading">
                   Trang Quản Lý Sự Kiện & Hiệp Hội
                 </h1>
 
-                <p className="text-xs sm:text-sm font-medium text-slate-500 italic mt-0.5">
+                <p className="text-[11.5px] font-medium text-slate-500 italic">
                   "One Identity, Connect Everywhere."
                 </p>
               </div>
             </div>
 
             {/* Organizing Committee Info */}
-            <div className="flex flex-wrap items-center gap-y-1 gap-x-4 text-xs text-slate-600 pt-1">
+            <div className="flex flex-wrap items-center gap-y-1 gap-x-3 text-xs text-slate-600 pt-0.5">
               <span className="flex items-center gap-1.5 text-slate-800 font-medium">
-                <Building2 className="w-4 h-4 text-[#0066FF]" />
+                <Building2 className="w-3.5 h-3.5 text-[#0066FF]" />
                 Hiệp hội Doanh nhân Công nghệ Aplusvn
               </span>
               <span className="text-slate-300">•</span>
               <span className="flex items-center gap-1.5 text-slate-800">
-                <Users className="w-4 h-4 text-[#0066FF]" />
+                <Users className="w-3.5 h-3.5 text-[#0066FF]" />
                 Chủ trì: Johnny Long Hồ (Project Manager)
               </span>
               <span className="text-slate-300">•</span>
               <span className="flex items-center gap-1.5 text-slate-800">
-                <Calendar className="w-4 h-4 text-[#FF6B00]" />
+                <Calendar className="w-3.5 h-3.5 text-[#FF6B00]" />
                 Sự kiện: Diễn Đàn Kết Nối Doanh Nghiệp 2026
               </span>
             </div>
           </div>
 
-          {/* Right Primary CTA Button */}
-          <div className="flex items-center gap-3 self-start md:self-center shrink-0">
+          {/* Right Primary CTA Buttons */}
+          <div className="flex flex-wrap items-center gap-2 self-start md:self-center shrink-0">
+            <Link href="/dashboard/connections">
+              <Button
+                size="default"
+                variant="outline"
+                className="gap-1.5 border-blue-200 bg-blue-50/70 hover:bg-blue-100 text-[#0066FF] font-bold rounded-xl cursor-pointer shadow-2xs h-9 text-xs"
+              >
+                <ShieldCheck className="w-3.5 h-3.5 text-[#0066FF]" /> Mạng Lưới B2B & Consent
+              </Button>
+            </Link>
+
             <Link href="/events">
               <Button
-                size="lg"
-                className="gap-2 bg-gradient-to-r from-[#0066FF] to-[#FF6B00] hover:opacity-90 text-white font-bold shadow-md shadow-orange-500/20 rounded-xl cursor-pointer transition-all"
+                size="default"
+                className="gap-1.5 bg-gradient-to-r from-[#0066FF] to-[#FF6B00] hover:opacity-90 text-white font-bold shadow-xs rounded-xl cursor-pointer transition-all h-9 text-xs"
               >
-                <Plus className="w-5 h-5" /> Tạo Sự Kiện Mới
+                <Plus className="w-4 h-4" /> Tạo Sự Kiện Mới
               </Button>
             </Link>
           </div>
@@ -242,7 +246,7 @@ export default async function OrganizerDashboardPage() {
             </div>
           </CardHeader>
           <CardContent className="space-y-1">
-            <div className="text-3xl font-black text-slate-900 font-['Outfit']">{totalDelegates} <span className="text-sm font-normal text-slate-500">Đại biểu</span></div>
+            <div className="text-3xl font-extrabold text-slate-900 font-heading">{totalDelegates} <span className="text-sm font-normal text-slate-500">Đại biểu</span></div>
             <p className="text-xs text-[#0066FF] flex items-center gap-1 font-medium pt-1">
               <TrendingUp className="w-3.5 h-3.5" /> 100% Hồ sơ đã xác thực định danh số
             </p>
@@ -261,7 +265,7 @@ export default async function OrganizerDashboardPage() {
           </CardHeader>
           <CardContent className="space-y-3">
             <div className="flex items-baseline justify-between">
-              <div className="text-3xl font-black text-slate-900 font-['Outfit']">
+              <div className="text-3xl font-extrabold text-slate-900 font-heading">
                 {checkedInDelegates} <span className="text-sm font-normal text-slate-500">/ {totalDelegates}</span>
               </div>
               <span className="text-sm font-bold text-[#0066FF] bg-blue-50 px-2.5 py-0.5 rounded-full border border-blue-200">
@@ -292,7 +296,7 @@ export default async function OrganizerDashboardPage() {
             </div>
           </CardHeader>
           <CardContent className="space-y-1">
-            <div className="text-3xl font-black text-slate-900 font-['Outfit']">{b2bMatchingCount} <span className="text-sm font-normal text-slate-500">Cuộc hẹn B2B</span></div>
+            <div className="text-3xl font-extrabold text-slate-900 font-heading">{b2bMatchingCount} <span className="text-sm font-normal text-slate-500">Cuộc hẹn B2B</span></div>
             <p className="text-xs text-[#FF6B00] flex items-center gap-1 font-medium pt-1">
               <TrendingUp className="w-3.5 h-3.5" /> Khởi tạo từ chạm thẻ NFC Doanh nhân
             </p>

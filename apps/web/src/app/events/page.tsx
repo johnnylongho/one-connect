@@ -64,18 +64,12 @@ export default function MemberEventHubPage() {
             <ArrowLeft className="w-4 h-4" />
           </Link>
 
-          <div className="relative p-[1.5px] rounded-xl bg-gradient-to-r from-[#0066FF] to-[#FF6B00] shadow-sm shrink-0">
-            <div className="bg-white px-2 py-1 rounded-[10px] flex items-center justify-center">
-              <img
-                src="/one_connect_final_logo_orange.png"
-                alt="One Connect Logo"
-                className="h-7 sm:h-8 w-auto object-contain"
-              />
-            </div>
+          <div className="p-2 rounded-xl bg-orange-50 text-[#FF6B00] border border-orange-100 shrink-0">
+            <Calendar className="w-5 h-5" />
           </div>
 
           <div>
-            <h1 className="text-base sm:text-lg font-black text-slate-900 tracking-tight font-['Outfit']">
+            <h1 className="text-base sm:text-lg font-extrabold text-slate-900 tracking-tight font-heading">
               Event Hub & Đăng Ký Vé
             </h1>
             <p className="text-[11px] text-slate-500 font-medium italic">
@@ -92,7 +86,7 @@ export default function MemberEventHubPage() {
       <main className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-xl font-bold text-slate-900 font-['Outfit'] flex items-center gap-2">
+            <h2 className="text-xl font-bold text-slate-900 font-heading flex items-center gap-2">
               <Calendar className="w-5 h-5 text-[#0066FF]" /> Danh Sách Sự Kiện Giao Thương (SCR-B04)
             </h2>
             <p className="text-xs text-slate-500 mt-0.5">
@@ -136,7 +130,7 @@ export default function MemberEventHubPage() {
                         <span className="text-[11px] font-bold text-[#0066FF] uppercase font-mono tracking-wider">
                           {evt.organizationName || 'Hiệp hội Doanh nhân Aplusvn'}
                         </span>
-                        <h3 className="text-lg sm:text-xl font-bold text-slate-900 font-['Outfit'] mt-0.5">
+                        <h3 className="text-lg sm:text-xl font-bold text-slate-900 font-heading mt-0.5">
                           {evt.name}
                         </h3>
                       </div>

@@ -122,7 +122,7 @@ export default function NfcLandingRouter() {
             <Lock className="w-8 h-8" />
           </div>
           <div className="space-y-1">
-            <h2 className="text-xl font-bold text-slate-900 font-['Outfit']">
+            <h2 className="text-xl font-bold text-slate-900 font-heading">
               Thẻ NFC Chưa Được Gán Hồ Sơ
             </h2>
             <p className="text-xs text-slate-500">

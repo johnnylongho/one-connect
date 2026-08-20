@@ -472,7 +472,167 @@ export default function SettingsAndPrivacyPage() {
       </div>
 
       {/* ===================================================================== */}
-      {/* 5. KHỐI 4: QUYỀN ĐƯỢC LÃNG QUÊN & XÓA DỮ LIỆU (RIGHT TO BE FORGOTTEN - ĐIỀU 16) */}
+      {/* 5. KHỐI 4: MA TRẬN PHÂN QUYỀN VAI TRÒ & PHÂN LUỒNG THIẾT BỊ (RBAC) */}
+      {/* ===================================================================== */}
+      <div className="glass-panel p-6 sm:p-7 space-y-5 border-blue-200 bg-gradient-to-br from-white via-blue-50/20 to-slate-50">
+        <div className="flex items-center justify-between border-b border-slate-200/80 pb-3">
+          <div>
+            <h3 className="text-base font-extrabold text-slate-900 flex items-center gap-2 font-heading">
+              <ShieldCheck className="w-5 h-5 text-[#0066FF]" /> 4. Ma Trận Phân Quyền (RBAC) & Phân Luồng Thiết Bị
+            </h3>
+            <p className="text-xs text-slate-500 mt-0.5">
+              Phân định rõ ràng giữa trải nghiệm hiện trường trên Di động (Mobile) và Trung tâm quản trị tinh gọn trên Laptop
+            </p>
+          </div>
+          <Badge className="bg-blue-50 text-[#0066FF] border-blue-200 text-[10px] font-bold">RBAC MATRIX</Badge>
+        </div>
+
+        {/* Device Flow Comparison Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+          {/* Column 1: Mobile */}
+          <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-2xs space-y-2.5">
+            <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+              <div className="flex items-center gap-2 font-bold text-slate-900">
+                <div className="p-1.5 rounded-lg bg-blue-50 text-[#0066FF]">
+                  <CreditCard className="w-4 h-4" />
+                </div>
+                <span>📱 Điện Thoại (Hiện Trường)</span>
+              </div>
+              <Badge variant="outline" className="text-[10px] bg-blue-50 text-[#0066FF] border-blue-200">
+                On-the-go
+              </Badge>
+            </div>
+            <ul className="space-y-1.5 text-slate-600 text-[11.5px]">
+              <li className="flex items-start gap-1.5">
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
+                <span><strong>Chạm NFC / Quét QR:</strong> Mở danh thiếp số công khai tức thì</span>
+              </li>
+              <li className="flex items-start gap-1.5">
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
+                <span><strong>2-Way Consent:</strong> Duyệt mở khóa SĐT 1-chạm tại bàn tiệc</span>
+              </li>
+              <li className="flex items-start gap-1.5">
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
+                <span><strong>vCard & Wallet:</strong> Lưu danh bạ máy, Apple Wallet, Google Wallet</span>
+              </li>
+              <li className="flex items-start gap-1.5">
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
+                <span><strong>Trạm Check-in di động:</strong> Lễ tân quét thẻ nhanh &lt;1s</span>
+              </li>
+            </ul>
+          </div>
+
+          {/* Column 2: Laptop */}
+          <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-2xs space-y-2.5">
+            <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+              <div className="flex items-center gap-2 font-bold text-slate-900">
+                <div className="p-1.5 rounded-lg bg-orange-50 text-[#FF6B00]">
+                  <Building2 className="w-4 h-4" />
+                </div>
+                <span>💻 Laptop / Desktop (Admin Cockpit)</span>
+              </div>
+              <Badge variant="outline" className="text-[10px] bg-orange-50 text-[#FF6B00] border-orange-200">
+                High Density
+              </Badge>
+            </div>
+            <ul className="space-y-1.5 text-slate-600 text-[11.5px]">
+              <li className="flex items-start gap-1.5">
+                <CheckCircle2 className="w-3.5 h-3.5 text-[#FF6B00] shrink-0 mt-0.5" />
+                <span><strong>Dashboard & Báo cáo:</strong> Đo lường KPI MICE, tỷ lệ ghép cặp B2B</span>
+              </li>
+              <li className="flex items-start gap-1.5">
+                <CheckCircle2 className="w-3.5 h-3.5 text-[#FF6B00] shrink-0 mt-0.5" />
+                <span><strong>Quản trị Đại biểu:</strong> Phân quyền vai trò hội viên, xuất Excel</span>
+              </li>
+              <li className="flex items-start gap-1.5">
+                <CheckCircle2 className="w-3.5 h-3.5 text-[#FF6B00] shrink-0 mt-0.5" />
+                <span><strong>Kho Thẻ NFC:</strong> Cấp phát hàng loạt, quản lý phôi thẻ thông minh</span>
+              </li>
+              <li className="flex items-start gap-1.5">
+                <CheckCircle2 className="w-3.5 h-3.5 text-[#FF6B00] shrink-0 mt-0.5" />
+                <span><strong>Audit Log PDPL:</strong> Tra cứu chứng chỉ kiểm toán SHA-256 bất biến</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        {/* 5-Role Capability Table */}
+        <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white">
+          <table className="w-full text-left text-xs border-collapse">
+            <thead>
+              <tr className="bg-slate-50 border-b border-slate-200 text-slate-600 font-bold">
+                <th className="py-2.5 px-3">Vai Trò (Role)</th>
+                <th className="py-2.5 px-2 text-center">Thẻ Số Cá Nhân</th>
+                <th className="py-2.5 px-2 text-center">2-Way Consent</th>
+                <th className="py-2.5 px-2 text-center">Trạm Check-in</th>
+                <th className="py-2.5 px-2 text-center">Quản Trị Đại Biểu</th>
+                <th className="py-2.5 px-2 text-center">Kho Thẻ NFC</th>
+                <th className="py-2.5 px-2 text-center">Báo Cáo KPI</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100 text-slate-700 font-medium">
+              <tr className="hover:bg-blue-50/40 transition-colors">
+                <td className="py-2.5 px-3 font-bold text-slate-900 flex items-center gap-1.5">
+                  <span>👑 SUPER_ADMIN</span>
+                </td>
+                <td className="py-2.5 px-2 text-center text-emerald-600 font-bold">✅</td>
+                <td className="py-2.5 px-2 text-center text-emerald-600 font-bold">✅</td>
+                <td className="py-2.5 px-2 text-center text-emerald-600 font-bold">✅</td>
+                <td className="py-2.5 px-2 text-center text-emerald-600 font-bold">✅</td>
+                <td className="py-2.5 px-2 text-center text-emerald-600 font-bold">✅</td>
+                <td className="py-2.5 px-2 text-center text-emerald-600 font-bold">✅</td>
+              </tr>
+              <tr className="hover:bg-blue-50/40 transition-colors">
+                <td className="py-2.5 px-3 font-bold text-blue-900 flex items-center gap-1.5">
+                  <span>🏛️ ORG_ADMIN</span>
+                </td>
+                <td className="py-2.5 px-2 text-center text-emerald-600 font-bold">✅</td>
+                <td className="py-2.5 px-2 text-center text-emerald-600 font-bold">✅</td>
+                <td className="py-2.5 px-2 text-center text-emerald-600 font-bold">✅</td>
+                <td className="py-2.5 px-2 text-center text-emerald-600 font-bold">✅</td>
+                <td className="py-2.5 px-2 text-center text-slate-300">❌</td>
+                <td className="py-2.5 px-2 text-center text-emerald-600 font-bold">✅</td>
+              </tr>
+              <tr className="hover:bg-blue-50/40 transition-colors">
+                <td className="py-2.5 px-3 font-bold text-slate-800 flex items-center gap-1.5">
+                  <span>📱 EVENT_OPERATOR</span>
+                </td>
+                <td className="py-2.5 px-2 text-center text-slate-300">❌</td>
+                <td className="py-2.5 px-2 text-center text-slate-300">❌</td>
+                <td className="py-2.5 px-2 text-center text-emerald-600 font-bold">✅</td>
+                <td className="py-2.5 px-2 text-center text-slate-300">❌</td>
+                <td className="py-2.5 px-2 text-center text-slate-300">❌</td>
+                <td className="py-2.5 px-2 text-center text-slate-300">❌</td>
+              </tr>
+              <tr className="hover:bg-blue-50/40 transition-colors">
+                <td className="py-2.5 px-3 font-bold text-slate-800 flex items-center gap-1.5">
+                  <span>💼 MEMBER</span>
+                </td>
+                <td className="py-2.5 px-2 text-center text-emerald-600 font-bold">✅</td>
+                <td className="py-2.5 px-2 text-center text-emerald-600 font-bold">✅</td>
+                <td className="py-2.5 px-2 text-center text-slate-300">❌</td>
+                <td className="py-2.5 px-2 text-center text-slate-300">❌</td>
+                <td className="py-2.5 px-2 text-center text-slate-300">❌</td>
+                <td className="py-2.5 px-2 text-center text-slate-300">❌</td>
+              </tr>
+              <tr className="hover:bg-blue-50/40 transition-colors">
+                <td className="py-2.5 px-3 font-bold text-slate-500 flex items-center gap-1.5">
+                  <span>👤 GUEST</span>
+                </td>
+                <td className="py-2.5 px-2 text-center text-slate-300">❌</td>
+                <td className="py-2.5 px-2 text-center text-slate-300">❌</td>
+                <td className="py-2.5 px-2 text-center text-slate-300">❌</td>
+                <td className="py-2.5 px-2 text-center text-slate-300">❌</td>
+                <td className="py-2.5 px-2 text-center text-slate-300">❌</td>
+                <td className="py-2.5 px-2 text-center text-slate-300">❌</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* ===================================================================== */}
+      {/* 6. KHỐI 5: QUYỀN ĐƯỢC LÃNG QUÊN & XÓA DỮ LIỆU (RIGHT TO BE FORGOTTEN - ĐIỀU 16) */}
       {/* ===================================================================== */}
       <div className="glass-panel p-6 sm:p-7 space-y-4 border-rose-200 bg-rose-50/30">
         <div className="flex items-center justify-between border-b border-rose-200/80 pb-3">

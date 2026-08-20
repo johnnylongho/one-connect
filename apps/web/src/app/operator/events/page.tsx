@@ -16,7 +16,7 @@ export default function EventOperationsHome() {
       <main className="app-container max-w-4xl space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-white font-['Outfit'] flex items-center gap-2">
+            <h1 className="text-2xl font-bold text-white font-heading flex items-center gap-2">
               <Zap className="w-6 h-6 text-amber-400" /> Vận Hành Trạm Check-in Event (SCR-D01)
             </h1>
             <p className="text-xs text-gray-400">
@@ -31,7 +31,7 @@ export default function EventOperationsHome() {
             <div key={evt.id} className="glass-panel p-6 border-amber-500/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div className="space-y-2">
                 <span className="badge-amber">ĐANG VẬN HÀNH TRẠM CỬA</span>
-                <h3 className="text-xl font-bold text-white font-['Outfit']">{evt.name}</h3>
+                <h3 className="text-xl font-bold text-white font-heading">{evt.name}</h3>
                 <p className="text-xs text-gray-300 flex items-center gap-2">
                   <MapPin className="w-3.5 h-3.5 text-indigo-400" /> {evt.locationName}
                 </p>

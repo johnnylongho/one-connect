@@ -360,19 +360,13 @@ export default function FastCheckinTerminal() {
             <ArrowLeft className="w-4 h-4" />
           </Link>
 
-          <div className="relative p-[1.5px] rounded-xl bg-gradient-to-r from-[#0066FF] to-[#FF6B00] shadow-sm shrink-0">
-            <div className="bg-white px-2 py-1 rounded-[10px] flex items-center justify-center">
-              <img
-                src="/one_connect_final_logo_orange.png"
-                alt="One Connect Logo"
-                className="h-7 sm:h-8 w-auto object-contain"
-              />
-            </div>
+          <div className="p-2 rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-100 shrink-0">
+            <Zap className="w-5 h-5" />
           </div>
 
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-base sm:text-lg font-black text-slate-900 tracking-tight font-['Outfit']">
+              <h1 className="text-base sm:text-lg font-extrabold text-slate-900 tracking-tight font-heading">
                 Trạm Check-in Thực Tế
               </h1>
               <Badge className="bg-emerald-50 text-emerald-700 border-emerald-200 text-[10px] font-bold">
@@ -577,7 +571,7 @@ export default function FastCheckinTerminal() {
                 </div>
               )}
 
-              <h3 className="text-lg sm:text-xl font-black font-['Outfit']">
+              <h3 className="text-lg sm:text-xl font-extrabold font-heading">
                 {lastCheckInResult.alreadyCheckedIn
                   ? 'CẢNH BÁO: ĐÃ CHECK-IN TRƯỚC ĐÓ (QUÉT LẶP)'
                   : lastCheckInResult.success

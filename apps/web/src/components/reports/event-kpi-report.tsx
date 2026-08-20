@@ -119,7 +119,7 @@ export function EventKpiReportView() {
                     SCR-B07 & KPI ANALYTICS
                   </Badge>
                 </div>
-                <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-slate-900 font-['Outfit'] mt-0.5">
+                <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-slate-900 font-heading font-extrabold mt-0.5">
                   Báo Cáo Hiệu Quả & Chỉ Số KPI Sự Kiện
                 </h1>
               </div>
@@ -167,7 +167,7 @@ export function EventKpiReportView() {
           </CardHeader>
           <CardContent className="space-y-3">
             <div className="flex items-baseline justify-between">
-              <div className="text-3xl font-black text-slate-900 font-['Outfit']">
+              <div className="text-3xl font-black text-slate-900 font-heading font-extrabold">
                 {actualCheckedIn} <span className="text-sm font-normal text-slate-500">/ {totalRegistered}</span>
               </div>
               <span className="text-sm font-bold text-[#0066FF] bg-blue-50 px-2.5 py-0.5 rounded-full border border-blue-200">
@@ -192,7 +192,7 @@ export function EventKpiReportView() {
             </div>
           </CardHeader>
           <CardContent className="space-y-3">
-            <div className="text-3xl font-black text-cyan-700 font-['Outfit']">{avgCheckinSpeed} <span className="text-sm font-normal text-slate-500">/ lượt quét</span></div>
+            <div className="text-3xl font-black text-cyan-700 font-heading font-extrabold">{avgCheckinSpeed} <span className="text-sm font-normal text-slate-500">/ lượt quét</span></div>
             <div className="flex items-center gap-2 text-xs text-slate-600">
               <Badge className="bg-cyan-50 text-cyan-700 border-cyan-200 text-[10px] font-mono font-bold">
                 SLA &lt; 0.5s ĐẠT CHUẨN
@@ -215,7 +215,7 @@ export function EventKpiReportView() {
             </div>
           </CardHeader>
           <CardContent className="space-y-3">
-            <div className="text-3xl font-black text-[#FF6B00] font-['Outfit']">{successfulB2bMatches} <span className="text-sm font-normal text-slate-500">Cuộc hẹn</span></div>
+            <div className="text-3xl font-black text-[#FF6B00] font-heading font-extrabold">{successfulB2bMatches} <span className="text-sm font-normal text-slate-500">Cuộc hẹn</span></div>
             <div className="flex items-center gap-1 text-xs text-slate-600">
               <span className="font-semibold text-slate-800">4 bàn VIP</span> hoạt động hết công suất
             </div>
@@ -236,7 +236,7 @@ export function EventKpiReportView() {
             </div>
           </CardHeader>
           <CardContent className="space-y-3">
-            <div className="text-3xl font-black text-emerald-600 font-['Outfit']">{consentRate}% <span className="text-sm font-normal text-slate-500">Explicit Consent</span></div>
+            <div className="text-3xl font-black text-emerald-600 font-heading font-extrabold">{consentRate}% <span className="text-sm font-normal text-slate-500">Explicit Consent</span></div>
             <div className="flex items-center gap-1 text-xs text-slate-600">
               <span className="font-bold text-slate-800">373/385</span> đại biểu đồng ý chia sẻ
             </div>

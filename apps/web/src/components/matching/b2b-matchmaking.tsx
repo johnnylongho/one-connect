@@ -264,7 +264,7 @@ export function B2BMatchmakingView({ initialMatchings }: B2BMatchmakingViewProps
                     SCR-B05 & 2-WAY CONSENT
                   </Badge>
                 </div>
-                <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-slate-900 font-['Outfit'] mt-0.5">
+                <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-slate-900 font-heading font-extrabold mt-0.5">
                   B2B Matchmaking & Xếp Bàn Giao Thương
                 </h1>
               </div>
@@ -297,7 +297,7 @@ export function B2BMatchmakingView({ initialMatchings }: B2BMatchmakingViewProps
             </div>
           </CardHeader>
           <CardContent className="space-y-1">
-            <div className="text-3xl font-black text-slate-900 font-['Outfit']">{sentRequestsCount} <span className="text-sm font-normal text-slate-500">Cuộc hẹn</span></div>
+            <div className="text-3xl font-black text-slate-900 font-heading font-extrabold">{sentRequestsCount} <span className="text-sm font-normal text-slate-500">Cuộc hẹn</span></div>
             <p className="text-xs text-[#0066FF] flex items-center gap-1 font-medium pt-1">
               <Sparkles className="w-3.5 h-3.5" /> Khởi tạo trực tiếp từ thẻ NFC
             </p>
@@ -314,7 +314,7 @@ export function B2BMatchmakingView({ initialMatchings }: B2BMatchmakingViewProps
             </div>
           </CardHeader>
           <CardContent className="space-y-1">
-            <div className="text-3xl font-black text-emerald-600 font-['Outfit']">{acceptedCount} <span className="text-sm font-normal text-slate-500">Đã chốt bàn</span></div>
+            <div className="text-3xl font-black text-emerald-600 font-heading font-extrabold">{acceptedCount} <span className="text-sm font-normal text-slate-500">Đã chốt bàn</span></div>
             <p className="text-xs text-emerald-600 flex items-center gap-1 font-medium pt-1">
               <UserCheck className="w-3.5 h-3.5" /> Đã xếp bàn đàm phán B2B
             </p>
@@ -331,7 +331,7 @@ export function B2BMatchmakingView({ initialMatchings }: B2BMatchmakingViewProps
             </div>
           </CardHeader>
           <CardContent className="space-y-1">
-            <div className="text-3xl font-black text-[#FF6B00] font-['Outfit']">{pendingCount} <span className="text-sm font-normal text-slate-500">Đang chờ</span></div>
+            <div className="text-3xl font-black text-[#FF6B00] font-heading font-extrabold">{pendingCount} <span className="text-sm font-normal text-slate-500">Đang chờ</span></div>
             <p className="text-xs text-[#FF6B00] flex items-center gap-1 font-medium pt-1">
               <Clock className="w-3.5 h-3.5" /> Thông báo PWA đẩy realtime
             </p>

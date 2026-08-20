@@ -51,7 +51,7 @@ export default function OnboardingWizard() {
                   <UserCheck className="w-6 h-6" />
                 </div>
                 <div>
-                  <h2 className="text-xl font-bold text-white font-['Outfit']">Bước 1: Thiết Lập Định Danh Cá Nhân</h2>
+                  <h2 className="text-xl font-bold text-white font-heading font-extrabold">Bước 1: Thiết Lập Định Danh Cá Nhân</h2>
                   <p className="text-xs text-gray-400">Hồ sơ này sẽ xuất hiện khi chạm thẻ NFC hoặc quét mã QR</p>
                 </div>
               </div>
@@ -101,7 +101,7 @@ export default function OnboardingWizard() {
                   <Building2 className="w-6 h-6" />
                 </div>
                 <div>
-                  <h2 className="text-xl font-bold text-white font-['Outfit']">Bước 2: Thông Tin Doanh Nghiệp & Sản Phẩm</h2>
+                  <h2 className="text-xl font-bold text-white font-heading font-extrabold">Bước 2: Thông Tin Doanh Nghiệp & Sản Phẩm</h2>
                   <p className="text-xs text-gray-400">Liên kết pháp nhân doanh nghiệp để xây dựng uy tín giao thương</p>
                 </div>
               </div>
@@ -145,7 +145,7 @@ export default function OnboardingWizard() {
               </div>
 
               <div>
-                <h2 className="text-2xl font-bold text-white font-['Outfit']">Hoàn Tất Thiết Lập!</h2>
+                <h2 className="text-2xl font-bold text-white font-heading font-extrabold">Hoàn Tất Thiết Lập!</h2>
                 <p className="text-xs text-gray-300 mt-1">
                   Cài đặt quyền riêng tư PDPL mặc định: Thông tin công khai (Tên, Chức danh, Công ty) sẽ hiển thị khi chạm thẻ. SĐT & Email cá nhân chỉ mở khi 2 bên phê duyệt Consent.
                 </p>
