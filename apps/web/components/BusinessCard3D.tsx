@@ -169,11 +169,18 @@ export default function BusinessCard3D({
               <div className="relative shrink-0">
                 <img
                   src={
-                    identity.avatarUrl ||
-                    '/avatar-johnny-long.jpg'
+                    (identity.avatarUrl && !identity.avatarUrl.startsWith('blob:') && identity.avatarUrl.trim() !== '')
+                      ? identity.avatarUrl
+                      : (identity.username === 'johnnylongho' || identity.id === 'id-001'
+                        ? '/avatar-johnny-long.jpg'
+                        : `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(identity.fullName || 'User')}&backgroundColor=0066ff,00c2ff`)
                   }
                   alt={identity.fullName}
-                  className="w-18 h-18 sm:w-20 sm:h-20 rounded-2xl object-cover border-2 border-white/40 shadow-2xl bg-slate-900"
+                  className="w-16 h-16 sm:w-20 sm:h-20 aspect-square rounded-2xl object-cover border-2 border-white/40 shadow-2xl bg-slate-900 block"
+                  onError={(e) => {
+                    e.currentTarget.onerror = null;
+                    e.currentTarget.src = `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(identity.fullName || 'User')}&backgroundColor=0066ff,00c2ff`;
+                  }}
                 />
                 <span className="absolute -bottom-1 -right-1 p-1 rounded-full bg-emerald-500 border-2 border-slate-950 shadow">
                   <ShieldCheck className="w-3.5 h-3.5 text-white" />

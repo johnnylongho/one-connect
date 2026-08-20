@@ -75,7 +75,7 @@ export function useOneConnectStore() {
         const parsed: AppState = JSON.parse(saved);
         // Ensure id-001 and card-1 are strictly synced with official values
         parsed.identities = parsed.identities.map((idnt) => {
-          if (idnt.id === 'id-001') {
+          if (idnt.id === 'id-001' || idnt.username === 'johnnylongho') {
             return {
               ...idnt,
               username: 'johnnylongho',
@@ -84,6 +84,7 @@ export function useOneConnectStore() {
               phone: '0794677369',
               email: 'contact.johnnylongho@gmail.com',
               website: 'https://aplusvn.net',
+              avatarUrl: (idnt.avatarUrl && !idnt.avatarUrl.startsWith('blob:') && idnt.avatarUrl.trim() !== '') ? idnt.avatarUrl : '/avatar-johnny-long.jpg',
             };
           }
           return idnt;

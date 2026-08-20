@@ -265,10 +265,11 @@ function DigitalProfileContent() {
     websiteDisplay: (matchedIdentity?.website || (matchedIdentity?.username === 'johnnylongho' ? 'aplusvn.net' : 'one-connect.vn')).replace('https://', '').replace('http://', ''),
     zalo: `https://zalo.me/${(matchedIdentity?.phone || '').replace(/[^0-9]/g, '')}`,
     avatarUrl:
-      matchedIdentity?.avatarUrl ||
-      (matchedIdentity?.username === 'johnnylongho'
-        ? '/avatar-johnny-long.jpg'
-        : `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(matchedIdentity?.fullName || 'User')}&backgroundColor=0066ff,00c2ff`),
+      (matchedIdentity?.avatarUrl && !matchedIdentity.avatarUrl.startsWith('blob:') && matchedIdentity.avatarUrl.trim() !== '')
+        ? matchedIdentity.avatarUrl
+        : ((matchedIdentity?.username === 'johnnylongho' || matchedIdentity?.id === 'id-001')
+          ? '/avatar-johnny-long.jpg'
+          : `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(matchedIdentity?.fullName || 'User')}&backgroundColor=0066ff,00c2ff`),
     ticketCode: `QR_ONECONNECT_${(matchedIdentity?.username || 'USER').toUpperCase()}_2026`,
     cardUid: matchedCard?.cardUid || `NFC-${(matchedIdentity?.username || 'VIP').toUpperCase().slice(0, 8)}-888`,
     cardType: 'NFC Executive Black Metal',
@@ -626,11 +627,15 @@ END:VCARD`;
               
               {/* Avatar positioned over the banner */}
               <div className="flex items-end justify-between -mt-12 sm:-mt-14 mb-2">
-                <div className="relative w-22 h-22 sm:w-26 sm:h-26 rounded-2xl overflow-hidden shadow-lg bg-white p-1 border-2 border-white ring-2 ring-blue-500/30 shrink-0 group">
+                <div className="relative w-24 h-24 sm:w-28 sm:h-28 aspect-square rounded-2xl overflow-hidden shadow-lg bg-white p-1 border-2 border-white ring-2 ring-blue-500/30 shrink-0 group">
                   <img
                     src={profile.avatarUrl}
                     alt={profile.fullName}
-                    className="w-full h-full object-cover rounded-xl"
+                    className="w-full h-full object-cover rounded-xl aspect-square block"
+                    onError={(e) => {
+                      e.currentTarget.onerror = null;
+                      e.currentTarget.src = `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(profile.fullName)}&backgroundColor=0066ff,00c2ff`;
+                    }}
                   />
                   {isOwner && (
                     <button

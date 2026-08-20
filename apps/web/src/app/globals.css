@@ -10,7 +10,7 @@
   --bg-card: #FFFFFF;
   --bg-card-hover: #F1F5F9;
   --border-color: #E2E8F0;
-  --border-glow: rgba(0, 102, 255, 0.2);
+  --border-glow: rgba(0, 102, 255, 0.15);
   
   --brand-blue: #0066FF;
   --brand-cyan: #00C2FF;
@@ -27,10 +27,10 @@
   --font-heading: 'Be Vietnam Pro', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-body: 'Plus Jakarta Sans', 'Be Vietnam Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.04);
-  --shadow-glow: 0 0 20px rgba(0, 102, 255, 0.12);
+  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.04), 0 1px 2px -1px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 4px 8px -2px rgba(0, 0, 0, 0.06), 0 2px 4px -2px rgba(0, 0, 0, 0.04);
+  --shadow-lg: 0 12px 20px -4px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.03);
+  --shadow-glow: 0 0 25px rgba(0, 102, 255, 0.12);
 }
 
 * {
@@ -45,9 +45,12 @@ html, body {
   color: var(--text-primary);
   min-height: 100vh;
   overflow-x: hidden;
+  max-width: 100vw;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
 }
 
 /* Background Soft Ambient Light for Light Theme */
@@ -58,7 +61,7 @@ body::before {
   left: 10%;
   width: 500px;
   height: 500px;
-  background: radial-gradient(circle, rgba(0, 102, 255, 0.04) 0%, rgba(248, 250, 252, 0) 70%);
+  background: radial-gradient(circle, rgba(0, 102, 255, 0.035) 0%, rgba(248, 250, 252, 0) 70%);
   pointer-events: none;
   z-index: 0;
 }
@@ -70,7 +73,7 @@ body::after {
   right: 5%;
   width: 600px;
   height: 600px;
-  background: radial-gradient(circle, rgba(255, 107, 0, 0.03) 0%, rgba(248, 250, 252, 0) 70%);
+  background: radial-gradient(circle, rgba(255, 107, 0, 0.025) 0%, rgba(248, 250, 252, 0) 70%);
   pointer-events: none;
   z-index: 0;
 }
@@ -89,7 +92,7 @@ a {
 .glass-panel {
   background: #FFFFFF;
   border: 1px solid var(--border-color);
-  border-radius: 16px;
+  border-radius: 18px;
   box-shadow: var(--shadow-sm);
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -114,10 +117,19 @@ a {
   transform: rotateY(180deg);
 }
 
+/* Hide scrollbar utility */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
 /* Custom Scrollbar for Sleek Executive Look */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 
 ::-webkit-scrollbar-track {
@@ -133,3 +145,7 @@ a {
   background: #94A3B8;
 }
 
+/* Mobile Touch Optimization */
+button, a, input, select, textarea {
+  touch-action: manipulation;
+}

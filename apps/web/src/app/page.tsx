@@ -3,7 +3,6 @@
 import React from 'react';
 import Link from 'next/link';
 import BusinessCard3D from '@/components/BusinessCard3D';
-import NfcTouchSimulator from '@/components/NfcTouchSimulator';
 import { useOneConnectStore } from '@/lib/store';
 import {
   CreditCard,
@@ -16,9 +15,12 @@ import {
   ArrowRight,
   Sparkles,
   CheckCircle2,
-  FileText,
   Clock,
   TrendingUp,
+  Smartphone,
+  Layers,
+  Lock,
+  Compass,
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -32,55 +34,57 @@ export default function Home() {
   const pendingConsents = state.connections.filter((c) => c.status === 'PENDING').length || 14;
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 sm:space-y-8 w-full max-w-full overflow-x-hidden">
       {/* 1. EXECUTIVE HERO BANNER */}
-      <section className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-slate-950 via-slate-900 to-blue-950/70 border border-slate-800 p-6 sm:p-10 shadow-2xl">
+      <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-white via-blue-50/40 to-slate-50 border border-slate-200/90 p-5 sm:p-8 lg:p-10 shadow-sm">
         {/* Glow ambient background */}
-        <div className="absolute top-0 right-0 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute top-0 right-0 w-80 h-80 bg-blue-500/5 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-80 h-80 bg-orange-500/5 rounded-full blur-3xl pointer-events-none" />
 
-        <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+        <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-center">
           {/* Left Text & Actions */}
-          <div className="lg:col-span-7 space-y-6">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-cyan-500/15 border border-cyan-500/30 text-cyan-300 text-xs font-bold tracking-wide">
-              <Sparkles className="w-4 h-4 text-cyan-400" /> Pre-CRM & Relationship Layer Ecosystem
+          <div className="lg:col-span-7 space-y-4 sm:space-y-6">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 border border-blue-200/80 text-[#0066FF] text-xs font-bold tracking-wide">
+              <Sparkles className="w-3.5 h-3.5 text-[#FF6B00]" /> Hạ Tầng Định Danh & Kết Nối Giao Thương Số
             </div>
 
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight leading-tight font-['Outfit']">
-              Chuyển Hóa Sự Kiện Thành <br />
-              <span className="bg-gradient-to-r from-cyan-400 via-indigo-400 to-purple-400 bg-clip-text text-transparent">
+            <h1 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 tracking-tight leading-tight">
+              Chuyển Hóa Sự Kiện Thành <br className="hidden sm:inline" />
+              <span className="bg-gradient-to-r from-[#0066FF] to-[#00C2FF] bg-clip-text text-transparent">
                 Mối Quan Hệ Kinh Doanh Có Cấu Trúc
               </span>
             </h1>
 
-            <p className="text-sm sm:text-base text-slate-300 leading-relaxed max-w-2xl">
-              One Connect Network cung cấp **tầng hạ tầng quản lý quan hệ (Relationship Layer)** kết hợp giao diện chạm NFC/QR ma sát bằng 0 và cơ chế đồng ý 2 chiều tuân thủ **Luật Bảo vệ Dữ liệu Cá nhân 91/2025/QH15**.
+            <p className="text-xs sm:text-sm text-slate-600 leading-relaxed max-w-2xl">
+              <strong>One Connect Network</strong> cung cấp tầng hạ tầng quản lý quan hệ (Relationship Layer) kết hợp giao diện chạm NFC/QR ma sát bằng 0 và cơ chế đồng ý 2 chiều tuân thủ nghiêm ngặt <strong>Luật Bảo vệ Dữ liệu Cá nhân 91/2025/QH15</strong>.
             </p>
 
-            <div className="flex flex-wrap items-center gap-3 pt-2">
-              <Link href="/dashboard/card">
-                <Button size="lg" className="gap-2 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-black font-extrabold shadow-xl shadow-cyan-500/20 rounded-xl">
-                  <CreditCard className="w-5 h-5" /> Quản Lý Thẻ Số Cá Nhân <ArrowRight className="w-4 h-4" />
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3 pt-1">
+              <Link href="/dashboard/card" className="w-full sm:w-auto">
+                <Button size="lg" className="w-full sm:w-auto gap-2 bg-[#0066FF] hover:bg-blue-700 text-white font-bold shadow-md shadow-blue-500/20 rounded-xl">
+                  <CreditCard className="w-4 h-4" /> Quản Lý Thẻ Số Cá Nhân <ArrowRight className="w-4 h-4" />
                 </Button>
               </Link>
-              <Link href="/operator/checkin">
-                <Button size="lg" variant="outline" className="gap-2 border-slate-700 bg-slate-900/80 hover:bg-slate-800 text-slate-200 rounded-xl">
-                  <Zap className="w-5 h-5 text-amber-400" /> Trạm Check-in Live (&lt;1s)
+              <Link href="/demo" className="w-full sm:w-auto">
+                <Button size="lg" variant="outline" className="w-full sm:w-auto gap-2 border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-semibold rounded-xl">
+                  <Sparkles className="w-4 h-4 text-[#FF6B00]" /> Live Demo Pitching Hub
                 </Button>
               </Link>
             </div>
           </div>
 
           {/* Right Interactive 3D Card Preview */}
-          <div className="lg:col-span-5 flex flex-col items-center">
+          <div className="lg:col-span-5 flex flex-col items-center justify-center w-full min-w-0">
             {currentIdentity ? (
-              <BusinessCard3D
-                identity={currentIdentity}
-                card={currentCard}
-                onReissueCard={() => reissueCard()}
-              />
+              <div className="w-full flex justify-center">
+                <BusinessCard3D
+                  identity={currentIdentity}
+                  card={currentCard}
+                  onReissueCard={() => reissueCard()}
+                />
+              </div>
             ) : (
-              <div className="w-full h-64 rounded-2xl bg-slate-900/80 border border-slate-800 flex items-center justify-center text-slate-400 text-xs">
+              <div className="w-full h-56 rounded-2xl bg-white border border-slate-200 flex items-center justify-center text-slate-400 text-xs">
                 Đang tải thẻ doanh nhân 3D...
               </div>
             )}
@@ -88,165 +92,175 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 2. TAILWIND METRIC CARDS (HÀNG NGANG FLEXBOX/GRID) */}
-      <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+      {/* 2. EXECUTIVE METRICS KPI (HÀNG NGANG FLEXBOX/GRID) */}
+      <section className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
         {/* Card 1 */}
-        <Card className="border-slate-800 bg-slate-900/70 hover:border-cyan-500/40 transition-all shadow-xl">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+        <Card className="border-slate-200/90 bg-white hover:border-blue-300 transition-all shadow-xs rounded-2xl">
+          <CardHeader className="flex flex-row items-center justify-between pb-1.5 p-4">
+            <CardTitle className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
               Kết Nối Đã Consent
             </CardTitle>
-            <div className="p-2.5 rounded-xl bg-cyan-500/10 border border-cyan-500/20">
-              <Users className="w-5 h-5 text-cyan-400" />
+            <div className="p-2 rounded-xl bg-blue-50 text-[#0066FF]">
+              <Users className="w-4 h-4" />
             </div>
           </CardHeader>
-          <CardContent className="space-y-1">
-            <div className="text-3xl font-black text-white font-['Outfit']">{totalConnections} <span className="text-sm font-normal text-slate-400">Đối tác</span></div>
-            <p className="text-xs text-emerald-400 flex items-center gap-1 font-medium pt-1">
-              <ShieldCheck className="w-3.5 h-3.5" /> 100% Tuân thủ PDPL 91/2025
+          <CardContent className="space-y-0.5 p-4 pt-0">
+            <div className="text-2xl sm:text-3xl font-extrabold text-slate-900">{totalConnections} <span className="text-xs font-medium text-slate-500">Đối tác</span></div>
+            <p className="text-[11px] text-emerald-600 flex items-center gap-1 font-semibold">
+              <ShieldCheck className="w-3.5 h-3.5" /> Chuẩn PDPL 91/2025
             </p>
           </CardContent>
         </Card>
 
         {/* Card 2 */}
-        <Card className="border-slate-800 bg-slate-900/70 hover:border-amber-500/40 transition-all shadow-xl">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-xs font-bold text-slate-400 uppercase tracking-wider">
-              Chờ Phê Duyệt (Consent)
+        <Card className="border-slate-200/90 bg-white hover:border-amber-300 transition-all shadow-xs rounded-2xl">
+          <CardHeader className="flex flex-row items-center justify-between pb-1.5 p-4">
+            <CardTitle className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+              Chờ Xác Nhận
             </CardTitle>
-            <div className="p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20">
-              <Clock className="w-5 h-5 text-amber-400" />
+            <div className="p-2 rounded-xl bg-amber-50 text-amber-600">
+              <Clock className="w-4 h-4" />
             </div>
           </CardHeader>
-          <CardContent className="space-y-1">
-            <div className="text-3xl font-black text-white font-['Outfit']">{pendingConsents} <span className="text-sm font-normal text-slate-400">Yêu cầu</span></div>
-            <p className="text-xs text-amber-400 flex items-center gap-1 font-medium pt-1">
-              <TrendingUp className="w-3.5 h-3.5" /> Đang chờ đối tác xác nhận
+          <CardContent className="space-y-0.5 p-4 pt-0">
+            <div className="text-2xl sm:text-3xl font-extrabold text-slate-900">{pendingConsents} <span className="text-xs font-medium text-slate-500">Yêu cầu</span></div>
+            <p className="text-[11px] text-amber-600 flex items-center gap-1 font-semibold">
+              <TrendingUp className="w-3.5 h-3.5" /> Cơ chế đồng ý 2 chiều
             </p>
           </CardContent>
         </Card>
 
         {/* Card 3 */}
-        <Card className="border-slate-800 bg-slate-900/70 hover:border-emerald-500/40 transition-all shadow-xl">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-xs font-bold text-slate-400 uppercase tracking-wider">
-              Khách Check-in Event
+        <Card className="border-slate-200/90 bg-white hover:border-emerald-300 transition-all shadow-xs rounded-2xl">
+          <CardHeader className="flex flex-row items-center justify-between pb-1.5 p-4">
+            <CardTitle className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+              Check-in Event Live
             </CardTitle>
-            <div className="p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
-              <CheckCircle2 className="w-5 h-5 text-emerald-400" />
+            <div className="p-2 rounded-xl bg-emerald-50 text-emerald-600">
+              <CheckCircle2 className="w-4 h-4" />
             </div>
           </CardHeader>
-          <CardContent className="space-y-1">
-            <div className="text-3xl font-black text-white font-['Outfit']">
-              {activeEvent?.checkInCount || 385} <span className="text-sm font-normal text-slate-400">/ 500</span>
+          <CardContent className="space-y-0.5 p-4 pt-0">
+            <div className="text-2xl sm:text-3xl font-extrabold text-slate-900">
+              {activeEvent?.checkInCount || 385} <span className="text-xs font-medium text-slate-500">/ 500</span>
             </div>
-            <p className="text-xs text-emerald-400 flex items-center gap-1 font-medium pt-1">
-              <Sparkles className="w-3.5 h-3.5" /> 77% Tiến độ check-in realtime
+            <p className="text-[11px] text-emerald-600 flex items-center gap-1 font-semibold">
+              <Sparkles className="w-3.5 h-3.5" /> 77% Tốc độ &lt;1 giây
             </p>
           </CardContent>
         </Card>
 
         {/* Card 4 */}
-        <Card className="border-slate-800 bg-slate-900/70 hover:border-purple-500/40 transition-all shadow-xl">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-xs font-bold text-slate-400 uppercase tracking-wider">
-              Tỷ Lệ Chạm Thẻ NFC
+        <Card className="border-slate-200/90 bg-white hover:border-purple-300 transition-all shadow-xs rounded-2xl">
+          <CardHeader className="flex flex-row items-center justify-between pb-1.5 p-4">
+            <CardTitle className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+              B2B Matchmaking
             </CardTitle>
-            <div className="p-2.5 rounded-xl bg-purple-500/10 border border-purple-500/20">
-              <Zap className="w-5 h-5 text-purple-400" />
+            <div className="p-2 rounded-xl bg-purple-50 text-purple-600">
+              <Zap className="w-4 h-4" />
             </div>
           </CardHeader>
-          <CardContent className="space-y-1">
-            <div className="text-3xl font-black text-white font-['Outfit']">98.5%</div>
-            <p className="text-xs text-purple-300 flex items-center gap-1 font-medium pt-1">
-              <Zap className="w-3.5 h-3.5 text-amber-400" /> Tốc độ &lt; 0.5s / lượt chạm
+          <CardContent className="space-y-0.5 p-4 pt-0">
+            <div className="text-2xl sm:text-3xl font-extrabold text-slate-900">
+              48 <span className="text-xs font-medium text-slate-500">Cuộc hẹn</span>
+            </div>
+            <p className="text-[11px] text-purple-600 flex items-center gap-1 font-semibold">
+              <Building2 className="w-3.5 h-3.5" /> Xếp bàn 1:1 tự động
             </p>
           </CardContent>
         </Card>
       </section>
 
-      {/* 3. FEATURE MODULES GRID */}
+      {/* 3. FOUR CORE PILLARS OF ONE CONNECT ECOSYSTEM */}
       <section className="space-y-4">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-lg font-bold text-white flex items-center gap-2 font-['Outfit']">
-              <Building2 className="w-5 h-5 text-cyan-400" /> 8 Module Tính Năng Hệ Sinh Thái One Connect
-            </h2>
-            <p className="text-xs text-slate-400">Phạm vi P0 & P1 theo tài liệu Feature Map v0.1</p>
+            <h2 className="text-lg sm:text-xl font-bold text-slate-900">4 Trụ Cột Nền Tảng One Connect</h2>
+            <p className="text-xs text-slate-500">Hạ tầng công nghệ toàn diện cho sự kiện và hiệp hội doanh nghiệp</p>
           </div>
-          <Badge variant="outline" className="bg-emerald-500/10 text-emerald-400 border-emerald-500/30">
-            SCOPE LOCKED
-          </Badge>
+          <Link href="/demo" className="text-xs text-[#0066FF] font-bold hover:underline hidden sm:inline-flex items-center gap-1">
+            Xem Kịch Bản Trình Diễn <ArrowRight className="w-3.5 h-3.5" />
+          </Link>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <Link href="/dashboard/card" className="glass-panel p-5 space-y-3 group hover:border-cyan-400/50">
-            <div className="w-10 h-10 rounded-xl bg-cyan-500/15 border border-cyan-500/30 text-cyan-400 flex items-center justify-center group-hover:scale-110 transition-transform">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {/* Pillar 1 */}
+          <div className="p-5 rounded-2xl bg-white border border-slate-200/90 hover:border-blue-300 transition-all space-y-3 shadow-xs">
+            <div className="w-10 h-10 rounded-xl bg-blue-50 text-[#0066FF] flex items-center justify-center">
               <CreditCard className="w-5 h-5" />
             </div>
-            <h3 className="font-bold text-white text-sm group-hover:text-cyan-300 transition-colors">1. Business Identity & Cards</h3>
-            <p className="text-xs text-slate-400 leading-relaxed">
-              Định danh doanh nhân/doanh nghiệp số, độc lập UID thẻ NFC (Card Replacement Continuity).
+            <h3 className="font-bold text-slate-900 text-sm">1. Thẻ Doanh Nhân NFC 1 Chạm</h3>
+            <p className="text-xs text-slate-600 leading-relaxed">
+              Thẻ vật lý tích hợp chip NFC + Dynamic QR code động. Cập nhật hồ sơ realtime không cần in lại danh thiếp giấy.
             </p>
-          </Link>
+            <Link href="/dashboard/card" className="text-xs font-bold text-[#0066FF] hover:underline inline-flex items-center gap-1 pt-1">
+              Khám phá thẻ số <ArrowRight className="w-3 h-3" />
+            </Link>
+          </div>
 
-          <Link href="/admin/org" className="glass-panel p-5 space-y-3 group hover:border-indigo-400/50">
-            <div className="w-10 h-10 rounded-xl bg-indigo-500/15 border border-indigo-500/30 text-indigo-400 flex items-center justify-center group-hover:scale-110 transition-transform">
-              <Building2 className="w-5 h-5" />
+          {/* Pillar 2 */}
+          <div className="p-5 rounded-2xl bg-white border border-slate-200/90 hover:border-emerald-300 transition-all space-y-3 shadow-xs">
+            <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+              <Smartphone className="w-5 h-5" />
             </div>
-            <h3 className="font-bold text-white text-sm group-hover:text-indigo-300 transition-colors">2. Association Membership</h3>
-            <p className="text-xs text-slate-400 leading-relaxed">
-              Quản lý tư cách hội viên, phân quyền ban chấp hành và danh bạ tổ chức Hội/CLB.
+            <h3 className="font-bold text-slate-900 text-sm">2. Trạm Check-in Siêu Tốc &lt;1s</h3>
+            <p className="text-xs text-slate-600 leading-relaxed">
+              Điểm danh tự động qua NFC/QR không cần xếp hàng. Dữ liệu đồng bộ tức thì lên Dashboard ban tổ chức.
             </p>
-          </Link>
+            <Link href="/operator/checkin" className="text-xs font-bold text-emerald-600 hover:underline inline-flex items-center gap-1 pt-1">
+              Mở trạm check-in <ArrowRight className="w-3 h-3" />
+            </Link>
+          </div>
 
-          <Link href="/events" className="glass-panel p-5 space-y-3 group hover:border-purple-400/50">
-            <div className="w-10 h-10 rounded-xl bg-purple-500/15 border border-purple-500/30 text-purple-400 flex items-center justify-center group-hover:scale-110 transition-transform">
-              <Calendar className="w-5 h-5" />
-            </div>
-            <h3 className="font-bold text-white text-sm group-hover:text-purple-300 transition-colors">3. Event Management</h3>
-            <p className="text-xs text-slate-400 leading-relaxed">
-              Khởi tạo sự kiện, mở cổng đăng ký trực tuyến, quản lý vé mời và danh sách người tham dự.
-            </p>
-          </Link>
-
-          <Link href="/operator/checkin" className="glass-panel p-5 space-y-3 group hover:border-amber-400/50">
-            <div className="w-10 h-10 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-400 flex items-center justify-center group-hover:scale-110 transition-transform">
+          {/* Pillar 3 */}
+          <div className="p-5 rounded-2xl bg-white border border-slate-200/90 hover:border-purple-300 transition-all space-y-3 shadow-xs">
+            <div className="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center">
               <Zap className="w-5 h-5" />
             </div>
-            <h3 className="font-bold text-white text-sm group-hover:text-amber-300 transition-colors">4. Fast NFC/QR Check-in</h3>
-            <p className="text-xs text-slate-400 leading-relaxed">
-              Điểm danh trạm cửa siêu tốc (&lt; 1s), chống quét lặp idempotency, hỗ trợ QR camera fallback.
+            <h3 className="font-bold text-slate-900 text-sm">3. AI B2B Matchmaking 1:1</h3>
+            <p className="text-xs text-slate-600 leading-relaxed">
+              Gợi ý đối tác kinh doanh phù hợp theo ngành nghề, tự động cấp mã bàn và lịch hẹn giao thương tại sự kiện.
             </p>
-          </Link>
+            <Link href="/matching" className="text-xs font-bold text-purple-600 hover:underline inline-flex items-center gap-1 pt-1">
+              Xếp bàn giao thương <ArrowRight className="w-3 h-3" />
+            </Link>
+          </div>
+
+          {/* Pillar 4 */}
+          <div className="p-5 rounded-2xl bg-white border border-slate-200/90 hover:border-amber-300 transition-all space-y-3 shadow-xs">
+            <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
+              <Lock className="w-5 h-5" />
+            </div>
+            <h3 className="font-bold text-slate-900 text-sm">4. Chuẩn PDPL 91/2025/QH15</h3>
+            <p className="text-xs text-slate-600 leading-relaxed">
+              Cơ chế đồng ý 2 chiều (Consent), mã hóa số điện thoại, quyền thu hồi dữ liệu và kiểm toán truy cập minh bạch.
+            </p>
+            <Link href="/dashboard/settings" className="text-xs font-bold text-amber-600 hover:underline inline-flex items-center gap-1 pt-1">
+              Cấu hình bảo mật <ArrowRight className="w-3 h-3" />
+            </Link>
+          </div>
         </div>
       </section>
 
-      {/* 4. LIVE TOUCH SIMULATOR & PDPL LAW */}
-      <section className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
-        <NfcTouchSimulator targetCardUid="NFC-HA-777" />
-
-        <div className="glass-panel p-6 space-y-4">
-          <h3 className="text-sm font-bold text-white flex items-center gap-2 font-['Outfit']">
-            <ShieldCheck className="w-4 h-4 text-emerald-400" /> Tuân Thủ Luật PDPL Số 91/2025/QH15
-          </h3>
-          <p className="text-xs text-slate-300 leading-relaxed">
-            Mọi tương tác kết nối trên One Connect Network được bảo vệ nghiêm ngặt:
-          </p>
-          <ul className="space-y-2.5 text-xs text-slate-400">
-            <li className="flex items-start gap-2">
-              <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-              <span><strong>Explicit 2-way Consent</strong>: Quét NFC tạo yêu cầu kết nối; thông tin cá nhân nhạy cảm chỉ hiển thị khi đối phương bấm Chấp Nhận.</span>
-            </li>
-            <li className="flex items-start gap-2">
-              <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-              <span><strong>Data Sovereignty</strong>: Người dùng có quyền bật/tắt hiển thị hồ sơ cá nhân hoặc yêu cầu xuất dữ liệu / xóa vĩnh viễn tài khoản.</span>
-            </li>
-            <li className="flex items-start gap-2">
-              <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-              <span><strong>Card Replacement Continuity</strong>: Khi đổi thẻ NFC vật lý mới, ID tài khoản và toàn bộ lịch sử kết nối vẫn được bảo toàn trọn vẹn.</span>
-            </li>
-          </ul>
+      {/* 4. PRESENTATION CALL TO ACTION */}
+      <section className="p-6 sm:p-8 rounded-3xl bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 text-white shadow-lg space-y-4">
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+          <div className="space-y-1 max-w-2xl">
+            <Badge className="bg-white/20 text-white border-white/30 text-[10px] font-bold uppercase tracking-wider">
+              Pitching Deck 2026
+            </Badge>
+            <h3 className="text-xl sm:text-2xl font-black">
+              Sẵn Sàng Thuyết Trình Ý Tưởng Hệ Thống One Connect
+            </h3>
+            <p className="text-xs sm:text-sm text-blue-100 leading-relaxed">
+              Trải nghiệm kịch bản tương tác hoàn chỉnh: Chạm NFC mô phỏng, Đổi danh bạ hai chiều có Consent, Điểm danh sự kiện tự động và Xếp bàn B2B.
+            </p>
+          </div>
+          <Link href="/demo" className="shrink-0 w-full sm:w-auto">
+            <Button size="lg" className="w-full sm:w-auto gap-2 bg-white hover:bg-slate-100 text-blue-700 font-extrabold shadow-md rounded-xl">
+              <Sparkles className="w-4 h-4 text-[#FF6B00]" /> Mở Live Demo Hub
+            </Button>
+          </Link>
         </div>
       </section>
     </div>

@@ -439,119 +439,208 @@ export function B2BMatchmakingView({ initialMatchings }: B2BMatchmakingViewProps
               </div>
             </CardHeader>
 
-            <CardContent className="p-0 overflow-x-auto">
-              <Table>
-                <TableHeader className="bg-slate-50">
-                  <TableRow className="border-slate-200 hover:bg-transparent">
-                    <TableHead className="text-slate-600 text-xs font-bold">Đối Tác Đàm Phán</TableHead>
-                    <TableHead className="text-slate-600 text-xs font-bold">Doanh Nghiệp</TableHead>
-                    <TableHead className="text-slate-600 text-xs font-bold">Thời Gian & Số Bàn</TableHead>
-                    <TableHead className="text-slate-600 text-xs font-bold">Lời Nhắn Mục Tiêu</TableHead>
-                    <TableHead className="text-slate-600 text-xs font-bold text-center">Trạng Thái</TableHead>
-                    <TableHead className="text-slate-600 text-xs font-bold text-right">Hành Động</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredMatchings.map((item) => {
+            <CardContent className="p-0">
+              {/* MOBILE APPOINTMENT CARDS (Block on mobile, hidden on tablet/desktop) */}
+              <div className="block md:hidden divide-y divide-slate-100 p-3 space-y-3">
+                {filteredMatchings.length === 0 ? (
+                  <div className="text-center py-8 text-xs text-slate-500">
+                    Không tìm thấy cuộc hẹn nào phù hợp.
+                  </div>
+                ) : (
+                  filteredMatchings.map((item) => {
                     const isIncoming = item.receiverId === currentUserId;
                     const partnerName = isIncoming ? item.senderName : item.receiverName;
                     const partnerCompany = isIncoming ? item.senderCompany : item.receiverCompany;
                     const partnerAvatar = isIncoming ? item.senderAvatar : item.receiverAvatar;
 
                     return (
-                      <TableRow key={item.id} className="border-slate-100 hover:bg-slate-50">
-                        <TableCell>
-                          <div className="flex items-center gap-3">
+                      <div key={item.id} className="p-3 rounded-2xl bg-slate-50/80 border border-slate-200/80 space-y-3">
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="flex items-center gap-2.5">
                             <img
                               src={partnerAvatar}
                               alt={partnerName}
-                              className="w-9 h-9 rounded-xl object-cover border border-slate-200 shrink-0"
+                              className="w-10 h-10 rounded-xl object-cover border border-slate-200 shrink-0"
                             />
-                            <div>
-                              <p className="font-bold text-slate-900 text-xs flex items-center gap-1.5">
-                                {partnerName}
-                                {isIncoming ? (
-                                  <Badge className="bg-blue-50 text-[#0066FF] border-blue-200 text-[9px]">
-                                    Nhận được
-                                  </Badge>
-                                ) : (
-                                  <Badge className="bg-slate-100 text-slate-600 border-slate-200 text-[9px]">
-                                    Đã gửi
-                                  </Badge>
-                                )}
-                              </p>
-                              <p className="text-[11px] text-slate-500">{item.createdAt}</p>
+                            <div className="min-w-0">
+                              <p className="font-bold text-slate-900 text-xs truncate">{partnerName}</p>
+                              <p className="text-[11px] text-slate-600 truncate">{partnerCompany}</p>
                             </div>
                           </div>
-                        </TableCell>
-
-                        <TableCell className="text-xs font-medium text-slate-800">
-                          {partnerCompany}
-                        </TableCell>
-
-                        <TableCell>
-                          <div className="space-y-0.5">
-                            <div className="flex items-center gap-1 text-xs text-[#0066FF] font-bold">
-                              <Clock className="w-3.5 h-3.5" />
-                              {item.meetingTime}
-                            </div>
-                            <div className="flex items-center gap-1 text-[11px] text-[#FF6B00] font-medium">
-                              <MapPin className="w-3 h-3" />
-                              {item.tableNumber}
-                            </div>
+                          <div>
+                            {item.status === 'accepted' && (
+                              <Badge variant="outline" className="bg-emerald-50 text-emerald-700 border-emerald-200 text-[10px] font-bold">
+                                Đã Đồng Ý
+                              </Badge>
+                            )}
+                            {item.status === 'pending' && (
+                              <Badge variant="outline" className="bg-orange-50 text-orange-600 border-orange-200 text-[10px] font-bold">
+                                Chờ Phản Hồi
+                              </Badge>
+                            )}
+                            {item.status === 'rejected' && (
+                              <Badge variant="outline" className="bg-rose-50 text-rose-600 border-rose-200 text-[10px] font-bold">
+                                Từ Chối
+                              </Badge>
+                            )}
                           </div>
-                        </TableCell>
+                        </div>
 
-                        <TableCell className="max-w-xs">
-                          <p className="text-xs text-slate-600 line-clamp-2 italic">"{item.note}"</p>
-                        </TableCell>
+                        <div className="flex items-center justify-between text-xs bg-white p-2 rounded-xl border border-slate-100">
+                          <span className="flex items-center gap-1 text-[#0066FF] font-bold text-[11px]">
+                            <Clock className="w-3.5 h-3.5" /> {item.meetingTime}
+                          </span>
+                          <span className="flex items-center gap-1 text-[#FF6B00] font-semibold text-[11px]">
+                            <MapPin className="w-3.5 h-3.5" /> {item.tableNumber}
+                          </span>
+                        </div>
 
-                        <TableCell className="text-center">
-                          {item.status === 'accepted' && (
-                            <Badge variant="outline" className="bg-emerald-50 text-emerald-700 border-emerald-200 gap-1 font-bold text-[11px]">
-                              <CheckCircle2 className="w-3 h-3 text-emerald-600" /> Đã Đồng Ý
-                            </Badge>
-                          )}
-                          {item.status === 'pending' && (
-                            <Badge variant="outline" className="bg-orange-50 text-orange-600 border-orange-200 gap-1 font-bold text-[11px]">
-                              <Clock className="w-3 h-3" /> Chờ Phản Hồi
-                            </Badge>
-                          )}
-                          {item.status === 'rejected' && (
-                            <Badge variant="outline" className="bg-rose-50 text-rose-600 border-rose-200 gap-1 font-bold text-[11px]">
-                              <XCircle className="w-3 h-3" /> Từ Chối
-                            </Badge>
-                          )}
-                        </TableCell>
+                        {item.note && (
+                          <p className="text-[11px] text-slate-600 italic bg-white/60 p-2 rounded-lg border border-slate-100">
+                            "{item.note}"
+                          </p>
+                        )}
 
-                        <TableCell className="text-right">
-                          {isIncoming && item.status === 'pending' ? (
-                            <div className="flex items-center justify-end gap-1.5">
-                              <Button
-                                onClick={() => handleRespondRequest(item.id, 'accepted')}
-                                size="sm"
-                                className="h-8 gap-1 bg-emerald-600 hover:bg-emerald-700 text-white text-xs rounded-lg cursor-pointer"
-                              >
-                                <Check className="w-3.5 h-3.5" /> Đồng ý
-                              </Button>
-                              <Button
-                                onClick={() => handleRespondRequest(item.id, 'rejected')}
-                                size="sm"
-                                variant="outline"
-                                className="h-8 gap-1 border-slate-200 text-slate-600 hover:bg-slate-50 text-xs rounded-lg cursor-pointer"
-                              >
-                                <X className="w-3.5 h-3.5" /> Từ chối
-                              </Button>
-                            </div>
-                          ) : (
-                            <span className="text-xs text-slate-400 font-mono">Đã xử lý</span>
-                          )}
-                        </TableCell>
-                      </TableRow>
+                        {isIncoming && item.status === 'pending' && (
+                          <div className="grid grid-cols-2 gap-2 pt-1">
+                            <Button
+                              onClick={() => handleRespondRequest(item.id, 'accepted')}
+                              size="sm"
+                              className="h-8 bg-emerald-600 hover:bg-emerald-700 text-white text-xs rounded-xl"
+                            >
+                              <Check className="w-3.5 h-3.5 mr-1" /> Đồng ý
+                            </Button>
+                            <Button
+                              onClick={() => handleRespondRequest(item.id, 'rejected')}
+                              size="sm"
+                              variant="outline"
+                              className="h-8 border-slate-200 text-slate-600 hover:bg-slate-50 text-xs rounded-xl"
+                            >
+                              <X className="w-3.5 h-3.5 mr-1" /> Từ chối
+                            </Button>
+                          </div>
+                        )}
+                      </div>
                     );
-                  })}
-                </TableBody>
-              </Table>
+                  })
+                )}
+              </div>
+
+              {/* DESKTOP TABLE VIEW (Hidden on mobile) */}
+              <div className="hidden md:block overflow-x-auto">
+                <Table>
+                  <TableHeader className="bg-slate-50">
+                    <TableRow className="border-slate-200 hover:bg-transparent">
+                      <TableHead className="text-slate-600 text-xs font-bold">Đối Tác Đàm Phán</TableHead>
+                      <TableHead className="text-slate-600 text-xs font-bold">Doanh Nghiệp</TableHead>
+                      <TableHead className="text-slate-600 text-xs font-bold">Thời Gian & Số Bàn</TableHead>
+                      <TableHead className="text-slate-600 text-xs font-bold">Lời Nhắn Mục Tiêu</TableHead>
+                      <TableHead className="text-slate-600 text-xs font-bold text-center">Trạng Thái</TableHead>
+                      <TableHead className="text-slate-600 text-xs font-bold text-right">Hành Động</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {filteredMatchings.map((item) => {
+                      const isIncoming = item.receiverId === currentUserId;
+                      const partnerName = isIncoming ? item.senderName : item.receiverName;
+                      const partnerCompany = isIncoming ? item.senderCompany : item.receiverCompany;
+                      const partnerAvatar = isIncoming ? item.senderAvatar : item.receiverAvatar;
+
+                      return (
+                        <TableRow key={item.id} className="border-slate-100 hover:bg-slate-50">
+                          <TableCell>
+                            <div className="flex items-center gap-3">
+                              <img
+                                src={partnerAvatar}
+                                alt={partnerName}
+                                className="w-9 h-9 rounded-xl object-cover border border-slate-200 shrink-0"
+                              />
+                              <div>
+                                <p className="font-bold text-slate-900 text-xs flex items-center gap-1.5">
+                                  {partnerName}
+                                  {isIncoming ? (
+                                    <Badge className="bg-blue-50 text-[#0066FF] border-blue-200 text-[9px]">
+                                      Nhận được
+                                    </Badge>
+                                  ) : (
+                                    <Badge className="bg-slate-100 text-slate-600 border-slate-200 text-[9px]">
+                                      Đã gửi
+                                    </Badge>
+                                  )}
+                                </p>
+                                <p className="text-[11px] text-slate-500">{item.createdAt}</p>
+                              </div>
+                            </div>
+                          </TableCell>
+
+                          <TableCell className="text-xs font-medium text-slate-800">
+                            {partnerCompany}
+                          </TableCell>
+
+                          <TableCell>
+                            <div className="space-y-0.5">
+                              <div className="flex items-center gap-1 text-xs text-[#0066FF] font-bold">
+                                <Clock className="w-3.5 h-3.5" />
+                                {item.meetingTime}
+                              </div>
+                              <div className="flex items-center gap-1 text-[11px] text-[#FF6B00] font-medium">
+                                <MapPin className="w-3 h-3" />
+                                {item.tableNumber}
+                              </div>
+                            </div>
+                          </TableCell>
+
+                          <TableCell className="max-w-xs">
+                            <p className="text-xs text-slate-600 line-clamp-2 italic">"{item.note}"</p>
+                          </TableCell>
+
+                          <TableCell className="text-center">
+                            {item.status === 'accepted' && (
+                              <Badge variant="outline" className="bg-emerald-50 text-emerald-700 border-emerald-200 gap-1 font-bold text-[11px]">
+                                <CheckCircle2 className="w-3 h-3 text-emerald-600" /> Đã Đồng Ý
+                              </Badge>
+                            )}
+                            {item.status === 'pending' && (
+                              <Badge variant="outline" className="bg-orange-50 text-orange-600 border-orange-200 gap-1 font-bold text-[11px]">
+                                <Clock className="w-3 h-3" /> Chờ Phản Hồi
+                              </Badge>
+                            )}
+                            {item.status === 'rejected' && (
+                              <Badge variant="outline" className="bg-rose-50 text-rose-600 border-rose-200 gap-1 font-bold text-[11px]">
+                                <XCircle className="w-3 h-3" /> Từ Chối
+                              </Badge>
+                            )}
+                          </TableCell>
+
+                          <TableCell className="text-right">
+                            {isIncoming && item.status === 'pending' ? (
+                              <div className="flex items-center justify-end gap-1.5">
+                                <Button
+                                  onClick={() => handleRespondRequest(item.id, 'accepted')}
+                                  size="sm"
+                                  className="h-8 gap-1 bg-emerald-600 hover:bg-emerald-700 text-white text-xs rounded-lg cursor-pointer"
+                                >
+                                  <Check className="w-3.5 h-3.5" /> Đồng ý
+                                </Button>
+                                <Button
+                                  onClick={() => handleRespondRequest(item.id, 'rejected')}
+                                  size="sm"
+                                  variant="outline"
+                                  className="h-8 gap-1 border-slate-200 text-slate-600 hover:bg-slate-50 text-xs rounded-lg cursor-pointer"
+                                >
+                                  <X className="w-3.5 h-3.5" /> Từ chối
+                                </Button>
+                              </div>
+                            ) : (
+                              <span className="text-xs text-slate-400 font-mono">Đã xử lý</span>
+                            )}
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>

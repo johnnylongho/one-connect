@@ -202,8 +202,82 @@ export function DelegateCheckinTable({ delegates: initialDelegates, isLoading = 
         )}
       </div>
 
-      {/* TABLE DATA WITH LIGHT THEME */}
-      <div className="overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+      {/* MOBILE DELEGATE CARDS (Block on mobile, hidden on desktop) */}
+      <div className="block md:hidden space-y-3">
+        {isLoading ? (
+          Array.from({ length: 3 }).map((_, idx) => (
+            <div key={idx} className="p-4 rounded-2xl bg-white border border-slate-200 space-y-2">
+              <Skeleton className="h-4 w-32" />
+              <Skeleton className="h-3 w-48" />
+            </div>
+          ))
+        ) : paginatedDelegates.length === 0 ? (
+          <div className="text-center py-8 text-slate-500 text-xs bg-white rounded-2xl border border-slate-200">
+            Không tìm thấy đại biểu khớp với bộ lọc.
+          </div>
+        ) : (
+          paginatedDelegates.map((delegate) => {
+            const isSelected = selectedIds.includes(delegate.id);
+            return (
+              <div
+                key={delegate.id}
+                className={`p-3.5 rounded-2xl bg-white border transition-all space-y-3 shadow-xs ${
+                  isSelected ? 'border-blue-400 bg-blue-50/40' : 'border-slate-200'
+                }`}
+              >
+                <div className="flex items-start justify-between gap-2">
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <img
+                      src={delegate.avatarUrl || '/avatar-johnny-long.jpg'}
+                      alt={delegate.fullName}
+                      className="w-10 h-10 rounded-full object-cover border border-slate-200 shrink-0"
+                    />
+                    <div className="min-w-0">
+                      <div className="font-bold text-slate-900 text-xs flex items-center gap-1.5 truncate">
+                        <span className="truncate">{delegate.fullName}</span>
+                        {delegate.ticketType === 'VIP' && (
+                          <Badge className="bg-orange-50 text-orange-600 border-orange-200 text-[9px] px-1.5 py-0 font-bold shrink-0">
+                            VIP
+                          </Badge>
+                        )}
+                      </div>
+                      <p className="text-[11px] text-slate-500 truncate">{delegate.position} • {delegate.company}</p>
+                    </div>
+                  </div>
+                  <div>
+                    {delegate.status === 'checked_in' ? (
+                      <Badge variant="outline" className="bg-emerald-50 text-emerald-700 border-emerald-200 text-[10px] font-bold shrink-0">
+                        Đã Vào
+                      </Badge>
+                    ) : (
+                      <Badge variant="outline" className="bg-slate-100 text-slate-500 border-slate-200 text-[10px] shrink-0">
+                        Chưa Vào
+                      </Badge>
+                    )}
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between text-xs pt-1 border-t border-slate-100">
+                  <span className="font-mono text-[10px] text-slate-500 bg-slate-100 px-2 py-0.5 rounded">
+                    {delegate.ticketCode.substring(0, 14)}...
+                  </span>
+                  <Button
+                    onClick={() => setSelectedDelegateForQr(delegate)}
+                    variant="outline"
+                    size="sm"
+                    className="h-7 px-2.5 text-[11px] border-slate-200 text-[#0066FF] hover:bg-blue-50 rounded-lg"
+                  >
+                    <QrCode className="w-3 h-3 mr-1" /> Xem QR
+                  </Button>
+                </div>
+              </div>
+            );
+          })
+        )}
+      </div>
+
+      {/* DESKTOP TABLE DATA WITH LIGHT THEME (Hidden on mobile) */}
+      <div className="hidden md:block overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-xs">
         <Table>
           <TableHeader className="bg-slate-50">
             <TableRow className="border-slate-200 hover:bg-transparent">
