@@ -575,8 +575,8 @@ export default function DigitalNfcCardPage() {
                 <div className="p-2.5 rounded-xl bg-slate-800/90 border border-slate-700/80 flex items-center justify-between gap-2">
                   <div className="min-w-0 flex-1">
                     <p className="text-[10px] text-slate-400 font-mono uppercase tracking-wider">Đường dẫn nạp vào thẻ:</p>
-                    <p className="text-xs font-mono font-bold text-[#00C2FF] truncate">
-                      {typeof window !== 'undefined' ? `${window.location.origin}/p/${currentIdentity?.username || 'johnnylongho'}` : `https://one-connect-network.vercel.app/p/${currentIdentity?.username || 'johnnylongho'}`}
+                    <p className="text-xs font-mono font-bold text-[#00C2FF] truncate" suppressHydrationWarning>
+                      {mounted && typeof window !== 'undefined' ? `${window.location.origin}/p/${currentIdentity?.username || 'johnnylongho'}` : `https://one-connect-network.vercel.app/p/${currentIdentity?.username || 'johnnylongho'}`}
                     </p>
                   </div>
                   <Button

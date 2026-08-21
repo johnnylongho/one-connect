@@ -31,6 +31,7 @@ import {
   Camera,
   Upload,
   User,
+  Briefcase,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -43,6 +44,21 @@ import {
   DialogDescription,
   DialogFooter,
 } from '@/components/ui/dialog';
+
+const PRESET_INDUSTRIES = [
+  'Công Nghệ Thông Tin & AI',
+  'Du Lịch, Khách Sạn & MICE',
+  'Bất Động Sản & Nghỉ Dưỡng',
+  'Năng Lượng Tái Tạo & Môi Trường',
+  'Logistics, Cảng Biển & Vận Tải',
+  'Nông - Thủy Hải Sản & Chế Biến',
+  'Tài Chính, Ngân Hàng & Đầu Tư',
+  'Truyền Thông, Media & Sự Kiện',
+  'Pháp Lý & Tư Vấn Doanh Nghiệp',
+  'Y Tế, Dược Phẩm & Sức Khỏe',
+  'Xây Dựng, Vật Liệu & Kiến Trúc',
+  'Giáo Dục & Đổi Mới Sáng Tạo',
+];
 
 export default function SettingsAndPrivacyPage() {
   const { state, updatePrivacy, updateIdentity, reissueCard, currentCard, currentIdentity, resetState } = useOneConnectStore();
@@ -63,9 +79,32 @@ export default function SettingsAndPrivacyPage() {
   const [confirmDeleteInput, setConfirmDeleteInput] = useState('');
   const [alertNotice, setAlertNotice] = useState<{ text: string; type: 'success' | 'error' | 'info' } | null>(null);
 
+  // Industry & Skills Customization State
+  const [settingsIndustry, setSettingsIndustry] = useState(
+    currentIdentity?.industry || currentIdentity?.businesses?.[0]?.industry || 'Công Nghệ Thông Tin & AI'
+  );
+  const [settingsSkills, setSettingsSkills] = useState<string[]>(
+    (currentIdentity?.expertiseSkills && currentIdentity.expertiseSkills.length > 0)
+      ? currentIdentity.expertiseSkills
+      : (currentIdentity?.businesses?.[0]?.expertiseSkills && currentIdentity.businesses[0].expertiseSkills.length > 0)
+      ? currentIdentity.businesses[0].expertiseSkills
+      : ['Hạ Tầng IoT & NFC', 'AI B2B Matchmaking', 'Next.js & Turbopack', 'Truyền Thông Số', 'Sự Kiện MICE']
+  );
+  const [newSkillTag, setNewSkillTag] = useState('');
+
   const showToast = (text: string, type: 'success' | 'error' | 'info' = 'success') => {
     setAlertNotice({ text, type });
     setTimeout(() => setAlertNotice(null), 4000);
+  };
+
+  // Save Industry & Skills Handler
+  const handleSaveIndustryAndSkills = () => {
+    if (!currentIdentity) return;
+    updateIdentity(currentIdentity.id, {
+      industry: settingsIndustry,
+      expertiseSkills: settingsSkills,
+    });
+    showToast('Đã lưu tùy chọn lĩnh vực chuyên môn & kỹ năng cốt lõi thành công! ✨', 'success');
   };
 
   // Upload Avatar Handler
@@ -272,13 +311,180 @@ export default function SettingsAndPrivacyPage() {
       </div>
 
       {/* ===================================================================== */}
-      {/* 2. KHỐI 2: BẬT / TẮT KHẢ NĂNG HIỂN THỊ CÔNG KHAI HỒ SƠ */}
+      {/* 2. KHỐI 2: TÙY CHỌN LĨNH VỰC CHUYÊN MÔN & NĂNG LỰC CỐT LÕI (AI MATCH) */}
       {/* ===================================================================== */}
       <div className="glass-panel p-6 sm:p-7 space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-4">
           <div>
             <h3 className="text-base font-extrabold text-slate-900 flex items-center gap-2 font-heading">
-              <Eye className="w-5 h-5 text-blue-600" /> 2. Khả Năng Hiển Thị Hồ Sơ & Quyền Riêng Tư
+              <Briefcase className="w-5 h-5 text-[#0066FF]" /> 2. Lĩnh Vực Chuyên Môn & Năng Lực Cốt Lõi
+            </h3>
+            <p className="text-xs text-slate-500 mt-0.5">
+              Cập nhật ngành nghề và các kỹ năng thế mạnh để thuật toán AI B2B Matchmaking tối ưu ghép cặp đối tác 1:1
+            </p>
+          </div>
+          <Button
+            onClick={handleSaveIndustryAndSkills}
+            size="sm"
+            className="bg-[#0066FF] hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-xs cursor-pointer"
+          >
+            <CheckCircle2 className="w-4 h-4 mr-1.5" /> Lưu Lĩnh Vực & Kỹ Năng
+          </Button>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 text-xs">
+          {/* CỘT 1: LĨNH VỰC HOẠT ĐỘNG CHỦ ĐẠO */}
+          <div className="p-4 rounded-2xl bg-blue-50/60 border border-blue-200/80 space-y-3.5">
+            <div className="flex items-center justify-between">
+              <div className="space-y-0.5">
+                <span className="font-bold text-slate-900 text-sm flex items-center gap-1.5 font-heading">
+                  🏢 Ngành Nghề / Lĩnh Vực Chính
+                </span>
+                <p className="text-slate-500 text-[11px]">
+                  Ngành hoạt động trọng tâm hiển thị trên thẻ số & kết nối B2B
+                </p>
+              </div>
+              <Badge className="bg-[#0066FF] text-white text-[10px] font-bold">
+                AI Match Ready
+              </Badge>
+            </div>
+
+            {/* Dropdown chọn nhanh */}
+            <div className="space-y-1">
+              <label className="text-[10.5px] font-bold text-slate-600 uppercase tracking-wider block">Chọn từ danh mục chuẩn:</label>
+              <select
+                value={PRESET_INDUSTRIES.includes(settingsIndustry) ? settingsIndustry : 'Khác (Tự nhập)'}
+                onChange={(e) => {
+                  if (e.target.value !== 'Khác (Tự nhập)') {
+                    setSettingsIndustry(e.target.value);
+                  }
+                }}
+                className="w-full px-3 py-2 rounded-xl border border-blue-300 text-xs font-bold text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-[#0066FF]"
+              >
+                {PRESET_INDUSTRIES.map((ind) => (
+                  <option key={ind} value={ind}>
+                    {ind}
+                  </option>
+                ))}
+                <option value="Khác (Tự nhập)">➕ Khác (Tự nhập lĩnh vực chuyên môn riêng...)</option>
+              </select>
+            </div>
+
+            {/* Input tùy biến tự do */}
+            <div className="space-y-1">
+              <label className="text-[10.5px] font-bold text-slate-600 uppercase tracking-wider block">Tên lĩnh vực hiển thị chi tiết:</label>
+              <input
+                value={settingsIndustry}
+                onChange={(e) => setSettingsIndustry(e.target.value)}
+                placeholder="Nhập tên lĩnh vực hoạt động..."
+                className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-semibold text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-[#0066FF]"
+              />
+            </div>
+
+            {/* Quick Pills */}
+            <div className="space-y-1.5 pt-1">
+              <span className="text-[10.5px] font-bold text-slate-500 uppercase tracking-wider block">Chọn nhanh 1-chạm:</span>
+              <div className="flex flex-wrap gap-1">
+                {PRESET_INDUSTRIES.slice(0, 6).map((ind) => (
+                  <button
+                    key={ind}
+                    type="button"
+                    onClick={() => setSettingsIndustry(ind)}
+                    className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold transition-all cursor-pointer ${
+                      settingsIndustry === ind
+                        ? 'bg-[#0066FF] text-white shadow-xs'
+                        : 'bg-white text-slate-700 border border-slate-200 hover:bg-blue-100/60'
+                    }`}
+                  >
+                    {ind}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* CỘT 2: KỸ NĂNG & THẾ MẠNH CỐT LÕI (TAGS) */}
+          <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3.5">
+            <div className="flex items-center justify-between">
+              <div className="space-y-0.5">
+                <span className="font-bold text-slate-900 text-sm flex items-center gap-1.5 font-heading">
+                  <Sparkles className="w-4 h-4 text-[#FF6B00]" /> Thẻ Kỹ Năng & Năng Lực (Skills Tags)
+                </span>
+                <p className="text-slate-500 text-[11px]">
+                  Từ khóa giúp đối tác tìm thấy bạn trên thanh tìm kiếm
+                </p>
+              </div>
+              <span className="text-xs font-bold text-slate-600 bg-slate-200/80 px-2 py-0.5 rounded-full">
+                {settingsSkills.length} thẻ
+              </span>
+            </div>
+
+            {/* Active Tags Pills */}
+            <div className="flex flex-wrap gap-1.5 min-h-[60px] p-2.5 bg-white rounded-xl border border-slate-200">
+              {settingsSkills.map((skill, idx) => (
+                <span
+                  key={idx}
+                  className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-blue-50 border border-blue-200 text-[#0066FF] text-[11.5px] font-bold"
+                >
+                  <span>{skill}</span>
+                  <button
+                    type="button"
+                    onClick={() => setSettingsSkills(settingsSkills.filter((_, i) => i !== idx))}
+                    className="w-4 h-4 rounded-full bg-blue-100 hover:bg-rose-500 hover:text-white flex items-center justify-center text-[10px] text-blue-600 transition-colors cursor-pointer"
+                    title="Xóa thẻ này"
+                  >
+                    ✕
+                  </button>
+                </span>
+              ))}
+              {settingsSkills.length === 0 && (
+                <span className="text-[11.5px] text-slate-400 italic py-2 px-1">Chưa có thẻ kỹ năng nào. Nhập bên dưới để thêm:</span>
+              )}
+            </div>
+
+            {/* Input Add Tag */}
+            <div className="flex gap-2">
+              <input
+                value={newSkillTag}
+                onChange={(e) => setNewSkillTag(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    if (newSkillTag.trim() && !settingsSkills.includes(newSkillTag.trim())) {
+                      setSettingsSkills([...settingsSkills, newSkillTag.trim()]);
+                      setNewSkillTag('');
+                    }
+                  }
+                }}
+                placeholder="VD: IoT & NFC, AI B2B, Quản Trị MICE, Marketing..."
+                className="flex-1 px-3 py-2 rounded-xl border border-slate-300 text-xs font-semibold text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-[#0066FF]"
+              />
+              <Button
+                type="button"
+                size="sm"
+                onClick={() => {
+                  if (newSkillTag.trim() && !settingsSkills.includes(newSkillTag.trim())) {
+                    setSettingsSkills([...settingsSkills, newSkillTag.trim()]);
+                    setNewSkillTag('');
+                  }
+                }}
+                className="bg-[#0066FF] hover:bg-blue-700 text-white font-bold text-xs rounded-xl px-4 cursor-pointer shadow-xs shrink-0"
+              >
+                + Thêm
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* ===================================================================== */}
+      {/* 3. KHỐI 3: BẬT / TẮT KHẢ NĂNG HIỂN THỊ CÔNG KHAI HỒ SƠ */}
+      {/* ===================================================================== */}
+      <div className="glass-panel p-6 sm:p-7 space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-4">
+          <div>
+            <h3 className="text-base font-extrabold text-slate-900 flex items-center gap-2 font-heading">
+              <Eye className="w-5 h-5 text-blue-600" /> 3. Khả Năng Hiển Thị Hồ Sơ & Quyền Riêng Tư
             </h3>
             <p className="text-xs text-slate-500 mt-0.5">
               Kiểm soát những ai có thể nhìn thấy hồ sơ và thông tin cá nhân của bạn khi quét mã QR hoặc chạm thẻ NFC

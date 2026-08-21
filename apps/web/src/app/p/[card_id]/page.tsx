@@ -98,6 +98,21 @@ interface ProductItem {
   description: string;
 }
 
+export const PRESET_INDUSTRIES = [
+  'Công Nghệ Thông Tin & AI',
+  'Du Lịch, Khách Sạn & MICE',
+  'Bất Động Sản & Nghỉ Dưỡng',
+  'Năng Lượng Tái Tạo & Môi Trường',
+  'Logistics, Cảng Biển & Vận Tải',
+  'Nông - Thủy Hải Sản & Chế Biến',
+  'Tài Chính, Ngân Hàng & Đầu Tư',
+  'Truyền Thông, Media & Sự Kiện',
+  'Pháp Lý & Tư Vấn Doanh Nghiệp',
+  'Y Tế, Dược Phẩm & Sức Khỏe',
+  'Xây Dựng, Vật Liệu & Kiến Trúc',
+  'Giáo Dục & Đổi Mới Sáng Tạo',
+];
+
 const PRODUCTS: ProductItem[] = [
   {
     id: 'p1',
@@ -237,6 +252,11 @@ function DigitalProfileContent() {
   const [editAddress, setEditAddress] = useState(matchedIdentity?.address || matchedIdentity?.businesses?.[0]?.address || 'Tầng 8, Tòa nhà ASIA, 25 Lê Lợi, TP. Nha Trang, Khánh Hòa');
   const [editAssociation, setEditAssociation] = useState(matchedIdentity?.association || matchedIdentity?.businesses?.[0]?.association || 'Hội Doanh Nhân Trẻ Khánh Hòa (YBA) • Ban Công Nghệ');
   const [editSlogan, setEditSlogan] = useState(matchedIdentity?.slogan || 'Bứt Phá Giao Thương - Chuyển Hóa Mối Quan Hệ Kinh Doanh Số');
+  const [editIndustry, setEditIndustry] = useState(matchedIdentity?.industry || matchedIdentity?.businesses?.[0]?.industry || 'Công Nghệ Thông Tin & AI');
+  const [editSkills, setEditSkills] = useState<string[]>(
+    matchedIdentity?.expertiseSkills || matchedIdentity?.businesses?.[0]?.expertiseSkills || ['Hạ Tầng IoT & NFC', 'AI B2B Matchmaking', 'Next.js & Turbopack', 'Truyền Thông Số', 'Sự Kiện MICE']
+  );
+  const [newSkillInput, setNewSkillInput] = useState('');
   const [editPhone, setEditPhone] = useState(matchedIdentity?.phone || '0794677369');
   const [editEmail, setEditEmail] = useState(matchedIdentity?.email || 'contact.johnnylongho@gmail.com');
   const [editBio, setEditBio] = useState(matchedIdentity?.bio || 'Chuyên gia triển khai giải pháp hạ tầng danh thiếp số NFC...');
@@ -258,6 +278,12 @@ function DigitalProfileContent() {
     address: matchedIdentity?.address || matchedIdentity?.businesses?.[0]?.address || 'Việt Nam',
     association: matchedIdentity?.association || matchedIdentity?.businesses?.[0]?.association || 'Hội Viên One Connect Network',
     slogan: matchedIdentity?.slogan || 'Bứt Phá Giao Thương - Chuyển Hóa Mối Quan Hệ Kinh Doanh Số',
+    industry: matchedIdentity?.industry || matchedIdentity?.businesses?.[0]?.industry || 'Công Nghệ Thông Tin & AI',
+    skills: (matchedIdentity?.expertiseSkills && matchedIdentity.expertiseSkills.length > 0)
+      ? matchedIdentity.expertiseSkills
+      : (matchedIdentity?.businesses?.[0]?.expertiseSkills && matchedIdentity.businesses[0].expertiseSkills.length > 0)
+      ? matchedIdentity.businesses[0].expertiseSkills
+      : ['Hạ Tầng IoT & NFC', 'AI B2B Matchmaking', 'Next.js & Turbopack', 'Truyền Thông Số', 'Sự Kiện MICE'],
     bio: matchedIdentity?.bio || `Đại diện ${matchedIdentity?.businesses?.[0]?.businessName || 'Doanh nghiệp'} - Thành viên Hệ sinh thái One Connect Network.`,
     phone: matchedIdentity?.phone || '',
     email: matchedIdentity?.email || '',
@@ -276,7 +302,6 @@ function DigitalProfileContent() {
     eventJoined: 'Diễn Đàn Kết Nối Doanh Nghiệp Quốc Gia 2026',
     ticketTier: 'VIP Executive Pass',
     seatLocation: 'Khu A - Bàn Đại Biểu VIP #01',
-    skills: ['NFC Infrastructure', 'Event Tech', 'B2B Matchmaking', 'Digital Identity', 'Automation n8n'],
     seekingNeeds: matchedIdentity?.seekingNeeds || [
       'Đối tác Chuỗi Khách sạn/Resort MICE',
       'Các Hiệp hội Doanh nghiệp Tỉnh/Thành',
@@ -352,6 +377,14 @@ function DigitalProfileContent() {
     setEditAddress(matchedIdentity?.address || matchedIdentity?.businesses?.[0]?.address || profile.address);
     setEditAssociation(matchedIdentity?.association || profile.association);
     setEditSlogan(matchedIdentity?.slogan || profile.slogan);
+    setEditIndustry(matchedIdentity?.industry || matchedIdentity?.businesses?.[0]?.industry || 'Công Nghệ Thông Tin & AI');
+    setEditSkills(
+      (matchedIdentity?.expertiseSkills && matchedIdentity.expertiseSkills.length > 0)
+        ? matchedIdentity.expertiseSkills
+        : (matchedIdentity?.businesses?.[0]?.expertiseSkills && matchedIdentity.businesses[0].expertiseSkills.length > 0)
+        ? matchedIdentity.businesses[0].expertiseSkills
+        : ['Hạ Tầng IoT & NFC', 'AI B2B Matchmaking', 'Next.js & Turbopack', 'Truyền Thông Số', 'Sự Kiện MICE']
+    );
     setEditPhone(matchedIdentity?.phone || profile.phone);
     setEditEmail(matchedIdentity?.email || profile.email);
     setEditBio(matchedIdentity?.bio || profile.bio);
@@ -379,6 +412,8 @@ function DigitalProfileContent() {
       address: editAddress,
       association: editAssociation,
       slogan: editSlogan,
+      industry: editIndustry,
+      expertiseSkills: editSkills,
       phone: editPhone,
       email: editEmail,
       bio: editBio,
@@ -400,7 +435,7 @@ function DigitalProfileContent() {
     setIsEditModalOpen(false);
     toast({
       title: 'ĐÃ CẬP NHẬT HỒ SƠ THÀNH CÔNG! ✨',
-      description: 'Dữ liệu hồ sơ số, ảnh đại diện, doanh nghiệp và MST đã được cập nhật.',
+      description: 'Lĩnh vực chuyên môn, kỹ năng, doanh nghiệp và MST đã được cập nhật đồng bộ.',
       variant: 'success',
     });
   };
@@ -859,6 +894,17 @@ END:VCARD`;
                     </div>
                   </div>
 
+                  <div className="flex items-start gap-2.5 p-2 rounded-xl bg-blue-50/70 border border-blue-200/80">
+                    <Briefcase className="w-4 h-4 text-[#0066FF] shrink-0 mt-0.5" />
+                    <div className="min-w-0 flex-1">
+                      <span className="text-blue-700 text-[10px] font-bold block uppercase">LĨNH VỰC CHUYÊN MÔN / NGÀNH NGHỀ</span>
+                      <strong className="text-blue-950 font-black text-[13px] block truncate">{profile.industry}</strong>
+                    </div>
+                    <Badge className="bg-[#0066FF] text-white text-[9.5px] shrink-0 font-bold">
+                      AI MATCH
+                    </Badge>
+                  </div>
+
                   <div className="flex items-start gap-2.5 p-2 rounded-xl bg-slate-50 border border-slate-100">
                     <Hash className="w-4 h-4 text-slate-400 shrink-0 mt-0.5" />
                     <div className="min-w-0 flex-1">
@@ -1299,7 +1345,7 @@ END:VCARD`;
 
             <div className="p-3.5 space-y-3">
               <img
-                src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${typeof window !== 'undefined' ? window.location.href : 'https://one-connect-network.vercel.app/p/johnnylongho'}`}
+                src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${mounted && typeof window !== 'undefined' ? encodeURIComponent(window.location.href) : 'https%3A%2F%2Fone-connect-network.vercel.app%2Fp%2Fjohnnylongho'}`}
                 alt="Profile Link QR"
                 className="w-36 h-36 rounded-2xl border border-slate-200 p-2 bg-white mx-auto shadow-sm"
               />
@@ -1543,6 +1589,136 @@ END:VCARD`;
                     placeholder="VD: Bứt Phá Giao Thương - Chuyển Hóa Mối Quan Hệ Kinh Doanh Số"
                     className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-semibold text-slate-900 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0066FF]/20 focus:border-[#0066FF]"
                   />
+                </div>
+
+                {/* ========================================================= */}
+                {/* TÙY CHỈNH LĨNH VỰC CHUYÊN MÔN / NGÀNH NGHỀ HOẠT ĐỘNG */}
+                {/* ========================================================= */}
+                <div className="p-3.5 rounded-2xl bg-blue-50/70 border border-blue-200 text-left space-y-2.5">
+                  <div className="flex items-center justify-between">
+                    <label className="text-[11.5px] font-black text-blue-950 uppercase tracking-wider flex items-center gap-1.5 font-heading">
+                      <Briefcase className="w-4 h-4 text-[#0066FF]" /> Lĩnh Vực Chuyên Môn / Ngành Nghề <span className="text-red-500">*</span>
+                    </label>
+                    <span className="text-[10px] text-blue-700 font-bold bg-blue-100/90 border border-blue-200 px-2 py-0.5 rounded-full">
+                      AI Matching
+                    </span>
+                  </div>
+
+                  {/* Dropdown danh mục ngành nghề có sẵn */}
+                  <select
+                    value={PRESET_INDUSTRIES.includes(editIndustry) ? editIndustry : 'Khác (Tự nhập)'}
+                    onChange={(e) => {
+                      if (e.target.value !== 'Khác (Tự nhập)') {
+                        setEditIndustry(e.target.value);
+                      }
+                    }}
+                    className="w-full px-3 py-2 rounded-xl border border-blue-300 text-xs font-bold text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-[#0066FF]"
+                  >
+                    {PRESET_INDUSTRIES.map((ind) => (
+                      <option key={ind} value={ind}>
+                        {ind}
+                      </option>
+                    ))}
+                    <option value="Khác (Tự nhập)">➕ Khác (Tự nhập lĩnh vực riêng...)</option>
+                  </select>
+
+                  {/* Ô nhập tùy chỉnh linh hoạt */}
+                  <input
+                    value={editIndustry}
+                    onChange={(e) => setEditIndustry(e.target.value)}
+                    placeholder="Nhập tên lĩnh vực chuyên môn cụ thể..."
+                    className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-semibold text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-[#0066FF]"
+                  />
+
+                  {/* Nút bấm nhanh 1-chạm (Quick Industry Pills) */}
+                  <div className="space-y-1">
+                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Gợi ý chọn nhanh:</span>
+                    <div className="flex flex-wrap gap-1">
+                      {PRESET_INDUSTRIES.slice(0, 6).map((ind) => (
+                        <button
+                          key={ind}
+                          type="button"
+                          onClick={() => setEditIndustry(ind)}
+                          className={`px-2 py-1 rounded-lg text-[10.5px] font-semibold transition-all cursor-pointer ${
+                            editIndustry === ind
+                              ? 'bg-[#0066FF] text-white shadow-2xs'
+                              : 'bg-white text-slate-700 border border-slate-200 hover:bg-blue-100/60'
+                          }`}
+                        >
+                          {ind}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* ========================================================= */}
+                {/* TÙY CHỈNH KỸ NĂNG & THẾ MẠNH CHUYÊN SÂU (TAGS) */}
+                {/* ========================================================= */}
+                <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-left space-y-2.5">
+                  <div className="flex items-center justify-between">
+                    <label className="text-[11.5px] font-black text-slate-900 uppercase tracking-wider flex items-center gap-1.5 font-heading">
+                      <Sparkles className="w-4 h-4 text-[#FF6B00]" /> Kỹ Năng & Năng Lực Cốt Lõi (Tags)
+                    </label>
+                    <span className="text-[10px] text-slate-500 font-bold">
+                      {editSkills.length} thẻ
+                    </span>
+                  </div>
+
+                  {/* Danh sách Tags hiện có với nút xóa */}
+                  <div className="flex flex-wrap gap-1.5 min-h-[36px] p-2 bg-white rounded-xl border border-slate-200">
+                    {editSkills.map((skill, idx) => (
+                      <span
+                        key={idx}
+                        className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-blue-50 border border-blue-200 text-[#0066FF] text-[11px] font-bold animate-in fade-in"
+                      >
+                        <span>{skill}</span>
+                        <button
+                          type="button"
+                          onClick={() => setEditSkills(editSkills.filter((_, i) => i !== idx))}
+                          className="w-4 h-4 rounded-full bg-blue-100 hover:bg-red-500 hover:text-white flex items-center justify-center text-[10px] text-blue-600 transition-colors cursor-pointer"
+                          title="Xóa kỹ năng này"
+                        >
+                          ✕
+                        </button>
+                      </span>
+                    ))}
+                    {editSkills.length === 0 && (
+                      <span className="text-[11.5px] text-slate-400 italic py-1 px-1">Chưa có thẻ kỹ năng nào. Hãy thêm bên dưới:</span>
+                    )}
+                  </div>
+
+                  {/* Ô nhập thêm tag kỹ năng mới */}
+                  <div className="flex gap-1.5">
+                    <input
+                      value={newSkillInput}
+                      onChange={(e) => setNewSkillInput(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault();
+                          if (newSkillInput.trim() && !editSkills.includes(newSkillInput.trim())) {
+                            setEditSkills([...editSkills, newSkillInput.trim()]);
+                            setNewSkillInput('');
+                          }
+                        }
+                      }}
+                      placeholder="VD: IoT & NFC, AI B2B, Next.js, Marketing B2B..."
+                      className="flex-1 px-3 py-2 rounded-xl border border-slate-300 text-xs font-semibold text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-[#0066FF]"
+                    />
+                    <Button
+                      type="button"
+                      size="sm"
+                      onClick={() => {
+                        if (newSkillInput.trim() && !editSkills.includes(newSkillInput.trim())) {
+                          setEditSkills([...editSkills, newSkillInput.trim()]);
+                          setNewSkillInput('');
+                        }
+                      }}
+                      className="bg-[#0066FF] hover:bg-blue-700 text-white font-bold text-xs rounded-xl px-3.5 cursor-pointer shadow-xs shrink-0"
+                    >
+                      + Thêm Tag
+                    </Button>
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-2.5">

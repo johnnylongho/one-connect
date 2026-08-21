@@ -595,6 +595,8 @@ export function useOneConnectStore() {
     address?: string;
     association?: string;
     slogan?: string;
+    industry?: string;
+    expertiseSkills?: string[];
   }) => {
     setState(prev => ({
       ...prev,
@@ -612,6 +614,8 @@ export function useOneConnectStore() {
               address: updates.address !== undefined ? updates.address : b.address,
               association: updates.association !== undefined ? updates.association : b.association,
               slogan: updates.slogan !== undefined ? updates.slogan : b.slogan,
+              industry: updates.industry !== undefined ? updates.industry : b.industry,
+              expertiseSkills: updates.expertiseSkills !== undefined ? updates.expertiseSkills : b.expertiseSkills,
             } : b)
           : updates.businessName ? [{
               id: `pbiz-${Date.now()}`,
@@ -623,6 +627,8 @@ export function useOneConnectStore() {
               address: updates.address,
               association: updates.association,
               slogan: updates.slogan,
+              industry: updates.industry,
+              expertiseSkills: updates.expertiseSkills,
               relationType: 'FOUNDER_OWNER',
               isPrimary: true,
               status: 'ACTIVE' as const
@@ -652,6 +658,8 @@ export function useOneConnectStore() {
           address: updates.address !== undefined ? updates.address : item.address,
           association: updates.association !== undefined ? updates.association : item.association,
           slogan: updates.slogan !== undefined ? updates.slogan : item.slogan,
+          industry: updates.industry !== undefined ? updates.industry : item.industry,
+          expertiseSkills: updates.expertiseSkills !== undefined ? updates.expertiseSkills : item.expertiseSkills,
           businesses: updatedBusinesses,
           socialLinks: updatedSocialLinks.length > 0 ? updatedSocialLinks : item.socialLinks,
           updatedAt: new Date().toISOString()

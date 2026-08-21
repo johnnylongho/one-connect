@@ -35,6 +35,8 @@ export interface PersonBusiness {
   address?: string;
   association?: string;
   slogan?: string;
+  industry?: string;
+  expertiseSkills?: string[];
   relationType: string;
   isPrimary: boolean;
   status: PersonBusinessStatus;
@@ -59,6 +61,8 @@ export interface PersonIdentity {
   address?: string;
   association?: string;
   slogan?: string;
+  industry?: string; // Lĩnh vực chuyên môn / Ngành nghề hoạt động
+  expertiseSkills?: string[]; // Kỹ năng / Lĩnh vực chuyên sâu (Tags)
   seekingNeeds?: string[]; // Nhu cầu tìm kiếm / Cần hợp tác (Seeking)
   offeringServices?: string[]; // Năng lực cung cấp / Giải pháp (Offering)
   brochureUrl?: string; // Tài liệu Catalogue / Profile công ty (PDF/Link)
