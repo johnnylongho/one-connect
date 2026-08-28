@@ -71,7 +71,7 @@ export default function SimulationAndDemoHub() {
   const [mounted, setMounted] = React.useState(false);
   const [selectedIdentity, setSelectedIdentity] = useState<PersonIdentity>(defaultIdentity);
   const [selectedCard, setSelectedCard] = useState<AccessCard>(defaultCard);
-  const [activeTab, setActiveTab] = useState<'NFC' | 'CHECKIN' | 'CONSENT' | 'MATCH' | 'STRESS'>('CONSENT');
+  const [activeTab, setActiveTab] = useState<'NFC' | 'CHECKIN' | 'CONSENT' | 'ZALO' | 'MATCH' | 'STRESS'>('ZALO');
   const [isProcessing, setIsProcessing] = useState(false);
   const [measuredLatency, setMeasuredLatency] = useState<number | null>(null);
   const [stressCount, setStressCount] = useState(0);
@@ -79,6 +79,96 @@ export default function SimulationAndDemoHub() {
   // 2-Way Consent Simulation State
   const [consentStep, setConsentStep] = useState<'INITIAL' | 'REQUEST_SENT' | 'MUTUAL_ACCEPTED'>('INITIAL');
   const [consentAuditRecord, setConsentAuditRecord] = useState<any>(null);
+
+  // Zalo ZNS Simulator State
+  const [znsTemplate, setZnsTemplate] = useState<'CHECKIN' | 'CONSENT' | 'FOLLOWUP'>('CHECKIN');
+  const [znsPhone, setZnsPhone] = useState('0794677369');
+  const [znsName, setZnsName] = useState('HỒ HOÀNG LONG');
+  const [znsTable, setZnsTable] = useState('BÀN VIP A1');
+  const [znsEvent, setZnsEvent] = useState('TECHFEST MICE KHÁNH HÒA 2026');
+  const [znsSentHistory, setZnsSentHistory] = useState<any[]>([]);
+
+  // Send Zalo ZNS Handler
+  const handleSendZnsSimulation = async () => {
+    setIsProcessing(true);
+    const startTime = performance.now();
+
+    try {
+      let action = 'CHECKIN_ALERT';
+      let payload: any = {
+        fullName: znsName,
+        phone: znsPhone,
+        eventName: znsEvent,
+        tableNumber: znsTable,
+      };
+
+      if (znsTemplate === 'CONSENT') {
+        action = 'CONSENT_REQUEST';
+        payload = {
+          recipientPhone: znsPhone,
+          recipientName: znsName,
+          senderName: 'Trần Minh Đức',
+          senderTitle: 'Chủ tịch HĐQT',
+          senderCompany: 'TechCorp Vietnam',
+          consentLink: 'https://one-connect-network.vercel.app/dashboard',
+        };
+      } else if (znsTemplate === 'FOLLOWUP') {
+        action = 'FOLLOWUP_REMINDER';
+        payload = {
+          userPhone: znsPhone,
+          userName: znsName,
+          partnerName: 'Trần Minh Đức',
+          partnerCompany: 'TechCorp Vietnam',
+          actionNote: 'Gửi báo giá 500 thẻ NFC và hợp đồng MICE',
+          scheduledTime: '09:00 Sáng Mai',
+        };
+      }
+
+      const res = await fetch('/api/zalo/zns', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action, payload }),
+      });
+
+      const data = await res.json();
+      const endTime = performance.now();
+      const lat = Math.round(endTime - startTime);
+      setMeasuredLatency(lat);
+
+      const newRecord = {
+        id: `zns_${Date.now()}`,
+        template: znsTemplate,
+        phone: znsPhone,
+        name: znsName,
+        table: znsTable,
+        time: new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+        simulated: data.simulated || false,
+      };
+
+      setZnsSentHistory((prev) => [newRecord, ...prev]);
+
+      addLog(
+        'ZALO_ZNS_DISPATCHED',
+        `${znsName} (${znsPhone})`,
+        `Đã bắn tin ZNS mẫu [${znsTemplate}] • Phản hồi trong ${lat}ms`,
+        'Zalo OpenAPI Gateway ghi nhận thông báo chuyển phát thành công'
+      );
+
+      toast({
+        title: 'ĐÃ BẮN TIN NHẮN ZALO ZNS THÀNH CÔNG!',
+        description: `Thông báo đã được chuyển tới số ${znsPhone} qua Zalo Gateway (${lat}ms).`,
+        variant: 'success',
+      });
+    } catch (e: any) {
+      toast({
+        title: 'LỖI GỬI ZNS',
+        description: e.message,
+        variant: 'destructive',
+      });
+    } finally {
+      setIsProcessing(false);
+    }
+  };
 
   // Send Consent Request Handler (Delegate A -> B)
   const handleSendConsentRequest = async () => {
@@ -445,8 +535,8 @@ export default function SimulationAndDemoHub() {
             </CardHeader>
 
             <CardContent className="p-4 space-y-4">
-              {/* Scenario Tabs (5 Options) */}
-              <div className="grid grid-cols-2 sm:grid-cols-5 gap-1.5 p-1 bg-slate-100 rounded-xl text-center text-xs font-semibold">
+              {/* Scenario Tabs (6 Options) */}
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-1.5 p-1 bg-slate-100 rounded-xl text-center text-xs font-semibold">
                 <button
                   onClick={() => setActiveTab('NFC')}
                   className={`py-2 rounded-lg transition-all cursor-pointer ${
@@ -464,12 +554,20 @@ export default function SimulationAndDemoHub() {
                   2. Check-in
                 </button>
                 <button
+                  onClick={() => setActiveTab('ZALO')}
+                  className={`py-2 rounded-lg transition-all cursor-pointer ${
+                    activeTab === 'ZALO' ? 'bg-white text-[#0066FF] shadow-sm font-bold' : 'text-slate-600 hover:text-slate-900'
+                  }`}
+                >
+                  3. Zalo ZNS
+                </button>
+                <button
                   onClick={() => setActiveTab('CONSENT')}
                   className={`py-2 rounded-lg transition-all cursor-pointer ${
                     activeTab === 'CONSENT' ? 'bg-white text-emerald-600 shadow-sm font-bold' : 'text-slate-600 hover:text-slate-900'
                   }`}
                 >
-                  3. 2-Way Consent
+                  4. 2-Way Consent
                 </button>
                 <button
                   onClick={() => setActiveTab('MATCH')}
@@ -477,7 +575,7 @@ export default function SimulationAndDemoHub() {
                     activeTab === 'MATCH' ? 'bg-white text-[#FF6B00] shadow-sm font-bold' : 'text-slate-600 hover:text-slate-900'
                   }`}
                 >
-                  4. Ghép B2B
+                  5. Ghép B2B
                 </button>
                 <button
                   onClick={() => setActiveTab('STRESS')}
@@ -485,12 +583,90 @@ export default function SimulationAndDemoHub() {
                     activeTab === 'STRESS' ? 'bg-white text-purple-600 shadow-sm font-bold' : 'text-slate-600 hover:text-slate-900'
                   }`}
                 >
-                  5. Tải 50x
+                  6. Tải 50x
                 </button>
               </div>
 
-              {/* Delegate Selector Bar (when not in consent) */}
-              {activeTab !== 'CONSENT' ? (
+              {/* Selector Bar / Form depending on active Tab */}
+              {activeTab === 'ZALO' ? (
+                <div className="space-y-3 p-3.5 rounded-2xl bg-blue-50/70 border border-blue-200/80 text-xs">
+                  <div className="flex items-center justify-between font-bold text-blue-900">
+                    <span className="flex items-center gap-1.5">
+                      <Smartphone className="w-4 h-4 text-[#0066FF]" /> Zalo Notification Service (ZNS) Simulator
+                    </span>
+                    <Badge className="bg-blue-600 text-white text-[9px]">API Live (200 OK)</Badge>
+                  </div>
+
+                  <div className="space-y-2 text-[11.5px]">
+                    <div>
+                      <label className="text-[10px] font-bold text-slate-500 uppercase block mb-1">Mẫu Tin Nhắn ZNS Đăng Ký:</label>
+                      <div className="grid grid-cols-3 gap-1">
+                        <button
+                          type="button"
+                          onClick={() => setZnsTemplate('CHECKIN')}
+                          className={`p-1.5 rounded-lg border text-center font-bold text-[10px] cursor-pointer ${
+                            znsTemplate === 'CHECKIN' ? 'bg-[#0066FF] text-white border-blue-600' : 'bg-white text-slate-700 border-slate-200'
+                          }`}
+                        >
+                          Báo Bàn Tiệc VIP
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setZnsTemplate('CONSENT')}
+                          className={`p-1.5 rounded-lg border text-center font-bold text-[10px] cursor-pointer ${
+                            znsTemplate === 'CONSENT' ? 'bg-[#0066FF] text-white border-blue-600' : 'bg-white text-slate-700 border-slate-200'
+                          }`}
+                        >
+                          Mutual Consent
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setZnsTemplate('FOLLOWUP')}
+                          className={`p-1.5 rounded-lg border text-center font-bold text-[10px] cursor-pointer ${
+                            znsTemplate === 'FOLLOWUP' ? 'bg-[#0066FF] text-white border-blue-600' : 'bg-white text-slate-700 border-slate-200'
+                          }`}
+                        >
+                          Nhắc Lịch Follow-up
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2">
+                      <div>
+                        <label className="text-[10px] font-bold text-slate-500 uppercase block mb-1">Số Điện Thoại Zalo:</label>
+                        <input
+                          type="text"
+                          value={znsPhone}
+                          onChange={(e) => setZnsPhone(e.target.value)}
+                          className="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs text-slate-900 font-mono font-bold"
+                          placeholder="0794677369"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-[10px] font-bold text-slate-500 uppercase block mb-1">Họ Tên Đại Biểu:</label>
+                        <input
+                          type="text"
+                          value={znsName}
+                          onChange={(e) => setZnsName(e.target.value)}
+                          className="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs text-slate-900 font-bold"
+                        />
+                      </div>
+                    </div>
+
+                    {znsTemplate === 'CHECKIN' && (
+                      <div>
+                        <label className="text-[10px] font-bold text-slate-500 uppercase block mb-1">Số Bàn Tiệc Được Chỉ Định:</label>
+                        <input
+                          type="text"
+                          value={znsTable}
+                          onChange={(e) => setZnsTable(e.target.value)}
+                          className="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs text-emerald-700 font-bold"
+                        />
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ) : activeTab !== 'CONSENT' ? (
                 <div className="space-y-2">
                   <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">
                     Chọn Đại Biểu Doanh Nhân Trình Diễn:
@@ -547,6 +723,16 @@ export default function SimulationAndDemoHub() {
 
               {/* Scenario Trigger Buttons */}
               <div className="pt-2 border-t border-slate-100 space-y-2">
+                {activeTab === 'ZALO' && (
+                  <Button
+                    onClick={handleSendZnsSimulation}
+                    disabled={isProcessing}
+                    className="w-full bg-gradient-to-r from-[#0066FF] to-[#0088FF] hover:from-blue-700 hover:to-blue-600 text-white font-bold py-5 rounded-xl shadow-md shadow-blue-500/25 cursor-pointer"
+                  >
+                    <Smartphone className="w-4 h-4 mr-2" /> {isProcessing ? 'Đang gửi qua Zalo Gateway...' : `Bắn Tin Nhắn Zalo ZNS (${znsPhone})`}
+                  </Button>
+                )}
+
                 {activeTab === 'NFC' && (
                   <Button
                     onClick={() => handleSimulateNfcTap(selectedIdentity)}
@@ -630,9 +816,90 @@ export default function SimulationAndDemoHub() {
           </Card>
         </div>
 
-        {/* PANEL 2: LIVE SIMULATION VIEWPORT (CONSENT OR NFC CARD) */}
+        {/* PANEL 2: LIVE SIMULATION VIEWPORT (ZALO, CONSENT OR NFC CARD) */}
         <div className="lg:col-span-4 flex justify-center">
-          {activeTab === 'CONSENT' ? (
+          {activeTab === 'ZALO' ? (
+            <div className="w-full max-w-[340px] rounded-[36px] bg-slate-900 border-4 border-slate-700 shadow-2xl overflow-hidden relative p-3 flex flex-col justify-between">
+              {/* Dynamic Island / Notch */}
+              <div className="w-24 h-4 bg-slate-800 rounded-full mx-auto mb-2 flex items-center justify-center">
+                <div className="w-2 h-2 rounded-full bg-blue-400 animate-pulse" />
+              </div>
+
+              {/* Zalo Mock Screen */}
+              <div className="bg-[#EBF2F7] rounded-[24px] p-3.5 flex-1 border border-slate-200 space-y-3 overflow-y-auto text-slate-900">
+                {/* Zalo Header */}
+                <div className="flex items-center justify-between border-b border-slate-200/80 pb-2 bg-white -mx-3.5 -mt-3.5 p-3 rounded-t-[24px]">
+                  <div className="flex items-center gap-2">
+                    <div className="w-7 h-7 rounded-full bg-[#0068FF] text-white flex items-center justify-center font-bold text-xs shadow-xs">
+                      Z
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-xs text-slate-900 flex items-center gap-1">
+                        ONE CONNECT B2B <span className="text-[10px] text-blue-600 font-bold">✓</span>
+                      </h4>
+                      <p className="text-[9px] text-slate-400">Zalo Official Account</p>
+                    </div>
+                  </div>
+                  <Badge className="bg-emerald-50 text-emerald-700 border-emerald-200 text-[8.5px]">Tích Vàng</Badge>
+                </div>
+
+                {/* ZNS Message Bubble */}
+                <div className="p-3.5 rounded-2xl bg-white border border-blue-100 shadow-xs space-y-2.5">
+                  <div className="flex items-center justify-between text-[10px] text-slate-400 border-b border-slate-100 pb-1.5 font-sans">
+                    <span className="font-bold text-blue-600">THÔNG BÁO ZNS</span>
+                    <span>{new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}</span>
+                  </div>
+
+                  {znsTemplate === 'CHECKIN' && (
+                    <div className="space-y-2 text-xs">
+                      <p className="font-bold text-slate-900">Xác Nhận Check-in Sự Kiện Thành Công!</p>
+                      <div className="p-2.5 rounded-xl bg-blue-50/80 border border-blue-100 space-y-1 text-[11px]">
+                        <div className="flex justify-between"><span className="text-slate-500">Đại biểu:</span> <span className="font-bold text-slate-800">{znsName}</span></div>
+                        <div className="flex justify-between"><span className="text-slate-500">Sự kiện:</span> <span className="font-bold text-blue-700">{znsEvent}</span></div>
+                        <div className="flex justify-between"><span className="text-slate-500">Vị trí bàn tiệc:</span> <span className="font-extrabold text-emerald-600 text-sm">{znsTable}</span></div>
+                      </div>
+                      <p className="text-[10.5px] text-slate-500 italic">Vui lòng di chuyển đến vị trí bàn tiệc chỉ định. Chúc Quý khách có phiên giao thương hiệu quả.</p>
+                      <Button size="sm" className="w-full bg-[#0068FF] hover:bg-blue-700 text-white text-[11px] font-bold h-8 rounded-lg mt-1 shadow-sm">
+                        Mở Menu & Danh Bạ Bàn Tiệc (Zalo Mini App)
+                      </Button>
+                    </div>
+                  )}
+
+                  {znsTemplate === 'CONSENT' && (
+                    <div className="space-y-2 text-xs">
+                      <p className="font-bold text-slate-900">Yêu Cầu Kết Nối Giao Thương B2B</p>
+                      <div className="p-2.5 rounded-xl bg-blue-50/80 border border-blue-100 space-y-1 text-[11px]">
+                        <div className="flex justify-between"><span className="text-slate-500">Người gửi:</span> <span className="font-bold text-slate-800">Trần Minh Đức</span></div>
+                        <div className="flex justify-between"><span className="text-slate-500">Chức vụ:</span> <span className="font-semibold text-slate-700">Chủ Tịch HĐQT TechCorp</span></div>
+                        <div className="flex justify-between"><span className="text-slate-500">Bảo mật:</span> <span className="font-bold text-emerald-600">Luật PDPL 91/2025</span></div>
+                      </div>
+                      <p className="text-[10.5px] text-slate-500 italic">Đối tác muốn trao đổi danh bạ và kết nối hợp tác kinh doanh.</p>
+                      <Button size="sm" className="w-full bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold h-8 rounded-lg mt-1 shadow-sm">
+                        Chấp Nhận Kết Nối 2 Chiều
+                      </Button>
+                    </div>
+                  )}
+
+                  {znsTemplate === 'FOLLOWUP' && (
+                    <div className="space-y-2 text-xs">
+                      <p className="font-bold text-slate-900">Nhắc Lịch Chăm Sóc Đối Tác B2B</p>
+                      <div className="p-2.5 rounded-xl bg-orange-50/80 border border-orange-100 space-y-1 text-[11px]">
+                        <div className="flex justify-between"><span className="text-slate-500">Đối tác:</span> <span className="font-bold text-slate-800">Trần Minh Đức (TechCorp)</span></div>
+                        <div className="flex justify-between"><span className="text-slate-500">Hành động:</span> <span className="font-semibold text-orange-800">Gửi báo giá 500 thẻ NFC</span></div>
+                        <div className="flex justify-between"><span className="text-slate-500">Thời gian:</span> <span className="font-bold text-blue-700">09:00 Sáng Mai</span></div>
+                      </div>
+                      <Button size="sm" className="w-full bg-[#0068FF] hover:bg-blue-700 text-white text-[11px] font-bold h-8 rounded-lg mt-1 shadow-sm">
+                        Mở Sổ Tay CRM One Connect
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Bottom Home Indicator */}
+              <div className="w-24 h-1 bg-slate-600 rounded-full mx-auto mt-2" />
+            </div>
+          ) : activeTab === 'CONSENT' ? (
             <div className="w-full max-w-[340px] rounded-[36px] bg-slate-900 border-4 border-slate-700 shadow-2xl overflow-hidden relative p-3 flex flex-col justify-between">
               {/* Top Dynamic Island */}
               <div className="w-24 h-4 bg-slate-800 rounded-full mx-auto mb-2 flex items-center justify-center">
