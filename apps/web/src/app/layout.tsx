@@ -326,7 +326,17 @@ export default function RootLayout({
             {/* Left: Independent Logo + Search */}
             <div className="flex items-center gap-3">
               {/* Brand Logo - Fixed & Outside sidebar */}
-              <Logo href="/dashboard" size="md" />
+              <Link
+                href="/dashboard"
+                className="flex items-center gap-2 pr-1 group shrink-0"
+                title="One Connect Network"
+              >
+                <img
+                  src="/one_connect_final_logo_orange.png"
+                  alt="One Connect"
+                  className="h-7 sm:h-8 w-auto object-contain shrink-0 group-hover:scale-105 transition-transform"
+                />
+              </Link>
 
               <div className="h-5 w-px bg-slate-200 hidden md:block" />
 
