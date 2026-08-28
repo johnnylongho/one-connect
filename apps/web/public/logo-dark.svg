@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 80" fill="none">
+  <defs>
+    <linearGradient id="ocGradDark" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0066FF" />
+      <stop offset="50%" stop-color="#00C2FF" />
+      <stop offset="100%" stop-color="#38BDF8" />
+    </linearGradient>
+    <linearGradient id="goldGradDark" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F59E0B" />
+      <stop offset="100%" stop-color="#FBBF24" />
+    </linearGradient>
+  </defs>
+
+  <!-- ICON EMBLEM -->
+  <g transform="translate(10, 10)">
+    <rect x="0" y="0" width="60" height="60" rx="16" fill="url(#ocGradDark)" />
+    <rect x="3" y="3" width="54" height="54" rx="13" fill="#0A1128" />
+
+    <path d="M26 18 L33 14 L33 46 L25 46" fill="url(#ocGradDark)" />
+    
+    <path d="M37 22 A 10 10 0 0 1 37 38" stroke="url(#goldGradDark)" stroke-width="3" stroke-linecap="round" fill="none" />
+    <path d="M42 17 A 17 17 0 0 1 42 43" stroke="#38BDF8" stroke-width="3" stroke-linecap="round" fill="none" opacity="0.9" />
+    <path d="M47 12 A 24 24 0 0 1 47 48" stroke="#0066FF" stroke-width="2.5" stroke-linecap="round" fill="none" opacity="0.6" />
+
+    <circle cx="21" cy="44" r="3" fill="#FBBF24" />
+    <circle cx="39" cy="44" r="3" fill="#00C2FF" />
+    <line x1="21" y1="44" x2="39" y2="44" stroke="#00C2FF" stroke-width="2" stroke-dasharray="2 2" />
+  </g>
+
+  <!-- BRAND TYPOGRAPHY (LIGHT FOR DARK BACKGROUND) -->
+  <g transform="translate(82, 16)">
+    <text x="0" y="27" font-family="'Outfit', 'Plus Jakarta Sans', sans-serif" font-size="25" font-weight="900" letter-spacing="0.5" fill="#FFFFFF">
+      ONE <tspan fill="#00C2FF">CONNECT</tspan>
+    </text>
+    
+    <text x="1" y="44" font-family="'Plus Jakarta Sans', sans-serif" font-size="8.5" font-weight="800" letter-spacing="1.5" fill="#94A3B8">
+      BUSINESS RELATIONSHIP NETWORK
+    </text>
+
+    <rect x="202" y="14" width="30" height="14" rx="4" fill="#00C2FF" fill-opacity="0.2" />
+    <text x="208" y="24" font-family="'Plus Jakarta Sans', sans-serif" font-size="7.5" font-weight="800" fill="#00C2FF">
+      B2B
+    </text>
+  </g>
+</svg>

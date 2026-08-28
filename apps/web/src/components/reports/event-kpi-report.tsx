@@ -40,7 +40,7 @@ export function EventKpiReportView() {
   // Check-in Time Hourly Distribution
   const hourlyCheckins = [
     { time: '07:30 - 08:30', count: 45, percentage: 12, label: 'Đón khách sớm' },
-    { time: '08:30 - 09:30', count: 210, percentage: 55, label: 'Cao điểm Khai mạc (Peak 🔥)' },
+    { time: '08:30 - 09:30', count: 210, percentage: 55, label: 'Cao điểm Khai mạc (Peak)' },
     { time: '09:30 - 10:30', count: 85, percentage: 22, label: 'Phiên Giao thương & Tham luận' },
     { time: '10:30 - 11:30', count: 45, percentage: 11, label: 'B2B Matchmaking Session 1' },
   ];
@@ -94,7 +94,7 @@ export function EventKpiReportView() {
     } finally {
       setIsExporting(false);
       toast({
-        title: 'XUẤT BÁO CÁO CSV THÀNH CÔNG! 📊',
+        title: 'XUẤT BÁO CÁO CSV THÀNH CÔNG!',
         description: 'Tải xuống hoàn tất file danh sách check-in tuân thủ mã hóa mã vé & PDPL.',
         variant: 'success',
       });

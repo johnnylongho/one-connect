@@ -98,7 +98,7 @@ export default function SimulationAndDemoHub() {
     );
 
     toast({
-      title: 'ĐÃ GỬI YÊU CẦU CONSENT B2B! 🤝',
+      title: 'ĐÃ GỬI YÊU CẦU CONSENT B2B!',
       description: 'Lời mời kết nối và đề nghị cấp quyền số đã được gửi tới đối tác.',
       variant: 'success',
     });
@@ -135,7 +135,7 @@ export default function SimulationAndDemoHub() {
     );
 
     toast({
-      title: 'MUTUAL CONSENT XÁC LẬP THÀNH CÔNG! 🛡️',
+      title: 'MUTUAL CONSENT XÁC LẬP THÀNH CÔNG!',
       description: 'Số điện thoại 2 chiều đã mở khóa và cấp Chứng chỉ kiểm toán số.',
       variant: 'success',
     });
@@ -219,7 +219,7 @@ export default function SimulationAndDemoHub() {
     );
 
     toast({
-      title: `CHẠM THẺ NFC THÀNH CÔNG: ${card.cardUid} ⚡`,
+      title: `CHẠM THẺ NFC THÀNH CÔNG: ${card.cardUid}`,
       description: `Đã tải hồ sơ [${iden.fullName}] trong ${lat}ms (SLA < 500ms đạt chuẩn).`,
       variant: 'success',
     });
@@ -276,7 +276,7 @@ export default function SimulationAndDemoHub() {
     );
 
     toast({
-      title: 'ĐIỂM DANH CHECK-IN THÀNH CÔNG! 🎟️',
+      title: 'ĐIỂM DANH CHECK-IN THÀNH CÔNG!',
       description: `Đại biểu ${iden.fullName} đã qua cổng. Webhook đã bắn sang n8n.`,
       variant: 'success',
     });
@@ -316,7 +316,7 @@ export default function SimulationAndDemoHub() {
     );
 
     toast({
-      title: 'KẾT NỐI B2B THÀNH CÔNG! 🤝',
+      title: 'KẾT NỐI B2B THÀNH CÔNG!',
       description: `Consent đã xác lập giữa ${selectedIdentity.fullName} và ${partner.fullName}.`,
       variant: 'success',
     });
@@ -342,7 +342,7 @@ export default function SimulationAndDemoHub() {
     );
 
     toast({
-      title: 'HOÀN TẤT KIỂM THỬ TẢI 50 LƯỢT QUÉT! 🚀',
+      title: 'HOÀN TẤT KIỂM THỬ TẢI 50 LƯỢT QUÉT!',
       description: 'Hệ thống đạt thông lượng 1,250 check-in/phút, không xảy ra ùn tắc.',
       variant: 'success',
     });
@@ -398,11 +398,11 @@ export default function SimulationAndDemoHub() {
         </div>
         <div className="flex flex-wrap items-center gap-1.5">
           {[
-            { role: 'SUPER_ADMIN', label: '👑 SUPER_ADMIN' },
-            { role: 'ORG_ADMIN', label: '🏛️ ORG_ADMIN' },
-            { role: 'EVENT_OPERATOR', label: '📱 EVENT_OPERATOR' },
-            { role: 'MEMBER', label: '💼 MEMBER' },
-            { role: 'GUEST', label: '👤 GUEST' },
+            { role: 'SUPER_ADMIN', label: 'SUPER_ADMIN' },
+            { role: 'ORG_ADMIN', label: 'ORG_ADMIN' },
+            { role: 'EVENT_OPERATOR', label: 'EVENT_OPERATOR' },
+            { role: 'MEMBER', label: 'MEMBER' },
+            { role: 'GUEST', label: 'GUEST' },
           ].map((r) => (
             <button
               key={r.role}
@@ -438,7 +438,7 @@ export default function SimulationAndDemoHub() {
                 </div>
                 {measuredLatency && (
                   <Badge variant="outline" className="font-mono text-[10px] text-emerald-700 bg-emerald-50 border-emerald-200 font-bold">
-                    ⚡ {measuredLatency}ms
+                    {measuredLatency}ms
                   </Badge>
                 )}
               </div>
@@ -596,10 +596,10 @@ export default function SimulationAndDemoHub() {
                           variant="outline"
                           className="flex-1 border-slate-300 text-slate-700 font-bold py-4 rounded-xl cursor-pointer"
                         >
-                          🔄 Mô Phỏng Lại Từ Đầu
+                          Mô Phỏng Lại Từ Đầu
                         </Button>
                         <Badge className="bg-emerald-50 text-emerald-700 border-emerald-200 px-3 py-2 text-xs font-bold shrink-0">
-                          ✅ ĐÃ HOÀN TẤT
+                          ĐÃ HOÀN TẤT ✓
                         </Badge>
                       </div>
                     )}
@@ -679,7 +679,7 @@ export default function SimulationAndDemoHub() {
                 {/* Status Indicator inside Phone */}
                 {consentStep === 'INITIAL' && (
                   <div className="p-2.5 rounded-xl bg-blue-50/80 border border-blue-100 text-[10.5px] text-blue-900 text-center leading-snug">
-                    🔒 SĐT bị ẩn để ngăn chặn cuộc gọi rác và cào dữ liệu trái phép theo Luật PDPL 91/2025.
+                    SĐT bị ẩn để ngăn chặn cuộc gọi rác và cào dữ liệu trái phép theo Luật PDPL 91/2025.
                   </div>
                 )}
 
@@ -692,7 +692,7 @@ export default function SimulationAndDemoHub() {
                 {consentStep === 'MUTUAL_ACCEPTED' && (
                   <div className="space-y-2">
                     <div className="p-2.5 rounded-xl bg-emerald-50 border border-emerald-300 text-[10.5px] text-emerald-900 text-center leading-snug font-bold">
-                      🎉 Hai bên đã đồng thuận 2 chiều! Số điện thoại và danh bạ vCard đã tự động đồng bộ.
+                      Hai bên đã đồng thuận 2 chiều! Số điện thoại và danh bạ vCard đã tự động đồng bộ.
                     </div>
                     {consentAuditRecord && (
                       <div className="p-2 rounded-xl bg-slate-900 text-slate-100 text-[9px] font-mono space-y-0.5">

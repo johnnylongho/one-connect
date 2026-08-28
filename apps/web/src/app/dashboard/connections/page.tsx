@@ -454,7 +454,7 @@ export default function MyConnectionsPage() {
               </div>
 
               <div className="p-2.5 rounded-lg bg-blue-50/70 border border-blue-200 text-[10.5px] text-blue-900 leading-snug">
-                ⚖️ <strong>Căn cứ:</strong> Điều 9, Điều 11 & Điều 16 Luật Bảo vệ Dữ liệu Cá nhân số 91/2025/QH15.
+                <strong>Căn cứ:</strong> Điều 9, Điều 11 & Điều 16 Luật Bảo vệ Dữ liệu Cá nhân số 91/2025/QH15.
               </div>
             </div>
           )}
