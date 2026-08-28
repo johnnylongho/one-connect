@@ -214,7 +214,7 @@ export default function RelationshipMemoryDetailPage() {
                   notes.map(n => (
                     <div key={n.id} className="p-4 rounded-2xl bg-slate-50 border border-slate-200/90 space-y-1.5 text-xs sm:text-sm">
                       <p className="text-slate-800 leading-relaxed font-medium">{n.content}</p>
-                      <p className="text-[10.5px] text-slate-400 font-mono flex items-center gap-1 pt-1">
+                      <p className="text-[10.5px] text-slate-400 font-mono flex items-center gap-1 pt-1" suppressHydrationWarning>
                         <Clock className="w-3 h-3 text-cyan-600" /> {new Date(n.createdAt).toLocaleString('vi-VN')}
                       </p>
                     </div>

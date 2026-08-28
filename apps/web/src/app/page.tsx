@@ -816,28 +816,28 @@ export default function Home() {
             <div className="grid grid-cols-2 gap-2.5 text-center">
               <div className="bg-white p-3 rounded-xl border border-slate-200/90 shadow-2xs">
                 <div className="text-[10.5px] text-slate-500">Tiết Kiệm In Ấn</div>
-                <div className="text-sm sm:text-base font-extrabold text-emerald-600 font-mono">
+                <div className="text-sm sm:text-base font-extrabold text-emerald-600 font-mono" suppressHydrationWarning>
                   {(paperCostSaved / 1000000).toFixed(1)} Triệu
                 </div>
               </div>
 
               <div className="bg-white p-3 rounded-xl border border-slate-200/90 shadow-2xs">
                 <div className="text-[10.5px] text-slate-500">Cắt Giảm CO2</div>
-                <div className="text-sm sm:text-base font-extrabold text-[#0066FF] font-mono">
+                <div className="text-sm sm:text-base font-extrabold text-[#0066FF] font-mono" suppressHydrationWarning>
                   {co2SavedKg} kg CO2
                 </div>
               </div>
 
               <div className="bg-white p-3 rounded-xl border border-slate-200/90 shadow-2xs">
                 <div className="text-[10.5px] text-slate-500">Giảm Danh Thiếp Rác</div>
-                <div className="text-sm sm:text-base font-extrabold text-slate-800 font-mono">
-                  {totalDelegates.toLocaleString()} Tờ
+                <div className="text-sm sm:text-base font-extrabold text-slate-800 font-mono" suppressHydrationWarning>
+                  {totalDelegates.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')} Tờ
                 </div>
               </div>
 
               <div className="bg-white p-3 rounded-xl border border-slate-200/90 shadow-2xs">
                 <div className="text-[10.5px] text-slate-500">Thời Gian Đón Tiếp Giảm</div>
-                <div className="text-sm sm:text-base font-extrabold text-[#0066FF] font-mono">
+                <div className="text-sm sm:text-base font-extrabold text-[#0066FF] font-mono" suppressHydrationWarning>
                   {checkinHoursSaved} Giờ
                 </div>
               </div>
