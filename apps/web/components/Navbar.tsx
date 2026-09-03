@@ -28,12 +28,16 @@ export default function Navbar() {
   const { state, currentIdentity, setCurrentRole, setCurrentIdentityId, resetState } = useOneConnectStore();
   const [showRoleModal, setShowRoleModal] = useState(false);
 
+  const isJohnny = currentIdentity?.username === 'johnnylongho' || 
+                   currentIdentity?.email === 'contact.johnnylongho@gmail.com' ||
+                   currentIdentity?.id === 'id-001' || 
+                   currentIdentity?.id === '11111111-1111-1111-1111-111111111111';
+
   const rolesList: { role: RoleType; label: string; desc: string; icon: any }[] = [
-    { role: 'SUPER_ADMIN', label: 'Quản trị viên Hệ thống (System Admin)', desc: 'Toàn quyền kiểm soát, xem Audit Log, Quản lý Thẻ NFC & Báo cáo Giao thương', icon: ShieldCheck },
+    ...(isJohnny ? [{ role: 'SUPER_ADMIN' as RoleType, label: 'Quản trị viên Hệ thống (System Admin)', desc: 'Toàn quyền kiểm soát, xem Audit Log, Quản lý Thẻ NFC & Báo cáo Giao thương', icon: ShieldCheck }] : []),
     { role: 'ORG_ADMIN', label: 'Ban Quản trị Hội/CLB (Association Admin)', desc: 'Quản lý Hội viên, Tổ chức Sự kiện & Điều phối Kết nối', icon: Building2 },
     { role: 'EVENT_OPERATOR', label: 'Vận hành Trạm Check-in (Event Operator)', desc: 'Giao diện Điểm danh siêu tốc NFC/QR < 0.5s tại cửa sự kiện', icon: Zap },
     { role: 'MEMBER', label: 'Doanh nhân / Hội viên (Member)', desc: 'Quản lý Hồ sơ Số, Thẻ NFC cá nhân, Kết nối B2B & Lưu Ghi chú', icon: Users },
-    { role: 'GUEST', label: 'Khách quan tâm / Guest Profile', desc: 'Trải nghiệm Quét QR / Thẻ NFC từ góc nhìn đối tác mới', icon: UserCheck },
   ];
 
   return (

@@ -148,12 +148,12 @@ export const ALL_NAV_ITEMS: NavItem[] = [
     section: 'PITCHING',
   },
 
-  // TIỆN ÍCH: DEMO HUB
+  // TIỆN ÍCH: DEMO HUB (Chỉ Super Admin)
   {
     href: '/demo',
     label: 'Live Pitching Prototype',
     icon: Sparkles,
-    allowedRoles: ['SUPER_ADMIN', 'ORG_ADMIN', 'EVENT_OPERATOR', 'MEMBER', 'GUEST'],
+    allowedRoles: ['SUPER_ADMIN'],
     section: 'PITCHING',
   },
 ];
@@ -172,7 +172,13 @@ export default function RootLayout({
 
   const currentUserName = currentIdentity?.displayName || currentIdentity?.fullName || 'Hội Viên One Connect';
   const currentUserAvatar = currentIdentity?.avatarUrl || (currentIdentity?.username === 'johnnylongho' ? '/avatar-johnny-long.jpg' : `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(currentUserName)}`);
-  const effectiveRole = state?.currentRole || 'MEMBER';
+  
+  // DUY NHẤT Johnny Long Hồ được nhận diện và cấp quyền SUPER_ADMIN
+  const isJohnnySuperAdmin = currentIdentity?.username === 'johnnylongho' || 
+                             currentIdentity?.email === 'contact.johnnylongho@gmail.com' ||
+                             currentIdentity?.id === 'id-001' || 
+                             currentIdentity?.id === '11111111-1111-1111-1111-111111111111';
+  const effectiveRole = isJohnnySuperAdmin ? (state?.currentRole || 'SUPER_ADMIN') : 'MEMBER';
 
   // Load saved sidebar state from localStorage
   useEffect(() => {
@@ -208,9 +214,15 @@ export default function RootLayout({
   const adminItems = allowedNavItems.filter((item) => item.section === 'ADMIN');
   const pitchingItems = allowedNavItems.filter((item) => item.section === 'PITCHING');
 
-  const isPublicCardPage = pathname?.startsWith('/p/') || pathname?.startsWith('/c/');
+  // Chỉ các trang Auth (Đăng nhập, Đăng ký) và Thẻ số công khai mới không hiển thị Sidebar:
+  const isStandalonePage = 
+    pathname === '/login' ||
+    pathname === '/register' ||
+    pathname?.startsWith('/auth') ||
+    pathname?.startsWith('/p/') || 
+    pathname?.startsWith('/c/');
 
-  if (isPublicCardPage) {
+  if (isStandalonePage) {
     return (
       <html
         lang="vi"
@@ -223,7 +235,7 @@ export default function RootLayout({
           <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
         </head>
         <body
-          className="min-h-screen bg-[#F8FAFC] text-slate-900 font-sans antialiased selection:bg-blue-600 selection:text-white overflow-x-hidden"
+          className="min-h-screen bg-[#070A12] text-slate-100 font-sans antialiased selection:bg-blue-600 selection:text-white overflow-x-hidden"
           suppressHydrationWarning
         >
           {children}
@@ -364,77 +376,55 @@ export default function RootLayout({
 
               <div className="h-4 w-px bg-slate-200 hidden sm:block" />
 
-              {/* Role Switcher */}
-              <div className="relative">
-                <button
-                  onClick={() => setIsRoleDropdownOpen(!isRoleDropdownOpen)}
-                  className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold border border-slate-200 transition-colors"
-                >
-                  <span className="hidden sm:inline">Vai trò:</span>
-                  <strong className="text-slate-900" suppressHydrationWarning>{effectiveRole}</strong>
-                  <ChevronDown className="w-3.5 h-3.5 text-slate-500" />
-                </button>
+              {/* Role Indicator / Switcher (Chỉ hiển thị công cụ chuyển đổi cho Super Admin Johnny Long Hồ) */}
+              {isJohnnySuperAdmin ? (
+                <div className="relative">
+                  <button
+                    onClick={() => setIsRoleDropdownOpen(!isRoleDropdownOpen)}
+                    className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-semibold border border-blue-200 transition-colors cursor-pointer"
+                    title="Góc nhìn kiểm thử (Chỉ dành cho Super Admin)"
+                  >
+                    <span className="hidden sm:inline">Quyền:</span>
+                    <strong className="text-blue-950" suppressHydrationWarning>{effectiveRole}</strong>
+                    <ChevronDown className="w-3.5 h-3.5 text-blue-500" />
+                  </button>
 
-                {isRoleDropdownOpen && (
-                  <div className="absolute right-0 mt-2 w-64 rounded-xl bg-white border border-slate-200 shadow-xl p-1.5 z-50 space-y-1">
-                    <button
-                      onClick={() => {
-                        setCurrentRole('SUPER_ADMIN');
-                        setIsRoleDropdownOpen(false);
-                      }}
-                      className={`w-full text-left px-3 py-2 rounded-lg text-xs font-semibold ${
-                        effectiveRole === 'SUPER_ADMIN' ? 'bg-blue-50 text-[#0066FF]' : 'text-slate-700 hover:bg-slate-50'
-                      }`}
-                    >
-                      SUPER_ADMIN (Quản Trị Hệ Thống)
-                    </button>
-                    <button
-                      onClick={() => {
-                        setCurrentRole('ORG_ADMIN');
-                        setIsRoleDropdownOpen(false);
-                      }}
-                      className={`w-full text-left px-3 py-2 rounded-lg text-xs font-semibold ${
-                        effectiveRole === 'ORG_ADMIN' ? 'bg-blue-50 text-[#0066FF]' : 'text-slate-700 hover:bg-slate-50'
-                      }`}
-                    >
-                      ORG_ADMIN (Ban Tổ Chức / Hiệp Hội)
-                    </button>
-                    <button
-                      onClick={() => {
-                        setCurrentRole('EVENT_OPERATOR');
-                        setIsRoleDropdownOpen(false);
-                      }}
-                      className={`w-full text-left px-3 py-2 rounded-lg text-xs font-semibold ${
-                        effectiveRole === 'EVENT_OPERATOR' ? 'bg-blue-50 text-[#0066FF]' : 'text-slate-700 hover:bg-slate-50'
-                      }`}
-                    >
-                      EVENT_OPERATOR (Vận Hành Sự Kiện)
-                    </button>
-                    <button
-                      onClick={() => {
-                        setCurrentRole('MEMBER');
-                        setIsRoleDropdownOpen(false);
-                      }}
-                      className={`w-full text-left px-3 py-2 rounded-lg text-xs font-semibold ${
-                        effectiveRole === 'MEMBER' ? 'bg-blue-50 text-[#0066FF]' : 'text-slate-700 hover:bg-slate-50'
-                      }`}
-                    >
-                      MEMBER (Hội Viên Chính Thức)
-                    </button>
-                    <button
-                      onClick={() => {
-                        setCurrentRole('GUEST');
-                        setIsRoleDropdownOpen(false);
-                      }}
-                      className={`w-full text-left px-3 py-2 rounded-lg text-xs font-semibold ${
-                        effectiveRole === 'GUEST' ? 'bg-blue-50 text-[#0066FF]' : 'text-slate-700 hover:bg-slate-50'
-                      }`}
-                    >
-                      GUEST (Khách Mời Vãng Lai)
-                    </button>
-                  </div>
-                )}
-              </div>
+                  {isRoleDropdownOpen && (
+                    <div className="absolute right-0 mt-2 w-64 rounded-xl bg-white border border-slate-200 shadow-xl p-1.5 z-50 space-y-1">
+                      <div className="px-3 py-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100">
+                        Kiểm thử phân quyền hệ thống
+                      </div>
+                      <button
+                        onClick={() => {
+                          setCurrentRole('SUPER_ADMIN');
+                          setIsRoleDropdownOpen(false);
+                        }}
+                        className={`w-full text-left px-3 py-2 rounded-lg text-xs font-semibold ${
+                          effectiveRole === 'SUPER_ADMIN' ? 'bg-blue-50 text-[#0066FF]' : 'text-slate-700 hover:bg-slate-50'
+                        }`}
+                      >
+                        SUPER_ADMIN (Quản Trị Hệ Thống)
+                      </button>
+                      <button
+                        onClick={() => {
+                          setCurrentRole('MEMBER');
+                          setIsRoleDropdownOpen(false);
+                        }}
+                        className={`w-full text-left px-3 py-2 rounded-lg text-xs font-semibold ${
+                          effectiveRole === 'MEMBER' ? 'bg-blue-50 text-[#0066FF]' : 'text-slate-700 hover:bg-slate-50'
+                        }`}
+                      >
+                        MEMBER (Hội Viên Doanh Nghiệp)
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="px-3 py-1.5 rounded-xl bg-slate-100 text-slate-700 text-xs font-semibold border border-slate-200 flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                  <span>Hội Viên</span>
+                </div>
+              )}
 
               {/* Mobile Hamburger Menu Toggle */}
               <button
@@ -481,10 +471,10 @@ export default function RootLayout({
 
                 {/* Categorized RBAC Navigation Groups (Starts with Overview) */}
                 <div className="space-y-2">
-                  {renderNavGroup(personalItems, '1. ĐỊNH DANH (IDENTITY)', 'Profile')}
-                  {renderNavGroup(operationItems, '2. SỰ KIỆN & CHECK-IN', 'Sự kiện')}
-                  {renderNavGroup(adminItems, '3. KẾT NỐI & CRM B2B', 'Mạng lưới')}
-                  {renderNavGroup(pitchingItems, '4. HIỆP HỘI & PROTOTYPE', 'Cộng đồng')}
+                  {renderNavGroup(personalItems, '1. ĐỊNH DANH (IDENTITY)', 'Hồ sơ')}
+                  {renderNavGroup(operationItems, '2. SỰ KIỆN DOANH NGHIỆP', 'Sự kiện')}
+                  {renderNavGroup(adminItems, '3. MẠNG LƯỚI & CRM B2B', 'Giao thương')}
+                  {renderNavGroup(pitchingItems, '4. QUẢN TRỊ HỆ THỐNG', 'Điều hành')}
                 </div>
               </div>
 

@@ -74,8 +74,20 @@ export default function WorkspaceRoleSwitcher() {
     },
   ];
 
+  // Chỉ Johnny Long Hồ mới có quyền giữ hoặc chuyển sang SUPER_ADMIN
+  const isJohnnySuperAdmin = currentIdentity?.username === 'johnnylongho' || 
+                             currentIdentity?.email === 'contact.johnnylongho@gmail.com' ||
+                             currentIdentity?.id === 'id-001' || 
+                             currentIdentity?.id === '11111111-1111-1111-1111-111111111111';
+
+  const availableWorkspaces = WORKSPACES.filter(w => {
+    if (w.role === 'SUPER_ADMIN' && !isJohnnySuperAdmin) return false;
+    return true;
+  });
+
+  const effectiveRole = isJohnnySuperAdmin ? (state.currentRole || 'SUPER_ADMIN') : 'MEMBER';
   const currentWorkspace =
-    WORKSPACES.find((w) => w.role === state.currentRole) || WORKSPACES[3]!;
+    availableWorkspaces.find((w) => w.role === effectiveRole) || availableWorkspaces[availableWorkspaces.length - 1]!;
 
   const handleSelectWorkspace = (ws: typeof WORKSPACES[0]) => {
     switchWorkspace(ws.role);
@@ -135,7 +147,7 @@ export default function WorkspaceRoleSwitcher() {
           </div>
 
           <div className="space-y-1">
-            {WORKSPACES.map((ws) => {
+            {availableWorkspaces.map((ws) => {
               const Icon = ws.icon;
               const isActive = state.currentRole === ws.role;
 

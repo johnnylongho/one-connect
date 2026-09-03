@@ -23,14 +23,14 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useOneConnectStore } from '@/lib/store';
-import BusinessCard3D from '@/components/BusinessCard3D';
+import { supabase } from '@/lib/supabaseClient';
 
 export default function LoginPage() {
   const router = useRouter();
-  const { state, loginUser, currentIdentity, currentCard } = useOneConnectStore();
+  const { state, loginUser } = useOneConnectStore();
 
-  const [authMethod, setAuthMethod] = useState<'otp' | 'password' | 'nfc'>('otp');
-  const [identifier, setIdentifier] = useState('contact.johnnylongho@gmail.com');
+  const [authMethod, setAuthMethod] = useState<'otp' | 'password'>('otp');
+  const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [otpStep, setOtpStep] = useState<'request' | 'verify'>('request');
@@ -39,6 +39,38 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [successUser, setSuccessUser] = useState<string | null>(null);
+
+  // Đăng nhập nhanh qua Google Mail OAuth2
+  const handleGoogleSignIn = async () => {
+    try {
+      setLoading(true);
+      setErrorMsg('');
+      const origin = typeof window !== 'undefined' ? window.location.origin : (process.env.NEXT_PUBLIC_APP_URL || 'https://oneconnect.id.vn');
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${origin}/auth/callback`,
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'select_account',
+          },
+        },
+      });
+
+      if (error) {
+        setLoading(false);
+        setErrorMsg(`Lỗi kết nối Google: ${error.message}`);
+        return;
+      }
+
+      if (data?.url) {
+        window.location.href = data.url;
+      }
+    } catch (err: any) {
+      setLoading(false);
+      setErrorMsg(`Không thể kết nối dịch vụ Google: ${err?.message || 'Lỗi không xác định'}`);
+    }
+  };
 
   // Handle Request OTP
   const handleRequestOtp = (e: React.FormEvent) => {
@@ -92,7 +124,7 @@ export default function LoginPage() {
     e.preventDefault();
     const entered = otpCode.join('');
     if (entered !== generatedLoginOtp && entered !== '123456') {
-      setErrorMsg(`Mã OTP không chính xác. Vui lòng nhập mã: ${generatedLoginOtp} (hoặc 123456)`);
+      setErrorMsg('Mã OTP không chính xác hoặc đã hết hạn. Vui lòng kiểm tra lại hòm thư email của bạn.');
       return;
     }
 
@@ -139,103 +171,84 @@ export default function LoginPage() {
     }, 600);
   };
 
-  // Handle NFC Tap Login
-  const handleNfcSimulateLogin = () => {
-    setLoading(true);
-    setErrorMsg('');
-    setTimeout(() => {
-      const user = loginUser('johnnylongho');
-      if (user) {
-        setSuccessUser(user.fullName);
-        setLoading(false);
-        setTimeout(() => {
-          router.push('/dashboard/card');
-        }, 800);
-      }
-    }, 800);
-  };
-
   return (
-    <div className="min-h-screen bg-[#070A12] text-slate-100 flex flex-col justify-between selection:bg-blue-600 selection:text-white relative overflow-hidden">
-      {/* Background Ambient Glows */}
-      <div className="absolute -top-40 left-1/4 w-96 h-96 bg-blue-600/15 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute -bottom-40 right-1/4 w-96 h-96 bg-orange-500/10 rounded-full blur-3xl pointer-events-none" />
+    <div className="min-h-screen bg-[#040814] text-slate-100 flex flex-col justify-between selection:bg-blue-600 selection:text-white relative overflow-hidden">
+      {/* 1. Background Artwork Layer */}
+      <div className="absolute inset-0 z-0">
+        <img
+          src="/login-bg.jpg"
+          alt="One Connect Background"
+          className="w-full h-full object-cover object-left-top lg:object-center select-none pointer-events-none"
+        />
+        {/* Subtle right-side dark gradient to ensure crystal-clear contrast for login box */}
+        <div className="absolute inset-0 bg-gradient-to-t lg:bg-gradient-to-r from-transparent via-slate-950/20 to-slate-950/85 pointer-events-none" />
+      </div>
+
+      {/* 2. Desktop Interactive Clickable Hotspot over "ĐĂNG KÝ THÀNH VIÊN" on Background */}
+      <Link
+        href="/register"
+        title="Đăng Ký Thành Viên One Connect"
+        className="hidden lg:flex absolute z-20 items-center justify-center rounded-full transition-all duration-300 group cursor-pointer"
+        style={{
+          left: '3.8%',
+          top: '40.5%',
+          width: '17.5%',
+          height: '5.6%',
+          minWidth: '170px',
+          minHeight: '32px',
+          maxWidth: '280px',
+          maxHeight: '52px',
+        }}
+      >
+        {/* Glowing golden halo ring on hover */}
+        <span className="absolute inset-0 rounded-full border-2 border-amber-300/80 bg-amber-400/10 opacity-0 group-hover:opacity-100 group-hover:shadow-[0_0_35px_rgba(251,191,36,0.7)] group-hover:scale-105 transition-all duration-300 pointer-events-none" />
+        <span className="sr-only">Đăng Ký Thành Viên</span>
+      </Link>
 
       {/* Top Header */}
       <header className="p-4 sm:p-6 flex items-center justify-between max-w-7xl mx-auto w-full z-10">
-        <Link href="/" className="flex items-center gap-2.5 group">
+        {/* Mobile Brand (Desktop already has Logo in background) */}
+        <div className="flex items-center gap-2.5 lg:invisible select-none">
           <img
             src="/one_connect_final_logo_orange.png"
             alt="One Connect Logo"
-            className="h-8 sm:h-9 w-auto object-contain shrink-0 group-hover:scale-105 transition-transform"
+            className="h-8 sm:h-9 w-auto object-contain shrink-0"
           />
           <span className="font-black text-lg sm:text-xl tracking-tight text-white font-heading">
             ONE<span className="text-[#00C2FF]">CONNECT</span>
           </span>
-        </Link>
+        </div>
 
-        <Link
-          href="/"
-          className="flex items-center gap-1.5 text-xs font-bold text-slate-400 hover:text-white px-3 py-1.5 rounded-xl hover:bg-white/5 transition-all"
-        >
-          <ArrowLeft className="w-3.5 h-3.5" />
-          <span>Trang chủ</span>
-        </Link>
+        <div className="flex items-center gap-3 ml-auto">
+          <Link
+            href="/register"
+            className="inline-flex items-center gap-1.5 text-xs font-black text-amber-400 hover:text-amber-300 px-4 py-2 rounded-xl border border-amber-400/30 hover:bg-amber-400/10 transition-all shadow-xs"
+          >
+            <Sparkles className="w-3.5 h-3.5" />
+            <span>Đăng ký thành viên</span>
+          </Link>
+        </div>
       </header>
 
-      {/* Main Split-Screen Container */}
-      <main className="max-w-7xl mx-auto w-full px-4 py-6 sm:py-10 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center my-auto z-10">
-        {/* Left Column: 3D Showcase & Trust Highlights */}
-        <div className="lg:col-span-6 space-y-6 hidden lg:block text-left">
-          <div className="space-y-3">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-400/20 text-[#00C2FF] text-xs font-bold font-mono">
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>NỀN TẢNG ĐỊNH DANH DOANH NHÂN B2B</span>
-            </div>
-            <h1 className="text-3xl sm:text-4xl font-black text-white tracking-tight font-heading leading-tight">
-              Đăng Nhập Quản Trị <br />
-              <span className="bg-gradient-to-r from-blue-400 via-cyan-300 to-indigo-300 bg-clip-text text-transparent">
-                Hệ Sinh Thái Danh Thiếp Số
-              </span>
-            </h1>
-            <p className="text-sm text-slate-400 leading-relaxed">
-              Truy cập Dashboard quản trị danh thiếp số 3D, danh bạ đối tác B2B, quản lý trạm check-in sự kiện và không gian tổ chức của bạn.
-            </p>
-          </div>
+      {/* Main Container: Artwork on Left, Sleek Auth Box on Right */}
+      <main className="relative z-10 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-6 flex flex-col lg:flex-row items-center justify-between lg:justify-end my-auto min-h-[calc(100vh-140px)]">
+        {/* Left Spacing: Keeps full visibility of artwork and golden button */}
+        <div className="hidden lg:block lg:flex-1 pointer-events-none" />
 
-          {/* Interactive Card Mini Showcase */}
-          <div className="pt-2">
-            {currentIdentity && (
-              <div className="scale-95 origin-top-left pointer-events-none">
-                <BusinessCard3D
-                  identity={currentIdentity}
-                  card={currentCard}
-                  showActions={false}
-                />
-              </div>
-            )}
-          </div>
-
-          {/* Trust & Compliance Badges */}
-          <div className="pt-4 grid grid-cols-3 gap-3 border-t border-slate-800/80">
-            <div className="flex items-center gap-2 text-xs text-slate-400 font-medium">
-              <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
-              <span>Nghị định 91/2025 PDPL</span>
-            </div>
-            <div className="flex items-center gap-2 text-xs text-slate-400 font-medium">
-              <Radio className="w-4 h-4 text-[#00C2FF] shrink-0" />
-              <span>Chip NFC NTAG215</span>
-            </div>
-            <div className="flex items-center gap-2 text-xs text-slate-400 font-medium">
-              <Building2 className="w-4 h-4 text-amber-400 shrink-0" />
-              <span>Multi-Tenant B2B</span>
-            </div>
-          </div>
+        {/* Mobile Quick CTA */}
+        <div className="lg:hidden mb-4 w-full max-w-md text-center">
+          <Link
+            href="/register"
+            className="w-full inline-flex items-center justify-center gap-2 px-6 py-3 rounded-2xl bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 text-slate-950 font-black text-xs uppercase tracking-wider shadow-lg shadow-amber-500/25 active:scale-95 transition-all cursor-pointer"
+          >
+            <Sparkles className="w-4 h-4 text-slate-950" />
+            <span>ĐĂNG KÝ THÀNH VIÊN</span>
+          </Link>
         </div>
 
         {/* Right Column: Modern High-Security Auth Box */}
-        <div className="lg:col-span-6 w-full max-w-md mx-auto">
-          <div className="rounded-3xl bg-slate-900/90 border border-slate-800 p-6 sm:p-8 shadow-2xl backdrop-blur-2xl space-y-6">
+        <div className="w-full max-w-md lg:mr-2 xl:mr-8 shrink-0">
+          <div className="rounded-3xl bg-slate-950/85 border border-slate-700/60 backdrop-blur-2xl p-6 sm:p-8 shadow-2xl shadow-blue-950/50 space-y-6">
             {/* Header */}
             <div className="text-center space-y-1.5">
               <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-blue-600 to-cyan-500 text-white flex items-center justify-center mx-auto shadow-lg shadow-blue-500/25">
@@ -249,8 +262,8 @@ export default function LoginPage() {
               </p>
             </div>
 
-            {/* Auth Method Selector Tabs */}
-            <div className="grid grid-cols-3 p-1 rounded-2xl bg-slate-950/80 border border-slate-800 text-xs font-bold">
+            {/* Auth Method Selector Tabs (OTP & Mật Khẩu) */}
+            <div className="grid grid-cols-2 p-1 rounded-2xl bg-slate-950/80 border border-slate-800 text-xs font-bold">
               <button
                 type="button"
                 onClick={() => {
@@ -264,7 +277,7 @@ export default function LoginPage() {
                 }`}
               >
                 <Mail className="w-3.5 h-3.5" />
-                <span>Mã OTP</span>
+                <span>Mã OTP Email</span>
               </button>
 
               <button
@@ -281,22 +294,6 @@ export default function LoginPage() {
               >
                 <KeyRound className="w-3.5 h-3.5" />
                 <span>Mật Khẩu</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => {
-                  setAuthMethod('nfc');
-                  setErrorMsg('');
-                }}
-                className={`py-2 rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
-                  authMethod === 'nfc'
-                    ? 'bg-blue-600 text-white shadow-xs'
-                    : 'text-slate-400 hover:text-white'
-                }`}
-              >
-                <Radio className="w-3.5 h-3.5 text-cyan-300 animate-pulse" />
-                <span>Thẻ NFC</span>
               </button>
             </div>
 
@@ -336,10 +333,10 @@ export default function LoginPage() {
                             <input
                               type="text"
                               required
-                              placeholder="contact.johnnylongho@gmail.com"
+                              placeholder="Nhập email hoặc số điện thoại"
                               value={identifier}
                               onChange={(e) => setIdentifier(e.target.value)}
-                              className="w-full pl-10 pr-4 py-2.5 bg-slate-950 border border-slate-800 rounded-2xl text-xs text-white placeholder-slate-600 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all font-mono"
+                              className="w-full pl-10 pr-4 py-2.5 bg-slate-950 border border-slate-800 rounded-2xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all font-sans"
                             />
                           </div>
                           <p className="text-[10.5px] text-slate-500">
@@ -364,24 +361,17 @@ export default function LoginPage() {
                       </form>
                     ) : (
                       <form onSubmit={handleVerifyOtp} className="space-y-4">
-                        {/* OTP Banner */}
-                        <div className="p-3 rounded-2xl bg-blue-500/15 border border-blue-400/30 text-left flex items-start gap-2.5 shadow-md">
-                          <div className="w-7 h-7 rounded-lg bg-blue-600 text-white flex items-center justify-center shrink-0">
-                            <Mail className="w-3.5 h-3.5" />
+                        {/* OTP Notice Banner - NO LEAK */}
+                        <div className="p-3.5 rounded-2xl bg-blue-500/10 border border-blue-400/25 text-left flex items-start gap-3 shadow-md">
+                          <div className="w-8 h-8 rounded-xl bg-blue-600/20 text-[#00C2FF] flex items-center justify-center shrink-0">
+                            <Mail className="w-4 h-4" />
                           </div>
-                          <div className="space-y-0.5 flex-1 text-xs">
-                            <p className="text-[10.5px] font-bold text-slate-300">Mã xác thực OTP:</p>
-                            <p className="text-[#00C2FF] font-bold">
-                              Mã của bạn: <strong className="font-mono text-white text-xs px-1.5 py-0.5 bg-slate-950 rounded border border-blue-400/40">{generatedLoginOtp}</strong>
+                          <div className="space-y-1 flex-1 text-xs">
+                            <p className="font-bold text-slate-200">Đã gửi mã xác thực OTP</p>
+                            <p className="text-slate-300 text-[11px] leading-relaxed">
+                              Vui lòng kiểm tra email <strong className="text-white">{identifier}</strong> và nhập mã 6 số bên dưới để tiếp tục.
                             </p>
                           </div>
-                          <button
-                            type="button"
-                            onClick={() => setOtpCode(generatedLoginOtp.split(''))}
-                            className="px-2 py-1 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-[10px] font-bold shrink-0 cursor-pointer shadow-xs"
-                          >
-                            Tự điền
-                          </button>
                         </div>
 
                         <div className="space-y-2 text-center">
@@ -459,10 +449,10 @@ export default function LoginPage() {
                         <input
                           type="text"
                           required
-                          placeholder="johnnylongho"
+                          placeholder="Nhập tên đăng nhập, email hoặc SĐT"
                           value={identifier}
                           onChange={(e) => setIdentifier(e.target.value)}
-                          className="w-full pl-10 pr-4 py-2.5 bg-slate-950 border border-slate-800 rounded-2xl text-xs text-white placeholder-slate-600 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all font-mono"
+                          className="w-full pl-10 pr-4 py-2.5 bg-slate-950 border border-slate-800 rounded-2xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all font-sans"
                         />
                       </div>
                     </div>
@@ -513,41 +503,6 @@ export default function LoginPage() {
                   </form>
                 )}
 
-                {/* ========================================================= */}
-                {/* 3. METHOD 3: NFC 1-TAP LOGIN */}
-                {/* ========================================================= */}
-                {authMethod === 'nfc' && (
-                  <div className="space-y-4 text-center py-2">
-                    <div className="w-20 h-20 mx-auto rounded-3xl bg-cyan-950/80 border-2 border-cyan-400/50 flex items-center justify-center relative shadow-lg shadow-cyan-500/20">
-                      <Radio className="w-10 h-10 text-[#00C2FF] animate-pulse" />
-                      <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-emerald-500 animate-ping" />
-                    </div>
-
-                    <div className="space-y-1">
-                      <h4 className="font-bold text-sm text-white">Chạm Thẻ NFC Để Đăng Nhập</h4>
-                      <p className="text-xs text-slate-400 leading-relaxed max-w-xs mx-auto">
-                        Áp thẻ NFC vật lý của bạn vào lưng điện thoại hoặc đầu đọc thẻ để xác thực 1-chạm tức thì.
-                      </p>
-                    </div>
-
-                    <Button
-                      type="button"
-                      onClick={handleNfcSimulateLogin}
-                      disabled={loading}
-                      className="w-full py-3 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-bold text-xs rounded-2xl transition-all shadow-lg shadow-cyan-500/20 flex items-center justify-center gap-2 cursor-pointer"
-                    >
-                      {loading ? (
-                        <span className="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      ) : (
-                        <>
-                          <Radio className="w-4 h-4" />
-                          <span>Kích Hoạt Cảm Biến Chạm Thẻ</span>
-                        </>
-                      )}
-                    </Button>
-                  </div>
-                )}
-
                 {/* Social Login Divider */}
                 <div className="relative my-4">
                   <div className="absolute inset-0 flex items-center">
@@ -562,10 +517,11 @@ export default function LoginPage() {
                 <div className="grid grid-cols-2 gap-2.5">
                   <button
                     type="button"
-                    onClick={() => handlePasswordLogin({ preventDefault: () => {} } as any)}
-                    className="py-2.5 px-3 rounded-2xl bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-200 text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer shadow-xs"
+                    onClick={handleGoogleSignIn}
+                    disabled={loading}
+                    className="py-2.5 px-3 rounded-2xl bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-200 text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer shadow-xs active:scale-98"
                   >
-                    <svg className="w-4 h-4" viewBox="0 0 24 24">
+                    <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24">
                       <path
                         fill="#4285F4"
                         d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"
@@ -583,12 +539,12 @@ export default function LoginPage() {
                         d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"
                       />
                     </svg>
-                    <span>Google</span>
+                    <span>Google Mail</span>
                   </button>
 
                   <button
                     type="button"
-                    onClick={() => handlePasswordLogin({ preventDefault: () => {} } as any)}
+                    onClick={() => setErrorMsg('Cổng đăng nhập Zalo Business đang được hoàn tất xác thực OAuth2.')}
                     className="py-2.5 px-3 rounded-2xl bg-blue-950/40 hover:bg-blue-900/50 border border-blue-800/50 text-blue-200 text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer shadow-xs"
                   >
                     <span className="w-4 h-4 rounded bg-blue-600 text-white font-black text-[10px] flex items-center justify-center">Z</span>

@@ -40,8 +40,7 @@ export async function POST(request: Request) {
 
       return NextResponse.json({
         success: true,
-        message: `Mã OTP đã được gửi đến ${emailOrPhone}! (Mã thử nghiệm: ${OTP_STORE[cleanInput].code})`,
-        demoCode: OTP_STORE[cleanInput].code,
+        message: `Mã OTP xác thực đã được gửi đến ${emailOrPhone}. Vui lòng kiểm tra hộp thư.`,
       });
     }
 

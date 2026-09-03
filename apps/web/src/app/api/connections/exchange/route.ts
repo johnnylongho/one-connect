@@ -22,6 +22,8 @@ export async function POST(request: Request) {
       ? crypto.randomUUID() 
       : `${Math.random().toString(16).slice(2, 10)}-0000-4000-8000-${Date.now().toString(16).padStart(12, '0')}`;
 
+    const guestAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(guestName)}&background=0284c7&color=fff&bold=true`;
+
     // 1. Insert guest into person_identities
     const { error: pErr } = await supabaseAdmin.from('person_identities').insert({
       id: guestId,
@@ -29,6 +31,7 @@ export async function POST(request: Request) {
       phone: guestPhone,
       title: guestCompany || 'Đối tác chạm thẻ NFC',
       bio: guestNote || 'Khách chạm thẻ NFC và gửi danh thiếp.',
+      avatar_url: guestAvatar,
     });
 
     if (pErr) {

@@ -22,6 +22,7 @@ import {
   ArrowLeft,
   Sparkles,
   X,
+  Crown,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -285,26 +286,32 @@ export default function MemberDirectoryAdminPage() {
 
               {/* Quick Contact & Action Buttons */}
               <div className="flex flex-wrap sm:flex-nowrap items-center gap-2 w-full sm:w-auto pt-3 sm:pt-0 border-t sm:border-t-0 border-slate-100 justify-end">
-                {/* Inline Role Changer */}
-                <div className="flex items-center gap-1">
-                  <UserCheck className="w-3.5 h-3.5 text-slate-400" />
-                  <select
-                    value={currentMemberRole}
-                    onChange={(e) => {
-                      const newR = e.target.value as RoleType;
-                      changeUserRole(m.id, newR);
-                      setSuccessToast(`Đã đổi phân quyền của "${m.fullName}" thành [${newR}] thành công!`);
-                      setTimeout(() => setSuccessToast(''), 3500);
-                    }}
-                    className="px-2.5 py-1.5 rounded-xl bg-slate-50 border border-slate-200 text-xs font-bold text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#0066FF]/20 cursor-pointer"
-                    title="Phân quyền tài khoản này"
-                  >
-                    <option value="MEMBER">MEMBER (Hội viên)</option>
-                    <option value="EVENT_OPERATOR">EVENT_OPERATOR (Lễ tân)</option>
-                    <option value="ORG_ADMIN">ORG_ADMIN (Quản trị Hiệp hội)</option>
-                    <option value="SUPER_ADMIN">SUPER_ADMIN (Quản trị Hệ thống)</option>
-                  </select>
-                </div>
+                {/* Inline Role Indicator / Changer */}
+                {m.username === 'johnnylongho' || m.id === 'id-001' || m.id === '11111111-1111-1111-1111-111111111111' || (m.email && m.email.toLowerCase() === 'contact.johnnylongho@gmail.com') ? (
+                  <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-xs font-black shadow-2xs">
+                    <Crown className="w-3.5 h-3.5 text-amber-600" />
+                    <span>SUPER_ADMIN</span>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-1">
+                    <UserCheck className="w-3.5 h-3.5 text-slate-400" />
+                    <select
+                      value={currentMemberRole === 'SUPER_ADMIN' ? 'MEMBER' : currentMemberRole}
+                      onChange={(e) => {
+                        const newR = e.target.value as RoleType;
+                        changeUserRole(m.id, newR);
+                        setSuccessToast(`Đã đổi phân quyền của "${m.fullName}" thành [${newR}] thành công!`);
+                        setTimeout(() => setSuccessToast(''), 3500);
+                      }}
+                      className="px-2.5 py-1.5 rounded-xl bg-slate-50 border border-slate-200 text-xs font-bold text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#0066FF]/20 cursor-pointer"
+                      title="Phân quyền tài khoản này"
+                    >
+                      <option value="MEMBER">MEMBER (Hội viên)</option>
+                      <option value="EVENT_OPERATOR">EVENT_OPERATOR (Lễ tân)</option>
+                      <option value="ORG_ADMIN">ORG_ADMIN (Quản trị Hiệp hội)</option>
+                    </select>
+                  </div>
+                )}
 
                 <Link
                   href={profileLink}
@@ -446,7 +453,6 @@ export default function MemberDirectoryAdminPage() {
                     <option value="MEMBER">MEMBER (Hội viên / Doanh nhân)</option>
                     <option value="EVENT_OPERATOR">EVENT_OPERATOR (Lễ tân Điểm danh)</option>
                     <option value="ORG_ADMIN">ORG_ADMIN (Quản trị Hiệp hội / CLB)</option>
-                    <option value="SUPER_ADMIN">SUPER_ADMIN (Quản trị Hệ thống)</option>
                   </select>
                 </div>
                 <div>

@@ -409,6 +409,16 @@ export function useOneConnectStore() {
 
   // Actions
   const setCurrentRole = (role: RoleType) => {
+    // Chỉ tài khoản của Johnny Long Hồ mới có quyền giữ hoặc chuyển đổi SUPER_ADMIN
+    const isJohnny = currentIdentity?.username === 'johnnylongho' || 
+                     currentIdentity?.email === 'contact.johnnylongho@gmail.com' ||
+                     currentIdentity?.id === 'id-001' || 
+                     currentIdentity?.id === '11111111-1111-1111-1111-111111111111';
+
+    if (role === 'SUPER_ADMIN' && !isJohnny) {
+      setState(prev => ({ ...prev, currentRole: 'MEMBER' }));
+      return;
+    }
     setState(prev => ({ ...prev, currentRole: role }));
   };
 
@@ -814,7 +824,12 @@ export function useOneConnectStore() {
       : `${Math.random().toString(16).slice(2, 10)}-0000-4000-8000-${Date.now().toString(16).padStart(12, '0')}`;
     const newCardUid = `NFC-${cleanUsername.toUpperCase().slice(0, 8)}-${Math.floor(100 + Math.random() * 900)}`;
     const avatar = `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(data.fullName)}&backgroundColor=0066ff,00c2ff,10b981,f59e0b`;
-    const userRole: RoleType = data.role || 'MEMBER';
+    
+    // Mọi tài khoản mới tạo lập mặc định phân quyền MEMBER
+    // Chỉ duy nhất tài khoản của Johnny Long Hồ được set SUPER_ADMIN
+    const isJohnny = cleanUsername === 'johnnylongho' || 
+                     (data.email && data.email.toLowerCase() === 'contact.johnnylongho@gmail.com');
+    const userRole: RoleType = isJohnny ? 'SUPER_ADMIN' : 'MEMBER';
 
     const newIdentity: PersonIdentity = {
       id: newId,
@@ -1102,8 +1117,11 @@ export function useOneConnectStore() {
       if (password && found.password && found.password !== password) {
         return null;
       }
-      const isSuperAdmin = found.username === 'johnnylongho' || found.id === 'id-001' || clean.includes('johnny');
-      const determinedRole: RoleType = found.role || (isSuperAdmin ? 'SUPER_ADMIN' : 'MEMBER');
+      const isSuperAdmin = found.username === 'johnnylongho' || 
+                           found.id === 'id-001' || 
+                           found.id === '11111111-1111-1111-1111-111111111111' ||
+                           (found.email && found.email.toLowerCase() === 'contact.johnnylongho@gmail.com');
+      const determinedRole: RoleType = isSuperAdmin ? 'SUPER_ADMIN' : 'MEMBER';
 
       setState(prev => ({
         ...prev,
@@ -1113,16 +1131,7 @@ export function useOneConnectStore() {
       return found;
     }
 
-    // Default fallback to Johnny Long if keywords matched
-    if (clean.includes('admin') || clean.includes('johnny') || clean.includes('long')) {
-      setState(prev => ({
-        ...prev,
-        currentRole: 'SUPER_ADMIN',
-        currentIdentityId: 'id-001',
-      }));
-      return state.identities[0];
-    }
-
+    // Không tự động fallback sai lệch khi đăng nhập không khớp
     return null;
   };
 

@@ -7,16 +7,17 @@ import { Smartphone, CheckCircle2, ShieldCheck, ArrowRight, Lock } from 'lucide-
 
 export default function OtpAuthPage() {
   const router = useRouter();
-  const [phone, setPhone] = useState('0908123456');
-  const [otp, setOtp] = useState(['8', '8', '8', '8', '8', '8']);
-  const [sent, setSent] = useState(true);
+  const [phone, setPhone] = useState('');
+  const [otp, setOtp] = useState(['', '', '', '', '', '']);
+  const [sent, setSent] = useState(false);
   const [verifying, setVerifying] = useState(false);
 
   const handleVerify = () => {
+    if (otp.join('').length < 6) return;
     setVerifying(true);
     setTimeout(() => {
       setVerifying(false);
-      router.push('/onboarding');
+      router.push('/dashboard/card');
     }, 600);
   };
 
@@ -31,27 +32,28 @@ export default function OtpAuthPage() {
           </div>
 
           <div>
-            <h2 className="text-2xl font-extrabold text-white font-heading">Xác Thực OTP (SCR-A02)</h2>
+            <h2 className="text-2xl font-extrabold text-white font-heading">Xác Thực OTP</h2>
             <p className="text-xs text-gray-400 mt-1">
-              Đăng nhập ma sát tối thiểu với Mã Xác Thực OTP gửi qua Zalo / SMS
+              Đăng nhập bảo mật với Mã Xác Thực OTP gửi qua Email / SĐT
             </p>
           </div>
 
           <div className="space-y-4 text-left">
             <div>
-              <label className="text-xs text-gray-400 font-semibold mb-1 block">Số Điện Thoại Doanh Nhân</label>
+              <label className="text-xs text-gray-400 font-semibold mb-1 block">Email hoặc Số Điện Thoại</label>
               <input
                 type="text"
+                placeholder="0912345678 hoặc email@example.com"
                 value={phone}
                 onChange={e => setPhone(e.target.value)}
-                className="input-glass font-mono text-cyan-300"
+                className="input-glass font-mono text-cyan-300 text-xs"
               />
             </div>
 
             {sent && (
               <div className="space-y-2">
                 <label className="text-xs text-gray-400 font-semibold flex items-center justify-between">
-                  <span>Nhập 6 Số OTP (Mẫu: 888888)</span>
+                  <span>Nhập 6 Số OTP</span>
                   <span className="text-cyan-400 text-[11px] font-mono">Hết hạn sau 59s</span>
                 </label>
                 <div className="flex justify-between gap-2">
