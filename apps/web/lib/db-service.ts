@@ -617,7 +617,61 @@ export const DbService = {
   },
 
   /**
-   * 11. Multi-Table Realtime Listener Subscription
+   * 11. Exchange Contact from NFC Visitor / Guest
+   */
+  async exchangeGuestContact(params: {
+    ownerIdentityId: string;
+    guestName: string;
+    guestPhone: string;
+    guestCompany?: string;
+    guestNote?: string;
+  }): Promise<{ success: boolean; guestId: string }> {
+    const ownerUuid = ensureUuid(params.ownerIdentityId);
+    const guestId = typeof crypto !== 'undefined' && crypto.randomUUID 
+      ? crypto.randomUUID() 
+      : `${Math.random().toString(16).slice(2, 10)}-0000-4000-8000-${Date.now().toString(16).padStart(12, '0')}`;
+
+    if (isSupabaseConfigured) {
+      try {
+        // 1. Create a guest identity in person_identities
+        await supabase.from('person_identities').insert({
+          id: guestId,
+          full_name: params.guestName,
+          phone: params.guestPhone,
+          title: params.guestCompany || 'Đối tác kết nối NFC',
+          bio: params.guestNote || 'Khách chạm thẻ NFC và trao đổi danh thiếp tại sự kiện.',
+        });
+
+        // 2. Create connection
+        const { data: conn } = await supabase.from('connections').insert({
+          requester_identity_id: guestId,
+          receiver_identity_id: ownerUuid,
+          status: 'ACCEPTED',
+          requested_at: new Date().toISOString(),
+          responded_at: new Date().toISOString(),
+        }).select().single();
+
+        // 3. Create lead record
+        if (conn) {
+          await supabase.from('leads').insert({
+            connection_id: conn.id,
+            owner_identity_id: ownerUuid,
+            status: 'HOT',
+            next_action: 'Kết nối Zalo / Gọi điện theo số ' + params.guestPhone,
+          });
+        }
+
+        return { success: true, guestId };
+      } catch (err) {
+        console.warn('Supabase exchangeGuestContact error:', err);
+      }
+    }
+
+    return { success: true, guestId };
+  },
+
+  /**
+   * 12. Multi-Table Realtime Listener Subscription
    */
   subscribeToRealtime(onEvent: (payload: { table: string; eventType: string; newRecord: any; oldRecord?: any }) => void) {
     if (!isSupabaseConfigured) return () => {};

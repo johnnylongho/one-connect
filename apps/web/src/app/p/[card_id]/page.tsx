@@ -254,6 +254,13 @@ function DigitalProfileContent() {
   const isConnected = isOwner || existingConn?.status === 'CONNECTED';
   const isPending = !isConnected && (existingConn?.status === 'PENDING' || isConnRequested);
 
+  // Guest NFC Contact Exchange States
+  const [guestName, setGuestName] = useState('');
+  const [guestPhone, setGuestPhone] = useState('');
+  const [guestCompany, setGuestCompany] = useState('');
+  const [guestNote, setGuestNote] = useState('');
+  const [isExchanging, setIsExchanging] = useState(false);
+
   // Edit Profile Modal States
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isVcardModalOpen, setIsVcardModalOpen] = useState(false);
@@ -580,19 +587,58 @@ END:VCARD`;
     }
   };
 
-  // Instant B2B Connection trigger with Realtime Cloud Sync
+  // 1-Tap B2B Contact Exchange Trigger
   const handleRequestConnection = useCallback(() => {
-    if (matchedIdentity) {
+    // Nếu người xem đã là thành viên đăng nhập khác chủ thẻ
+    if (currentIdentity && matchedIdentity && currentIdentity.id !== matchedIdentity.id) {
       requestConnection(matchedIdentity.id, 'One Connect MICE NFC Tap');
+      setIsConnRequested(true);
+      toast({
+        title: 'ĐÃ GỬI DANH THIẾP THÀNH CÔNG!',
+        description: `Danh thiếp số của bạn đã gửi trực tiếp đến ${profile.fullName}.`,
+        variant: 'success',
+      });
+    } else {
+      // Khách / đối tác mới chạm thẻ NFC -> Mở form trao đổi danh thiếp nhanh 10 giây
+      setIsB2bModalOpen(true);
     }
-    setIsConnRequested(true);
-    setIsB2bModalOpen(true);
-    toast({
-      title: 'ĐÃ TRUYỀN YÊU CẦU REALTIME!',
-      description: `Yêu cầu trao đổi danh thiếp số đã gửi trực tiếp đến thiết bị của ${profile.fullName}.`,
-      variant: 'success',
-    });
-  }, [matchedIdentity, profile.fullName, requestConnection, toast]);
+  }, [currentIdentity, matchedIdentity, profile.fullName, requestConnection, toast]);
+
+  // Handle Guest Contact Exchange Submission
+  const handleSubmitExchange = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!guestName.trim() || !guestPhone.trim()) {
+      toast({
+        title: 'VUI LÒNG ĐIỀN ĐỦ THÔNG TIN',
+        description: 'Vui lòng nhập Họ tên và Số điện thoại / Zalo để gửi danh thiếp.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    setIsExchanging(true);
+    try {
+      await DbService.exchangeGuestContact({
+        ownerIdentityId: matchedIdentity?.id || '11111111-1111-1111-1111-111111111111',
+        guestName,
+        guestPhone,
+        guestCompany,
+        guestNote,
+      });
+
+      setIsConnRequested(true);
+      setIsB2bModalOpen(false);
+      toast({
+        title: 'ĐÃ TRAO ĐỔI DANH THIẾP THÀNH CÔNG!',
+        description: `Danh thiếp số của bạn đã được chuyển thẳng tới ${profile.fullName}.`,
+        variant: 'success',
+      });
+    } catch (err) {
+      console.warn('Exchange error:', err);
+    } finally {
+      setIsExchanging(false);
+    }
+  };
 
   const handleCopyLink = () => {
     if (typeof window !== 'undefined') {
@@ -831,17 +877,14 @@ END:VCARD`;
                   type="button"
                   onClick={handleRequestConnection}
                   size="lg"
-                  disabled={isConnected || isPending}
-                  className={`flex-1 font-black rounded-xl text-[13.5px] sm:text-[14px] py-4 shadow-sm active:scale-98 transition-all touch-manipulation ${
-                    isConnected
-                      ? 'bg-emerald-600 hover:bg-emerald-600 text-white cursor-default'
-                      : isPending
-                      ? 'bg-amber-500 hover:bg-amber-500 text-white cursor-default'
-                      : 'bg-gradient-to-r from-[#0066FF] to-[#FF6B00] hover:opacity-95 text-white cursor-pointer'
+                  className={`flex-1 font-black rounded-xl text-[13.5px] sm:text-[14px] py-4 shadow-sm active:scale-98 transition-all touch-manipulation cursor-pointer ${
+                    isConnected || isConnRequested
+                      ? 'bg-emerald-600 hover:bg-emerald-600 text-white'
+                      : 'bg-gradient-to-r from-[#0066FF] to-[#FF6B00] hover:opacity-95 text-white'
                   }`}
                 >
                   <UserCheck className="w-4 h-4 mr-1.5" />
-                  {isConnected ? '✓ Đã Kết Nối' : isPending ? '⏳ Đang Chờ Duyệt' : 'Kết Nối Realtime'}
+                  {isConnected || isConnRequested ? '✓ Đã Trao Đổi Danh Thiếp' : 'Trao Đổi Danh Thiếp'}
                 </Button>
               </div>
 
@@ -1221,7 +1264,7 @@ END:VCARD`;
           </Tabs>
         </div>
 
-        {/* 4. FLOATING BOTTOM ACTION DOCK (Thao tác 1 chạm luôn hiển thị cố định ở chân trang) */}
+        {/* 4. FLOATING BOTTOM ACTION DOCK */}
         <div className="fixed bottom-0 inset-x-0 z-40 bg-white/95 backdrop-blur-lg border-t border-slate-200/90 py-2.5 px-4 shadow-[0_-4px_20px_rgba(0,0,0,0.08)] max-w-md mx-auto">
           <div className="flex items-center gap-2">
             <Button
@@ -1237,58 +1280,103 @@ END:VCARD`;
               type="button"
               onClick={handleRequestConnection}
               size="sm"
-              disabled={isConnected || isPending}
-              className={`flex-1 font-extrabold rounded-xl text-[13px] py-3 shadow-2xs active:scale-98 transition-all ${
-                isConnected
-                  ? 'bg-emerald-600 hover:bg-emerald-600 text-white cursor-default'
-                  : isPending
-                  ? 'bg-amber-500 hover:bg-amber-500 text-white cursor-default'
-                  : 'bg-gradient-to-r from-[#0066FF] to-[#FF6B00] hover:opacity-95 text-white cursor-pointer'
+              className={`flex-1 font-extrabold rounded-xl text-[13px] py-3 shadow-2xs active:scale-98 transition-all cursor-pointer ${
+                isConnected || isConnRequested
+                  ? 'bg-emerald-600 hover:bg-emerald-600 text-white'
+                  : 'bg-gradient-to-r from-[#0066FF] to-[#FF6B00] hover:opacity-95 text-white'
               }`}
             >
               <UserCheck className="w-3.5 h-3.5 mr-1" />
-              {isConnected ? '✓ Đã Kết Nối' : isPending ? '⏳ Đang Chờ Duyệt' : 'Kết Nối Realtime'}
+              {isConnected || isConnRequested ? '✓ Đã Trao Đổi' : 'Trao Đổi Danh Thiếp'}
             </Button>
           </div>
         </div>
 
-        {/* 4. MODAL XÁC NHẬN KẾT NỐI B2B TỨC THÌ (Zero Delay Modal) */}
+        {/* 5. MODAL TRAO ĐỔI DANH THIẾP 1 CHẠM QUA NFC */}
         <Dialog open={isB2bModalOpen} onOpenChange={setIsB2bModalOpen}>
-          <DialogContent className="sm:max-w-sm bg-white border-slate-200 text-slate-900 shadow-2xl rounded-3xl p-5 space-y-3 text-center">
-            <DialogHeader className="space-y-1.5">
-              <div className="w-14 h-14 rounded-full bg-emerald-50 border-2 border-emerald-200 text-emerald-600 flex items-center justify-center mx-auto shadow-xs">
-                <CheckCircle2 className="w-8 h-8" />
+          <DialogContent className="sm:max-w-md bg-white border-slate-200 text-slate-900 shadow-2xl rounded-3xl p-5 space-y-3">
+            <DialogHeader className="space-y-1.5 text-center">
+              <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-[#0066FF] to-blue-500 text-white flex items-center justify-center mx-auto shadow-md shadow-blue-500/20">
+                <UserCheck className="w-6 h-6" />
               </div>
               <DialogTitle className="text-lg font-black text-slate-900 font-heading">
-                Đã Gửi Yêu Cầu Kết Nối B2B!
+                Trao Đổi Danh Thiếp Số
               </DialogTitle>
-              <DialogDescription className="text-[13px] text-slate-600 leading-relaxed">
-                Hồ sơ danh thiếp số của bạn đã được gửi thành công đến doanh nhân <strong>{profile.fullName}</strong>.
+              <DialogDescription className="text-xs text-slate-500 leading-relaxed">
+                Gửi lại thông tin liên hệ của bạn để <strong>{profile.fullName}</strong> lưu vào danh bạ và kết nối B2B trực tiếp.
               </DialogDescription>
             </DialogHeader>
 
-            <div className="p-3 rounded-2xl bg-blue-50/70 border border-blue-200 space-y-1 text-[13px] text-left">
-              <div className="flex justify-between">
-                <span className="text-slate-500">Đối Tác:</span>
-                <span className="font-bold text-slate-900">{profile.fullName}</span>
+            <form onSubmit={handleSubmitExchange} className="space-y-3 pt-1">
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">
+                  Họ và tên của bạn <span className="text-rose-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="Ví dụ: Nguyễn Văn Hùng"
+                  value={guestName}
+                  onChange={(e) => setGuestName(e.target.value)}
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 text-xs font-medium focus:outline-hidden focus:ring-2 focus:ring-[#0066FF] focus:bg-white transition-all"
+                />
               </div>
-              <div className="flex justify-between">
-                <span className="text-slate-500">Tổ Chức:</span>
-                <span className="font-semibold text-blue-700 truncate">{profile.company}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-slate-500">Trạng Thái:</span>
-                <span className="font-bold text-emerald-600">Chờ Ghép Đôi 2 Chiều</span>
-              </div>
-            </div>
 
-            <Button
-              type="button"
-              onClick={() => setIsB2bModalOpen(false)}
-              className="w-full bg-[#0066FF] hover:bg-blue-700 text-white font-bold rounded-xl py-3.5 text-[14px]"
-            >
-              Đồng Ý & Tiếp Tục
-            </Button>
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">
+                  Số điện thoại / Zalo <span className="text-rose-500">*</span>
+                </label>
+                <input
+                  type="tel"
+                  required
+                  placeholder="Ví dụ: 0912 345 678"
+                  value={guestPhone}
+                  onChange={(e) => setGuestPhone(e.target.value)}
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 text-xs font-medium focus:outline-hidden focus:ring-2 focus:ring-[#0066FF] focus:bg-white transition-all"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">
+                  Công ty & Chức vụ (Tùy chọn)
+                </label>
+                <input
+                  type="text"
+                  placeholder="Ví dụ: Giám Đốc Cty TNHH Giải Pháp Số"
+                  value={guestCompany}
+                  onChange={(e) => setGuestCompany(e.target.value)}
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 text-xs font-medium focus:outline-hidden focus:ring-2 focus:ring-[#0066FF] focus:bg-white transition-all"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">
+                  Nhu cầu kết nối / Lời nhắn (Tùy chọn)
+                </label>
+                <input
+                  type="text"
+                  placeholder="Ví dụ: Quan tâm hợp tác B2B phân phối sản phẩm"
+                  value={guestNote}
+                  onChange={(e) => setGuestNote(e.target.value)}
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 text-xs font-medium focus:outline-hidden focus:ring-2 focus:ring-[#0066FF] focus:bg-white transition-all"
+                />
+              </div>
+
+              <div className="pt-2">
+                <Button
+                  type="submit"
+                  disabled={isExchanging}
+                  className="w-full bg-gradient-to-r from-[#0066FF] to-[#FF6B00] hover:opacity-95 text-white font-bold rounded-xl py-3 text-xs shadow-md shadow-blue-500/20 active:scale-98 transition-all cursor-pointer"
+                >
+                  {isExchanging ? 'Đang gửi qua Cloud...' : 'Xác Nhận Gửi Danh Thiếp'}
+                </Button>
+              </div>
+
+              <p className="text-[10.5px] text-slate-400 text-center flex items-center justify-center gap-1">
+                <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+                <span>Bảo mật dữ liệu cá nhân theo Nghị định 13 & Luật PDPL 91/2025</span>
+              </p>
+            </form>
           </DialogContent>
         </Dialog>
 
