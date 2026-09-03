@@ -215,7 +215,7 @@ export function B2BMatchmakingView({ initialMatchings }: B2BMatchmakingViewProps
     setIsDialogOpen(false);
 
     toast({
-      title: 'ĐÃ GỬI LỜI MỜI B2B MATCHMAKING! 🚀',
+      title: 'ĐÃ GỬI LỜI MỜI B2B MATCHMAKING!',
       description: `Yêu cầu hẹn gặp đã gửi tới ${selectedTarget.fullName} (${selectedTarget.company}). Thông báo đã kích hoạt.`,
       variant: 'success',
     });
@@ -233,7 +233,7 @@ export function B2BMatchmakingView({ initialMatchings }: B2BMatchmakingViewProps
 
     if (newStatus === 'accepted') {
       toast({
-        title: 'ĐÃ CHẤP THUẬN CUỘC HẸN B2B! 🤝',
+        title: 'ĐÃ CHẤP THUẬN CUỘC HẸN B2B!',
         description: 'Bàn đàm phán đã được khóa và gửi thông báo nhắc lịch đến cả 2 bên.',
         variant: 'success',
       });

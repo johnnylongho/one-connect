@@ -101,7 +101,7 @@ export function DelegateCheckinTable({ delegates: initialDelegates, isLoading = 
   // Bulk Actions Handlers
   const handleBulkPrintQr = () => {
     toast({
-      title: 'ĐANG XỬ LÝ IN THẺ QR HÀNG LOẠT! 🖨️',
+      title: 'ĐANG XỬ LÝ IN THẺ QR HÀNG LOẠT!',
       description: `Đã gửi lệnh in thẻ VIP Badge cho ${selectedIds.length} đại biểu đã chọn.`,
       variant: 'success',
     });
@@ -109,7 +109,7 @@ export function DelegateCheckinTable({ delegates: initialDelegates, isLoading = 
 
   const handleBulkSendEmail = () => {
     toast({
-      title: 'ĐÃ GỬI EMAIL NHẮC LỊCH! ✉️',
+      title: 'ĐÃ GỬI EMAIL NHẮC LỊCH!',
       description: `Hệ thống đã tự động gửi email thông báo mã vé đến ${selectedIds.length} đại biểu.`,
       variant: 'success',
     });

@@ -327,7 +327,7 @@ function DigitalProfileContent() {
 
     if (file.size > 5 * 1024 * 1024) {
       toast({
-        title: 'TỆP QUÁ LỚN! ⚠️',
+        title: 'TỆP QUÁ LỚN!',
         description: 'Vui lòng chọn ảnh có dung lượng dưới 5MB.',
         variant: 'destructive',
       });
@@ -340,7 +340,7 @@ function DigitalProfileContent() {
       if (result) {
         setEditAvatarUrl(result);
         toast({
-          title: 'ĐÃ TẢI ẢNH CHÂN DUNG LÊN! 📸',
+          title: 'ĐÃ TẢI ẢNH CHÂN DUNG LÊN!',
           description: 'Bấm "Lưu Thay Đổi" để áp dụng vào danh thiếp số của bạn.',
           variant: 'success',
         });
@@ -353,7 +353,7 @@ function DigitalProfileContent() {
     const newAvatar = `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(editFullName || 'User')}&backgroundColor=0066ff,00c2ff,10b981,f59e0b`;
     setEditAvatarUrl(newAvatar);
     toast({
-      title: 'ĐÃ TẠO AVATAR CHỮ KÝ! 🎨',
+      title: 'ĐÃ TẠO AVATAR CHỮ KÝ!',
       description: 'Đã tự động tạo avatar theo họ tên của bạn.',
       variant: 'success',
     });
@@ -362,7 +362,7 @@ function DigitalProfileContent() {
   const handleOpenEditModal = () => {
     if (!isOwner) {
       toast({
-        title: 'BẠN KHÔNG CÓ QUYỀN CHỈNH SỬA! 🔒',
+        title: 'BẠN KHÔNG CÓ QUYỀN CHỈNH SỬA!',
         description: 'Chỉ chủ sở hữu hồ sơ mới có quyền cập nhật thông tin này.',
         variant: 'destructive',
       });
@@ -396,7 +396,7 @@ function DigitalProfileContent() {
     e.preventDefault();
     if (!matchedIdentity || !isOwner) {
       toast({
-        title: 'BẠN KHÔNG CÓ QUYỀN CHỈNH SỬA! 🔒',
+        title: 'BẠN KHÔNG CÓ QUYỀN CHỈNH SỬA!',
         description: 'Chỉ chủ sở hữu hồ sơ mới có quyền cập nhật thông tin này.',
         variant: 'destructive',
       });
@@ -434,7 +434,7 @@ function DigitalProfileContent() {
 
     setIsEditModalOpen(false);
     toast({
-      title: 'ĐÃ CẬP NHẬT HỒ SƠ THÀNH CÔNG! ✨',
+      title: 'ĐÃ CẬP NHẬT HỒ SƠ THÀNH CÔNG!',
       description: 'Lĩnh vực chuyên môn, kỹ năng, doanh nghiệp và MST đã được cập nhật đồng bộ.',
       variant: 'success',
     });
@@ -519,7 +519,7 @@ X-SOCIALPROFILE;type=zalo:${profile.zalo}
 X-TAXCODE:${profile.taxCode}
 X-ASSOCIATION:${profile.association}
 ${photoField}CATEGORIES:One Connect,B2B Partner,VIP Delegate,${profile.eventJoined}
-NOTE:👤 ${profile.fullName} (${profile.displayName})\\n🏢 ${profile.company}\\n💼 Chức vụ: ${profile.roleVietnamese}\\n🏛️ Hiệp hội: ${profile.association}\\n📋 MST: ${profile.taxCode}\\n📍 Địa chỉ: ${profile.address}\\n💬 Zalo: ${profile.zalo}\\n📅 Bối cảnh gặp gỡ: ${formattedDateTime}\\n🎪 Sự kiện: ${profile.eventJoined}\\n💡 Slogan: "${profile.slogan}"\\n🌐 Website: ${profile.websiteDisplay}
+NOTE:${profile.fullName} (${profile.displayName})\\n${profile.company}\\nChức vụ: ${profile.roleVietnamese}\\nHiệp hội: ${profile.association}\\nMST: ${profile.taxCode}\\nĐịa chỉ: ${profile.address}\\nZalo: ${profile.zalo}\\nBối cảnh gặp gỡ: ${formattedDateTime}\\nSự kiện: ${profile.eventJoined}\\nSlogan: "${profile.slogan}"\\nWebsite: ${profile.websiteDisplay}
 END:VCARD`;
 
     const blob = new Blob([vCardData], { type: 'text/vcard;charset=utf-8;' });
@@ -533,7 +533,7 @@ END:VCARD`;
 
     setIsVcardModalOpen(true);
     toast({
-      title: 'ĐÃ TẢI DANH BẠ vCARD 1-CLICK! 📇',
+      title: 'ĐÃ TẢI DANH BẠ vCARD 1-CLICK!',
       description: `Tệp danh bạ chuẩn của ${profile.fullName} đã được tải về máy.`,
       variant: 'success',
     });
@@ -549,14 +549,14 @@ END:VCARD`;
 
   // 1-Click Zalo Share with Professional B2B Introduction
   const handleShareZalo = () => {
-    const shareText = `👤 Kính gửi Quý Đối Tác, tôi xin gửi Danh Thiếp Số One Connect của ${profile.fullName} (${profile.displayName}) - ${profile.roleVietnamese} tại ${profile.company}.\n🌐 Xem hồ sơ & Kết nối B2B: ${typeof window !== 'undefined' ? window.location.href : 'https://one-connect-network.vercel.app/p/johnnylongho'}\n📞 Hotline: ${profile.phone} | 💬 Zalo: ${profile.zalo}`;
+    const shareText = `Kính gửi Quý Đối Tác, tôi xin gửi Danh Thiếp Số One Connect của ${profile.fullName} (${profile.displayName}) - ${profile.roleVietnamese} tại ${profile.company}.\nXem hồ sơ & Kết nối B2B: ${typeof window !== 'undefined' ? window.location.href : 'https://one-connect-network.vercel.app/p/johnnylongho'}\nHotline: ${profile.phone} | Zalo: ${profile.zalo}`;
     
     if (typeof window !== 'undefined') {
       navigator.clipboard.writeText(shareText);
       setIsCopied(true);
       setTimeout(() => setIsCopied(false), 2000);
       toast({
-        title: 'ĐÃ SAO CHÉP MẪU TIN NHẮN ZALO! 💬',
+        title: 'ĐÃ SAO CHÉP MẪU TIN NHẮN ZALO!',
         description: 'Đã sao chép lời giới thiệu B2B. Bạn có thể dán vào Zalo gửi ngay.',
         variant: 'success',
       });
@@ -569,7 +569,7 @@ END:VCARD`;
     setIsConnRequested(true);
     setIsB2bModalOpen(true);
     toast({
-      title: 'ĐÃ GỬI LỜI MỜI KẾT NỐI B2B! 🤝',
+      title: 'ĐÃ GỬI LỜI MỜI KẾT NỐI B2B!',
       description: `Lời mời và danh thiếp số đã được gửi tức thì đến ${profile.fullName}.`,
       variant: 'success',
     });
@@ -581,7 +581,7 @@ END:VCARD`;
       setIsCopied(true);
       setTimeout(() => setIsCopied(false), 2000);
       toast({
-        title: 'ĐÃ SAO CHÉP LIÊN KẾT DANH THIẾP SỐ! 📋',
+        title: 'ĐÃ SAO CHÉP LIÊN KẾT DANH THIẾP SỐ!',
         description: 'Bạn có thể dán link gửi qua Zalo, Messenger hoặc Email.',
         variant: 'success',
       });
@@ -971,10 +971,10 @@ END:VCARD`;
                   </span>
                 </div>
 
-                {/* 🔍 ĐANG TÌM KIẾM (SEEKING) */}
+                {/* ĐANG TÌM KIẾM (SEEKING) */}
                 <div className="space-y-1.5">
                   <span className="text-[11px] font-extrabold text-[#FF6B00] uppercase tracking-wider flex items-center gap-1">
-                    🔍 ĐANG TÌM KIẾM ĐỐI TÁC (SEEKING):
+                    ĐANG TÌM KIẾM ĐỐI TÁC (SEEKING):
                   </span>
                   <div className="flex flex-wrap gap-1.5">
                     {profile.seekingNeeds.map((need, idx) => (
@@ -988,10 +988,10 @@ END:VCARD`;
                   </div>
                 </div>
 
-                {/* 💡 NĂNG LỰC CUNG CẤP (OFFERING) */}
+                {/* NĂNG LỰC CUNG CẤP (OFFERING) */}
                 <div className="space-y-1.5 pt-1">
                   <span className="text-[11px] font-extrabold text-[#0066FF] uppercase tracking-wider flex items-center gap-1">
-                    💡 NĂNG LỰC CUNG CẤP (OFFERING):
+                    NĂNG LỰC CUNG CẤP (OFFERING):
                   </span>
                   <div className="flex flex-wrap gap-1.5">
                     {profile.offeringServices.map((offer, idx) => (
@@ -1005,7 +1005,7 @@ END:VCARD`;
                   </div>
                 </div>
 
-                {/* 📄 TÀI LIỆU NĂNG LỰC / BROCHURE */}
+                {/* TÀI LIỆU NĂNG LỰC / BROCHURE */}
                 {profile.brochureUrl && (
                   <div className="pt-2 border-t border-slate-100">
                     <a
@@ -1383,7 +1383,7 @@ END:VCARD`;
                 <Download className="w-7 h-7" />
               </div>
               <DialogTitle className="text-lg font-black text-slate-900 font-heading">
-                Đã Xuất Danh Bạ vCard 3.0! 📇
+                Đã Xuất Danh Bạ vCard 3.0!
               </DialogTitle>
               <DialogDescription className="text-[13px] text-slate-600 leading-relaxed">
                 Tệp danh bạ điện tử chuẩn hóa của <strong>{profile.fullName}</strong> đã được tạo thành công kèm ảnh đại diện, chức vụ, MST và Zalo.
@@ -1619,7 +1619,7 @@ END:VCARD`;
                         {ind}
                       </option>
                     ))}
-                    <option value="Khác (Tự nhập)">➕ Khác (Tự nhập lĩnh vực riêng...)</option>
+                    <option value="Khác (Tự nhập)">Khác (Tự nhập lĩnh vực riêng...)</option>
                   </select>
 
                   {/* Ô nhập tùy chỉnh linh hoạt */}

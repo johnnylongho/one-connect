@@ -140,7 +140,7 @@ export default function RelationshipMemoryDetailPage() {
                     <Calendar className="w-3 h-3 text-slate-500" /> Ngày gặp: 20/08/2026
                   </span>
                   <span className="text-slate-600">
-                    🎪 {conn.contextEventName || 'Diễn Đàn Doanh Nhân Trẻ Khánh Hòa 2026'}
+                    {conn.contextEventName || 'Diễn Đàn Doanh Nhân Trẻ Khánh Hòa 2026'}
                   </span>
                 </div>
               </div>
@@ -214,7 +214,7 @@ export default function RelationshipMemoryDetailPage() {
                   notes.map(n => (
                     <div key={n.id} className="p-4 rounded-2xl bg-slate-50 border border-slate-200/90 space-y-1.5 text-xs sm:text-sm">
                       <p className="text-slate-800 leading-relaxed font-medium">{n.content}</p>
-                      <p className="text-[10.5px] text-slate-400 font-mono flex items-center gap-1 pt-1">
+                      <p className="text-[10.5px] text-slate-400 font-mono flex items-center gap-1 pt-1" suppressHydrationWarning>
                         <Clock className="w-3 h-3 text-cyan-600" /> {new Date(n.createdAt).toLocaleString('vi-VN')}
                       </p>
                     </div>
@@ -249,7 +249,7 @@ export default function RelationshipMemoryDetailPage() {
                           : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'
                       }`}
                     >
-                      {st === 'HOT' ? '🔥 HOT' : st === 'WARM' ? '⚡ WARM' : '🌱 NEW'}
+                      {st === 'HOT' ? 'HOT' : st === 'WARM' ? 'WARM' : 'NEW'}
                     </button>
                   ))}
                 </div>

@@ -237,7 +237,7 @@ export default function DigitalNfcCardPage() {
       if ('vibrate' in navigator) {
         navigator.vibrate([100, 50, 100]);
       }
-      setNfcWriteStatus('GHI THẺ NFC THÀNH CÔNG! 🎉');
+      setNfcWriteStatus('GHI THẺ NFC THÀNH CÔNG!');
       showAlert(`Đã ghi thành công liên kết định danh vào chip NFC: ${targetUrl}`, 'success');
       setTimeout(() => {
         setIsWritingNfc(false);
@@ -363,7 +363,7 @@ export default function DigitalNfcCardPage() {
     setTimeout(() => {
       setIsSimulatingTap(false);
       setTapSuccess(true);
-      showAlert('⚡ Chạm thẻ NFC 1-chạm thành công (0.42s)! Đã truyền tải Token định danh số.', 'success');
+      showAlert('Chạm thẻ NFC 1-chạm thành công (0.42s)! Đã truyền tải Token định danh số.', 'success');
       setTimeout(() => setTapSuccess(false), 3000);
     }, 800);
   };
@@ -546,8 +546,8 @@ export default function DigitalNfcCardPage() {
               {tapSuccess && (
                 <div className="p-4 rounded-2xl bg-gradient-to-r from-emerald-50 to-blue-50 border border-emerald-300 flex items-center justify-between animate-in zoom-in-95 duration-200 shadow-md">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-emerald-500 text-white flex items-center justify-center font-black">
-                      ⚡
+                    <div className="w-10 h-10 rounded-full bg-emerald-500 text-white flex items-center justify-center">
+                      <Zap className="w-5 h-5" />
                     </div>
                     <div>
                       <p className="text-xs font-bold text-emerald-900">ĐÃ NHẬN DIỆN THẺ NFC CHẠM GẦN</p>
@@ -728,7 +728,7 @@ export default function DigitalNfcCardPage() {
               <div className="space-y-3 text-xs">
                 <div className="space-y-1.5">
                   <span className="text-[11px] font-extrabold text-[#FF6B00] uppercase tracking-wider flex items-center gap-1">
-                    🔍 ĐANG TÌM KIẾM ĐỐI TÁC:
+                    ĐANG TÌM KIẾM ĐỐI TÁC:
                   </span>
                   <div className="flex flex-wrap gap-1.5">
                     {(currentIdentity?.seekingNeeds || [
@@ -748,7 +748,7 @@ export default function DigitalNfcCardPage() {
 
                 <div className="space-y-1.5 pt-1">
                   <span className="text-[11px] font-extrabold text-[#0066FF] uppercase tracking-wider flex items-center gap-1">
-                    💡 NĂNG LỰC CUNG CẤP:
+                    NĂNG LỰC CUNG CẤP:
                   </span>
                   <div className="flex flex-wrap gap-1.5">
                     {(currentIdentity?.offeringServices || [

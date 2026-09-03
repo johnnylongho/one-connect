@@ -39,7 +39,7 @@ export default function MemberEventHubPage() {
   const handleRegister = (eventId: string, eventName: string) => {
     if (!pdplConsent) {
       toast({
-        title: 'CẦN ĐỒNG Ý PHÁP LÝ PDPL ⚠️',
+        title: 'CẦN ĐỒNG Ý PHÁP LÝ PDPL',
         description: 'Vui lòng xác nhận đồng ý chia sẻ thông tin theo Luật PDPL 91/2025/QH15 để đăng ký vé.',
         variant: 'destructive',
       });
@@ -50,7 +50,7 @@ export default function MemberEventHubPage() {
       registerForEvent(eventId, currentIdentity.id, selectedTicketType);
     }
     toast({
-      title: 'ĐĂNG KÝ VÉ THÀNH CÔNG! 🎉',
+      title: 'ĐĂNG KÝ VÉ THÀNH CÔNG!',
       description: `Mã vé NFC/QR đã được cấp cho sự kiện "${eventName}". Vui lòng xuất trình thẻ tại trạm soát vé.`,
       variant: 'success',
     });

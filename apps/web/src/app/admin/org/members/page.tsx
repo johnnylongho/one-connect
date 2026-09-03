@@ -187,10 +187,10 @@ export default function MemberDirectoryAdminPage() {
             className="px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-xs font-bold text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#0066FF]/20 cursor-pointer"
           >
             <option value="ALL">Tất cả vai trò</option>
-            <option value="SUPER_ADMIN">👑 Quản trị Hệ thống (SUPER_ADMIN)</option>
-            <option value="ORG_ADMIN">🏛️ Quản trị Hiệp hội (ORG_ADMIN)</option>
-            <option value="EVENT_OPERATOR">📱 Lễ tân Check-in (EVENT_OPERATOR)</option>
-            <option value="MEMBER">💼 Hội viên / Doanh nhân (MEMBER)</option>
+            <option value="SUPER_ADMIN">Quản trị Hệ thống (SUPER_ADMIN)</option>
+            <option value="ORG_ADMIN">Quản trị Hiệp hội (ORG_ADMIN)</option>
+            <option value="EVENT_OPERATOR">Lễ tân Check-in (EVENT_OPERATOR)</option>
+            <option value="MEMBER">Hội viên / Doanh nhân (MEMBER)</option>
           </select>
 
           <Badge className="bg-slate-100 text-slate-700 border-slate-300 font-mono text-xs shrink-0">
@@ -205,10 +205,10 @@ export default function MemberDirectoryAdminPage() {
           </span>
           {[
             { id: 'ALL', label: 'Tất Cả' },
-            { id: 'Công nghệ', label: '💻 Công Nghệ' },
-            { id: 'Vinacoffee', label: '☕ Nông Sản & F&B' },
-            { id: 'TechCorp', label: '⚙️ Phần Mềm & Cloud' },
-            { id: 'Aplusvn', label: '🚀 Media & Định Danh' },
+            { id: 'Công nghệ', label: 'Công Nghệ' },
+            { id: 'Vinacoffee', label: 'Nông Sản & F&B' },
+            { id: 'TechCorp', label: 'Phần Mềm & Cloud' },
+            { id: 'Aplusvn', label: 'Media & Định Danh' },
           ].map((ind) => (
             <button
               key={ind.id}
@@ -234,12 +234,12 @@ export default function MemberDirectoryAdminPage() {
           const currentMemberRole: RoleType = m.role || (m.id === 'id-001' ? 'SUPER_ADMIN' : 'MEMBER');
 
           const roleBadgeConfig: Record<string, { label: string; bg: string }> = {
-            SUPER_ADMIN: { label: '👑 SUPER ADMIN', bg: 'bg-purple-50 text-purple-700 border-purple-200' },
-            ORG_ADMIN: { label: '🏛️ ORG ADMIN', bg: 'bg-blue-50 text-[#0066FF] border-blue-200' },
-            ORGANIZER: { label: '🏛️ BAN TỔ CHỨC', bg: 'bg-blue-50 text-[#0066FF] border-blue-200' },
-            EVENT_OPERATOR: { label: '📱 LỄ TÂN CHECK-IN', bg: 'bg-amber-50 text-amber-700 border-amber-200' },
-            MEMBER: { label: '💼 HỘI VIÊN', bg: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
-            GUEST: { label: '👤 KHÁCH MỜI', bg: 'bg-slate-50 text-slate-600 border-slate-200' },
+            SUPER_ADMIN: { label: 'SUPER ADMIN', bg: 'bg-purple-50 text-purple-700 border-purple-200' },
+            ORG_ADMIN: { label: 'ORG ADMIN', bg: 'bg-blue-50 text-[#0066FF] border-blue-200' },
+            ORGANIZER: { label: 'BAN TỔ CHỨC', bg: 'bg-blue-50 text-[#0066FF] border-blue-200' },
+            EVENT_OPERATOR: { label: 'LỄ TÂN CHECK-IN', bg: 'bg-amber-50 text-amber-700 border-amber-200' },
+            MEMBER: { label: 'HỘI VIÊN', bg: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
+            GUEST: { label: 'KHÁCH MỜI', bg: 'bg-slate-50 text-slate-600 border-slate-200' },
           };
           const currentBadge = roleBadgeConfig[currentMemberRole] || { label: currentMemberRole, bg: 'bg-slate-50 text-slate-600 border-slate-200' };
 
@@ -299,10 +299,10 @@ export default function MemberDirectoryAdminPage() {
                     className="px-2.5 py-1.5 rounded-xl bg-slate-50 border border-slate-200 text-xs font-bold text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#0066FF]/20 cursor-pointer"
                     title="Phân quyền tài khoản này"
                   >
-                    <option value="MEMBER">💼 MEMBER (Hội viên)</option>
-                    <option value="EVENT_OPERATOR">📱 EVENT_OPERATOR (Lễ tân)</option>
-                    <option value="ORG_ADMIN">🏛️ ORG_ADMIN (Quản trị Hiệp hội)</option>
-                    <option value="SUPER_ADMIN">👑 SUPER_ADMIN (Quản trị Hệ thống)</option>
+                    <option value="MEMBER">MEMBER (Hội viên)</option>
+                    <option value="EVENT_OPERATOR">EVENT_OPERATOR (Lễ tân)</option>
+                    <option value="ORG_ADMIN">ORG_ADMIN (Quản trị Hiệp hội)</option>
+                    <option value="SUPER_ADMIN">SUPER_ADMIN (Quản trị Hệ thống)</option>
                   </select>
                 </div>
 
@@ -443,10 +443,10 @@ export default function MemberDirectoryAdminPage() {
                     onChange={(e) => setSelectedRole(e.target.value as RoleType)}
                     className="w-full px-3.5 py-2.5 rounded-xl border-2 border-[#0066FF]/40 text-sm font-bold text-slate-900 bg-blue-50/50 focus:outline-none focus:ring-2 focus:ring-[#0066FF]/20"
                   >
-                    <option value="MEMBER">💼 MEMBER (Hội viên / Doanh nhân)</option>
-                    <option value="EVENT_OPERATOR">📱 EVENT_OPERATOR (Lễ tân Điểm danh)</option>
-                    <option value="ORG_ADMIN">🏛️ ORG_ADMIN (Quản trị Hiệp hội / CLB)</option>
-                    <option value="SUPER_ADMIN">👑 SUPER_ADMIN (Quản trị Hệ thống)</option>
+                    <option value="MEMBER">MEMBER (Hội viên / Doanh nhân)</option>
+                    <option value="EVENT_OPERATOR">EVENT_OPERATOR (Lễ tân Điểm danh)</option>
+                    <option value="ORG_ADMIN">ORG_ADMIN (Quản trị Hiệp hội / CLB)</option>
+                    <option value="SUPER_ADMIN">SUPER_ADMIN (Quản trị Hệ thống)</option>
                   </select>
                 </div>
                 <div>

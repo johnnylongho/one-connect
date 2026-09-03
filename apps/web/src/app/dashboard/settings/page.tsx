@@ -104,7 +104,7 @@ export default function SettingsAndPrivacyPage() {
       industry: settingsIndustry,
       expertiseSkills: settingsSkills,
     });
-    showToast('Đã lưu tùy chọn lĩnh vực chuyên môn & kỹ năng cốt lõi thành công! ✨', 'success');
+    showToast('Đã lưu tùy chọn lĩnh vực chuyên môn & kỹ năng cốt lõi thành công!', 'success');
   };
 
   // Upload Avatar Handler
@@ -338,7 +338,7 @@ export default function SettingsAndPrivacyPage() {
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
                 <span className="font-bold text-slate-900 text-sm flex items-center gap-1.5 font-heading">
-                  🏢 Ngành Nghề / Lĩnh Vực Chính
+                  Ngành Nghề / Lĩnh Vực Chính
                 </span>
                 <p className="text-slate-500 text-[11px]">
                   Ngành hoạt động trọng tâm hiển thị trên thẻ số & kết nối B2B
@@ -366,7 +366,7 @@ export default function SettingsAndPrivacyPage() {
                     {ind}
                   </option>
                 ))}
-                <option value="Khác (Tự nhập)">➕ Khác (Tự nhập lĩnh vực chuyên môn riêng...)</option>
+                <option value="Khác (Tự nhập)">Khác (Tự nhập lĩnh vực chuyên môn riêng...)</option>
               </select>
             </div>
 
@@ -687,7 +687,7 @@ export default function SettingsAndPrivacyPage() {
                 <div className="p-1.5 rounded-lg bg-blue-50 text-[#0066FF]">
                   <CreditCard className="w-4 h-4" />
                 </div>
-                <span>📱 Điện Thoại (Hiện Trường)</span>
+                <span>Điện Thoại (Hiện Trường)</span>
               </div>
               <Badge variant="outline" className="text-[10px] bg-blue-50 text-[#0066FF] border-blue-200">
                 On-the-go
@@ -720,7 +720,7 @@ export default function SettingsAndPrivacyPage() {
                 <div className="p-1.5 rounded-lg bg-orange-50 text-[#FF6B00]">
                   <Building2 className="w-4 h-4" />
                 </div>
-                <span>💻 Laptop / Desktop (Admin Cockpit)</span>
+                <span>Laptop / Desktop (Admin Cockpit)</span>
               </div>
               <Badge variant="outline" className="text-[10px] bg-orange-50 text-[#FF6B00] border-orange-200">
                 High Density
@@ -764,58 +764,58 @@ export default function SettingsAndPrivacyPage() {
             <tbody className="divide-y divide-slate-100 text-slate-700 font-medium">
               <tr className="hover:bg-blue-50/40 transition-colors">
                 <td className="py-2.5 px-3 font-bold text-slate-900 flex items-center gap-1.5">
-                  <span>👑 SUPER_ADMIN</span>
+                  <span>SUPER_ADMIN</span>
                 </td>
-                <td className="py-2.5 px-2 text-center text-emerald-600 font-bold">✅</td>
-                <td className="py-2.5 px-2 text-center text-emerald-600 font-bold">✅</td>
-                <td className="py-2.5 px-2 text-center text-emerald-600 font-bold">✅</td>
-                <td className="py-2.5 px-2 text-center text-emerald-600 font-bold">✅</td>
-                <td className="py-2.5 px-2 text-center text-emerald-600 font-bold">✅</td>
-                <td className="py-2.5 px-2 text-center text-emerald-600 font-bold">✅</td>
+                <td className="py-2.5 px-2 text-center text-emerald-600 font-bold">✓</td>
+                <td className="py-2.5 px-2 text-center text-emerald-600 font-bold">✓</td>
+                <td className="py-2.5 px-2 text-center text-emerald-600 font-bold">✓</td>
+                <td className="py-2.5 px-2 text-center text-emerald-600 font-bold">✓</td>
+                <td className="py-2.5 px-2 text-center text-emerald-600 font-bold">✓</td>
+                <td className="py-2.5 px-2 text-center text-emerald-600 font-bold">✓</td>
               </tr>
               <tr className="hover:bg-blue-50/40 transition-colors">
                 <td className="py-2.5 px-3 font-bold text-blue-900 flex items-center gap-1.5">
-                  <span>🏛️ ORG_ADMIN</span>
+                  <span>ORG_ADMIN</span>
                 </td>
-                <td className="py-2.5 px-2 text-center text-emerald-600 font-bold">✅</td>
-                <td className="py-2.5 px-2 text-center text-emerald-600 font-bold">✅</td>
-                <td className="py-2.5 px-2 text-center text-emerald-600 font-bold">✅</td>
-                <td className="py-2.5 px-2 text-center text-emerald-600 font-bold">✅</td>
-                <td className="py-2.5 px-2 text-center text-slate-300">❌</td>
-                <td className="py-2.5 px-2 text-center text-emerald-600 font-bold">✅</td>
+                <td className="py-2.5 px-2 text-center text-emerald-600 font-bold">✓</td>
+                <td className="py-2.5 px-2 text-center text-emerald-600 font-bold">✓</td>
+                <td className="py-2.5 px-2 text-center text-emerald-600 font-bold">✓</td>
+                <td className="py-2.5 px-2 text-center text-emerald-600 font-bold">✓</td>
+                <td className="py-2.5 px-2 text-center text-slate-300">—</td>
+                <td className="py-2.5 px-2 text-center text-emerald-600 font-bold">✓</td>
               </tr>
               <tr className="hover:bg-blue-50/40 transition-colors">
                 <td className="py-2.5 px-3 font-bold text-slate-800 flex items-center gap-1.5">
-                  <span>📱 EVENT_OPERATOR</span>
+                  <span>EVENT_OPERATOR</span>
                 </td>
-                <td className="py-2.5 px-2 text-center text-slate-300">❌</td>
-                <td className="py-2.5 px-2 text-center text-slate-300">❌</td>
-                <td className="py-2.5 px-2 text-center text-emerald-600 font-bold">✅</td>
-                <td className="py-2.5 px-2 text-center text-slate-300">❌</td>
-                <td className="py-2.5 px-2 text-center text-slate-300">❌</td>
-                <td className="py-2.5 px-2 text-center text-slate-300">❌</td>
+                <td className="py-2.5 px-2 text-center text-slate-300">—</td>
+                <td className="py-2.5 px-2 text-center text-slate-300">—</td>
+                <td className="py-2.5 px-2 text-center text-emerald-600 font-bold">✓</td>
+                <td className="py-2.5 px-2 text-center text-slate-300">—</td>
+                <td className="py-2.5 px-2 text-center text-slate-300">—</td>
+                <td className="py-2.5 px-2 text-center text-slate-300">—</td>
               </tr>
               <tr className="hover:bg-blue-50/40 transition-colors">
                 <td className="py-2.5 px-3 font-bold text-slate-800 flex items-center gap-1.5">
-                  <span>💼 MEMBER</span>
+                  <span>MEMBER</span>
                 </td>
-                <td className="py-2.5 px-2 text-center text-emerald-600 font-bold">✅</td>
-                <td className="py-2.5 px-2 text-center text-emerald-600 font-bold">✅</td>
-                <td className="py-2.5 px-2 text-center text-slate-300">❌</td>
-                <td className="py-2.5 px-2 text-center text-slate-300">❌</td>
-                <td className="py-2.5 px-2 text-center text-slate-300">❌</td>
-                <td className="py-2.5 px-2 text-center text-slate-300">❌</td>
+                <td className="py-2.5 px-2 text-center text-emerald-600 font-bold">✓</td>
+                <td className="py-2.5 px-2 text-center text-emerald-600 font-bold">✓</td>
+                <td className="py-2.5 px-2 text-center text-slate-300">—</td>
+                <td className="py-2.5 px-2 text-center text-slate-300">—</td>
+                <td className="py-2.5 px-2 text-center text-slate-300">—</td>
+                <td className="py-2.5 px-2 text-center text-slate-300">—</td>
               </tr>
               <tr className="hover:bg-blue-50/40 transition-colors">
                 <td className="py-2.5 px-3 font-bold text-slate-500 flex items-center gap-1.5">
-                  <span>👤 GUEST</span>
+                  <span>GUEST</span>
                 </td>
-                <td className="py-2.5 px-2 text-center text-slate-300">❌</td>
-                <td className="py-2.5 px-2 text-center text-slate-300">❌</td>
-                <td className="py-2.5 px-2 text-center text-slate-300">❌</td>
-                <td className="py-2.5 px-2 text-center text-slate-300">❌</td>
-                <td className="py-2.5 px-2 text-center text-slate-300">❌</td>
-                <td className="py-2.5 px-2 text-center text-slate-300">❌</td>
+                <td className="py-2.5 px-2 text-center text-slate-300">—</td>
+                <td className="py-2.5 px-2 text-center text-slate-300">—</td>
+                <td className="py-2.5 px-2 text-center text-slate-300">—</td>
+                <td className="py-2.5 px-2 text-center text-slate-300">—</td>
+                <td className="py-2.5 px-2 text-center text-slate-300">—</td>
+                <td className="py-2.5 px-2 text-center text-slate-300">—</td>
               </tr>
             </tbody>
           </table>
@@ -866,7 +866,7 @@ export default function SettingsAndPrivacyPage() {
 
           <div className="space-y-3 py-2 text-xs">
             <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-900 space-y-1">
-              <p className="font-bold">⚠️ Toàn bộ dữ liệu sau sẽ bị xóa ngay lập tức:</p>
+              <p className="font-bold">Toàn bộ dữ liệu sau sẽ bị xóa ngay lập tức:</p>
               <ul className="list-disc list-inside text-[11.5px] space-y-0.5 text-rose-800">
                 <li>Hồ sơ danh thiếp số @{currentIdentity?.username || 'user'}</li>
                 <li>Chip NFC {currentCard?.cardUid} sẽ bị vô hiệu hóa</li>

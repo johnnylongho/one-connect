@@ -11,14 +11,19 @@
 
 | Hạng mục | Nội dung chi tiết |
 |---|---|
-| **Tên dự án / đề tài** | **ONE CONNECT NETWORK — Nền Tảng Hạ Tầng Định Danh Số (Business Identity) & Quản Trị Quan Hệ Giao Thương B2B Tích Hợp Thẻ Chạm NFC Không Ma Sát Tuân Thủ Luật Dữ Liệu Cá Nhân 91/2025/QH15 Cho Hệ Sinh Thái Doanh Nghiệp Khánh Hòa** |
-| **Lĩnh vực tham gia** | Chuyển đổi số, Công nghệ thông tin & Viễn thông, Đổi mới sáng tạo trong Du lịch MICE và Dịch vụ B2B |
-| **Đơn vị / Tác giả chủ trì** | Hồ Hoàng Long (Johnny Long Hồ) — Quản lý Dự án kiêm Media (Aplusvn Media & Tech) |
-| **Email liên hệ** | `johnny@aplusvn.com` / `long.ho@aplusvn.com` |
-| **Điện thoại** | 0903.888.999 |
+| **Tên dự án / đề tài** | **Nền Tảng Hạ Tầng Định Danh Số (Business Identity) & Quản Trị Quan Hệ Giao Thương B2B Tích Hợp Thẻ Chạm NFC Không Ma Sát Tuân Thủ Luật Dữ Liệu Cá Nhân 91/2025/QH15 Cho Hệ Sinh Thái Doanh Nghiệp Khánh Hòa** |
+| **Lĩnh vực tham gia** | Chuyển đổi số, Công nghệ Thông tin, Đổi mới sáng tạo trong Du lịch MICE & Dịch vụ B2B |
+| **Bảng dự thi** | BẢNG DỰ ÁN KHỞI NGHIỆP ĐMST (Đã có sản phẩm MVP v1.0 hoạt động thực tế) |
+| **Chủ nhiệm dự án** | HỒ HOÀNG LONG — Quản lý Dự án & Phát triển Sản phẩm |
+| **Đơn vị công tác / Pháp nhân** | Công ty Cổ phần Tập đoàn Công nghệ số A+ (A PLUSVN) |
+| **Địa chỉ liên hệ** | Tầng 8, Tòa nhà ASIA, 25 Lê Lợi, Nha Trang, Tỉnh Khánh Hòa |
+| **Email liên hệ** | `contact.johnnylongho@gmail.com` |
+| **Điện thoại** | 0794.677.369 |
+| **Thành viên nhóm dự án** | 1. Hồ Hoàng Long (Quản lý dự án và phát triển sản phẩm)<br>2. Nguyễn Nhật Thanh (Trưởng phòng phát triển AI)<br>3. Trần Tuấn Kiệt (Định hướng kinh doanh) |
 | **Trạng thái phát triển** | Đã hoàn thành bản MVP v1.0 hoạt động thực tế (Live Product) |
 | **Đường dẫn sản phẩm Live** | [https://one-connect-network.vercel.app/](https://one-connect-network.vercel.app/) |
 | **Mã nguồn dự án (GitHub)** | [https://github.com/johnnylongho/one-connect](https://github.com/johnnylongho/one-connect) |
+| **Tình trạng sở hữu trí tuệ** | Chưa đăng ký (Đang hoàn thiện hồ sơ đăng ký tại Cục SHTT) |
 
 ---
 
@@ -127,7 +132,7 @@ Nhằm hiện thực hóa dự án và đưa ONE CONNECT trở thành giải ph�
 
 ---
 
-*Khánh Hòa, ngày 18 tháng 08 năm 2026*  
-**ĐẠI DIỆN DỰ ÁN ONE CONNECT NETWORK**  
+*Khánh Hòa, ngày 28 tháng 08 năm 2026*  
+**CHỦ NHIỆM DỰ ÁN ONE CONNECT NETWORK**  
 *(Đã ký)*  
-**Hồ Hoàng Long (Johnny Long Hồ)**
+**HỒ HOÀNG LONG**

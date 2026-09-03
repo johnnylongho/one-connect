@@ -25,6 +25,7 @@ import {
   Layers,
 } from 'lucide-react';
 import { useOneConnectStore } from '@/lib/store';
+import { Logo } from '@/components/shared/Logo';
 import './globals.css';
 
 const beVietnamPro = Be_Vietnam_Pro({
@@ -56,11 +57,11 @@ export interface NavItem {
   isCoreFeature?: boolean;
   allowedRoles: ('SUPER_ADMIN' | 'ORG_ADMIN' | 'EVENT_OPERATOR' | 'MEMBER' | 'GUEST')[];
   section: 'PERSONAL' | 'OPERATION' | 'ADMIN' | 'PITCHING';
-  deviceTag?: '📱' | '💻';
+  deviceTag?: string;
 }
 
 export const ALL_NAV_ITEMS: NavItem[] = [
-  // 📱 TRỤ CỘT 1: ĐỊNH DANH DOANH NHÂN (Identity Layer)
+  // TRỤ CỘT 1: ĐỊNH DANH DOANH NHÂN (Identity Layer)
   {
     href: '/dashboard',
     label: 'Tổng Quan Bảng Điều Khiển',
@@ -76,7 +77,6 @@ export const ALL_NAV_ITEMS: NavItem[] = [
     badge: 'CORE',
     allowedRoles: ['SUPER_ADMIN', 'ORG_ADMIN', 'MEMBER'],
     section: 'PERSONAL',
-    deviceTag: '📱',
   },
   {
     href: '/dashboard/settings',
@@ -86,7 +86,7 @@ export const ALL_NAV_ITEMS: NavItem[] = [
     section: 'PERSONAL',
   },
 
-  // 🎪 TRỤ CỘT 2: SỰ KIỆN & CHECK-IN (Event Operations & Check-in)
+  // TRỤ CỘT 2: SỰ KIỆN & CHECK-IN (Event Operations & Check-in)
   {
     href: '/events',
     label: 'Lịch Trình & Sự Kiện',
@@ -99,10 +99,9 @@ export const ALL_NAV_ITEMS: NavItem[] = [
     label: 'Trạm Check-in Siêu Tốc',
     icon: Smartphone,
     isCoreFeature: true,
-    badge: 'CORE <1s',
+    badge: '<1s',
     allowedRoles: ['SUPER_ADMIN', 'ORG_ADMIN', 'EVENT_OPERATOR'],
     section: 'OPERATION',
-    deviceTag: '📱',
   },
   {
     href: '/operator/attendees',
@@ -112,7 +111,7 @@ export const ALL_NAV_ITEMS: NavItem[] = [
     section: 'OPERATION',
   },
 
-  // 🤝 TRỤ CỘT 3: KẾT NỐI & BỘ NHỚ QUAN HỆ (Connection & Relationship Memory)
+  // TRỤ CỘT 3: KẾT NỐI & BỘ NHỚ QUAN HỆ (Connection & Relationship Memory)
   {
     href: '/dashboard/connections',
     label: 'Danh Bạ B2B & Ghi Chú Riêng Tư',
@@ -132,14 +131,13 @@ export const ALL_NAV_ITEMS: NavItem[] = [
     section: 'ADMIN',
   },
 
-  // 🏢 TRỤ CỘT 4: QUẢN TRỊ HIỆP HỘI & BÁO CÁO (Association Hub)
+  // TRỤ CỘT 4: QUẢN TRỊ HIỆP HỘI & BÁO CÁO (Association Hub)
   {
     href: '/admin/org/members',
     label: 'Danh Bạ Hội Viên Hiệp Hội',
     icon: Users,
     allowedRoles: ['SUPER_ADMIN', 'ORG_ADMIN'],
     section: 'PITCHING',
-    deviceTag: '💻',
   },
   {
     href: '/reports',
@@ -147,15 +145,13 @@ export const ALL_NAV_ITEMS: NavItem[] = [
     icon: BarChart3,
     allowedRoles: ['SUPER_ADMIN', 'ORG_ADMIN'],
     section: 'PITCHING',
-    deviceTag: '💻',
   },
 
-  // ✨ TIỆN ÍCH: DEMO HUB
+  // TIỆN ÍCH: DEMO HUB
   {
     href: '/demo',
     label: 'Live Pitching Prototype',
     icon: Sparkles,
-    highlight: true,
     allowedRoles: ['SUPER_ADMIN', 'ORG_ADMIN', 'EVENT_OPERATOR', 'MEMBER', 'GUEST'],
     section: 'PITCHING',
   },
@@ -267,8 +263,6 @@ export default function RootLayout({
                 className={`flex items-center h-9 rounded-xl transition-all ${
                   isActive
                     ? 'font-bold bg-blue-50 text-[#0066FF] border border-blue-200/80 shadow-2xs'
-                    : item.highlight
-                    ? 'text-orange-600 bg-orange-50/80 hover:bg-orange-100/80 border border-orange-200/80 font-semibold'
                     : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
                 } ${isSidebarCollapsed ? 'w-9' : 'w-full'}`}
               >
@@ -278,8 +272,6 @@ export default function RootLayout({
                     className={`w-4 h-4 shrink-0 ${
                       isActive
                         ? 'text-[#0066FF]'
-                        : item.highlight
-                        ? 'text-[#FF6B00]'
                         : 'text-slate-500'
                     }`}
                   />
@@ -290,13 +282,12 @@ export default function RootLayout({
                   <div className="flex-1 flex items-center justify-between min-w-0 pr-2.5">
                     <span className="truncate">{item.label}</span>
                     <div className="flex items-center gap-1 shrink-0 ml-1.5">
-                      {item.deviceTag && (
-                        <span className="text-[9.5px] opacity-70" title="Thiết bị ưu tiên">
-                          {item.deviceTag}
-                        </span>
-                      )}
                       {item.badge && (
-                        <span className="text-[9px] font-bold px-1.5 py-0.2 rounded-full bg-orange-100 text-orange-600 border border-orange-200">
+                        <span className={`text-[9px] font-bold px-1.5 py-0.2 rounded-full border ${
+                          isActive
+                            ? 'bg-blue-100 text-[#0066FF] border-blue-200'
+                            : 'bg-slate-100 text-slate-600 border-slate-200'
+                        }`}>
                           {item.badge}
                         </span>
                       )}
@@ -394,7 +385,7 @@ export default function RootLayout({
                         effectiveRole === 'SUPER_ADMIN' ? 'bg-blue-50 text-[#0066FF]' : 'text-slate-700 hover:bg-slate-50'
                       }`}
                     >
-                      👑 SUPER_ADMIN (Quản Trị Hệ Thống)
+                      SUPER_ADMIN (Quản Trị Hệ Thống)
                     </button>
                     <button
                       onClick={() => {
@@ -405,7 +396,7 @@ export default function RootLayout({
                         effectiveRole === 'ORG_ADMIN' ? 'bg-blue-50 text-[#0066FF]' : 'text-slate-700 hover:bg-slate-50'
                       }`}
                     >
-                      🏛️ ORG_ADMIN (Quản Trị Hiệp Hội)
+                      ORG_ADMIN (Quản Trị Hiệp Hội)
                     </button>
                     <button
                       onClick={() => {
@@ -416,7 +407,7 @@ export default function RootLayout({
                         effectiveRole === 'EVENT_OPERATOR' ? 'bg-blue-50 text-[#0066FF]' : 'text-slate-700 hover:bg-slate-50'
                       }`}
                     >
-                      📱 EVENT_OPERATOR (Lễ Tân / Check-in)
+                      EVENT_OPERATOR (Lễ Tân / Check-in)
                     </button>
                     <button
                       onClick={() => {
@@ -427,7 +418,7 @@ export default function RootLayout({
                         effectiveRole === 'MEMBER' ? 'bg-blue-50 text-[#0066FF]' : 'text-slate-700 hover:bg-slate-50'
                       }`}
                     >
-                      💼 MEMBER (Doanh Nhân / Hội Viên)
+                      MEMBER (Doanh Nhân / Hội Viên)
                     </button>
                     <button
                       onClick={() => {
@@ -438,7 +429,7 @@ export default function RootLayout({
                         effectiveRole === 'GUEST' ? 'bg-blue-50 text-[#0066FF]' : 'text-slate-700 hover:bg-slate-50'
                       }`}
                     >
-                      👤 GUEST (Khách Mời Vãng Lai)
+                      GUEST (Khách Mời Vãng Lai)
                     </button>
                   </div>
                 )}
@@ -489,10 +480,10 @@ export default function RootLayout({
 
                 {/* Categorized RBAC Navigation Groups (Starts with Overview) */}
                 <div className="space-y-2">
-                  {renderNavGroup(personalItems, '📱 1. ĐỊNH DANH (IDENTITY)', 'Profile')}
-                  {renderNavGroup(operationItems, '🎪 2. SỰ KIỆN & CHECK-IN', 'Sự kiện')}
-                  {renderNavGroup(adminItems, '🤝 3. KẾT NỐI & BỘ NHỚ QUAN HỆ', 'Mạng lưới')}
-                  {renderNavGroup(pitchingItems, '🏢 4. HIỆP HỘI & PROTOTYPE', 'Cộng đồng')}
+                  {renderNavGroup(personalItems, '1. ĐỊNH DANH (IDENTITY)', 'Profile')}
+                  {renderNavGroup(operationItems, '2. SỰ KIỆN & CHECK-IN', 'Sự kiện')}
+                  {renderNavGroup(adminItems, '3. KẾT NỐI & CRM B2B', 'Mạng lưới')}
+                  {renderNavGroup(pitchingItems, '4. HIỆP HỘI & PROTOTYPE', 'Cộng đồng')}
                 </div>
               </div>
 
@@ -580,10 +571,10 @@ export default function RootLayout({
                     </div>
 
                     <div className="space-y-3">
-                      {renderNavGroup(personalItems, '📱 MODULE 1: DOANH NHÂN & B2B')}
-                      {renderNavGroup(operationItems, '🎪 MODULE 2: QUẢN LÝ EVENT')}
-                      {renderNavGroup(adminItems, '🏢 MODULE 3: QUẢN TRỊ HIỆP HỘI')}
-                      {renderNavGroup(pitchingItems, '✨ DEMO HUB')}
+                      {renderNavGroup(personalItems, 'MODULE 1: DOANH NHÂN & B2B')}
+                      {renderNavGroup(operationItems, 'MODULE 2: QUẢN LÝ EVENT')}
+                      {renderNavGroup(adminItems, 'MODULE 3: QUẢN TRỊ HIỆP HỘI')}
+                      {renderNavGroup(pitchingItems, 'DEMO HUB PROTOTYPE')}
                     </div>
                   </div>
 
