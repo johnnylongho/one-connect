@@ -228,14 +228,15 @@ function DigitalProfileContent() {
 
   const matchedCard = state.cards.find(c => c.personIdentityId === matchedIdentity?.id && c.status === 'ACTIVE') || state.cards[0];
 
-  // Quyền chỉnh sửa: CHỈ cho phép chủ sở hữu tài khoản (hoặc Super Admin) chỉnh sửa hồ sơ
+  // Quyền chỉnh sửa: Chỉ bật khi chủ tài khoản mở ở chế độ chỉnh sửa hoặc từ Dashboard
   const isOwner = Boolean(
+    mounted &&
     currentIdentity &&
     matchedIdentity &&
     (currentIdentity.id === matchedIdentity.id ||
-     currentIdentity.username.toLowerCase() === matchedIdentity.username.toLowerCase() ||
-     currentIdentity.userId === matchedIdentity.userId ||
-     state.currentRole === 'SUPER_ADMIN')
+     currentIdentity.username.toLowerCase() === matchedIdentity.username.toLowerCase()) &&
+    typeof window !== 'undefined' &&
+    (window.location.search.includes('mode=edit') || window.location.search.includes('owner=true'))
   );
 
   // Live connection status from Cloud Database & Realtime
@@ -251,7 +252,8 @@ function DigitalProfileContent() {
          (ensureUuid(c.requesterIdentityId) === targetUuid && ensureUuid(c.receiverIdentityId) === myUuid)
   );
 
-  const isConnected = isOwner || existingConn?.status === 'CONNECTED';
+  // Trạng thái kết nối: Chỉ bật khi 2 bên đã thực sự có bản ghi CONNECTED trong CSDL
+  const isConnected = existingConn?.status === 'CONNECTED';
   const isPending = !isConnected && (existingConn?.status === 'PENDING' || isConnRequested);
 
   // Guest NFC Contact Exchange States
