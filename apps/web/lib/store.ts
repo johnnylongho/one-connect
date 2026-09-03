@@ -65,10 +65,12 @@ const defaultState: AppState = {
 };
 
 export function useOneConnectStore() {
-  const [state, setState] = useState<AppState>(() => {
-    if (typeof window === 'undefined') return defaultState;
+  const [state, setState] = useState<AppState>(defaultState);
+  const [isHydrated, setIsHydrated] = useState(false);
+
+  // Load saved state from localStorage only after initial client mount to prevent SSR hydration mismatch
+  useEffect(() => {
     try {
-      // Clear legacy storage v1 if present
       localStorage.removeItem('one_connect_app_state_v1');
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
@@ -101,19 +103,20 @@ export function useOneConnectStore() {
           }
           return c;
         });
-        return parsed;
+        setState(parsed);
       }
     } catch (e) {
       console.error('Failed to load state from localStorage', e);
     }
-    return defaultState;
-  });
+    setIsHydrated(true);
+  }, []);
 
+  // Save changes to localStorage only after state has been hydrated
   useEffect(() => {
-    if (typeof window !== 'undefined') {
+    if (isHydrated && typeof window !== 'undefined') {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
     }
-  }, [state]);
+  }, [state, isHydrated]);
 
   // Realtime Cloud Synchronization with Supabase
   useEffect(() => {

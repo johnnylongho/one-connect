@@ -370,7 +370,7 @@ export default function RootLayout({
                   className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold border border-slate-200 transition-colors"
                 >
                   <span className="hidden sm:inline">Vai trò:</span>
-                  <strong className="text-slate-900">{effectiveRole}</strong>
+                  <strong className="text-slate-900" suppressHydrationWarning>{effectiveRole}</strong>
                   <ChevronDown className="w-3.5 h-3.5 text-slate-500" />
                 </button>
 
@@ -504,8 +504,8 @@ export default function RootLayout({
                         />
                       </div>
                       <div className="min-w-0 flex-1 pr-1">
-                        <p className="font-bold text-slate-900 text-xs truncate">{currentUserName}</p>
-                        <p className="text-[9.5px] text-blue-600 font-bold truncate uppercase">{effectiveRole}</p>
+                        <p className="font-bold text-slate-900 text-xs truncate" suppressHydrationWarning>{currentUserName}</p>
+                        <p className="text-[9.5px] text-blue-600 font-bold truncate uppercase" suppressHydrationWarning>{effectiveRole}</p>
                       </div>
                     </div>
                     <Link href="/login" title="Đăng xuất" className="p-1 text-slate-400 hover:text-rose-600 transition-colors shrink-0">
