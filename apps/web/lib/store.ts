@@ -104,8 +104,8 @@ export function useOneConnectStore() {
               ...c,
               cardUid: '04:8F:2A:1B:9C:5D:80',
               nfcIdentifier: 'NFC-2026-APLUS-001',
-              dynamicUrl: 'https://one-connect-network.vercel.app/p/johnnylongho',
-              qrValue: 'https://one-connect-network.vercel.app/p/johnnylongho',
+              dynamicUrl: 'https://www.oneconnect.id.vn/p/johnnylongho',
+              qrValue: 'https://www.oneconnect.id.vn/p/johnnylongho',
             };
           }
           return c;
@@ -193,7 +193,7 @@ export function useOneConnectStore() {
               id: newRecord.id,
               requesterName: reqUser?.fullName || 'Doanh nhân đối tác',
               requesterTitle: reqUser?.title || 'Đại diện Doanh nghiệp',
-              requesterAvatar: reqUser?.avatarUrl || '/avatar-johnny-long.jpg',
+              requesterAvatar: reqUser?.avatarUrl || (reqUser?.username === 'johnnylongho' ? '/avatar-johnny-long.jpg' : `https://ui-avatars.com/api/?name=${encodeURIComponent(reqUser?.fullName || 'User')}&background=0284c7&color=fff&bold=true`),
             };
           } else if (newRecord.status === 'ACCEPTED' || newRecord.status === 'REJECTED') {
             if (updatedIncoming?.id === newRecord.id) {
@@ -258,7 +258,7 @@ export function useOneConnectStore() {
                 username: 'guest',
                 fullName: `${newRecord.requester_name}`,
                 displayName: `${newRecord.requester_name}`,
-                avatarUrl: '/avatar-johnny-long.jpg',
+                avatarUrl: newRecord.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(newRecord.requester_name || 'Khach')}&background=0284c7&color=fff&bold=true`,
                 title: newRecord.requester_title || 'Khách vừa chạm thẻ NFC',
                 bio: '',
                 phone: newRecord.requester_phone || '',
@@ -277,7 +277,7 @@ export function useOneConnectStore() {
                 id: newRecord.id,
                 requesterName: `${newRecord.requester_name} (${newRecord.requester_phone})`,
                 requesterTitle: newRecord.requester_title || 'Khách vừa chạm thẻ NFC',
-                requesterAvatar: '/avatar-johnny-long.jpg',
+                requesterAvatar: newRecord.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(newRecord.requester_name || 'Khach')}&background=0284c7&color=fff&bold=true`,
               },
               connections: [guestConn, ...prev.connections.filter(c => c.id !== newRecord.id)],
             };
@@ -309,7 +309,7 @@ export function useOneConnectStore() {
             username: rawUsername,
             fullName: newRecord.full_name,
             displayName: newRecord.display_name || newRecord.full_name,
-            avatarUrl: newRecord.avatar_url || '/avatar-johnny-long.jpg',
+            avatarUrl: newRecord.avatar_url || (rawUsername === 'johnnylongho' ? '/avatar-johnny-long.jpg' : `https://ui-avatars.com/api/?name=${encodeURIComponent(newRecord.full_name || 'User')}&background=0284c7&color=fff&bold=true`),
             title: newRecord.title || 'Doanh Nhân',
             bio: newRecord.bio || '',
             phone: newRecord.phone || '',
@@ -585,7 +585,7 @@ export function useOneConnectStore() {
             username: 'guest',
             fullName: incoming?.requesterName || 'Khách chạm thẻ NFC',
             displayName: incoming?.requesterName || 'Khách chạm thẻ NFC',
-            avatarUrl: '/avatar-johnny-long.jpg',
+            avatarUrl: `https://ui-avatars.com/api/?name=${encodeURIComponent(incoming?.requesterName || 'Khach')}&background=0284c7&color=fff&bold=true`,
             title: incoming?.requesterTitle || 'Đối tác kết nối NFC',
             bio: '',
             phone: '',
