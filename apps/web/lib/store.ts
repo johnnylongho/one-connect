@@ -237,6 +237,37 @@ export function useOneConnectStore() {
             connections: updatedConnections,
           };
         });
+      } else if (table === 'broadcast_connection' && newRecord) {
+        setState(prev => {
+          const myUuid = ensureUuid(prev.currentIdentityId);
+          const isMeReceiver = newRecord.receiver_identity_id === myUuid || 
+            newRecord.receiver_identity_id === prev.currentIdentityId ||
+            prev.currentIdentityId === 'id-001';
+
+          if (isMeReceiver && newRecord.status === 'PENDING') {
+            return {
+              ...prev,
+              incomingRequest: {
+                id: newRecord.id,
+                requesterName: `${newRecord.requester_name} (${newRecord.requester_phone})`,
+                requesterTitle: newRecord.requester_title || 'Khách vừa chạm thẻ NFC',
+                requesterAvatar: '/avatar-johnny-long.jpg',
+              },
+            };
+          }
+          return prev;
+        });
+      } else if (table === 'broadcast_accepted' && newRecord) {
+        setState(prev => {
+          const updated = prev.connections.map(c => 
+            c.id === newRecord.connectionId ? { ...c, status: 'CONNECTED' as const } : c
+          );
+          return {
+            ...prev,
+            connections: updated,
+            incomingRequest: prev.incomingRequest?.id === newRecord.connectionId ? null : prev.incomingRequest,
+          };
+        });
       } else if (table === 'person_identities' && newRecord) {
         setState(prev => {
           const rawUsername = (newRecord.full_name || '')
@@ -527,8 +558,9 @@ export function useOneConnectStore() {
       auditLogs: [newAuditLog, ...prev.auditLogs],
     }));
 
-    // Dispatch to Cloud Supabase Database
+    // Dispatch to Cloud Supabase Database & Broadcast to Partner
     DbService.respondToConnection(connectionId, 'ACCEPTED').catch(console.warn);
+    DbService.broadcastEvent('connection_accepted', { connectionId, status: 'ACCEPTED' }).catch(console.warn);
   };
 
   const rejectConnection = (connectionId: string) => {

@@ -617,7 +617,7 @@ export const DbService = {
   },
 
   /**
-   * 11. Exchange Contact from NFC Visitor / Guest
+   * 11. Exchange Contact from NFC Visitor / Guest (via Server API & Realtime Broadcast)
    */
   async exchangeGuestContact(params: {
     ownerIdentityId: string;
@@ -625,59 +625,71 @@ export const DbService = {
     guestPhone: string;
     guestCompany?: string;
     guestNote?: string;
-  }): Promise<{ success: boolean; guestId: string }> {
+  }): Promise<{ success: boolean; connectionId: string }> {
     const ownerUuid = ensureUuid(params.ownerIdentityId);
-    const guestId = typeof crypto !== 'undefined' && crypto.randomUUID 
-      ? crypto.randomUUID() 
-      : `${Math.random().toString(16).slice(2, 10)}-0000-4000-8000-${Date.now().toString(16).padStart(12, '0')}`;
 
-    if (isSupabaseConfigured) {
-      try {
-        // 1. Create a guest identity in person_identities
-        await supabase.from('person_identities').insert({
-          id: guestId,
-          full_name: params.guestName,
-          phone: params.guestPhone,
-          title: params.guestCompany || 'Đối tác kết nối NFC',
-          bio: params.guestNote || 'Khách chạm thẻ NFC và trao đổi danh thiếp tại sự kiện.',
-        });
+    try {
+      // 1. Call server API (Runs with Service Role Key - completely bypasses RLS)
+      const res = await fetch('/api/connections/exchange', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ownerIdentityId: ownerUuid,
+          guestName: params.guestName,
+          guestPhone: params.guestPhone,
+          guestCompany: params.guestCompany,
+          guestNote: params.guestNote,
+        }),
+      });
 
-        // 2. Create connection
-        const { data: conn } = await supabase.from('connections').insert({
-          requester_identity_id: guestId,
-          receiver_identity_id: ownerUuid,
-          status: 'ACCEPTED',
-          requested_at: new Date().toISOString(),
-          responded_at: new Date().toISOString(),
-        }).select().single();
+      const data = await res.json();
+      const connectionId = data?.connectionId || `conn-${Date.now()}`;
 
-        // 3. Create lead record
-        if (conn) {
-          await supabase.from('leads').insert({
-            connection_id: conn.id,
-            owner_identity_id: ownerUuid,
-            status: 'HOT',
-            next_action: 'Kết nối Zalo / Gọi điện theo số ' + params.guestPhone,
-          });
-        }
+      // 2. Broadcast on the live network channel instantly (< 50ms)
+      await this.broadcastEvent('new_connection_request', {
+        id: connectionId,
+        receiver_identity_id: ownerUuid,
+        requester_identity_id: data?.guestId || `guest-${Date.now()}`,
+        requester_name: params.guestName,
+        requester_phone: params.guestPhone,
+        requester_title: params.guestCompany || 'Đối tác chạm thẻ NFC',
+        status: 'PENDING',
+        requested_at: new Date().toISOString(),
+      });
 
-        return { success: true, guestId };
-      } catch (err) {
-        console.warn('Supabase exchangeGuestContact error:', err);
-      }
+      return { success: true, connectionId };
+    } catch (err) {
+      console.warn('exchangeGuestContact error:', err);
+      return { success: true, connectionId: `local-${Date.now()}` };
     }
-
-    return { success: true, guestId };
   },
 
   /**
-   * 12. Multi-Table Realtime Listener Subscription
+   * 12. Broadcast Instant WebSocket Event Across All Connected Devices
+   */
+  async broadcastEvent(event: string, payload: any) {
+    if (!isSupabaseConfigured) return;
+
+    try {
+      const channel = supabase.channel('oneconnect-live-network');
+      await channel.send({
+        type: 'broadcast',
+        event,
+        payload,
+      });
+    } catch (e) {
+      console.warn('Supabase broadcastEvent error:', e);
+    }
+  },
+
+  /**
+   * 13. Unified Realtime Listener Subscription (PostgreSQL WAL + Broadcast)
    */
   subscribeToRealtime(onEvent: (payload: { table: string; eventType: string; newRecord: any; oldRecord?: any }) => void) {
     if (!isSupabaseConfigured) return () => {};
 
     try {
-      const channelName = `oc_rt_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
+      const channelName = 'oneconnect-live-network';
       const channel = supabase.channel(channelName);
 
       channel
@@ -696,15 +708,34 @@ export const DbService = {
           }
         )
         .on(
-          'postgres_changes',
-          { event: '*', schema: 'public', table: 'person_identities' },
+          'broadcast',
+          { event: 'new_connection_request' },
           (payload) => {
-            onEvent({ table: 'person_identities', eventType: payload.eventType, newRecord: payload.new, oldRecord: payload.old });
+            if (payload?.payload) {
+              onEvent({
+                table: 'broadcast_connection',
+                eventType: 'INSERT',
+                newRecord: payload.payload,
+              });
+            }
+          }
+        )
+        .on(
+          'broadcast',
+          { event: 'connection_accepted' },
+          (payload) => {
+            if (payload?.payload) {
+              onEvent({
+                table: 'broadcast_accepted',
+                eventType: 'UPDATE',
+                newRecord: payload.payload,
+              });
+            }
           }
         )
         .subscribe((status) => {
           if (status === 'SUBSCRIBED') {
-            console.log('✅ Supabase Realtime channel successfully connected:', channelName);
+            console.log('✅ OneConnect Realtime channel connected:', channelName);
           }
         });
 

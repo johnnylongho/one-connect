@@ -629,8 +629,8 @@ END:VCARD`;
       setIsConnRequested(true);
       setIsB2bModalOpen(false);
       toast({
-        title: 'ĐÃ TRAO ĐỔI DANH THIẾP THÀNH CÔNG!',
-        description: `Danh thiếp số của bạn đã được chuyển thẳng tới ${profile.fullName}.`,
+        title: 'ĐÃ GỬI DANH THIẾP THÀNH CÔNG!',
+        description: `Thông tin đã truyền đến thiết bị của ${profile.fullName}. Đang chờ đối tác bấm xác nhận...`,
         variant: 'success',
       });
     } catch (err) {
@@ -877,14 +877,21 @@ END:VCARD`;
                   type="button"
                   onClick={handleRequestConnection}
                   size="lg"
+                  disabled={isConnected || isConnRequested}
                   className={`flex-1 font-black rounded-xl text-[13.5px] sm:text-[14px] py-4 shadow-sm active:scale-98 transition-all touch-manipulation cursor-pointer ${
-                    isConnected || isConnRequested
+                    isConnected
                       ? 'bg-emerald-600 hover:bg-emerald-600 text-white'
+                      : isConnRequested
+                      ? 'bg-amber-500 hover:bg-amber-500 text-white animate-pulse'
                       : 'bg-gradient-to-r from-[#0066FF] to-[#FF6B00] hover:opacity-95 text-white'
                   }`}
                 >
                   <UserCheck className="w-4 h-4 mr-1.5" />
-                  {isConnected || isConnRequested ? '✓ Đã Trao Đổi Danh Thiếp' : 'Trao Đổi Danh Thiếp'}
+                  {isConnected
+                    ? '✓ Đã Kết Nối'
+                    : isConnRequested
+                    ? '⏳ Đang Chờ Xác Nhận...'
+                    : 'Trao Đổi Danh Thiếp'}
                 </Button>
               </div>
 
@@ -1280,14 +1287,21 @@ END:VCARD`;
               type="button"
               onClick={handleRequestConnection}
               size="sm"
+              disabled={isConnected || isConnRequested}
               className={`flex-1 font-extrabold rounded-xl text-[13px] py-3 shadow-2xs active:scale-98 transition-all cursor-pointer ${
-                isConnected || isConnRequested
+                isConnected
                   ? 'bg-emerald-600 hover:bg-emerald-600 text-white'
+                  : isConnRequested
+                  ? 'bg-amber-500 hover:bg-amber-500 text-white animate-pulse'
                   : 'bg-gradient-to-r from-[#0066FF] to-[#FF6B00] hover:opacity-95 text-white'
               }`}
             >
               <UserCheck className="w-3.5 h-3.5 mr-1" />
-              {isConnected || isConnRequested ? '✓ Đã Trao Đổi' : 'Trao Đổi Danh Thiếp'}
+              {isConnected
+                ? '✓ Đã Kết Nối'
+                : isConnRequested
+                ? '⏳ Đang Chờ Xác Nhận...'
+                : 'Trao Đổi Danh Thiếp'}
             </Button>
           </div>
         </div>
