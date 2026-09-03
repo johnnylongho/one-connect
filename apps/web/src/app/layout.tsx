@@ -321,9 +321,9 @@ export default function RootLayout({
         <div className="min-h-screen flex flex-col bg-[#F8FAFC] w-full overflow-x-hidden">
           
           {/* ================================================================= */}
-          {/* 1. TOP HEADER BAR (CHỨA LOGO ĐỘC LẬP & THANH CÔNG CỤ TOÀN HỆ THỐNG) */}
+          {/* 1. TOP HEADER BAR (CỐ ĐỊNH TRÊN CÙNG - FIXED HEADER) */}
           {/* ================================================================= */}
-          <header className="h-14 border-b border-slate-200/90 bg-white/95 backdrop-blur-md sticky top-0 z-40 px-3 sm:px-5 flex items-center justify-between shadow-2xs">
+          <header className="h-14 border-b border-slate-200/90 bg-white/95 backdrop-blur-md fixed top-0 left-0 right-0 z-40 px-3 sm:px-5 flex items-center justify-between shadow-2xs">
             {/* Left: Independent Logo + Search */}
             <div className="flex items-center gap-3">
               {/* Brand Logo - Fixed & Outside sidebar */}
@@ -397,7 +397,7 @@ export default function RootLayout({
                         effectiveRole === 'ORG_ADMIN' ? 'bg-blue-50 text-[#0066FF]' : 'text-slate-700 hover:bg-slate-50'
                       }`}
                     >
-                      ORG_ADMIN (Quản Trị Hiệp Hội)
+                      ORG_ADMIN (Ban Tổ Chức / Hiệp Hội)
                     </button>
                     <button
                       onClick={() => {
@@ -408,7 +408,7 @@ export default function RootLayout({
                         effectiveRole === 'EVENT_OPERATOR' ? 'bg-blue-50 text-[#0066FF]' : 'text-slate-700 hover:bg-slate-50'
                       }`}
                     >
-                      EVENT_OPERATOR (Lễ Tân / Check-in)
+                      EVENT_OPERATOR (Vận Hành Sự Kiện)
                     </button>
                     <button
                       onClick={() => {
@@ -419,7 +419,7 @@ export default function RootLayout({
                         effectiveRole === 'MEMBER' ? 'bg-blue-50 text-[#0066FF]' : 'text-slate-700 hover:bg-slate-50'
                       }`}
                     >
-                      MEMBER (Doanh Nhân / Hội Viên)
+                      MEMBER (Hội Viên Chính Thức)
                     </button>
                     <button
                       onClick={() => {
@@ -448,18 +448,18 @@ export default function RootLayout({
           </header>
 
           {/* ================================================================= */}
-          {/* 2. BODY LAYOUT: COLLAPSIBLE THIN SIDEBAR + MAIN CONTENT */}
+          {/* 2. BODY LAYOUT: FIXED DESKTOP SIDEBAR + SCROLLABLE MAIN CONTENT */}
           {/* ================================================================= */}
           <div className="flex-1 flex w-full min-h-[calc(100vh-3.5rem)]">
             
-            {/* DESKTOP COLLAPSIBLE SLEEK SIDEBAR */}
+            {/* DESKTOP FIXED COLLAPSIBLE SLEEK SIDEBAR (CỐ ĐỊNH HOÀN TOÀN BÊN TRÁI KHÔNG BỊ CUỘN THEO TRANG) */}
             <aside
-              className={`shrink-0 border-r border-slate-200/90 bg-white flex flex-col justify-between hidden md:flex sticky top-14 h-[calc(100vh-3.5rem)] z-30 shadow-2xs transition-all duration-200 ease-in-out ${
+              className={`shrink-0 border-r border-slate-200/90 bg-white flex flex-col justify-between hidden md:flex fixed top-14 left-0 bottom-0 h-[calc(100vh-3.5rem)] z-30 shadow-2xs transition-all duration-200 ease-in-out ${
                 isSidebarCollapsed ? 'w-14' : 'w-60'
               }`}
             >
-              {/* Menu Navigation Items */}
-              <div className="space-y-2.5 overflow-y-auto p-2">
+              {/* Menu Navigation Items (Cuộn độc lập bên trong menu nếu danh sách dài) */}
+              <div className="flex-1 space-y-2.5 overflow-y-auto p-2 scrollbar-thin">
                 {/* Sidebar Header: Toggle Minimize Button placed at fixed X position above Overview icon */}
                 <div className="pb-2 mb-1 border-b border-slate-100/90 flex items-center">
                   <button
@@ -488,8 +488,8 @@ export default function RootLayout({
                 </div>
               </div>
 
-              {/* Bottom Sidebar User Info / Status */}
-              <div className="border-t border-slate-200 bg-slate-50 p-2 flex items-center justify-between text-xs text-slate-500">
+              {/* Bottom Sidebar User Info / Status (Cố định ở đáy Sidebar) */}
+              <div className="shrink-0 border-t border-slate-200 bg-slate-50 p-2 flex items-center justify-between text-xs text-slate-500">
                 {!isSidebarCollapsed ? (
                   <>
                     <div className="flex items-center gap-2 min-w-0">
@@ -592,8 +592,10 @@ export default function RootLayout({
               </div>
             )}
 
-            {/* MAIN CONTENT CONTAINER */}
-            <div className="flex-1 flex flex-col min-w-0 min-h-screen w-full overflow-x-hidden">
+            {/* MAIN CONTENT CONTAINER (Chừa lề chuẩn cho Fixed Header và Fixed Sidebar) */}
+            <div className={`flex-1 flex flex-col min-w-0 min-h-screen w-full pt-14 transition-all duration-200 ease-in-out ${
+              isSidebarCollapsed ? 'md:pl-14' : 'md:pl-60'
+            }`}>
               <RealtimeConnectionModal />
               {/* Page Main Content - Fixed Unified Container Width across all routes */}
               <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-6xl w-full mx-auto overflow-x-hidden">
