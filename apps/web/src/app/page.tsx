@@ -144,9 +144,9 @@ export default function Home() {
 
             {/* CTAs */}
             <div className="flex flex-wrap items-center gap-2 pt-0.5">
-              <Link href="#simulators">
+              <Link href="#features">
                 <Button size="default" className="gap-2 bg-[#0066FF] hover:bg-blue-700 text-white font-bold rounded-xl text-xs h-9 px-4 shadow-xs transition-all active:scale-95 cursor-pointer">
-                  <Play className="w-3.5 h-3.5 fill-white" /> Trải Nghiệm Mô Phỏng Tính Năng
+                  <Play className="w-3.5 h-3.5 fill-white" /> Khám Phá 5 Tính Năng Đột Phá
                 </Button>
               </Link>
               <Link href="/dashboard">
@@ -223,13 +223,13 @@ export default function Home() {
       {/* ========================================================================= */}
       {/* 2. INTERACTIVE FEATURE SIMULATOR HUB (5-IN-1) */}
       {/* ========================================================================= */}
-      <section id="simulators" className="space-y-4">
+      <section id="features" className="space-y-4">
         <div className="text-center max-w-3xl mx-auto space-y-1">
           <Badge variant="outline" className="px-2.5 py-0.5 bg-blue-50 text-[#0066FF] border-blue-200 text-[11px] font-bold uppercase tracking-wider">
             VÒNG LẶP TRẢI NGHIỆM TƯƠNG TÁC THỰC TẾ
           </Badge>
           <h2 className="text-base sm:text-xl lg:text-2xl font-extrabold text-slate-900 tracking-tight font-heading whitespace-normal sm:whitespace-nowrap">
-            Mô Phỏng 5 Trải Nghiệm Đột Phá Của One Connect
+            5 Trải Nghiệm Đột Phá Của One Connect
           </h2>
           <p className="text-xs text-slate-600">
             Khám phá trực quan từng cấu phần: từ cú chạm NFC siêu tốc 0.42s đến bảo mật PDPL 91 và bộ nhớ quan hệ.
@@ -390,7 +390,7 @@ export default function Home() {
                     <Smartphone className="w-10 h-10 text-slate-500 mx-auto" />
                     <div className="text-xs font-semibold text-slate-300">Chưa có tín hiệu NFC</div>
                     <div className="text-[11px] text-slate-500 max-w-xs">
-                      Nhấn nút màu xanh bên trái để mô phỏng tương tác chạm thẻ thật
+                      Bấm nút bên trái để kích hoạt truyền tải danh thiếp số
                     </div>
                   </div>
                 )}
@@ -475,7 +475,7 @@ export default function Home() {
                     <Zap className="w-10 h-10 text-slate-500 mx-auto" />
                     <div className="text-xs font-semibold text-slate-300">Trạm Check-in Sẵn Sàng (Live Gate)</div>
                     <div className="text-[11px] text-slate-500 max-w-xs">
-                      Bấm nút màu xanh để mô phỏng quét thẻ đại biểu thực tế
+                      Bấm nút bên trái để thực hiện điểm danh đại biểu tức thì
                     </div>
                   </div>
                 )}

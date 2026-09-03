@@ -739,7 +739,7 @@ export default function SimulationAndDemoHub() {
                     disabled={isProcessing}
                     className="w-full bg-gradient-to-r from-[#0066FF] to-[#00C2FF] hover:from-blue-700 hover:to-cyan-600 text-white font-bold py-5 rounded-xl shadow-md shadow-blue-500/20 cursor-pointer"
                   >
-                    <Zap className="w-4 h-4 mr-2" /> Mô Phỏng Chạm Thẻ NFC ({selectedCard.cardUid})
+                    <Zap className="w-4 h-4 mr-2" /> Kích Hoạt Chạm Thẻ NFC ({selectedCard.cardUid})
                   </Button>
                 )}
 
@@ -782,7 +782,7 @@ export default function SimulationAndDemoHub() {
                           variant="outline"
                           className="flex-1 border-slate-300 text-slate-700 font-bold py-4 rounded-xl cursor-pointer"
                         >
-                          Mô Phỏng Lại Từ Đầu
+                          Thực Hiện Lại Từ Đầu
                         </Button>
                         <Badge className="bg-emerald-50 text-emerald-700 border-emerald-200 px-3 py-2 text-xs font-bold shrink-0">
                           ĐÃ HOÀN TẤT ✓

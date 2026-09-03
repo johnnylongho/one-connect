@@ -202,10 +202,6 @@ export default function DigitalNfcCardPage() {
   const [inputUid, setInputUid] = useState('');
   const [alertMessage, setAlertMessage] = useState<{ text: string; type: 'success' | 'info' | 'error' } | null>(null);
 
-  // Tap Simulation State
-  const [isSimulatingTap, setIsSimulatingTap] = useState(false);
-  const [tapSuccess, setTapSuccess] = useState(false);
-
   // Hardware Web NFC Tag Writer State
   const [isWritingNfc, setIsWritingNfc] = useState(false);
   const [nfcWriteStatus, setNfcWriteStatus] = useState<string | null>(null);
@@ -353,19 +349,6 @@ export default function DigitalNfcCardPage() {
         .toUpperCase()
     ).join(':');
     setInputUid(randomHex);
-    showAlert(`Đã nhận diện mã UID NFC từ đầu đọc: ${randomHex}`, 'info');
-  };
-
-  const handleTriggerSimulatedTap = () => {
-    setIsSimulatingTap(true);
-    setTapSuccess(false);
-
-    setTimeout(() => {
-      setIsSimulatingTap(false);
-      setTapSuccess(true);
-      showAlert('Chạm thẻ NFC 1-chạm thành công (0.42s)! Đã truyền tải Token định danh số.', 'success');
-      setTimeout(() => setTapSuccess(false), 3000);
-    }, 800);
   };
 
   const filteredCards = cards.filter((c) => {
@@ -406,14 +389,18 @@ export default function DigitalNfcCardPage() {
               Chỉnh Sửa Hồ Sơ
             </Button>
 
-            <Button
-              onClick={handleTriggerSimulatedTap}
-              variant="outline"
-              className="gap-2 border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs rounded-xl shadow-2xs cursor-pointer"
+            <Link
+              href={`/p/${currentIdentity?.username || 'johnnylongho'}`}
+              target="_blank"
             >
-              <Zap className="w-4 h-4 text-amber-500" />
-              {isSimulatingTap ? 'Đang chạm NFC...' : 'Mô Phỏng Chạm Thẻ'}
-            </Button>
+              <Button
+                variant="outline"
+                className="gap-2 border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs rounded-xl shadow-2xs cursor-pointer"
+              >
+                <ExternalLink className="w-4 h-4 text-blue-600" />
+                Xem Danh Thiếp Thực Tế
+              </Button>
+            </Link>
 
             <Button
               onClick={() => {
@@ -540,24 +527,6 @@ export default function DigitalNfcCardPage() {
                     );
                   }}
                 />
-              )}
-
-              {/* Simulated Tap Live Reaction Box */}
-              {tapSuccess && (
-                <div className="p-4 rounded-2xl bg-gradient-to-r from-emerald-50 to-blue-50 border border-emerald-300 flex items-center justify-between animate-in zoom-in-95 duration-200 shadow-md">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-emerald-500 text-white flex items-center justify-center">
-                      <Zap className="w-5 h-5" />
-                    </div>
-                    <div>
-                      <p className="text-xs font-bold text-emerald-900">ĐÃ NHẬN DIỆN THẺ NFC CHẠM GẦN</p>
-                      <p className="text-[11px] text-emerald-700">
-                        Đang đồng bộ hồ sơ @{currentIdentity?.username || 'johnnylongho'} vào thiết bị đối tác
-                      </p>
-                    </div>
-                  </div>
-                  <Badge className="bg-emerald-600 text-white text-[10px]">0.42s FAST TAP</Badge>
-                </div>
               )}
 
               {/* Professional NFC Programming & NFC Tools Guide */}
