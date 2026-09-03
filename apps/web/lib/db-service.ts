@@ -652,7 +652,10 @@ export const DbService = {
         requester_identity_id: data?.guestId || `guest-${Date.now()}`,
         requester_name: params.guestName,
         requester_phone: params.guestPhone,
+        requester_company: params.guestCompany || '',
+        requester_note: params.guestNote || '',
         requester_title: params.guestCompany || 'Đối tác chạm thẻ NFC',
+        avatar_url: `https://ui-avatars.com/api/?name=${encodeURIComponent(params.guestName || 'Khach')}&background=0284c7&color=fff&bold=true`,
         status: 'PENDING',
         requested_at: new Date().toISOString(),
       });

@@ -49,6 +49,9 @@ export interface AppState {
   incomingRequest?: {
     id: string;
     requesterName: string;
+    requesterPhone?: string;
+    requesterCompany?: string;
+    requesterNote?: string;
     requesterTitle?: string;
     requesterAvatar?: string;
   } | null;
@@ -245,6 +248,11 @@ export function useOneConnectStore() {
             prev.currentIdentityId === 'id-001';
 
           if (isMeReceiver && newRecord.status === 'PENDING') {
+            const guestInitials = `https://ui-avatars.com/api/?name=${encodeURIComponent(newRecord.requester_name || 'Khach')}&background=0284c7&color=fff&bold=true`;
+            const guestAvatar = newRecord.avatar_url && !newRecord.avatar_url.includes('avatar-johnny-long.jpg')
+              ? newRecord.avatar_url
+              : guestInitials;
+
             const guestConn: Connection = {
               id: newRecord.id,
               requesterIdentityId: newRecord.requester_identity_id,
@@ -258,9 +266,9 @@ export function useOneConnectStore() {
                 username: 'guest',
                 fullName: `${newRecord.requester_name}`,
                 displayName: `${newRecord.requester_name}`,
-                avatarUrl: newRecord.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(newRecord.requester_name || 'Khach')}&background=0284c7&color=fff&bold=true`,
-                title: newRecord.requester_title || 'Khách vừa chạm thẻ NFC',
-                bio: '',
+                avatarUrl: guestAvatar,
+                title: newRecord.requester_company || newRecord.requester_title || 'Khách vừa chạm thẻ NFC',
+                bio: newRecord.requester_note || '',
                 phone: newRecord.requester_phone || '',
                 email: '',
                 website: '',
@@ -275,9 +283,12 @@ export function useOneConnectStore() {
               ...prev,
               incomingRequest: {
                 id: newRecord.id,
-                requesterName: `${newRecord.requester_name} (${newRecord.requester_phone})`,
-                requesterTitle: newRecord.requester_title || 'Khách vừa chạm thẻ NFC',
-                requesterAvatar: newRecord.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(newRecord.requester_name || 'Khach')}&background=0284c7&color=fff&bold=true`,
+                requesterName: newRecord.requester_name || 'Khách chạm thẻ NFC',
+                requesterPhone: newRecord.requester_phone || '',
+                requesterCompany: newRecord.requester_company || newRecord.requester_title || 'Đại diện Doanh nghiệp',
+                requesterNote: newRecord.requester_note || '',
+                requesterTitle: newRecord.requester_company || newRecord.requester_title || 'Đại diện Doanh nghiệp',
+                requesterAvatar: guestAvatar,
               },
               connections: [guestConn, ...prev.connections.filter(c => c.id !== newRecord.id)],
             };
