@@ -252,9 +252,36 @@ function DigitalProfileContent() {
          (ensureUuid(c.requesterIdentityId) === targetUuid && ensureUuid(c.receiverIdentityId) === myUuid)
   );
 
-  // Trạng thái kết nối: Chỉ bật khi 2 bên đã thực sự có bản ghi CONNECTED trong CSDL
-  const isConnected = existingConn?.status === 'CONNECTED';
+  // Guest connection state when accepted via Realtime
+  const [isGuestAccepted, setIsGuestAccepted] = useState(false);
+
+  // Trạng thái kết nối: Chỉ bật khi 2 bên đã thực sự có bản ghi CONNECTED trong CSDL hoặc vừa được chấp thuận
+  const isConnected = (existingConn?.status === 'CONNECTED') || isGuestAccepted;
   const isPending = !isConnected && (existingConn?.status === 'PENDING' || isConnRequested);
+
+  // Lắng nghe tín hiệu khi chủ thẻ bấm Chấp Nhận trên máy tính
+  useEffect(() => {
+    const unsubscribe = DbService.subscribeToRealtime((payload) => {
+      if (payload.table === 'broadcast_accepted') {
+        setIsGuestAccepted(true);
+        if (typeof window !== 'undefined' && 'vibrate' in navigator) {
+          try {
+            navigator.vibrate([100, 50, 150]);
+          } catch (e) {}
+        }
+        const hostName = matchedIdentity?.fullName || 'Johnny Long Hồ';
+        toast({
+          title: '🎉 KẾT NỐI THÀNH CÔNG!',
+          description: `${hostName} đã chấp thuận yêu cầu kết nối danh thiếp của bạn.`,
+          variant: 'success',
+        });
+      }
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, [matchedIdentity?.fullName, toast]);
 
   // Guest NFC Contact Exchange States
   const [guestName, setGuestName] = useState('');

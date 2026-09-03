@@ -48,14 +48,20 @@ export function RealtimeConnectionModal() {
   if (!incoming) return null;
 
   const handleAccept = () => {
+    if (!incoming) return;
+    const reqId = incoming.id;
     const partnerName = incoming.requesterName;
-    acceptConnection(incoming.id);
+    clearIncomingRequest();
+    acceptConnection(reqId);
     setAcceptedToast(`Đã thiết lập liên kết thành công với ${partnerName}.`);
     setTimeout(() => setAcceptedToast(null), 4000);
   };
 
   const handleReject = () => {
-    rejectConnection(incoming.id);
+    if (!incoming) return;
+    const reqId = incoming.id;
+    clearIncomingRequest();
+    rejectConnection(reqId);
   };
 
   return (

@@ -245,6 +245,32 @@ export function useOneConnectStore() {
             prev.currentIdentityId === 'id-001';
 
           if (isMeReceiver && newRecord.status === 'PENDING') {
+            const guestConn: Connection = {
+              id: newRecord.id,
+              requesterIdentityId: newRecord.requester_identity_id,
+              receiverIdentityId: newRecord.receiver_identity_id,
+              status: 'PENDING',
+              createdAt: newRecord.requested_at || new Date().toISOString(),
+              notesCount: 0,
+              partner: {
+                id: newRecord.requester_identity_id,
+                userId: newRecord.requester_identity_id,
+                username: 'guest',
+                fullName: `${newRecord.requester_name}`,
+                displayName: `${newRecord.requester_name}`,
+                avatarUrl: '/avatar-johnny-long.jpg',
+                title: newRecord.requester_title || 'Khách vừa chạm thẻ NFC',
+                bio: '',
+                phone: newRecord.requester_phone || '',
+                email: '',
+                website: '',
+                socialLinks: [],
+                businesses: [],
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString(),
+              },
+            };
+
             return {
               ...prev,
               incomingRequest: {
@@ -253,6 +279,7 @@ export function useOneConnectStore() {
                 requesterTitle: newRecord.requester_title || 'Khách vừa chạm thẻ NFC',
                 requesterAvatar: '/avatar-johnny-long.jpg',
               },
+              connections: [guestConn, ...prev.connections.filter(c => c.id !== newRecord.id)],
             };
           }
           return prev;
@@ -532,31 +559,63 @@ export function useOneConnectStore() {
   };
 
   const acceptConnection = (connectionId: string) => {
-    const conn = state.connections.find(c => c.id === connectionId);
-    if (!conn) return;
+    setState(prev => {
+      const existingIdx = prev.connections.findIndex(c => c.id === connectionId);
+      const updatedConns = [...prev.connections];
 
-    const updatedConn: Connection = {
-      ...conn,
-      status: 'CONNECTED',
-      connectedAt: new Date().toISOString(),
-    };
+      if (existingIdx >= 0 && updatedConns[existingIdx]) {
+        updatedConns[existingIdx] = {
+          ...updatedConns[existingIdx]!,
+          status: 'CONNECTED',
+          connectedAt: new Date().toISOString(),
+        };
+      } else {
+        const incoming = prev.incomingRequest;
+        updatedConns.unshift({
+          id: connectionId,
+          requesterIdentityId: 'guest',
+          receiverIdentityId: ensureUuid(prev.currentIdentityId),
+          status: 'CONNECTED',
+          connectedAt: new Date().toISOString(),
+          createdAt: new Date().toISOString(),
+          notesCount: 0,
+          partner: {
+            id: 'guest',
+            userId: 'guest',
+            username: 'guest',
+            fullName: incoming?.requesterName || 'Khách chạm thẻ NFC',
+            displayName: incoming?.requesterName || 'Khách chạm thẻ NFC',
+            avatarUrl: '/avatar-johnny-long.jpg',
+            title: incoming?.requesterTitle || 'Đối tác kết nối NFC',
+            bio: '',
+            phone: '',
+            email: '',
+            website: '',
+            socialLinks: [],
+            businesses: [],
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+          },
+        });
+      }
 
-    const newAuditLog: AuditLog = {
-      id: `log-${Date.now()}`,
-      actorUserId: state.currentIdentityId,
-      actorName: currentIdentity?.fullName || 'User',
-      action: 'PDPL_MUTUAL_CONSENT_ACCEPTED',
-      objectType: 'CONNECTION',
-      objectId: connectionId,
-      createdAt: new Date().toISOString(),
-    };
+      const newAuditLog: AuditLog = {
+        id: `log-${Date.now()}`,
+        actorUserId: prev.currentIdentityId,
+        actorName: 'Johnny Long Hồ',
+        action: 'PDPL_MUTUAL_CONSENT_ACCEPTED',
+        objectType: 'CONNECTION',
+        objectId: connectionId,
+        createdAt: new Date().toISOString(),
+      };
 
-    setState(prev => ({
-      ...prev,
-      incomingRequest: prev.incomingRequest?.id === connectionId ? null : prev.incomingRequest,
-      connections: prev.connections.map(c => c.id === connectionId ? updatedConn : c),
-      auditLogs: [newAuditLog, ...prev.auditLogs],
-    }));
+      return {
+        ...prev,
+        incomingRequest: null,
+        connections: updatedConns,
+        auditLogs: [newAuditLog, ...prev.auditLogs],
+      };
+    });
 
     // Dispatch to Cloud Supabase Database & Broadcast to Partner
     DbService.respondToConnection(connectionId, 'ACCEPTED').catch(console.warn);
