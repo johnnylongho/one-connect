@@ -359,13 +359,13 @@ function RegisterForm() {
 
       {/* Top Header */}
       <header className="p-4 sm:p-6 flex items-center justify-between max-w-7xl mx-auto w-full z-10">
-        <Link href="/login" className="flex items-center group">
+        <div className="flex items-center select-none cursor-default">
           <img
             src="/one_connect_logo_transparent.png"
             alt="One Connect"
-            className="h-8 sm:h-9 w-auto object-contain shrink-0 group-hover:opacity-90 transition-opacity"
+            className="h-8 sm:h-9 w-auto object-contain shrink-0"
           />
-        </Link>
+        </div>
 
         <Link
           href="/login"

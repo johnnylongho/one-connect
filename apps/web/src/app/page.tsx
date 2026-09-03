@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import BusinessCard3D from '@/components/BusinessCard3D';
 import { useOneConnectStore } from '@/lib/store';
 import {
@@ -49,7 +50,15 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 
 export default function Home() {
+  const router = useRouter();
   const { state, currentIdentity, currentCard, reissueCard } = useOneConnectStore();
+
+  // Auth Guard: If not logged in, redirect immediately to login page
+  useEffect(() => {
+    if (!state.currentIdentityId && !currentIdentity) {
+      router.replace('/login');
+    }
+  }, [state.currentIdentityId, currentIdentity, router]);
 
   // Active Simulator Tab
   const [activeSimTab, setActiveSimTab] = useState<'nfc' | 'checkin' | 'consent' | 'memory' | 'ai'>('nfc');
