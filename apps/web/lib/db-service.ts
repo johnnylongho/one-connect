@@ -68,11 +68,13 @@ export const DbService = {
 
       if (data && !error && data.length > 0) {
         const cloudIdentities: PersonIdentity[] = data.map((d: any) => {
-          const rawUsername = (d.full_name || '')
+          const isJohnny = d.id === '11111111-1111-1111-1111-111111111111' || 
+                           (d.email && d.email.toLowerCase() === 'contact.johnnylongho@gmail.com');
+          const rawUsername = isJohnny ? 'johnnylongho' : ((d.full_name || '')
             .toLowerCase()
             .normalize('NFD')
             .replace(/[\u0300-\u036f]/g, '')
-            .replace(/[^a-z0-9]/g, '') || 'user';
+            .replace(/[^a-z0-9]/g, '') || 'user');
           
           return {
             id: d.id,
@@ -80,14 +82,14 @@ export const DbService = {
             username: rawUsername,
             fullName: d.full_name,
             displayName: d.display_name || d.full_name,
-            avatarUrl: d.avatar_url || (rawUsername === 'johnnylongho' ? '/avatar-johnny-long.jpg' : `https://ui-avatars.com/api/?name=${encodeURIComponent(d.full_name || 'User')}&background=0284c7&color=fff&bold=true`),
+            avatarUrl: d.avatar_url || (isJohnny ? '/avatar-johnny-long.jpg' : `https://ui-avatars.com/api/?name=${encodeURIComponent(d.full_name || 'User')}&background=0284c7&color=fff&bold=true`),
             coverUrl: d.cover_url || undefined,
-            title: d.title || 'Doanh Nhân Hội Viên',
+            title: d.title || (isJohnny ? 'Quản lý & Triển khai Dự án kiêm Media' : 'Doanh Nhân Hội Viên'),
             bio: d.bio || 'Hội viên Mạng lưới Định danh Doanh nhân One Connect.',
             phone: d.phone || '0901234567',
             email: d.email || 'member@oneconnect.id.vn',
             website: d.website || 'https://oneconnect.id.vn',
-            role: 'MEMBER',
+            role: (isJohnny ? 'SUPER_ADMIN' : 'MEMBER') as any,
             socialLinks: [
               { id: `soc-${d.id}-1`, identityId: d.id, platform: 'phone', url: `tel:${d.phone || ''}`, isPublic: true },
               { id: `soc-${d.id}-2`, identityId: d.id, platform: 'website', url: d.website || 'https://oneconnect.id.vn', isPublic: true },

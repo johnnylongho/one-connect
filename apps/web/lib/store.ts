@@ -137,6 +137,11 @@ export function useOneConnectStore() {
       if (cloudIdentities && cloudIdentities.length > 0) {
         setState(prev => {
           const merged = [...cloudIdentities];
+          // Always ensure Johnny Long Ho is cleanly accessible as id-001
+          const localJohnny = prev.identities.find(p => p.id === 'id-001' || p.username === 'johnnylongho');
+          if (localJohnny && !merged.some(m => m.id === 'id-001')) {
+            merged.unshift(localJohnny);
+          }
           prev.identities.forEach(p => {
             if (!merged.some(m => m.id === p.id || m.username === p.username)) {
               merged.push(p);
@@ -404,8 +409,21 @@ export function useOneConnectStore() {
     };
   }, []);
 
-  const currentIdentity = state.identities.find(i => i.id === state.currentIdentityId) || state.identities[0];
-  const currentCard = state.cards.find(c => c.personIdentityId === state.currentIdentityId && c.status === 'ACTIVE') || state.cards[0];
+  const currentIdentity = state.identities.find(
+    (i) =>
+      i.id === state.currentIdentityId ||
+      (state.currentIdentityId === 'id-001' && (i.id === '11111111-1111-1111-1111-111111111111' || i.username === 'johnnylongho')) ||
+      (state.currentIdentityId === '11111111-1111-1111-1111-111111111111' && (i.id === 'id-001' || i.username === 'johnnylongho'))
+  ) || (state.currentIdentityId === 'id-001' || state.currentRole === 'SUPER_ADMIN' ? state.identities.find(i => i.id === 'id-001' || i.username === 'johnnylongho') : null) || state.identities.find(i => i.id === 'id-001') || state.identities[0];
+
+  const currentCard = currentIdentity
+    ? state.cards.find(
+        (c) =>
+          c.personIdentityId === currentIdentity.id ||
+          (currentIdentity.id === 'id-001' && c.personIdentityId === '11111111-1111-1111-1111-111111111111') ||
+          (currentIdentity.id === '11111111-1111-1111-1111-111111111111' && c.personIdentityId === 'id-001')
+      ) || state.cards[0]
+    : undefined;
 
   // Actions
   const setCurrentRole = (role: RoleType) => {
@@ -416,14 +434,32 @@ export function useOneConnectStore() {
                      currentIdentity?.id === '11111111-1111-1111-1111-111111111111';
 
     if (role === 'SUPER_ADMIN' && !isJohnny) {
-      setState(prev => ({ ...prev, currentRole: 'MEMBER' }));
+      setState(prev => {
+        const updated = { ...prev, currentRole: 'MEMBER' as RoleType };
+        if (typeof window !== 'undefined') {
+          try { localStorage.setItem(STORAGE_KEY, JSON.stringify(updated)); } catch {}
+        }
+        return updated;
+      });
       return;
     }
-    setState(prev => ({ ...prev, currentRole: role }));
+    setState(prev => {
+      const updated = { ...prev, currentRole: role };
+      if (typeof window !== 'undefined') {
+        try { localStorage.setItem(STORAGE_KEY, JSON.stringify(updated)); } catch {}
+      }
+      return updated;
+    });
   };
 
   const setCurrentIdentityId = (id: string) => {
-    setState(prev => ({ ...prev, currentIdentityId: id }));
+    setState(prev => {
+      const updated = { ...prev, currentIdentityId: id };
+      if (typeof window !== 'undefined') {
+        try { localStorage.setItem(STORAGE_KEY, JSON.stringify(updated)); } catch {}
+      }
+      return updated;
+    });
   };
 
   const resetState = () => {

@@ -91,14 +91,16 @@ function AuthCallbackContent() {
     const role = isJohnny ? 'SUPER_ADMIN' : 'MEMBER';
 
     // 1. Kiểm tra tài khoản đã tồn tại trong local store chưa
-    let existing = state.identities.find(
-      (i) => (i.email && i.email.toLowerCase() === email.toLowerCase()) || 
-             (i.username && i.username.toLowerCase() === baseSlug)
-    );
+    let existing = isJohnny 
+      ? state.identities.find(i => i.id === 'id-001' || i.id === '11111111-1111-1111-1111-111111111111' || i.username === 'johnnylongho')
+      : state.identities.find(
+          (i) => (i.email && i.email.toLowerCase() === email.toLowerCase()) || 
+                 (i.username && i.username.toLowerCase() === baseSlug)
+        );
 
-    let targetId = existing?.id;
+    let targetId = isJohnny ? 'id-001' : existing?.id;
 
-    if (!existing) {
+    if (!existing && !isJohnny) {
       // Đăng ký mới vào Store
       const { identity } = registerIdentity({
         fullName: fullName,
@@ -130,9 +132,20 @@ function AuthCallbackContent() {
     if (targetId) {
       setCurrentIdentityId(targetId);
       setCurrentRole(role);
+
+      // Lưu tức thì vào localStorage để các trang tiếp theo đọc được ngay
+      if (typeof window !== 'undefined') {
+        try {
+          const raw = localStorage.getItem('one_connect_app_state_v2');
+          const parsed = raw ? JSON.parse(raw) : { ...state };
+          parsed.currentIdentityId = targetId;
+          parsed.currentRole = role;
+          localStorage.setItem('one_connect_app_state_v2', JSON.stringify(parsed));
+        } catch (e) {}
+      }
     }
 
-    setSyncedUser(fullName);
+    setSyncedUser(isJohnny ? 'Hồ Hoàng Long (Johnny Long Hồ)' : fullName);
     setStatus('success');
 
     setTimeout(() => {
