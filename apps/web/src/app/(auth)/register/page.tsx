@@ -359,20 +359,17 @@ function RegisterForm() {
 
       {/* Top Header */}
       <header className="p-4 sm:p-6 flex items-center justify-between max-w-7xl mx-auto w-full z-10">
-        <Link href="/" className="flex items-center gap-2.5 group">
+        <Link href="/login" className="flex items-center group">
           <img
-            src="/one_connect_final_logo_orange.png"
-            alt="One Connect Logo"
-            className="h-8 sm:h-9 w-auto object-contain shrink-0 group-hover:scale-105 transition-transform"
+            src="/one_connect_logo_transparent.png"
+            alt="One Connect"
+            className="h-8 sm:h-9 w-auto object-contain shrink-0 group-hover:opacity-90 transition-opacity"
           />
-          <span className="font-black text-lg sm:text-xl tracking-tight text-white font-heading">
-            ONE<span className="text-[#00C2FF]">CONNECT</span>
-          </span>
         </Link>
 
         <Link
           href="/login"
-          className="flex items-center gap-1.5 text-xs font-bold text-slate-300 hover:text-white px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 transition-all border border-white/10"
+          className="flex items-center gap-1.5 text-xs font-bold text-slate-300 hover:text-white px-3.5 py-2 rounded-xl bg-slate-900/70 hover:bg-slate-800 transition-all border border-slate-700/60 backdrop-blur-md shadow-xs"
         >
           <span>Đã có tài khoản? Đăng nhập</span>
           <ArrowRight className="w-3.5 h-3.5" />
@@ -439,7 +436,7 @@ function RegisterForm() {
                   type="button"
                   onClick={handleGoogleSignUp}
                   disabled={loading}
-                  className="w-full py-3 px-4 rounded-2xl bg-white hover:bg-slate-100 text-slate-900 font-bold text-xs flex items-center justify-center gap-3 transition-all cursor-pointer shadow-lg shadow-white/5 active:scale-98"
+                  className="w-full py-3 px-4 rounded-2xl bg-white hover:bg-slate-100 text-slate-900 font-bold text-xs flex items-center justify-center gap-2.5 transition-all cursor-pointer shadow-md active:scale-98"
                 >
                   <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24">
                     <path
@@ -459,13 +456,13 @@ function RegisterForm() {
                       d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"
                     />
                   </svg>
-                  <span>Đăng Ký Nhanh Bằng Google Mail (1-Click)</span>
+                  <span>Đăng ký qua Google</span>
                 </button>
 
                 <div className="relative flex items-center justify-center">
                   <div className="w-full border-t border-slate-800" />
                   <span className="bg-slate-900 px-3 text-[10px] uppercase font-mono tracking-wider text-slate-500 absolute">
-                    Hoặc đăng ký thủ công
+                    Hoặc điền thông tin trực tiếp
                   </span>
                 </div>
               </div>
@@ -511,14 +508,14 @@ function RegisterForm() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-1">
                       <label className="text-xs font-semibold text-slate-300">
-                        Họ và tên Doanh nhân <span className="text-red-400">*</span>
+                        Họ và tên <span className="text-red-400">*</span>
                       </label>
                       <div className="relative">
                         <User className="w-4 h-4 absolute left-3 top-3 text-slate-500" />
                         <input
                           type="text"
                           required
-                          placeholder="VD: Nguyễn Nhật Thanh"
+                          placeholder="Nhập họ và tên đầy đủ"
                           value={fullName}
                           onChange={(e) => {
                             const val = e.target.value;
@@ -534,7 +531,7 @@ function RegisterForm() {
                               setUsername(slug);
                             }
                           }}
-                          className="w-full pl-9 pr-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-600 focus:outline-none focus:border-blue-500"
+                          className="w-full pl-9 pr-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
                         />
                       </div>
                     </div>
@@ -549,13 +546,13 @@ function RegisterForm() {
                         <input
                           type="text"
                           required
-                          placeholder="nhatthanh"
+                          placeholder="Nhập tên đăng nhập (viết liền, không dấu)"
                           value={username}
                           onChange={(e) => {
                             setIsUsernameCustomized(true);
                             setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ''));
                           }}
-                          className="w-full pl-9 pr-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-600 focus:outline-none focus:border-blue-500 font-mono"
+                          className="w-full pl-9 pr-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 font-mono"
                         />
                       </div>
                     </div>
@@ -570,10 +567,10 @@ function RegisterForm() {
                       <input
                         type="text"
                         required
-                        placeholder="VD: Công ty TNHH Giải Pháp Nhật Thanh"
+                        placeholder="Nhập tên doanh nghiệp hoặc tổ chức"
                         value={businessName}
                         onChange={(e) => setBusinessName(e.target.value)}
-                        className="w-full pl-9 pr-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-600 focus:outline-none focus:border-blue-500"
+                        className="w-full pl-9 pr-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
                       />
                     </div>
                   </div>
@@ -581,34 +578,34 @@ function RegisterForm() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-1">
                       <label className="text-xs font-semibold text-slate-300">
-                        Số điện thoại Hotline / Zalo <span className="text-red-400">*</span>
+                        Số điện thoại <span className="text-red-400">*</span>
                       </label>
                       <div className="relative">
                         <Phone className="w-4 h-4 absolute left-3 top-3 text-slate-500" />
                         <input
                           type="tel"
                           required
-                          placeholder="0912345678"
+                          placeholder="Nhập số điện thoại liên hệ"
                           value={phone}
                           onChange={(e) => setPhone(e.target.value)}
-                          className="w-full pl-9 pr-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-600 focus:outline-none focus:border-blue-500 font-mono"
+                          className="w-full pl-9 pr-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 font-mono"
                         />
                       </div>
                     </div>
 
                     <div className="space-y-1">
                       <label className="text-xs font-semibold text-slate-300">
-                        Email công tác <span className="text-red-400">*</span>
+                        Địa chỉ Email <span className="text-red-400">*</span>
                       </label>
                       <div className="relative">
                         <Mail className="w-4 h-4 absolute left-3 top-3 text-slate-500" />
                         <input
                           type="email"
                           required
-                          placeholder="nhatthanh@example.com"
+                          placeholder="Nhập địa chỉ email chính thức"
                           value={email}
                           onChange={(e) => setEmail(e.target.value)}
-                          className="w-full pl-9 pr-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-600 focus:outline-none focus:border-blue-500 font-mono"
+                          className="w-full pl-9 pr-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 font-mono"
                         />
                       </div>
                     </div>
@@ -625,10 +622,10 @@ function RegisterForm() {
                         <input
                           type={showPassword ? 'text' : 'password'}
                           required
-                          placeholder="Tối thiểu 6 ký tự"
+                          placeholder="Nhập mật khẩu (tối thiểu 6 ký tự)"
                           value={password}
                           onChange={(e) => setPassword(e.target.value)}
-                          className="w-full pl-9 pr-9 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-600 focus:outline-none focus:border-blue-500 font-mono"
+                          className="w-full pl-9 pr-9 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 font-mono"
                         />
                         <button
                           type="button"
@@ -649,10 +646,10 @@ function RegisterForm() {
                         <input
                           type={showPassword ? 'text' : 'password'}
                           required
-                          placeholder="Nhập lại mật khẩu"
+                          placeholder="Nhập lại mật khẩu để xác nhận"
                           value={confirmPassword}
                           onChange={(e) => setConfirmPassword(e.target.value)}
-                          className="w-full pl-9 pr-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-600 focus:outline-none focus:border-blue-500 font-mono"
+                          className="w-full pl-9 pr-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 font-mono"
                         />
                       </div>
                     </div>
@@ -689,10 +686,10 @@ function RegisterForm() {
                       <input
                         type="text"
                         required
-                        placeholder="VD: Hội Doanh Nhân Trẻ Khánh Hòa (YBA)"
+                        placeholder="Nhập tên tổ chức, hiệp hội hoặc doanh nghiệp"
                         value={orgName}
                         onChange={(e) => setOrgName(e.target.value)}
-                        className="w-full pl-9 pr-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-600 focus:outline-none focus:border-purple-500"
+                        className="w-full pl-9 pr-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-purple-500"
                       />
                     </div>
                   </div>
@@ -723,31 +720,31 @@ function RegisterForm() {
                         onChange={(e) => setOrgMemberCount(e.target.value)}
                         className="w-full px-3 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-purple-500 font-mono"
                       >
-                        <option value="50">Gói Thử Nghiệm: 50 Hội viên</option>
-                        <option value="200">Gói Tiêu Chuẩn: 200 Hội viên</option>
-                        <option value="500">Gói Doanh Nghiệp: 500 Hội viên</option>
-                        <option value="2000">Gói Đại Hội: 2,000+ Đại biểu</option>
+                        <option value="50">Quy mô 50 Hội viên</option>
+                        <option value="200">Quy mô 200 Hội viên</option>
+                        <option value="500">Quy mô 500 Hội viên</option>
+                        <option value="2000">Quy mô 2,000+ Hội viên</option>
                       </select>
                     </div>
                   </div>
 
                   <div className="border-t border-slate-800 pt-3 space-y-3">
                     <p className="text-[11px] font-mono font-bold uppercase tracking-wider text-purple-400">
-                      Thông Tin Người Đại Diện Quản Trị (Org Admin):
+                      Thông Tin Người Đại Diện Quản Trị:
                     </p>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div className="space-y-1">
                         <label className="text-xs font-semibold text-slate-300">
-                          Họ và tên Trưởng ban / Chủ tịch <span className="text-red-400">*</span>
+                          Họ và tên người đại diện <span className="text-red-400">*</span>
                         </label>
                         <input
                           type="text"
                           required
-                          placeholder="VD: Nguyễn Nhật Thanh"
+                          placeholder="Nhập họ và tên người đại diện"
                           value={adminFullName}
                           onChange={(e) => setAdminFullName(e.target.value)}
-                          className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-600 focus:outline-none focus:border-purple-500"
+                          className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-purple-500"
                         />
                       </div>
 
@@ -757,10 +754,10 @@ function RegisterForm() {
                         </label>
                         <input
                           type="text"
-                          placeholder="VD: Chủ tịch / Tổng thư ký"
+                          placeholder="Nhập chức danh / vị trí công tác"
                           value={adminTitle}
                           onChange={(e) => setAdminTitle(e.target.value)}
-                          className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-600 focus:outline-none focus:border-purple-500"
+                          className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-purple-500"
                         />
                       </div>
                     </div>
@@ -773,10 +770,10 @@ function RegisterForm() {
                         <input
                           type="email"
                           required
-                          placeholder="admin.nhatthanh@example.com"
+                          placeholder="Nhập địa chỉ email công vụ"
                           value={adminEmail}
                           onChange={(e) => setAdminEmail(e.target.value)}
-                          className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-600 focus:outline-none focus:border-purple-500 font-mono"
+                          className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-purple-500 font-mono"
                         />
                       </div>
 
@@ -786,10 +783,10 @@ function RegisterForm() {
                         </label>
                         <input
                           type="tel"
-                          placeholder="0912345678"
+                          placeholder="Nhập số điện thoại người đại diện"
                           value={adminPhone}
                           onChange={(e) => setAdminPhone(e.target.value)}
-                          className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-600 focus:outline-none focus:border-purple-500 font-mono"
+                          className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-purple-500 font-mono"
                         />
                       </div>
                     </div>
@@ -803,10 +800,10 @@ function RegisterForm() {
                         <input
                           type="password"
                           required
-                          placeholder="Tối thiểu 6 ký tự"
+                          placeholder="Nhập mật khẩu quản trị (tối thiểu 6 ký tự)"
                           value={adminPassword}
                           onChange={(e) => setAdminPassword(e.target.value)}
-                          className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-600 focus:outline-none focus:border-purple-500 font-mono"
+                          className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-purple-500 font-mono"
                         />
                       </div>
 
@@ -817,10 +814,10 @@ function RegisterForm() {
                         <input
                           type="password"
                           required
-                          placeholder="Nhập lại mật khẩu"
+                          placeholder="Nhập lại mật khẩu quản trị"
                           value={adminConfirmPassword}
                           onChange={(e) => setAdminConfirmPassword(e.target.value)}
-                          className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-600 focus:outline-none focus:border-purple-500 font-mono"
+                          className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-purple-500 font-mono"
                         />
                       </div>
                     </div>

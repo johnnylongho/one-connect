@@ -208,15 +208,12 @@ export default function LoginPage() {
       {/* Top Header */}
       <header className="p-4 sm:p-6 flex items-center justify-between max-w-7xl mx-auto w-full z-10">
         {/* Mobile Brand (Desktop already has Logo in background) */}
-        <div className="flex items-center gap-2.5 lg:invisible select-none">
+        <div className="flex items-center lg:invisible select-none">
           <img
-            src="/one_connect_final_logo_orange.png"
-            alt="One Connect Logo"
+            src="/one_connect_logo_transparent.png"
+            alt="One Connect"
             className="h-8 sm:h-9 w-auto object-contain shrink-0"
           />
-          <span className="font-black text-lg sm:text-xl tracking-tight text-white font-heading">
-            ONE<span className="text-[#00C2FF]">CONNECT</span>
-          </span>
         </div>
 
         <div className="flex items-center gap-3 ml-auto">
