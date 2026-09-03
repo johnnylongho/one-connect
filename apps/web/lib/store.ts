@@ -15,7 +15,7 @@ import {
   AuditLog,
   RoleType
 } from './types';
-import { DbService } from './db-service';
+import { DbService, ensureUuid } from './db-service';
 import {
   INITIAL_IDENTITIES,
   INITIAL_CARDS,
@@ -46,6 +46,12 @@ export interface AppState {
   leads: Lead[];
   privacy: PrivacySetting;
   auditLogs: AuditLog[];
+  incomingRequest?: {
+    id: string;
+    requesterName: string;
+    requesterTitle?: string;
+    requesterAvatar?: string;
+  } | null;
 }
 
 const defaultState: AppState = {
@@ -62,6 +68,7 @@ const defaultState: AppState = {
   leads: INITIAL_LEADS,
   privacy: INITIAL_PRIVACY,
   auditLogs: INITIAL_AUDIT_LOGS,
+  incomingRequest: null,
 };
 
 export function useOneConnectStore() {
@@ -122,6 +129,37 @@ export function useOneConnectStore() {
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
+    // 1. Fetch Cloud Identities
+    DbService.fetchCloudIdentities().then((cloudIdentities) => {
+      if (cloudIdentities && cloudIdentities.length > 0) {
+        setState(prev => {
+          const merged = [...cloudIdentities];
+          prev.identities.forEach(p => {
+            if (!merged.some(m => m.id === p.id || m.username === p.username)) {
+              merged.push(p);
+            }
+          });
+          return { ...prev, identities: merged };
+        });
+      }
+    }).catch(console.warn);
+
+    // 2. Fetch Cloud Connections
+    DbService.fetchCloudConnections().then((cloudConns) => {
+      if (cloudConns && cloudConns.length > 0) {
+        setState(prev => {
+          const merged = [...cloudConns];
+          prev.connections.forEach(c => {
+            if (!merged.some(m => m.id === c.id)) {
+              merged.push(c);
+            }
+          });
+          return { ...prev, connections: merged };
+        });
+      }
+    }).catch(console.warn);
+
+    // 3. Subscribe to Realtime multi-table events
     const unsubscribe = DbService.subscribeToRealtime(({ table, newRecord }) => {
       if (table === 'check_ins' && newRecord) {
         setState(prev => {
@@ -134,12 +172,101 @@ export function useOneConnectStore() {
                 eventId: newRecord.event_id || 'evt-001',
                 registrationId: newRecord.registration_id || `reg-${Date.now()}`,
                 personIdentityId: newRecord.person_identity_id,
-                method: newRecord.check_in_method || 'NFC',
+                method: newRecord.method || 'NFC',
                 checkedInAt: newRecord.check_in_time || new Date().toISOString(),
-                operatorName: newRecord.verified_by || 'Trạm Check-in',
+                operatorName: newRecord.gate_location || 'Trạm Check-in',
               },
               ...prev.checkIns,
             ],
+          };
+        });
+      } else if (table === 'connections' && newRecord) {
+        setState(prev => {
+          const myUuid = ensureUuid(prev.currentIdentityId);
+          const isMeReceiver = newRecord.receiver_identity_id === myUuid || newRecord.receiver_identity_id === prev.currentIdentityId;
+          const isMeRequester = newRecord.requester_identity_id === myUuid || newRecord.requester_identity_id === prev.currentIdentityId;
+
+          let updatedIncoming = prev.incomingRequest;
+          if (isMeReceiver && newRecord.status === 'PENDING') {
+            const reqUser = prev.identities.find(i => i.id === newRecord.requester_identity_id || ensureUuid(i.id) === newRecord.requester_identity_id);
+            updatedIncoming = {
+              id: newRecord.id,
+              requesterName: reqUser?.fullName || 'Doanh nhân đối tác',
+              requesterTitle: reqUser?.title || 'Đại diện Doanh nghiệp',
+              requesterAvatar: reqUser?.avatarUrl || '/avatar-johnny-long.jpg',
+            };
+          } else if (newRecord.status === 'ACCEPTED' || newRecord.status === 'REJECTED') {
+            if (updatedIncoming?.id === newRecord.id) {
+              updatedIncoming = null;
+            }
+          }
+
+          const existingIdx = prev.connections.findIndex(c => c.id === newRecord.id || 
+            (c.requesterIdentityId === newRecord.requester_identity_id && c.receiverIdentityId === newRecord.receiver_identity_id));
+
+          const uiStatus = newRecord.status === 'ACCEPTED' ? 'CONNECTED' : (newRecord.status === 'REJECTED' ? 'BLOCKED' : 'PENDING');
+
+          const updatedConnections = [...prev.connections];
+          const existingConnItem = existingIdx >= 0 ? updatedConnections[existingIdx] : undefined;
+          if (existingConnItem) {
+            updatedConnections[existingIdx] = {
+              ...existingConnItem,
+              id: newRecord.id,
+              status: uiStatus,
+              connectedAt: newRecord.responded_at || undefined,
+            };
+          } else if (isMeReceiver || isMeRequester) {
+            const partnerId = isMeRequester ? newRecord.receiver_identity_id : newRecord.requester_identity_id;
+            const partner = prev.identities.find(i => i.id === partnerId || ensureUuid(i.id) === partnerId);
+            updatedConnections.unshift({
+              id: newRecord.id,
+              requesterIdentityId: newRecord.requester_identity_id,
+              receiverIdentityId: newRecord.receiver_identity_id,
+              status: uiStatus,
+              connectedAt: newRecord.responded_at || undefined,
+              createdAt: newRecord.requested_at || new Date().toISOString(),
+              partner,
+              contextEventName: 'Diễn Đàn Kết Nối Doanh Nghiệp 2026',
+              notesCount: 0,
+            });
+          }
+
+          return {
+            ...prev,
+            incomingRequest: updatedIncoming,
+            connections: updatedConnections,
+          };
+        });
+      } else if (table === 'person_identities' && newRecord) {
+        setState(prev => {
+          const rawUsername = (newRecord.full_name || '')
+            .toLowerCase()
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .replace(/[^a-z0-9]/g, '') || 'user';
+
+          const newIdent: PersonIdentity = {
+            id: newRecord.id,
+            userId: newRecord.user_id || newRecord.id,
+            username: rawUsername,
+            fullName: newRecord.full_name,
+            displayName: newRecord.display_name || newRecord.full_name,
+            avatarUrl: newRecord.avatar_url || '/avatar-johnny-long.jpg',
+            title: newRecord.title || 'Doanh Nhân',
+            bio: newRecord.bio || '',
+            phone: newRecord.phone || '',
+            email: newRecord.email || '',
+            website: newRecord.website || 'https://oneconnect.id.vn',
+            socialLinks: [],
+            businesses: [],
+            createdAt: newRecord.created_at,
+            updatedAt: newRecord.updated_at,
+          };
+
+          const exists = prev.identities.some(i => i.id === newRecord.id);
+          return {
+            ...prev,
+            identities: exists ? prev.identities.map(i => i.id === newRecord.id ? newIdent : i) : [newIdent, ...prev.identities],
           };
         });
       }
@@ -311,15 +438,21 @@ export function useOneConnectStore() {
     };
   };
 
-  // Consent & Connection Action
+  // Consent & Connection Action (Realtime Cloud Sync)
   const requestConnection = (targetIdentityId: string, eventName?: string) => {
-    if (targetIdentityId === state.currentIdentityId) {
+    const myId = state.currentIdentityId;
+    if (targetIdentityId === myId || ensureUuid(targetIdentityId) === ensureUuid(myId)) {
       return { success: false, message: 'Bạn không thể tự kết nối với chính mình.' };
     }
 
+    const myUuid = ensureUuid(myId);
+    const targetUuid = ensureUuid(targetIdentityId);
+
     const existing = state.connections.find(
-      c => (c.requesterIdentityId === state.currentIdentityId && c.receiverIdentityId === targetIdentityId) ||
-           (c.requesterIdentityId === targetIdentityId && c.receiverIdentityId === state.currentIdentityId)
+      c => (c.requesterIdentityId === myId && c.receiverIdentityId === targetIdentityId) ||
+           (c.requesterIdentityId === targetIdentityId && c.receiverIdentityId === myId) ||
+           (c.requesterIdentityId === myUuid && c.receiverIdentityId === targetUuid) ||
+           (c.requesterIdentityId === targetUuid && c.receiverIdentityId === myUuid)
     );
 
     if (existing) {
@@ -329,10 +462,11 @@ export function useOneConnectStore() {
       return { success: true, connection: existing, message: 'Yêu cầu kết nối đang chờ đối phương đồng ý (Consent Pending).' };
     }
 
+    const tempConnId = `conn-${Date.now()}`;
     const newConn: Connection = {
-      id: `conn-${Date.now()}`,
-      requesterIdentityId: state.currentIdentityId,
-      receiverIdentityId: targetIdentityId,
+      id: tempConnId,
+      requesterIdentityId: myUuid,
+      receiverIdentityId: targetUuid,
       status: 'PENDING',
       createdAt: new Date().toISOString(),
       contextEventName: eventName || 'StartUp Deal Day One Khánh Hòa 2026',
@@ -341,7 +475,7 @@ export function useOneConnectStore() {
 
     const newAuditLog: AuditLog = {
       id: `log-${Date.now()}`,
-      actorUserId: state.currentIdentityId,
+      actorUserId: myId,
       actorName: currentIdentity?.fullName || 'User',
       action: 'CONNECTION_REQUEST_CREATED',
       objectType: 'CONNECTION',
@@ -354,6 +488,14 @@ export function useOneConnectStore() {
       connections: [newConn, ...prev.connections],
       auditLogs: [newAuditLog, ...prev.auditLogs],
     }));
+
+    // Dispatch to Cloud Supabase Database
+    DbService.sendConnectionRequest(myId, targetIdentityId).then((cloudConn) => {
+      setState(prev => ({
+        ...prev,
+        connections: prev.connections.map(c => c.id === tempConnId ? { ...c, id: cloudConn.id } : c),
+      }));
+    }).catch(console.warn);
 
     return { success: true, connection: newConn, message: 'Đã gửi yêu cầu kết nối! Đang chờ đối phương xác nhận Consent theo Luật PDPL.' };
   };
@@ -380,9 +522,27 @@ export function useOneConnectStore() {
 
     setState(prev => ({
       ...prev,
+      incomingRequest: prev.incomingRequest?.id === connectionId ? null : prev.incomingRequest,
       connections: prev.connections.map(c => c.id === connectionId ? updatedConn : c),
       auditLogs: [newAuditLog, ...prev.auditLogs],
     }));
+
+    // Dispatch to Cloud Supabase Database
+    DbService.respondToConnection(connectionId, 'ACCEPTED').catch(console.warn);
+  };
+
+  const rejectConnection = (connectionId: string) => {
+    setState(prev => ({
+      ...prev,
+      incomingRequest: prev.incomingRequest?.id === connectionId ? null : prev.incomingRequest,
+      connections: prev.connections.map(c => c.id === connectionId ? { ...c, status: 'BLOCKED' } : c),
+    }));
+
+    DbService.respondToConnection(connectionId, 'REJECTED').catch(console.warn);
+  };
+
+  const clearIncomingRequest = () => {
+    setState(prev => ({ ...prev, incomingRequest: null }));
   };
 
   // Card Replacement Continuity Action
@@ -489,14 +649,16 @@ export function useOneConnectStore() {
     };
 
     const cleanUsername = data.username || slugify(data.fullName) || `user${Date.now().toString().slice(-4)}`;
-    const newId = `id-${Date.now()}`;
+    const newId = typeof crypto !== 'undefined' && crypto.randomUUID
+      ? crypto.randomUUID()
+      : `${Math.random().toString(16).slice(2, 10)}-0000-4000-8000-${Date.now().toString(16).padStart(12, '0')}`;
     const newCardUid = `NFC-${cleanUsername.toUpperCase().slice(0, 8)}-${Math.floor(100 + Math.random() * 900)}`;
     const avatar = `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(data.fullName)}&backgroundColor=0066ff,00c2ff,10b981,f59e0b`;
     const userRole: RoleType = data.role || 'MEMBER';
 
     const newIdentity: PersonIdentity = {
       id: newId,
-      userId: `usr-${Date.now()}`,
+      userId: newId,
       username: cleanUsername,
       fullName: data.fullName,
       displayName: data.fullName,
@@ -522,7 +684,7 @@ export function useOneConnectStore() {
           id: `soc-${Date.now()}-2`,
           identityId: newId,
           platform: 'website',
-          url: `https://one-connect-network.vercel.app/p/${cleanUsername}`,
+          url: `https://oneconnect.id.vn/p/${cleanUsername}`,
           isPublic: true,
         }
       ],
@@ -551,8 +713,8 @@ export function useOneConnectStore() {
       cardUid: newCardUid,
       cardType: data.cardType || 'NFC_EXECUTIVE',
       nfcIdentifier: `NFC-UID-${Date.now()}`,
-      dynamicUrl: `https://one-connect-network.vercel.app/p/${cleanUsername}`,
-      qrValue: `https://one-connect-network.vercel.app/p/${cleanUsername}`,
+      dynamicUrl: `https://oneconnect.id.vn/p/${cleanUsername}`,
+      qrValue: `https://oneconnect.id.vn/p/${cleanUsername}`,
       status: 'ACTIVE',
       issuedAt: new Date().toISOString(),
     };
@@ -858,6 +1020,8 @@ export function useOneConnectStore() {
     performCheckIn,
     requestConnection,
     acceptConnection,
+    rejectConnection,
+    clearIncomingRequest,
     reissueCard,
     addNote,
     registerForEvent,

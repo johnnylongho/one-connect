@@ -60,7 +60,7 @@ import {
 } from '@/components/ui/dialog';
 import { ToastProvider, useToast } from '@/components/ui/toast';
 import { useOneConnectStore } from '@/lib/store';
-import { DbService } from '@/lib/db-service';
+import { DbService, ensureUuid } from '@/lib/db-service';
 import { PersonIdentity } from '@/lib/types';
 import BusinessCard3D from '@/components/BusinessCard3D';
 
@@ -174,7 +174,7 @@ function DigitalProfileContent() {
   const params = useParams();
   const cardId = (params?.card_id as string) || (params?.username as string) || 'NFC-HA-777';
   const { toast } = useToast();
-  const { state, currentIdentity, updateIdentity } = useOneConnectStore();
+  const { state, currentIdentity, updateIdentity, requestConnection } = useOneConnectStore();
 
   const [activeTab, setActiveTab] = useState('about');
   const [mounted, setMounted] = useState(false);
@@ -237,6 +237,22 @@ function DigitalProfileContent() {
      currentIdentity.userId === matchedIdentity.userId ||
      state.currentRole === 'SUPER_ADMIN')
   );
+
+  // Live connection status from Cloud Database & Realtime
+  const myId = currentIdentity?.id || '';
+  const myUuid = ensureUuid(myId);
+  const targetId = matchedIdentity?.id || '';
+  const targetUuid = ensureUuid(targetId);
+
+  const existingConn = state.connections.find(
+    c => (c.requesterIdentityId === myId && c.receiverIdentityId === targetId) ||
+         (c.requesterIdentityId === targetId && c.receiverIdentityId === myId) ||
+         (ensureUuid(c.requesterIdentityId) === myUuid && ensureUuid(c.receiverIdentityId) === targetUuid) ||
+         (ensureUuid(c.requesterIdentityId) === targetUuid && ensureUuid(c.receiverIdentityId) === myUuid)
+  );
+
+  const isConnected = isOwner || existingConn?.status === 'CONNECTED';
+  const isPending = !isConnected && (existingConn?.status === 'PENDING' || isConnRequested);
 
   // Edit Profile Modal States
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -564,16 +580,19 @@ END:VCARD`;
     }
   };
 
-  // Instant B2B Connection trigger without any async lag
+  // Instant B2B Connection trigger with Realtime Cloud Sync
   const handleRequestConnection = useCallback(() => {
+    if (matchedIdentity) {
+      requestConnection(matchedIdentity.id, 'One Connect MICE NFC Tap');
+    }
     setIsConnRequested(true);
     setIsB2bModalOpen(true);
     toast({
-      title: 'ĐÃ GỬI LỜI MỜI KẾT NỐI B2B!',
-      description: `Lời mời và danh thiếp số đã được gửi tức thì đến ${profile.fullName}.`,
+      title: 'ĐÃ TRUYỀN YÊU CẦU REALTIME!',
+      description: `Yêu cầu trao đổi danh thiếp số đã gửi trực tiếp đến thiết bị của ${profile.fullName}.`,
       variant: 'success',
     });
-  }, [profile.fullName, toast]);
+  }, [matchedIdentity, profile.fullName, requestConnection, toast]);
 
   const handleCopyLink = () => {
     if (typeof window !== 'undefined') {
@@ -812,10 +831,17 @@ END:VCARD`;
                   type="button"
                   onClick={handleRequestConnection}
                   size="lg"
-                  className="flex-1 bg-gradient-to-r from-[#0066FF] to-[#FF6B00] hover:opacity-95 text-white font-black rounded-xl text-[13.5px] sm:text-[14px] py-4 shadow-sm active:scale-98 transition-all cursor-pointer touch-manipulation"
+                  disabled={isConnected || isPending}
+                  className={`flex-1 font-black rounded-xl text-[13.5px] sm:text-[14px] py-4 shadow-sm active:scale-98 transition-all touch-manipulation ${
+                    isConnected
+                      ? 'bg-emerald-600 hover:bg-emerald-600 text-white cursor-default'
+                      : isPending
+                      ? 'bg-amber-500 hover:bg-amber-500 text-white cursor-default'
+                      : 'bg-gradient-to-r from-[#0066FF] to-[#FF6B00] hover:opacity-95 text-white cursor-pointer'
+                  }`}
                 >
                   <UserCheck className="w-4 h-4 mr-1.5" />
-                  {isConnRequested ? 'Đã Kết Nối' : 'Kết Nối B2B'}
+                  {isConnected ? '✓ Đã Kết Nối' : isPending ? '⏳ Đang Chờ Duyệt' : 'Kết Nối Realtime'}
                 </Button>
               </div>
 
@@ -1211,10 +1237,17 @@ END:VCARD`;
               type="button"
               onClick={handleRequestConnection}
               size="sm"
-              className="flex-1 bg-gradient-to-r from-[#0066FF] to-[#FF6B00] hover:opacity-95 text-white font-extrabold rounded-xl text-[13px] py-3 shadow-2xs active:scale-98 transition-all cursor-pointer"
+              disabled={isConnected || isPending}
+              className={`flex-1 font-extrabold rounded-xl text-[13px] py-3 shadow-2xs active:scale-98 transition-all ${
+                isConnected
+                  ? 'bg-emerald-600 hover:bg-emerald-600 text-white cursor-default'
+                  : isPending
+                  ? 'bg-amber-500 hover:bg-amber-500 text-white cursor-default'
+                  : 'bg-gradient-to-r from-[#0066FF] to-[#FF6B00] hover:opacity-95 text-white cursor-pointer'
+              }`}
             >
               <UserCheck className="w-3.5 h-3.5 mr-1" />
-              {isConnRequested ? 'Đã Gửi' : 'Kết Nối B2B'}
+              {isConnected ? '✓ Đã Kết Nối' : isPending ? '⏳ Đang Chờ Duyệt' : 'Kết Nối Realtime'}
             </Button>
           </div>
         </div>
