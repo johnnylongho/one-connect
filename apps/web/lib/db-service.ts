@@ -645,8 +645,8 @@ export const DbService = {
       const data = await res.json();
       const connectionId = data?.connectionId || `conn-${Date.now()}`;
 
-      // 2. Broadcast on the live network channel instantly (< 50ms)
-      await this.broadcastEvent('new_connection_request', {
+      // 2. Broadcast guest lead event on the live network channel (< 50ms)
+      await this.broadcastEvent('new_guest_lead', {
         id: connectionId,
         receiver_identity_id: ownerUuid,
         requester_identity_id: data?.guestId || `guest-${Date.now()}`,
@@ -654,9 +654,9 @@ export const DbService = {
         requester_phone: params.guestPhone,
         requester_company: params.guestCompany || '',
         requester_note: params.guestNote || '',
-        requester_title: params.guestCompany || 'Đối tác chạm thẻ NFC',
+        requester_title: params.guestCompany || 'Khách chạm thẻ NFC',
         avatar_url: `https://ui-avatars.com/api/?name=${encodeURIComponent(params.guestName || 'Khach')}&background=0284c7&color=fff&bold=true`,
-        status: 'PENDING',
+        status: 'NEW',
         requested_at: new Date().toISOString(),
       });
 
@@ -708,6 +708,19 @@ export const DbService = {
           { event: '*', schema: 'public', table: 'check_ins' },
           (payload) => {
             onEvent({ table: 'check_ins', eventType: payload.eventType, newRecord: payload.new, oldRecord: payload.old });
+          }
+        )
+        .on(
+          'broadcast',
+          { event: 'new_guest_lead' },
+          (payload) => {
+            if (payload?.payload) {
+              onEvent({
+                table: 'broadcast_guest_lead',
+                eventType: 'INSERT',
+                newRecord: payload.payload,
+              });
+            }
           }
         )
         .on(

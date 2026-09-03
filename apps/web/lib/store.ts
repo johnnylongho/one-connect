@@ -240,6 +240,64 @@ export function useOneConnectStore() {
             connections: updatedConnections,
           };
         });
+      } else if (table === 'broadcast_guest_lead' && newRecord) {
+        setState(prev => {
+          const myUuid = ensureUuid(prev.currentIdentityId);
+          const isMeReceiver = newRecord.receiver_identity_id === myUuid || 
+            newRecord.receiver_identity_id === prev.currentIdentityId ||
+            prev.currentIdentityId === 'id-001';
+
+          if (isMeReceiver) {
+            const guestInitials = `https://ui-avatars.com/api/?name=${encodeURIComponent(newRecord.requester_name || 'Khach')}&background=0284c7&color=fff&bold=true`;
+            const guestAvatar = newRecord.avatar_url && !newRecord.avatar_url.includes('avatar-johnny-long.jpg')
+              ? newRecord.avatar_url
+              : guestInitials;
+
+            const guestConn: Connection = {
+              id: newRecord.id,
+              requesterIdentityId: newRecord.requester_identity_id,
+              receiverIdentityId: newRecord.receiver_identity_id,
+              status: 'PENDING',
+              createdAt: newRecord.requested_at || new Date().toISOString(),
+              notesCount: 0,
+              partner: {
+                id: newRecord.requester_identity_id,
+                userId: newRecord.requester_identity_id,
+                username: 'guest',
+                fullName: `${newRecord.requester_name}`,
+                displayName: `${newRecord.requester_name}`,
+                avatarUrl: guestAvatar,
+                title: newRecord.requester_company || 'Khách vãng lai (Chưa xác thực)',
+                bio: newRecord.requester_note || 'Khách chạm thẻ NFC để lại thông tin.',
+                phone: newRecord.requester_phone || '',
+                email: '',
+                website: '',
+                socialLinks: [],
+                businesses: [],
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString(),
+              },
+            };
+
+            const newLead: Lead = {
+              id: `lead-${Date.now()}`,
+              connectionId: newRecord.id,
+              ownerIdentityId: prev.currentIdentityId,
+              status: 'NEW',
+              priority: 'HIGH',
+              source: 'Chạm Thẻ NFC Trực Tiếp',
+              createdAt: new Date().toISOString(),
+              updatedAt: new Date().toISOString(),
+            };
+
+            return {
+              ...prev,
+              connections: [guestConn, ...prev.connections.filter(c => c.id !== newRecord.id)],
+              leads: [newLead, ...prev.leads.filter(l => l.connectionId !== newRecord.id)],
+            };
+          }
+          return prev;
+        });
       } else if (table === 'broadcast_connection' && newRecord) {
         setState(prev => {
           const myUuid = ensureUuid(prev.currentIdentityId);
