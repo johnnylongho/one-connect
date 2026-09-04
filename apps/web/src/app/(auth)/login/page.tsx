@@ -305,33 +305,33 @@ export default function LoginPage() {
 
       {/* Top Header */}
       <header className="p-4 sm:p-6 flex items-center justify-between max-w-7xl mx-auto w-full z-10">
-        {/* Mobile Brand (Desktop already has Logo in background) */}
-        <div className="flex items-center lg:invisible select-none">
+        {/* Mobile Brand (Hidden on mobile per request, desktop has logo in artwork) */}
+        <div className="hidden sm:flex items-center lg:invisible select-none">
           <Link href="/" title="Về trang chủ giới thiệu">
             <img
-              src="/one_connect_logo_transparent.png"
+              src="/brand_logo_transparent.png?v=20260904"
               alt="One Connect"
               className="h-8 sm:h-9 w-auto object-contain shrink-0"
             />
           </Link>
         </div>
 
-        <div className="flex items-center gap-2.5 ml-auto">
+        <div className="w-full sm:w-auto grid grid-cols-2 gap-2 sm:flex sm:items-center sm:gap-2.5 sm:ml-auto">
           {/* Back to intro/landing page */}
           <Link
             href="/"
-            className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-300 hover:text-white px-3.5 py-2 rounded-xl bg-slate-900/80 hover:bg-slate-800 border border-slate-700/80 backdrop-blur-md transition-all shadow-xs cursor-pointer"
+            className="inline-flex items-center justify-center gap-1.5 text-xs font-bold text-slate-300 hover:text-white px-3 py-2.5 rounded-xl bg-slate-900/80 hover:bg-slate-800 border border-slate-700/80 backdrop-blur-md transition-all shadow-xs cursor-pointer text-center"
           >
-            <ArrowLeft className="w-3.5 h-3.5" />
-            <span>Trang chủ giới thiệu</span>
+            <ArrowLeft className="w-3.5 h-3.5 shrink-0" />
+            <span className="truncate">Trang chủ giới thiệu</span>
           </Link>
 
           <Link
             href="/register"
-            className="inline-flex items-center gap-1.5 text-xs font-black text-amber-400 hover:text-amber-300 px-4 py-2 rounded-xl border border-amber-400/30 hover:bg-amber-400/10 transition-all shadow-xs"
+            className="inline-flex items-center justify-center gap-1.5 text-xs font-black text-amber-400 hover:text-amber-300 px-3 py-2.5 rounded-xl border border-amber-400/30 hover:bg-amber-400/10 bg-amber-500/5 transition-all shadow-xs text-center"
           >
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>Đăng ký thành viên</span>
+            <Sparkles className="w-3.5 h-3.5 shrink-0" />
+            <span className="truncate">Đăng ký thành viên</span>
           </Link>
         </div>
       </header>
@@ -340,17 +340,6 @@ export default function LoginPage() {
       <main className="relative z-10 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-6 flex flex-col lg:flex-row items-center justify-between lg:justify-end my-auto min-h-[calc(100vh-140px)]">
         {/* Left Spacing: Keeps full visibility of artwork and golden button */}
         <div className="hidden lg:block lg:flex-1 pointer-events-none" />
-
-        {/* Mobile Quick CTA */}
-        <div className="lg:hidden mb-4 w-full max-w-md text-center">
-          <Link
-            href="/register"
-            className="w-full inline-flex items-center justify-center gap-2 px-6 py-3 rounded-2xl bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 text-slate-950 font-black text-xs uppercase tracking-wider shadow-lg shadow-amber-500/25 active:scale-95 transition-all cursor-pointer"
-          >
-            <Sparkles className="w-4 h-4 text-slate-950" />
-            <span>ĐĂNG KÝ THÀNH VIÊN</span>
-          </Link>
-        </div>
 
         {/* Right Column: Modern High-Security Auth Box */}
         <div className="w-full max-w-md lg:mr-2 xl:mr-8 shrink-0">

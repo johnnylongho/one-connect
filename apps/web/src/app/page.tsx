@@ -102,10 +102,10 @@ export default function HomePage() {
       <header className="sticky top-0 z-50 bg-[#0A1124]/95 backdrop-blur-2xl border-b border-slate-800 shadow-[0_4px_24px_rgba(0,0,0,0.18)] transition-all">
         <div className="max-w-7xl mx-auto flex items-center justify-between h-16 sm:h-18 px-4 sm:px-6 lg:px-8">
           
-          {/* Brand Logo - Transparent Isolated PNG */}
+          {/* Brand Logo - Transparent Isolated PNG with Cache Buster */}
           <Link href="/" className="flex items-center group select-none shrink-0" title="One Connect Network">
             <img
-              src="/one_connect_logo_transparent.png"
+              src="/brand_logo_transparent.png?v=20260904"
               alt="One Connect Logo"
               className="h-8 sm:h-9 w-auto object-contain transition-transform duration-200 group-hover:scale-105"
             />
@@ -276,9 +276,9 @@ export default function HomePage() {
         <div className="flex flex-col items-center text-center space-y-6 sm:space-y-8 w-full max-w-5xl mx-auto">
           
           {/* Glass Badge */}
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/90 backdrop-blur-md border border-blue-200/80 text-[#0055EE] text-xs font-extrabold tracking-wide shadow-xs">
+          <div className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-3.5 py-1.5 rounded-full bg-white/90 backdrop-blur-md border border-blue-200/80 text-[#0055EE] text-[10px] xs:text-[11px] sm:text-xs font-extrabold tracking-tight shadow-xs whitespace-nowrap max-w-full">
             <Sparkles className="w-3.5 h-3.5 text-blue-600 shrink-0" />
-            <span>Hạ Tầng Định Danh Số B2B &amp; Quản Trị Sự Kiện MICE Thông Minh</span>
+            <span className="whitespace-nowrap">Hạ Tầng Định Danh Số B2B &amp; Quản Trị Sự Kiện MICE Thông Minh</span>
           </div>
 
           {/* Broad Headline Container - Ensures Headline Stays on Single Lines */}
@@ -950,7 +950,7 @@ export default function HomePage() {
           <div className="flex flex-col items-center sm:items-start gap-2.5 text-center sm:text-left">
             <Link href="/" title="One Connect Network" className="inline-block">
               <img
-                src="/one_connect_logo_transparent.png"
+                src="/brand_logo_transparent.png?v=20260904"
                 alt="One Connect"
                 className="h-7 sm:h-7 w-auto object-contain mx-auto sm:mx-0"
               />

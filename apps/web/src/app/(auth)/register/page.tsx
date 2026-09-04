@@ -579,21 +579,21 @@ function RegisterForm() {
       <div className="absolute -bottom-40 left-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
 
       {/* Top Header */}
-      <header className="p-4 sm:p-6 flex items-center justify-between max-w-7xl mx-auto w-full z-10">
+      <header className="p-4 sm:p-6 grid grid-cols-2 gap-2 sm:flex sm:items-center sm:justify-between max-w-7xl mx-auto w-full z-10">
         <Link
           href="/"
-          className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-300 hover:text-white px-3.5 py-2 rounded-xl bg-slate-900/80 hover:bg-slate-800 transition-all border border-slate-700/60 backdrop-blur-md shadow-xs cursor-pointer"
+          className="inline-flex items-center justify-center gap-1.5 text-xs font-bold text-slate-300 hover:text-white px-3 py-2.5 rounded-xl bg-slate-900/80 hover:bg-slate-800 transition-all border border-slate-700/60 backdrop-blur-md shadow-xs cursor-pointer text-center"
         >
-          <ArrowLeft className="w-3.5 h-3.5" />
-          <span>Trang chủ giới thiệu</span>
+          <ArrowLeft className="w-3.5 h-3.5 shrink-0" />
+          <span className="truncate">Trang chủ giới thiệu</span>
         </Link>
 
         <Link
           href="/login"
-          className="flex items-center gap-1.5 text-xs font-bold text-slate-300 hover:text-white px-3.5 py-2 rounded-xl bg-slate-900/80 hover:bg-slate-800 transition-all border border-slate-700/60 backdrop-blur-md shadow-xs"
+          className="inline-flex items-center justify-center gap-1.5 text-xs font-bold text-slate-300 hover:text-white px-3 py-2.5 rounded-xl bg-slate-900/80 hover:bg-slate-800 transition-all border border-slate-700/60 backdrop-blur-md shadow-xs text-center"
         >
-          <span>Đã có tài khoản? Đăng nhập</span>
-          <ArrowRight className="w-3.5 h-3.5" />
+          <span className="truncate">Đã có tài khoản? Đăng nhập</span>
+          <ArrowRight className="w-3.5 h-3.5 shrink-0" />
         </Link>
       </header>
 
