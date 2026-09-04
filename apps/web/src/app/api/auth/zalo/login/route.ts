@@ -7,11 +7,13 @@ export async function GET(req: NextRequest) {
     process.env.NEXT_PUBLIC_ZALO_APP_ID ||
     '208082851799800309';
 
-  const host = req.headers.get('host') || '';
+  const host = req.headers.get('x-forwarded-host') || req.headers.get('host') || '';
   const isLocal = host.includes('localhost') || host.includes('127.0.0.1');
   const redirectUri = isLocal
     ? `http://${host}/api/auth/zalo/callback`
-    : 'https://oneconnect.id.vn/api/auth/zalo/callback';
+    : host.includes('www.oneconnect.id.vn')
+      ? 'https://www.oneconnect.id.vn/api/auth/zalo/callback'
+      : 'https://oneconnect.id.vn/api/auth/zalo/callback';
 
   // PKCE Code Verifier: 43 characters Base64URL string
   const codeVerifier = crypto.randomBytes(32).toString('base64url');
