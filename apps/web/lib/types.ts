@@ -1,4 +1,4 @@
-export type UserStatus = 'ACTIVE' | 'BLOCKED' | 'DELETION_REQUESTED' | 'DELETED';
+export type UserStatus = 'ACTIVE' | 'INACTIVE' | 'BLOCKED' | 'DELETION_REQUESTED' | 'DELETED';
 export type VerificationStatus = 'UNVERIFIED' | 'PENDING' | 'VERIFIED' | 'REJECTED';
 export type PersonBusinessStatus = 'ACTIVE' | 'INACTIVE';
 export type OrganizationStatus = 'ACTIVE' | 'INACTIVE';
@@ -56,6 +56,7 @@ export interface PersonIdentity {
   email?: string;
   password?: string;
   role?: RoleType;
+  status?: UserStatus;
   website?: string;
   taxCode?: string;
   address?: string;

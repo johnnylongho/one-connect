@@ -23,16 +23,22 @@ import {
   Sparkles,
   X,
   Crown,
+  Lock,
+  Unlock,
+  Trash2,
+  AlertTriangle,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 
 export default function MemberDirectoryAdminPage() {
-  const { state, registerIdentity, changeUserRole } = useOneConnectStore();
+  const { state, registerIdentity, changeUserRole, toggleIdentityStatus, deleteIdentity } = useOneConnectStore();
   const [searchTerm, setSearchTerm] = useState('');
   const [filterRole, setFilterRole] = useState<string>('ALL');
   const [filterIndustry, setFilterIndustry] = useState<string>('ALL');
   const [selectedMemberForCard, setSelectedMemberForCard] = useState<any | null>(null);
+  const [memberToDelete, setMemberToDelete] = useState<any | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
 
   // Form states for new member
@@ -232,7 +238,9 @@ export default function MemberDirectoryAdminPage() {
           const companyName = m.businesses && m.businesses[0] ? m.businesses[0].businessName : 'Tập đoàn Công nghệ Số A+ (APLUSVN)';
           const profileLink = `/p/${m.username || m.id}`;
           const memberCard = state.cards.find((c) => c.personIdentityId === m.id && c.status === 'ACTIVE') || state.cards.find((c) => c.personIdentityId === m.id);
-          const currentMemberRole: RoleType = m.role || (m.id === 'id-001' ? 'SUPER_ADMIN' : 'MEMBER');
+          const currentMemberRole: RoleType = m.role || (m.id === 'id-001' || m.id === '11111111-1111-1111-1111-111111111111' ? 'SUPER_ADMIN' : 'MEMBER');
+          const isSuperAdmin = m.username === 'johnnylongho' || m.id === 'id-001' || m.id === '11111111-1111-1111-1111-111111111111' || (m.email && m.email.toLowerCase() === 'contact.johnnylongho@gmail.com');
+          const isInactive = m.status === 'INACTIVE';
 
           const roleBadgeConfig: Record<string, { label: string; bg: string }> = {
             SUPER_ADMIN: { label: 'SUPER ADMIN', bg: 'bg-purple-50 text-purple-700 border-purple-200' },
@@ -247,30 +255,48 @@ export default function MemberDirectoryAdminPage() {
           return (
             <div
               key={m.id}
-              className="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200/90 shadow-xs hover:shadow-md transition-all flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 group"
+              className={`p-4 sm:p-5 rounded-2xl border shadow-xs hover:shadow-md transition-all flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 group ${
+                isInactive ? 'bg-slate-50/70 border-slate-300/80 opacity-85' : 'bg-white border-slate-200/90'
+              }`}
             >
               {/* Member Info */}
               <div className="flex items-center gap-3.5 min-w-0 flex-1">
-                <img
-                  src={m.avatarUrl || '/avatar-johnny-long.jpg'}
-                  alt={m.fullName}
-                  className="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl object-cover shadow-2xs border border-slate-200 bg-slate-100 shrink-0 group-hover:scale-105 transition-transform"
-                  onError={(e) => {
-                    e.currentTarget.onerror = null;
-                    e.currentTarget.src = `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(m.fullName)}&backgroundColor=0066ff,00c2ff`;
-                  }}
-                />
+                <div className="relative shrink-0">
+                  <img
+                    src={m.avatarUrl || '/avatar-johnny-long.jpg'}
+                    alt={m.fullName}
+                    className={`w-13 h-13 sm:w-14 sm:h-14 rounded-2xl object-cover shadow-2xs border bg-slate-100 group-hover:scale-105 transition-transform ${
+                      isInactive ? 'border-rose-300 grayscale-30' : 'border-slate-200'
+                    }`}
+                    onError={(e) => {
+                      e.currentTarget.onerror = null;
+                      e.currentTarget.src = `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(m.fullName)}&backgroundColor=0066ff,00c2ff`;
+                    }}
+                  />
+                  {isInactive && (
+                    <div className="absolute -bottom-1 -right-1 bg-rose-600 text-white rounded-full p-0.5 shadow-xs" title="Tài khoản đã bị vô hiệu hóa">
+                      <Lock className="w-3 h-3" />
+                    </div>
+                  )}
+                </div>
+
                 <div className="space-y-1 min-w-0 flex-1">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <h3 className="font-bold text-sm sm:text-base text-slate-900 tracking-tight">
+                    <h3 className={`font-bold text-sm sm:text-base tracking-tight ${isInactive ? 'text-slate-500 line-through' : 'text-slate-900'}`}>
                       {m.fullName}
                     </h3>
                     <Badge className={`${currentBadge.bg} text-[10px] font-extrabold uppercase`}>
                       {currentBadge.label}
                     </Badge>
-                    <Badge className="bg-emerald-50 text-emerald-700 border-emerald-200 text-[10px] font-mono">
-                      {memberCard?.cardUid || 'NFC-ACTIVE'}
-                    </Badge>
+                    {isInactive ? (
+                      <Badge className="bg-rose-50 text-rose-700 border-rose-200 text-[10px] font-bold">
+                        ĐÃ KHÓA
+                      </Badge>
+                    ) : (
+                      <Badge className="bg-emerald-50 text-emerald-700 border-emerald-200 text-[10px] font-mono">
+                        {memberCard?.cardUid || 'NFC-ACTIVE'}
+                      </Badge>
+                    )}
                   </div>
 
                   <p className="text-xs sm:text-[13px] font-bold text-[#0066FF] leading-snug">
@@ -287,7 +313,7 @@ export default function MemberDirectoryAdminPage() {
               {/* Quick Contact & Action Buttons */}
               <div className="flex flex-wrap sm:flex-nowrap items-center gap-2 w-full sm:w-auto pt-3 sm:pt-0 border-t sm:border-t-0 border-slate-100 justify-end">
                 {/* Inline Role Indicator / Changer */}
-                {m.username === 'johnnylongho' || m.id === 'id-001' || m.id === '11111111-1111-1111-1111-111111111111' || (m.email && m.email.toLowerCase() === 'contact.johnnylongho@gmail.com') ? (
+                {isSuperAdmin ? (
                   <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-xs font-black shadow-2xs">
                     <Crown className="w-3.5 h-3.5 text-amber-600" />
                     <span>SUPER_ADMIN</span>
@@ -337,6 +363,57 @@ export default function MemberDirectoryAdminPage() {
                 >
                   <CreditCard className="w-3.5 h-3.5 mr-1 text-[#FF6B00]" /> Thẻ NFC
                 </Button>
+
+                {/* Deactivate / Activate Button */}
+                {!isSuperAdmin && (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={async () => {
+                      const targetAction = isInactive ? 'ACTIVE' : 'INACTIVE';
+                      const res = await toggleIdentityStatus(m.id, targetAction);
+                      if (res && res.success === false) {
+                        alert(res.error || 'Thao tác không thành công');
+                      } else {
+                        setSuccessToast(
+                          isInactive
+                            ? `Đã kích hoạt lại tài khoản hội viên "${m.fullName}".`
+                            : `Đã tạm khóa (vô hiệu hóa) tài khoản hội viên "${m.fullName}".`
+                        );
+                        setTimeout(() => setSuccessToast(''), 4000);
+                      }
+                    }}
+                    className={`rounded-xl text-xs font-bold py-1.5 cursor-pointer shadow-2xs transition-all ${
+                      isInactive
+                        ? 'border-emerald-200 text-emerald-700 bg-emerald-50 hover:bg-emerald-100'
+                        : 'border-amber-200 text-amber-700 bg-amber-50/70 hover:bg-amber-100'
+                    }`}
+                    title={isInactive ? 'Kích hoạt lại tài khoản' : 'Khóa tài khoản này'}
+                  >
+                    {isInactive ? (
+                      <>
+                        <Unlock className="w-3.5 h-3.5 mr-1 text-emerald-600" /> Mở khóa
+                      </>
+                    ) : (
+                      <>
+                        <Lock className="w-3.5 h-3.5 mr-1 text-amber-600" /> Khóa
+                      </>
+                    )}
+                  </Button>
+                )}
+
+                {/* Delete Member Button */}
+                {!isSuperAdmin && (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => setMemberToDelete(m)}
+                    className="rounded-xl border-rose-200 text-rose-600 bg-rose-50/60 hover:bg-rose-100 hover:text-rose-700 text-xs font-bold py-1.5 cursor-pointer shadow-2xs"
+                    title="Xóa vĩnh viễn tài khoản hội viên"
+                  >
+                    <Trash2 className="w-3.5 h-3.5 mr-1 text-rose-600" /> Xóa
+                  </Button>
+                )}
               </div>
             </div>
           );
@@ -573,6 +650,75 @@ export default function MemberDirectoryAdminPage() {
                 </Button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL: XÁC NHẬN XÓA THÀNH VIÊN VĨNH VIỄN */}
+      {memberToDelete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-xs animate-in fade-in duration-200">
+          <div className="bg-white w-full max-w-md rounded-3xl p-6 shadow-2xl border border-slate-200 space-y-5 animate-in zoom-in-95 duration-200 text-left relative">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-2xl bg-rose-50 border border-rose-200 flex items-center justify-center shrink-0 text-rose-600">
+                <AlertTriangle className="w-6 h-6" />
+              </div>
+              <div>
+                <h3 className="font-bold text-base text-slate-900">Xác Nhận Xóa Hội Viên Vĩnh Viễn</h3>
+                <p className="text-xs text-slate-500">Hành động này không thể hoàn tác</p>
+              </div>
+            </div>
+
+            <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-2 text-xs">
+              <p className="text-slate-700">
+                Bạn đang chuẩn bị xóa hội viên: <strong className="text-slate-900 font-bold">{memberToDelete.fullName}</strong>
+              </p>
+              {memberToDelete.email && (
+                <p className="text-slate-500 font-mono">Email: {memberToDelete.email}</p>
+              )}
+              {memberToDelete.phone && (
+                <p className="text-slate-500 font-mono">Điện thoại: {memberToDelete.phone}</p>
+              )}
+              <p className="text-rose-600 font-semibold pt-1 border-t border-slate-200">
+                ⚠️ Toàn bộ dữ liệu hồ sơ cá nhân, thẻ NFC số, lịch sử check-in sự kiện và các liên kết kinh doanh của hội viên này sẽ bị xóa hoàn toàn khỏi hệ thống.
+              </p>
+            </div>
+
+            <div className="flex items-center justify-end gap-3 pt-2">
+              <Button
+                type="button"
+                variant="outline"
+                disabled={isDeleting}
+                onClick={() => setMemberToDelete(null)}
+                className="rounded-xl border-slate-200 text-slate-600 font-bold text-xs px-4 py-2.5 cursor-pointer"
+              >
+                Hủy bỏ
+              </Button>
+              <Button
+                type="button"
+                disabled={isDeleting}
+                onClick={async () => {
+                  setIsDeleting(true);
+                  try {
+                    const res = await deleteIdentity(memberToDelete.id);
+                    if (res && res.success === false) {
+                      alert(res.error || 'Xóa tài khoản không thành công');
+                    } else {
+                      setSuccessToast(`Đã xóa vĩnh viễn tài khoản hội viên "${memberToDelete.fullName}" khỏi hệ thống.`);
+                      setMemberToDelete(null);
+                      setTimeout(() => setSuccessToast(''), 4000);
+                    }
+                  } catch (e: any) {
+                    alert('Lỗi: ' + e.message);
+                  } finally {
+                    setIsDeleting(false);
+                  }
+                }}
+                className="bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-xl text-xs px-5 py-2.5 cursor-pointer shadow-xs flex items-center gap-1.5"
+              >
+                <Trash2 className="w-4 h-4" />
+                {isDeleting ? 'Đang xử lý xóa...' : 'Xác Nhận Xóa Vĩnh Viễn'}
+              </Button>
+            </div>
           </div>
         </div>
       )}

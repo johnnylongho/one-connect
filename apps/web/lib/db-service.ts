@@ -90,6 +90,7 @@ export const DbService = {
             email: d.email || 'member@oneconnect.id.vn',
             website: d.website || 'https://oneconnect.id.vn',
             role: (isJohnny ? 'SUPER_ADMIN' : 'MEMBER') as any,
+            status: (d.status || 'ACTIVE') as any,
             socialLinks: [
               { id: `soc-${d.id}-1`, identityId: d.id, platform: 'phone', url: `tel:${d.phone || ''}`, isPublic: true },
               { id: `soc-${d.id}-2`, identityId: d.id, platform: 'website', url: d.website || 'https://oneconnect.id.vn', isPublic: true },
@@ -767,6 +768,54 @@ export const DbService = {
     } catch (err) {
       console.warn('Supabase Realtime subscription error:', err);
       return () => {};
+    }
+  },
+
+  /**
+   * 15. Toggle Identity Status between ACTIVE and INACTIVE
+   */
+  async toggleIdentityStatus(id: string, newStatus: 'ACTIVE' | 'INACTIVE'): Promise<{ success: boolean; error?: string }> {
+    try {
+      const res = await fetch('/api/admin/users', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, status: newStatus }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        return { success: false, error: data.error || 'Failed to update user status' };
+      }
+      // Update local memory
+      localIdentities = localIdentities.map(i => i.id === id ? { ...i, status: newStatus } : i);
+      return { success: true };
+    } catch (err: any) {
+      console.error('toggleIdentityStatus error:', err);
+      return { success: false, error: err.message };
+    }
+  },
+
+  /**
+   * 16. Delete Identity permanently and cascade all associated data
+   */
+  async deleteIdentity(id: string): Promise<{ success: boolean; error?: string }> {
+    try {
+      const res = await fetch('/api/admin/users', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        return { success: false, error: data.error || 'Failed to delete user' };
+      }
+      // Update local memory
+      localIdentities = localIdentities.filter(i => i.id !== id);
+      localCards = localCards.filter(c => c.personIdentityId !== id);
+      localConnections = localConnections.filter(c => c.requesterIdentityId !== id && c.receiverIdentityId !== id);
+      return { success: true };
+    } catch (err: any) {
+      console.error('deleteIdentity error:', err);
+      return { success: false, error: err.message };
     }
   },
 };

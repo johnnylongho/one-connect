@@ -57,11 +57,99 @@ export interface AppState {
   } | null;
 }
 
+/**
+ * Deduplicate identities by UUID, email, phone, or username.
+ * Prevents multiple records for the same individual (e.g. Ho Hoang Long).
+ */
+export function deduplicateIdentities(identities: PersonIdentity[]): PersonIdentity[] {
+  const result: PersonIdentity[] = [];
+
+  for (const item of identities) {
+    const itemUuid = ensureUuid(item.id);
+    const itemEmail = item.email?.toLowerCase().trim();
+    const itemPhone = item.phone?.replace(/\D/g, '');
+    const itemUsername = item.username?.toLowerCase().trim();
+
+    const isJohnny = item.id === '11111111-1111-1111-1111-111111111111' ||
+                     item.id === 'id-001' ||
+                     itemUsername === 'johnnylongho' ||
+                     itemEmail === 'contact.johnnylongho@gmail.com';
+
+    const existingIdx = result.findIndex(existing => {
+      // If it's Johnny Long Ho, match any Johnny Long Ho variant
+      if (isJohnny) {
+        const exEmail = existing.email?.toLowerCase().trim();
+        const exUsername = existing.username?.toLowerCase().trim();
+        return existing.id === '11111111-1111-1111-1111-111111111111' ||
+               existing.id === 'id-001' ||
+               exUsername === 'johnnylongho' ||
+               exEmail === 'contact.johnnylongho@gmail.com';
+      }
+
+      // 1. Check exact ID or mapped UUID
+      if (existing.id === item.id || ensureUuid(existing.id) === itemUuid) return true;
+
+      // 2. Check email if available
+      if (itemEmail && existing.email && existing.email.toLowerCase().trim() === itemEmail) return true;
+
+      // 3. Check phone if available
+      const exPhone = existing.phone?.replace(/\D/g, '');
+      if (itemPhone && exPhone && itemPhone === exPhone) return true;
+
+      // 4. Check username if available and not generic
+      if (itemUsername && itemUsername !== 'user' && existing.username && existing.username.toLowerCase().trim() === itemUsername) return true;
+
+      return false;
+    });
+
+    if (existingIdx >= 0 && result[existingIdx]) {
+      // Merge rich properties, keep the primary/clean ID
+      const existing = result[existingIdx]!;
+      const preferredId = (item.id.includes('-') && item.id.length === 36) ? item.id : existing.id;
+      result[existingIdx] = {
+        ...existing,
+        ...item,
+        id: preferredId,
+        avatarUrl: existing.avatarUrl || item.avatarUrl,
+        socialLinks: (existing.socialLinks && existing.socialLinks.length > 0) ? existing.socialLinks : (item.socialLinks || []),
+        businesses: (existing.businesses && existing.businesses.length > 0) ? existing.businesses : (item.businesses || []),
+        status: item.status || existing.status || 'ACTIVE',
+      };
+    } else {
+      result.push({
+        ...item,
+        status: item.status || 'ACTIVE',
+      });
+    }
+  }
+
+  return result;
+}
+
+/**
+ * Deduplicate cards so each person identity only has one primary active card
+ */
+export function deduplicateCards(cards: AccessCard[]): AccessCard[] {
+  const seenPersons = new Set<string>();
+  const seenUids = new Set<string>();
+  const result: AccessCard[] = [];
+
+  for (const card of cards) {
+    const canonicalPersonId = ensureUuid(card.personIdentityId);
+    if (!seenPersons.has(canonicalPersonId) && !seenUids.has(card.cardUid)) {
+      seenPersons.add(canonicalPersonId);
+      seenUids.add(card.cardUid);
+      result.push(card);
+    }
+  }
+  return result;
+}
+
 const defaultState: AppState = {
   currentRole: 'MEMBER',
   currentIdentityId: '', // Empty by default = Guest / Requires Login
-  identities: INITIAL_IDENTITIES,
-  cards: INITIAL_CARDS,
+  identities: deduplicateIdentities(INITIAL_IDENTITIES),
+  cards: deduplicateCards(INITIAL_CARDS),
   organizations: INITIAL_ORGANIZATIONS,
   events: INITIAL_EVENTS,
   registrations: INITIAL_REGISTRATIONS,
@@ -86,11 +174,12 @@ export function useOneConnectStore() {
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
         const parsed: AppState = JSON.parse(saved);
-        // Ensure id-001 and card-1 are strictly synced with official values
-        parsed.identities = parsed.identities.map((idnt) => {
-          if (idnt.id === 'id-001' || idnt.username === 'johnnylongho') {
+        // Ensure strictly deduplicated identities
+        parsed.identities = deduplicateIdentities(parsed.identities || []).map((idnt) => {
+          if (idnt.id === 'id-001' || idnt.id === '11111111-1111-1111-1111-111111111111' || idnt.username === 'johnnylongho') {
             return {
               ...idnt,
+              id: '11111111-1111-1111-1111-111111111111',
               username: idnt.username || 'johnnylongho',
               fullName: idnt.fullName || 'Hồ Hoàng Long',
               displayName: idnt.displayName || idnt.fullName || 'Johnny Long Hồ',
@@ -102,10 +191,12 @@ export function useOneConnectStore() {
           }
           return idnt;
         });
-        parsed.cards = parsed.cards.map((c) => {
-          if (c.personIdentityId === 'id-001') {
+
+        parsed.cards = deduplicateCards(parsed.cards || []).map((c) => {
+          if (c.personIdentityId === 'id-001' || c.personIdentityId === '11111111-1111-1111-1111-111111111111') {
             return {
               ...c,
+              personIdentityId: '11111111-1111-1111-1111-111111111111',
               cardUid: '04:8F:2A:1B:9C:5D:80',
               nfcIdentifier: 'NFC-2026-APLUS-001',
               dynamicUrl: 'https://www.oneconnect.id.vn/p/johnnylongho',
@@ -133,21 +224,11 @@ export function useOneConnectStore() {
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
-    // 1. Fetch Cloud Identities
+    // 1. Fetch Cloud Identities with automatic deduplication
     DbService.fetchCloudIdentities().then((cloudIdentities) => {
       if (cloudIdentities && cloudIdentities.length > 0) {
         setState(prev => {
-          const merged = [...cloudIdentities];
-          // Always ensure Johnny Long Ho is cleanly accessible as id-001
-          const localJohnny = prev.identities.find(p => p.id === 'id-001' || p.username === 'johnnylongho');
-          if (localJohnny && !merged.some(m => m.id === 'id-001')) {
-            merged.unshift(localJohnny);
-          }
-          prev.identities.forEach(p => {
-            if (!merged.some(m => m.id === p.id || m.username === p.username)) {
-              merged.push(p);
-            }
-          });
+          const merged = deduplicateIdentities([...cloudIdentities, ...prev.identities]);
           return { ...prev, identities: merged };
         });
       }
@@ -1242,6 +1323,37 @@ export function useOneConnectStore() {
     }
   };
 
+  // Toggle Identity Status (ACTIVE / INACTIVE)
+  const toggleIdentityStatus = async (id: string, explicitStatus?: 'ACTIVE' | 'INACTIVE') => {
+    const isJohnny = id === '11111111-1111-1111-1111-111111111111' || id === 'id-001';
+    if (isJohnny) return { success: false, error: 'Không thể vô hiệu hóa tài khoản Quản trị viên tối cao.' };
+
+    const target = state.identities.find(i => i.id === id);
+    const newStatus: 'ACTIVE' | 'INACTIVE' = explicitStatus || (target?.status === 'INACTIVE' ? 'ACTIVE' : 'INACTIVE');
+
+    setState(prev => ({
+      ...prev,
+      identities: prev.identities.map(i => i.id === id ? { ...i, status: newStatus } : i),
+    }));
+
+    return await DbService.toggleIdentityStatus(id, newStatus);
+  };
+
+  // Delete Identity permanently and cascade related records
+  const deleteIdentity = async (id: string) => {
+    const isJohnny = id === '11111111-1111-1111-1111-111111111111' || id === 'id-001';
+    if (isJohnny) return { success: false, error: 'Không thể xóa tài khoản Quản trị viên tối cao.' };
+
+    setState(prev => ({
+      ...prev,
+      identities: prev.identities.filter(i => i.id !== id),
+      cards: prev.cards.filter(c => c.personIdentityId !== id),
+      connections: prev.connections.filter(c => c.requesterIdentityId !== id && c.receiverIdentityId !== id),
+    }));
+
+    return await DbService.deleteIdentity(id);
+  };
+
   return {
     state,
     currentIdentity,
@@ -1255,6 +1367,8 @@ export function useOneConnectStore() {
     changeUserRole,
     switchWorkspace,
     updateIdentity,
+    toggleIdentityStatus,
+    deleteIdentity,
     resetState,
     performCheckIn,
     requestConnection,

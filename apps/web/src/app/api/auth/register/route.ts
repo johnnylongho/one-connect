@@ -17,6 +17,51 @@ export async function POST(req: NextRequest) {
     const cleanPassword = password || 'OneConnect@2026';
     const userId = id || (typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : `usr_${Date.now()}`);
 
+    // Pre-check for duplicate email in users table
+    try {
+      const checkRes = await fetch(`${supabaseUrl}/rest/v1/users?email=eq.${encodeURIComponent(cleanEmail)}&select=id`, {
+        headers: {
+          apikey: serviceRoleKey,
+          Authorization: `Bearer ${serviceRoleKey}`,
+        },
+      });
+      if (checkRes.ok) {
+        const existingUsers = await checkRes.json();
+        if (existingUsers && existingUsers.length > 0) {
+          return NextResponse.json(
+            { success: false, error: 'Email này đã được đăng ký trên hệ thống. Vui lòng đăng nhập hoặc sử dụng email khác.' },
+            { status: 409 }
+          );
+        }
+      }
+    } catch (checkErr) {
+      console.warn('Pre-check duplicate email warning:', checkErr);
+    }
+
+    // Pre-check for duplicate phone in users table
+    if (phone && phone.trim()) {
+      const cleanPhone = phone.trim();
+      try {
+        const phoneCheckRes = await fetch(`${supabaseUrl}/rest/v1/users?phone=eq.${encodeURIComponent(cleanPhone)}&select=id`, {
+          headers: {
+            apikey: serviceRoleKey,
+            Authorization: `Bearer ${serviceRoleKey}`,
+          },
+        });
+        if (phoneCheckRes.ok) {
+          const existingPhones = await phoneCheckRes.json();
+          if (existingPhones && existingPhones.length > 0) {
+            return NextResponse.json(
+              { success: false, error: 'Số điện thoại này đã được đăng ký trên hệ thống.' },
+              { status: 409 }
+            );
+          }
+        }
+      } catch (checkPhoneErr) {
+        console.warn('Pre-check duplicate phone warning:', checkPhoneErr);
+      }
+    }
+
     // 1. Create User in Supabase Auth via Admin API
     let authUser = null;
     try {
