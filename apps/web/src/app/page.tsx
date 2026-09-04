@@ -1,8 +1,7 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
-import BusinessCard3D from '@/components/BusinessCard3D';
 import { useOneConnectStore } from '@/lib/store';
 import {
   Zap,
@@ -12,61 +11,51 @@ import {
   Smartphone,
   Layers,
   Lock,
-  FileText,
   Play,
   QrCode,
   Leaf,
   Check,
-  ChevronRight,
   Sparkles,
   ArrowRight,
   Radio,
   Unlock,
   Tag,
-  Cpu,
   RefreshCw,
   MessageSquare,
   Menu,
   X,
-  ExternalLink,
-  Users,
   ChevronDown,
+  Building2,
+  CreditCard,
+  Download,
+  Users,
+  Calendar,
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 
 export default function HomePage() {
-  const { state, currentIdentity, currentCard, reissueCard } = useOneConnectStore();
+  const { state, currentIdentity } = useOneConnectStore();
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  // Active Simulator Tab
-  const [activeSimTab, setActiveSimTab] = useState<'nfc' | 'checkin' | 'consent' | 'memory' | 'ai'>('nfc');
-  const [selectedTheme, setSelectedTheme] = useState<'obsidian' | 'sapphire' | 'gold' | 'emerald'>('obsidian');
+  // Active Interactive Tab
+  const [activeTab, setActiveTab] = useState<'checkin' | 'consent' | 'crm'>('checkin');
 
-  // Simulator 1: NFC Tap state
-  const [nfcTapping, setNfcTapping] = useState(false);
-  const [nfcTapped, setNfcTapped] = useState(false);
-  const [tapLatency, setTapLatency] = useState(0);
-
-  // Simulator 2: Fast Checkin state
+  // Simulator 1: Fast Check-in state
   const [checkinScanning, setCheckinScanning] = useState(false);
   const [checkinSuccess, setCheckinSuccess] = useState(false);
-  const [attendeeCount, setAttendeeCount] = useState(142);
+  const [attendeeCount, setAttendeeCount] = useState(148);
 
-  // Simulator 3: 2-Way Consent state
+  // Simulator 2: 2-Way Consent state
   const [consentGranted, setConsentGranted] = useState(false);
 
-  // Simulator 4: Relationship Memory state
-  const [noteText, setNoteText] = useState(
-    'Gặp anh Minh Đức tại Diễn đàn MICE Nha Trang. Đối tác quan tâm 1,000 thẻ NFC One Connect cho TechCorp Q3/2026.'
-  );
+  // Simulator 3: CRM Lead Classification
   const [leadStatus, setLeadStatus] = useState<'WARM' | 'HOT' | 'CONVERTED'>('HOT');
-
-  // Simulator 5: AI Matchmaking state
-  const [supplyIndustry, setSupplyIndustry] = useState('Công Nghệ & AI');
-  const [demandIndustry, setDemandIndustry] = useState('Khách Sạn & MICE');
+  const [noteText, setNoteText] = useState(
+    'Gặp gỡ đối tác tại diễn đàn doanh nghiệp. Đối tác cần triển khai 500 thẻ NFC cho đội ngũ kinh doanh.'
+  );
 
   // ROI Calculator State
   const [attendeesPerEvent, setAttendeesPerEvent] = useState(300);
@@ -76,18 +65,7 @@ export default function HomePage() {
   const totalDelegates = attendeesPerEvent * eventsPerYear;
   const paperCostSaved = totalDelegates * 25000; // 25k VND per printed packet + badge
   const co2SavedKg = Math.round(totalDelegates * 0.18);
-  const checkinHoursSaved = Math.round((totalDelegates * 25) / 3600); // 25s saved per person
-
-  const handleSimulateNfcTap = () => {
-    setNfcTapping(true);
-    setNfcTapped(false);
-    const start = Date.now();
-    setTimeout(() => {
-      setTapLatency(Date.now() - start);
-      setNfcTapping(false);
-      setNfcTapped(true);
-    }, 420);
-  };
+  const checkinHoursSaved = Math.round((totalDelegates * 25) / 3600); // 25s saved per delegate
 
   const handleSimulateCheckin = () => {
     setCheckinScanning(true);
@@ -107,138 +85,74 @@ export default function HomePage() {
     }
   };
 
-  const previewIdentity = currentIdentity || {
-    id: 'demo-identity',
-    userId: 'demo-user',
-    username: 'hohoanglong',
-    fullName: 'Hồ Hoàng Long',
-    displayName: 'Hồ Hoàng Long',
-    title: 'Quản lý Dự án & Phát triển Sản phẩm',
-    avatarUrl: '/avatar-johnny-long.jpg',
-    phone: '0923.456.789',
-    email: 'contact.johnnylongho@gmail.com',
-    association: 'Tập đoàn Công nghệ số A+ (A PLUSVN)',
-    slogan: 'Physical Touch • Digital Memory • Enterprise Trust',
-    industry: 'Công Nghệ Số & AI B2B',
-    socialLinks: [],
-    businesses: [
-      {
-        id: 'biz-01',
-        personIdentityId: 'demo-identity',
-        businessId: 'biz-01',
-        businessName: 'Tập đoàn Công nghệ số A+',
-        position: 'Quản lý Dự án & Phát triển Sản phẩm',
-        relationType: 'OWNER',
-        isPrimary: true,
-        status: 'ACTIVE' as const,
-      },
-    ],
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  };
-
-  const previewCard = currentCard || {
-    id: 'card-demo',
-    personIdentityId: 'demo-identity',
-    cardUid: '1C-NFC-KH2026',
-    cardType: 'NFC_BUSINESS_PRO' as const,
-    dynamicUrl: 'https://oneconnect.id.vn/c/demo',
-    qrValue: 'https://oneconnect.id.vn/c/demo',
-    status: 'ACTIVE' as const,
-    issuedAt: new Date().toISOString(),
-  };
-
   return (
-    <div className="min-h-screen bg-[#070A12] text-slate-100 antialiased selection:bg-blue-600 selection:text-white overflow-x-hidden">
+    <div className="min-h-screen bg-white text-slate-900 antialiased selection:bg-blue-600 selection:text-white overflow-x-hidden">
       
       {/* ================================================================= */}
-      {/* 1. STICKY TOP NAVIGATION BAR */}
+      {/* 1. STICKY TOP NAVIGATION BAR (CLEAN WHITE) */}
       {/* ================================================================= */}
-      <header className="sticky top-0 z-50 bg-[#070A12]/90 backdrop-blur-md border-b border-slate-800/80 px-4 sm:px-6 lg:px-8 transition-all">
-        <div className="max-w-7xl mx-auto flex items-center justify-between h-16 sm:h-18">
+      <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-100 shadow-2xs transition-all">
+        <div className="max-w-7xl mx-auto flex items-center justify-between h-16 sm:h-18 px-4 sm:px-6 lg:px-8">
           
-          {/* Brand Logo */}
-          <Link href="/" className="flex items-center gap-2.5 sm:gap-3 group select-none shrink-0">
-            <div className="relative flex items-center justify-center">
-              <img
-                src="/one_connect_final_logo_orange.png"
-                alt="One Connect Logo"
-                className="h-8 sm:h-9 w-auto object-contain transition-transform duration-200 group-hover:scale-105"
-              />
-            </div>
-            <div className="flex flex-col">
-              <span className="text-base sm:text-lg font-black tracking-wider text-white font-heading leading-tight">
-                ONE CONNECT
-              </span>
-              <span className="text-[9.5px] font-bold tracking-widest uppercase text-cyan-400 font-mono">
-                B2B IDENTITY NETWORK
-              </span>
-            </div>
+          {/* Brand Logo - Separated Transparent PNG without subtitle text */}
+          <Link href="/" className="flex items-center group select-none shrink-0" title="One Connect Network">
+            <img
+              src="/one_connect_logo_transparent.png"
+              alt="One Connect"
+              className="h-8 sm:h-9 w-auto object-contain transition-transform duration-200 group-hover:scale-105"
+            />
           </Link>
 
-          {/* Desktop Nav Links */}
-          <nav className="hidden lg:flex items-center gap-6 xl:gap-8 text-xs font-semibold text-slate-300">
+          {/* Desktop Navigation Links */}
+          <nav className="hidden lg:flex items-center gap-7 text-xs font-semibold text-slate-600">
             <button
               onClick={() => scrollToSection('features')}
-              className="hover:text-cyan-400 transition-colors cursor-pointer"
+              className="hover:text-blue-600 transition-colors cursor-pointer"
             >
-              Tính Năng Cốt Lõi
-            </button>
-            <button
-              onClick={() => scrollToSection('card3d')}
-              className="hover:text-cyan-400 transition-colors cursor-pointer"
-            >
-              Thẻ 3D NFC
+              Tính Năng
             </button>
             <button
               onClick={() => scrollToSection('checkin')}
-              className="hover:text-cyan-400 transition-colors cursor-pointer"
+              className="hover:text-blue-600 transition-colors cursor-pointer"
             >
-              Điểm Danh Sự Kiện
+              Check-in Sự Kiện
             </button>
             <button
               onClick={() => scrollToSection('security')}
-              className="hover:text-cyan-400 transition-colors cursor-pointer"
+              className="hover:text-blue-600 transition-colors cursor-pointer"
             >
               Bảo Mật PDPL 91
             </button>
             <button
-              onClick={() => scrollToSection('calculator')}
-              className="hover:text-cyan-400 transition-colors cursor-pointer"
+              onClick={() => scrollToSection('roi')}
+              className="hover:text-blue-600 transition-colors cursor-pointer"
             >
-              Tính Hiệu Quả (ROI)
+              Hiệu Quả (ROI)
             </button>
             <button
               onClick={() => scrollToSection('pricing')}
-              className="hover:text-cyan-400 transition-colors cursor-pointer"
+              className="hover:text-blue-600 transition-colors cursor-pointer"
             >
-              Gói Hội Viên
-            </button>
-            <button
-              onClick={() => scrollToSection('dossier')}
-              className="hover:text-cyan-400 transition-colors cursor-pointer"
-            >
-              Hồ Sơ ĐMST 2026
+              Báo Giá
             </button>
           </nav>
 
           {/* Action CTAs */}
-          <div className="hidden sm:flex items-center gap-2.5">
-            {/* Quick Learn More Link */}
+          <div className="hidden sm:flex items-center gap-3">
             <button
               onClick={() => scrollToSection('features')}
-              className="text-xs font-bold text-slate-300 hover:text-white px-3 py-2 rounded-xl hover:bg-slate-800/60 transition-colors cursor-pointer"
+              className="text-xs font-semibold text-slate-600 hover:text-slate-900 px-2.5 py-1.5 rounded-lg hover:bg-slate-50 transition-colors cursor-pointer"
             >
               Tìm hiểu thêm
             </button>
 
-            {/* Experience Project / Login Button */}
+            {/* Primary Action: Trải nghiệm dự án -> /login */}
             <Link href="/login">
               <Button
                 size="sm"
-                className="gap-1.5 bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 text-white font-bold rounded-xl text-xs h-9 px-3.5 shadow-md shadow-blue-500/20 active:scale-95 transition-all cursor-pointer"
+                className="gap-1.5 bg-[#0066FF] hover:bg-blue-700 text-white font-bold rounded-xl text-xs h-9 px-4 shadow-sm shadow-blue-500/20 active:scale-95 transition-all cursor-pointer"
               >
-                <Sparkles className="w-3.5 h-3.5 text-white" />
+                <Sparkles className="w-3.5 h-3.5" />
                 Trải nghiệm dự án
               </Button>
             </Link>
@@ -249,9 +163,9 @@ export default function HomePage() {
                 <Button
                   size="sm"
                   variant="outline"
-                  className="gap-1.5 border-cyan-500/50 bg-cyan-950/40 text-cyan-300 hover:bg-cyan-900/60 font-bold rounded-xl text-xs h-9 px-3 cursor-pointer"
+                  className="gap-1.5 border-slate-200 bg-slate-50 text-slate-800 hover:bg-slate-100 font-bold rounded-xl text-xs h-9 px-3 cursor-pointer"
                 >
-                  <Layers className="w-3.5 h-3.5 text-cyan-400" />
+                  <Layers className="w-3.5 h-3.5 text-blue-600" />
                   Vào Dashboard
                 </Button>
               </Link>
@@ -260,7 +174,7 @@ export default function HomePage() {
                 <Button
                   size="sm"
                   variant="outline"
-                  className="border-slate-700 bg-slate-800/80 hover:bg-slate-700 text-white font-bold rounded-xl text-xs h-9 px-3.5 cursor-pointer"
+                  className="border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-semibold rounded-xl text-xs h-9 px-3.5 cursor-pointer"
                 >
                   Đăng nhập
                 </Button>
@@ -272,7 +186,7 @@ export default function HomePage() {
                 <Button
                   size="sm"
                   variant="ghost"
-                  className="text-slate-300 hover:text-white hover:bg-slate-800/60 font-semibold rounded-xl text-xs h-9 px-3 cursor-pointer"
+                  className="text-slate-600 hover:text-slate-900 hover:bg-slate-50 font-semibold rounded-xl text-xs h-9 px-3 cursor-pointer"
                 >
                   Đăng ký
                 </Button>
@@ -283,73 +197,61 @@ export default function HomePage() {
           {/* Mobile Hamburger Toggle */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 lg:hidden cursor-pointer"
+            className="p-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 lg:hidden cursor-pointer"
             aria-label="Toggle Menu"
           >
-            {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
         </div>
 
         {/* Mobile Dropdown Menu */}
         {mobileMenuOpen && (
-          <div className="lg:hidden border-t border-slate-800 bg-[#070A12] py-4 px-2 space-y-2 animate-in fade-in slide-in-from-top-2 duration-200">
+          <div className="lg:hidden border-t border-slate-100 bg-white py-4 px-4 space-y-2 shadow-lg animate-in fade-in slide-in-from-top-2 duration-150">
             <button
               onClick={() => scrollToSection('features')}
-              className="w-full text-left px-3 py-2 text-xs font-semibold text-slate-200 hover:bg-slate-800 rounded-lg"
+              className="w-full text-left px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 rounded-lg"
             >
               Tính Năng Cốt Lõi
             </button>
             <button
-              onClick={() => scrollToSection('card3d')}
-              className="w-full text-left px-3 py-2 text-xs font-semibold text-slate-200 hover:bg-slate-800 rounded-lg"
-            >
-              Thẻ 3D NFC
-            </button>
-            <button
               onClick={() => scrollToSection('checkin')}
-              className="w-full text-left px-3 py-2 text-xs font-semibold text-slate-200 hover:bg-slate-800 rounded-lg"
+              className="w-full text-left px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 rounded-lg"
             >
-              Điểm Danh Sự Kiện
+              Check-in Sự Kiện
             </button>
             <button
               onClick={() => scrollToSection('security')}
-              className="w-full text-left px-3 py-2 text-xs font-semibold text-slate-200 hover:bg-slate-800 rounded-lg"
+              className="w-full text-left px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 rounded-lg"
             >
               Bảo Mật PDPL 91
             </button>
             <button
-              onClick={() => scrollToSection('calculator')}
-              className="w-full text-left px-3 py-2 text-xs font-semibold text-slate-200 hover:bg-slate-800 rounded-lg"
+              onClick={() => scrollToSection('roi')}
+              className="w-full text-left px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 rounded-lg"
             >
               Tính Hiệu Quả (ROI)
             </button>
             <button
               onClick={() => scrollToSection('pricing')}
-              className="w-full text-left px-3 py-2 text-xs font-semibold text-slate-200 hover:bg-slate-800 rounded-lg"
+              className="w-full text-left px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 rounded-lg"
             >
-              Gói Hội Viên
-            </button>
-            <button
-              onClick={() => scrollToSection('dossier')}
-              className="w-full text-left px-3 py-2 text-xs font-semibold text-slate-200 hover:bg-slate-800 rounded-lg"
-            >
-              Hồ Sơ ĐMST 2026
+              Báo Giá
             </button>
 
-            <div className="pt-3 border-t border-slate-800 flex flex-col gap-2">
+            <div className="pt-3 border-t border-slate-100 flex flex-col gap-2">
               <Link href="/login" className="w-full">
-                <Button className="w-full gap-2 bg-gradient-to-r from-blue-600 to-cyan-500 text-white font-bold rounded-xl text-xs h-10">
+                <Button className="w-full gap-2 bg-[#0066FF] hover:bg-blue-700 text-white font-bold rounded-xl text-xs h-10 shadow-sm">
                   <Sparkles className="w-4 h-4" /> Trải nghiệm dự án
                 </Button>
               </Link>
               <div className="grid grid-cols-2 gap-2">
                 <Link href="/login" className="w-full">
-                  <Button variant="outline" className="w-full border-slate-700 bg-slate-800 text-white font-bold rounded-xl text-xs h-9">
+                  <Button variant="outline" className="w-full border-slate-200 text-slate-700 font-semibold rounded-xl text-xs h-9">
                     Đăng nhập
                   </Button>
                 </Link>
                 <Link href="/register" className="w-full">
-                  <Button variant="ghost" className="w-full bg-slate-800/40 text-slate-300 font-bold rounded-xl text-xs h-9">
+                  <Button variant="ghost" className="w-full bg-slate-100 text-slate-700 font-semibold rounded-xl text-xs h-9">
                     Đăng ký
                   </Button>
                 </Link>
@@ -360,131 +262,149 @@ export default function HomePage() {
       </header>
 
       {/* ================================================================= */}
-      {/* 2. EXECUTIVE HERO BANNER */}
+      {/* 2. EXECUTIVE HERO BANNER (CLEAN & MINIMALIST WHITE) */}
       {/* ================================================================= */}
-      <section className="relative overflow-hidden py-10 sm:py-16 lg:py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <div className="absolute top-1/4 -left-20 w-96 h-96 bg-blue-600/15 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute top-1/3 -right-20 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
+      <section className="relative overflow-hidden py-12 sm:py-16 lg:py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        {/* Subtle background glow */}
+        <div className="absolute top-10 left-1/2 -translate-x-1/2 w-[700px] h-[350px] bg-gradient-to-tr from-blue-100/50 via-cyan-50/40 to-transparent rounded-full blur-3xl pointer-events-none -z-10" />
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center relative z-10">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
           
-          {/* Left Column: Vision & Pitching Hero */}
+          {/* Left Hero Content */}
           <div className="lg:col-span-7 space-y-5 sm:space-y-6">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-400/30 text-cyan-300 text-xs font-bold tracking-wide">
-                <Sparkles className="w-3.5 h-3.5 text-[#FF6B00]" /> Cuộc Thi Khởi Nghiệp ĐMST Khánh Hòa 2026
-              </span>
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-400/30 text-emerald-400 text-xs font-bold">
-                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" /> Live Production MVP v1.0
-              </span>
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 border border-blue-100 text-[#0066FF] text-xs font-bold tracking-wide">
+              <Sparkles className="w-3.5 h-3.5 text-blue-600 shrink-0" />
+              <span>Hạ Tầng Định Danh Số B2B & Quản Trị Sự Kiện MICE</span>
             </div>
 
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight leading-tight font-heading">
-              Physical Touch • Digital Memory • Enterprise Trust <br />
-              <span className="bg-gradient-to-r from-[#0066FF] via-[#00C2FF] to-cyan-300 bg-clip-text text-transparent">
-                Hệ Sinh Thái Định Danh Số B2B
-              </span>
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 tracking-tight leading-tight font-heading">
+              Kết Nối Doanh Nghiệp Thông Minh <br />
+              <span className="text-[#0066FF]">Chạm 1 Giây, Giao Thương Bền Vững</span>
             </h1>
 
-            <p className="text-sm sm:text-base text-slate-300 leading-relaxed max-w-2xl font-normal">
-              <strong>ONE CONNECT NETWORK</strong> là nền tảng SaaS đột phá biến mọi điểm chạm sự kiện MICE và gặp gỡ doanh nhân thành <strong className="text-white">mối quan hệ kinh doanh có dữ liệu</strong>, điểm danh siêu tốc <strong className="text-cyan-400">&lt; 0.42s</strong> và tiên phong bảo mật 2 chiều tuân thủ nghiêm ngặt <strong className="text-cyan-400">Luật Dữ liệu Cá nhân 91/2025/QH15</strong>.
+            <p className="text-sm sm:text-base text-slate-600 leading-relaxed max-w-2xl">
+              <strong>One Connect Network</strong> là giải pháp danh thiếp số thông minh NFC/QR tích hợp trạm Check-in sự kiện MICE và CRM quan hệ đối tác, tiên phong bảo mật 2 chiều tuân thủ nghiêm ngặt <strong>Luật Dữ liệu Cá nhân 91/2025/QH15</strong>.
             </p>
 
             {/* CTAs */}
             <div className="flex flex-wrap items-center gap-3 pt-2">
-              {/* Button: Trải nghiệm dự án -> /login */}
               <Link href="/login">
                 <Button
                   size="lg"
-                  className="gap-2 bg-gradient-to-r from-blue-600 via-blue-500 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 text-white font-extrabold rounded-xl text-sm h-11 px-6 shadow-xl shadow-blue-500/25 active:scale-95 transition-all cursor-pointer"
+                  className="gap-2 bg-[#0066FF] hover:bg-blue-700 text-white font-bold rounded-xl text-sm h-11 px-6 shadow-md shadow-blue-500/20 active:scale-95 transition-all cursor-pointer"
                 >
                   <Play className="w-4 h-4 fill-white" /> Trải Nghiệm Dự Án Ngay
                 </Button>
               </Link>
 
-              {/* Button: Tìm hiểu thêm -> Scroll to features */}
               <button
                 onClick={() => scrollToSection('features')}
-                className="inline-flex items-center gap-2 border border-slate-700 bg-slate-800/80 hover:bg-slate-700 text-slate-200 hover:text-white font-bold rounded-xl text-sm h-11 px-5 transition-all cursor-pointer"
+                className="inline-flex items-center gap-2 border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-semibold rounded-xl text-sm h-11 px-5 transition-all shadow-2xs cursor-pointer"
               >
-                <span>Tìm Hiểu Thêm</span>
-                <ChevronDown className="w-4 h-4 text-cyan-400" />
+                <span>Tìm Hiểu Tính Năng</span>
+                <ChevronDown className="w-4 h-4 text-slate-500" />
               </button>
 
-              {/* Button: Đăng ký */}
               <Link href="/register">
                 <Button
                   size="lg"
                   variant="ghost"
-                  className="gap-2 text-slate-300 hover:text-white hover:bg-slate-800 font-semibold text-sm h-11 px-4 cursor-pointer"
+                  className="gap-1.5 text-slate-600 hover:text-slate-900 hover:bg-slate-100 font-medium text-sm h-11 px-4 cursor-pointer"
                 >
-                  Đăng ký tài khoản <ArrowRight className="w-4 h-4 text-slate-400" />
+                  Đăng ký miễn phí <ArrowRight className="w-4 h-4 text-slate-400" />
                 </Button>
               </Link>
             </div>
 
-            {/* Quick Metrics Bar */}
-            <div className="grid grid-cols-3 gap-4 pt-4 border-t border-slate-800/80 max-w-lg">
+            {/* Key Metrics Row */}
+            <div className="grid grid-cols-3 gap-4 pt-4 border-t border-slate-100 max-w-lg">
               <div>
-                <div className="text-xl sm:text-2xl font-black text-cyan-400 font-heading">0.42s</div>
-                <div className="text-xs text-slate-400 font-medium">Tốc độ chạm NFC</div>
+                <div className="text-xl sm:text-2xl font-black text-[#0066FF] font-heading">&lt; 0.42s</div>
+                <div className="text-xs text-slate-500 font-medium">Tốc độ chạm NFC</div>
               </div>
               <div>
-                <div className="text-xl sm:text-2xl font-black text-emerald-400 font-heading">100%</div>
-                <div className="text-xs text-slate-400 font-medium">PDPL 91 Consent</div>
+                <div className="text-xl sm:text-2xl font-black text-emerald-600 font-heading">100%</div>
+                <div className="text-xs text-slate-500 font-medium">Chuẩn Luật PDPL 91</div>
               </div>
               <div>
-                <div className="text-xl sm:text-2xl font-black text-slate-200 font-heading">85%</div>
-                <div className="text-xs text-slate-400 font-medium">Tiết kiệm in ấn</div>
+                <div className="text-xl sm:text-2xl font-black text-slate-800 font-heading">85%</div>
+                <div className="text-xs text-slate-500 font-medium">Tiết kiệm chi phí in</div>
               </div>
             </div>
           </div>
 
-          {/* Right Column: 3D Interactive Card Showcase */}
-          <div id="card3d" className="lg:col-span-5 flex flex-col items-center justify-center w-full min-w-0">
-            <div className="w-full relative group">
-              <div className="relative rounded-3xl bg-slate-900/90 border border-slate-800 p-5 shadow-2xl backdrop-blur-sm">
-                <div className="flex items-center justify-between pb-3 border-b border-slate-800 mb-3 text-xs">
-                  <span className="flex items-center gap-1.5 font-bold text-cyan-400">
-                    <Radio className="w-4 h-4 text-cyan-400 animate-pulse" /> Danh Thiếp Số 3D NFC
-                  </span>
-                  <span className="text-[11px] text-slate-400">Di chuột hoặc lật 2 mặt</span>
-                </div>
-
-                <div className="flex justify-center py-2">
-                  <BusinessCard3D
-                    identity={previewIdentity}
-                    card={previewCard}
-                    theme={selectedTheme}
-                    onReissueCard={() => reissueCard && reissueCard()}
-                  />
-                </div>
-
-                {/* Theme Selector */}
-                <div className="flex items-center justify-between pt-3 border-t border-slate-800 text-xs text-slate-400">
-                  <span className="text-[11px] font-semibold">Màu phôi thẻ kim loại:</span>
-                  <div className="flex gap-1.5">
-                    {(['obsidian', 'sapphire', 'gold', 'emerald'] as const).map((t) => (
-                      <button
-                        key={t}
-                        onClick={() => setSelectedTheme(t)}
-                        className={`w-6 h-6 rounded-full border-2 transition-transform cursor-pointer ${
-                          selectedTheme === t ? 'scale-110 border-white' : 'border-transparent opacity-70'
-                        } ${
-                          t === 'obsidian'
-                            ? 'bg-slate-900'
-                            : t === 'sapphire'
-                            ? 'bg-blue-600'
-                            : t === 'gold'
-                            ? 'bg-amber-500'
-                            : 'bg-emerald-600'
-                        }`}
-                        title={`Thẻ ${t.toUpperCase()}`}
-                      />
-                    ))}
+          {/* Right Hero Visual: Sleek 2D Digital Business Card Mockup */}
+          <div className="lg:col-span-5 flex justify-center w-full min-w-0">
+            <div className="w-full max-w-md bg-white rounded-3xl border border-slate-200/80 shadow-xl shadow-slate-200/50 p-6 space-y-5 relative">
+              
+              {/* Card Header & Chip Indicator */}
+              <div className="flex items-center justify-between pb-4 border-b border-slate-100">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600">
+                    <Radio className="w-4 h-4 animate-pulse" />
+                  </div>
+                  <div>
+                    <span className="text-xs font-bold text-slate-900 block">Thẻ Danh Thiếp Số</span>
+                    <span className="text-[10px] font-mono text-slate-400">NFC & Dynamic QR</span>
                   </div>
                 </div>
+                <Badge variant="outline" className="bg-emerald-50 text-emerald-700 border-emerald-200 font-bold text-[10px]">
+                  ✓ Hoạt Động 24/7
+                </Badge>
               </div>
+
+              {/* Profile Card Body */}
+              <div className="flex items-center gap-4 py-1">
+                <img
+                  src="/avatar-johnny-long.jpg"
+                  alt="Hồ Hoàng Long"
+                  className="w-16 h-16 rounded-2xl object-cover border-2 border-slate-100 shadow-sm shrink-0"
+                />
+                <div className="min-w-0 flex-1 space-y-1">
+                  <div className="flex items-center gap-1.5">
+                    <h3 className="text-base font-extrabold text-slate-900 truncate">Hồ Hoàng Long</h3>
+                    <ShieldCheck className="w-4 h-4 text-blue-600 shrink-0" />
+                  </div>
+                  <p className="text-xs text-blue-600 font-medium truncate">Quản lý Dự án & Sản phẩm</p>
+                  <p className="text-xs text-slate-500 flex items-center gap-1 truncate">
+                    <Building2 className="w-3.5 h-3.5 shrink-0 text-slate-400" />
+                    <span>Tập đoàn Công nghệ số A+</span>
+                  </p>
+                </div>
+              </div>
+
+              {/* Contact Snapshot */}
+              <div className="bg-slate-50 rounded-2xl p-3.5 space-y-2 border border-slate-100 text-xs">
+                <div className="flex items-center justify-between text-slate-600">
+                  <span className="text-[11px] text-slate-500">Số Điện Thoại:</span>
+                  <span className="font-mono font-semibold text-slate-800">0923.456.789</span>
+                </div>
+                <div className="flex items-center justify-between text-slate-600">
+                  <span className="text-[11px] text-slate-500">Email:</span>
+                  <span className="font-mono font-semibold text-slate-800">contact@oneconnect.id.vn</span>
+                </div>
+                <div className="flex items-center justify-between text-slate-600">
+                  <span className="text-[11px] text-slate-500">Bảo mật dữ liệu:</span>
+                  <span className="text-emerald-600 font-semibold flex items-center gap-1">
+                    <ShieldCheck className="w-3.5 h-3.5" /> Chuẩn PDPL 91
+                  </span>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="grid grid-cols-2 gap-2 pt-1">
+                <Link href="/login" className="w-full">
+                  <Button size="sm" className="w-full bg-[#0066FF] hover:bg-blue-700 text-white font-bold rounded-xl text-xs h-9 shadow-xs">
+                    <Sparkles className="w-3.5 h-3.5" /> Thử nghiệm kết nối
+                  </Button>
+                </Link>
+                <Link href="/login" className="w-full">
+                  <Button size="sm" variant="outline" className="w-full border-slate-200 text-slate-700 hover:bg-slate-50 font-semibold rounded-xl text-xs h-9">
+                    <Download className="w-3.5 h-3.5" /> Lưu danh bạ (.vcf)
+                  </Button>
+                </Link>
+              </div>
+
             </div>
           </div>
 
@@ -492,170 +412,150 @@ export default function HomePage() {
       </section>
 
       {/* ================================================================= */}
-      {/* 3. INTERACTIVE 5-FEATURE SIMULATION HUB */}
+      {/* 3. 4 TRỤ CỘT GIẢI PHÁP CỐT LÕI (#features) */}
       {/* ================================================================= */}
-      <section id="features" className="py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-6">
+      <section id="features" className="py-14 sm:py-18 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-8 bg-slate-50/50 rounded-3xl border border-slate-100 my-6">
         
-        <div className="text-center max-w-3xl mx-auto space-y-2">
-          <Badge variant="outline" className="px-3 py-1 bg-cyan-500/10 text-cyan-400 border-cyan-500/30 text-xs font-bold uppercase tracking-wider">
-            KHÁM PHÁ CÔNG NGHỆ ĐỘT PHÁ
+        <div className="text-center max-w-2xl mx-auto space-y-2">
+          <Badge variant="outline" className="px-3 py-1 bg-blue-50 text-[#0066FF] border-blue-100 text-xs font-bold uppercase tracking-wider">
+            TÍNH NĂNG NỔI BẬT
           </Badge>
-          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white tracking-tight font-heading">
-            Trải Nghiệm Trực Tiếp 5 Phân Hệ Cốt Lõi
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight font-heading">
+            Giải Pháp Toàn Diện Cho Doanh Nghiệp & Sự Kiện
           </h2>
-          <p className="text-xs sm:text-sm text-slate-400">
-            Bấm chọn từng thẻ tính năng bên dưới để kích hoạt mô phỏng tương tác thực tế ngay trên trình duyệt.
+          <p className="text-xs sm:text-sm text-slate-600">
+            Tối ưu hóa hành trình gặp gỡ và kết nối giao thương B2B từ điểm chạm đầu tiên đến khâu chốt hợp đồng.
           </p>
         </div>
 
-        {/* Feature Tabs Selector */}
-        <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 bg-slate-900/90 p-1.5 rounded-2xl border border-slate-800">
-          <button
-            onClick={() => setActiveSimTab('nfc')}
-            className={`p-2.5 sm:p-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
-              activeSimTab === 'nfc'
-                ? 'bg-[#0066FF] text-white shadow-md'
-                : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
-            }`}
-          >
-            <Radio className="w-3.5 h-3.5" /> Chạm NFC &lt;0.42s
-          </button>
-          <button
-            onClick={() => setActiveSimTab('checkin')}
-            className={`p-2.5 sm:p-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
-              activeSimTab === 'checkin'
-                ? 'bg-[#0066FF] text-white shadow-md'
-                : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
-            }`}
-          >
-            <Zap className="w-3.5 h-3.5" /> Điểm Danh MICE &lt;1s
-          </button>
-          <button
-            onClick={() => setActiveSimTab('consent')}
-            className={`p-2.5 sm:p-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
-              activeSimTab === 'consent'
-                ? 'bg-[#0066FF] text-white shadow-md'
-                : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
-            }`}
-          >
-            <ShieldCheck className="w-3.5 h-3.5" /> Chuẩn PDPL 91
-          </button>
-          <button
-            onClick={() => setActiveSimTab('memory')}
-            className={`p-2.5 sm:p-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
-              activeSimTab === 'memory'
-                ? 'bg-[#0066FF] text-white shadow-md'
-                : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
-            }`}
-          >
-            <MessageSquare className="w-3.5 h-3.5" /> Sổ Tay CRM B2B
-          </button>
-          <button
-            onClick={() => setActiveSimTab('ai')}
-            className={`col-span-2 sm:col-span-1 p-2.5 sm:p-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
-              activeSimTab === 'ai'
-                ? 'bg-[#0066FF] text-white shadow-md'
-                : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
-            }`}
-          >
-            <Cpu className="w-3.5 h-3.5" /> Ghép Đôi AI B2B
-          </button>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+          {/* Card 1 */}
+          <Card className="border border-slate-200/90 bg-white hover:border-blue-400 hover:shadow-lg hover:shadow-blue-500/5 transition-all rounded-2xl shadow-2xs">
+            <CardHeader className="pb-2 p-5">
+              <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center text-[#0066FF] mb-2">
+                <CreditCard className="w-5 h-5" />
+              </div>
+              <CardTitle className="text-base font-bold text-slate-900">Danh Thiếp Số Thông Minh</CardTitle>
+            </CardHeader>
+            <CardContent className="text-xs text-slate-600 leading-relaxed px-5 pb-5 pt-0">
+              Chạm thẻ NFC hoặc quét mã QR là mở hồ sơ tức thì không cần cài ứng dụng. Thay đổi thông tin cá nhân và doanh nghiệp không giới hạn.
+            </CardContent>
+          </Card>
+
+          {/* Card 2 */}
+          <Card className="border border-slate-200/90 bg-white hover:border-blue-400 hover:shadow-lg hover:shadow-blue-500/5 transition-all rounded-2xl shadow-2xs">
+            <CardHeader className="pb-2 p-5">
+              <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center text-[#0066FF] mb-2">
+                <Zap className="w-5 h-5" />
+              </div>
+              <CardTitle className="text-base font-bold text-slate-900">Check-in MICE &lt; 1s</CardTitle>
+            </CardHeader>
+            <CardContent className="text-xs text-slate-600 leading-relaxed px-5 pb-5 pt-0">
+              Điểm danh đại biểu siêu tốc bằng QR vé hoặc thẻ NFC. Loại bỏ hoàn toàn việc in ấn danh sách giấy và tự động đồng bộ khi mất mạng (Offline Sync).
+            </CardContent>
+          </Card>
+
+          {/* Card 3 */}
+          <Card className="border border-slate-200/90 bg-white hover:border-emerald-400 hover:shadow-lg hover:shadow-emerald-500/5 transition-all rounded-2xl shadow-2xs">
+            <CardHeader className="pb-2 p-5">
+              <div className="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600 mb-2">
+                <ShieldCheck className="w-5 h-5" />
+              </div>
+              <CardTitle className="text-base font-bold text-slate-900">Chuẩn Luật PDPL 91</CardTitle>
+            </CardHeader>
+            <CardContent className="text-xs text-slate-600 leading-relaxed px-5 pb-5 pt-0">
+              Tiên phong tuân thủ Luật Bảo vệ Dữ liệu Cá nhân 91/2025/QH15. Cơ chế Đồng thuận 2 chiều minh bạch, chủ động quyền chia sẻ và thu hồi dữ liệu.
+            </CardContent>
+          </Card>
+
+          {/* Card 4 */}
+          <Card className="border border-slate-200/90 bg-white hover:border-blue-400 hover:shadow-lg hover:shadow-blue-500/5 transition-all rounded-2xl shadow-2xs">
+            <CardHeader className="pb-2 p-5">
+              <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center text-[#0066FF] mb-2">
+                <TrendingUp className="w-5 h-5" />
+              </div>
+              <CardTitle className="text-base font-bold text-slate-900">Sổ Tay Giao Thương (CRM)</CardTitle>
+            </CardHeader>
+            <CardContent className="text-xs text-slate-600 leading-relaxed px-5 pb-5 pt-0">
+              Ghi nhớ ngay bối cảnh cuộc gặp, phân loại mức độ tiềm năng (Lead WARM / HOT) và hỗ trợ đội ngũ kinh doanh chuyển đổi cơ hội thành hợp đồng.
+            </CardContent>
+          </Card>
         </div>
 
-        {/* Tab Content Display */}
-        <div className="bg-slate-900/80 rounded-3xl p-6 sm:p-8 border border-slate-800 shadow-xl">
+      </section>
+
+      {/* ================================================================= */}
+      {/* 4. TRẢI NGHIỆM TƯƠNG TÁC THỰC TẾ (#checkin & #security) */}
+      {/* ================================================================= */}
+      <section id="checkin" className="py-12 sm:py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-6">
+        
+        <div className="text-center max-w-2xl mx-auto space-y-2">
+          <Badge variant="outline" className="px-3 py-1 bg-slate-100 text-slate-700 border-slate-200 text-xs font-bold uppercase tracking-wider">
+            TRẢI NGHIỆM TRỰC QUAN
+          </Badge>
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight font-heading">
+            Kiểm Chứng Tính Năng Trực Tiếp Trên Trình Duyệt
+          </h2>
+          <p className="text-xs sm:text-sm text-slate-600">
+            Bấm chọn từng chức năng bên dưới để mô phỏng tương tác thực tế của nền tảng One Connect.
+          </p>
+        </div>
+
+        {/* Tab Selector */}
+        <div className="flex justify-center">
+          <div className="inline-flex p-1 rounded-xl bg-slate-100 border border-slate-200 max-w-md w-full">
+            <button
+              onClick={() => setActiveTab('checkin')}
+              className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all cursor-pointer ${
+                activeTab === 'checkin' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              1. Điểm Danh &lt; 1s
+            </button>
+            <button
+              onClick={() => setActiveTab('consent')}
+              className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all cursor-pointer ${
+                activeTab === 'consent' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              2. Bảo Mật PDPL 91
+            </button>
+            <button
+              onClick={() => setActiveTab('crm')}
+              className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all cursor-pointer ${
+                activeTab === 'crm' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              3. Phân Loại Lead CRM
+            </button>
+          </div>
+        </div>
+
+        {/* Tab Content Box */}
+        <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-md max-w-4xl mx-auto">
           
-          {/* TAB 1: NFC TAP */}
-          {activeSimTab === 'nfc' && (
+          {/* TAB 1: FAST CHECK-IN */}
+          {activeTab === 'checkin' && (
             <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
               <div className="md:col-span-6 space-y-4">
-                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-slate-800 text-cyan-300 text-xs font-bold">
-                  <Radio className="w-4 h-4 text-cyan-400" /> Tốc Độ Chạm Thực Tế Đo Được
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-blue-50 text-blue-700 text-xs font-bold">
+                  <Zap className="w-3.5 h-3.5" /> Trạm Điểm Danh Cửa Tốc Độ Cao
                 </div>
-                <h3 className="text-xl sm:text-2xl font-extrabold text-white font-heading">
-                  Chạm NFC &lt; 0.42 Giây — Không Cần Cài App
+                <h3 className="text-xl font-extrabold text-slate-900 font-heading">
+                  Quét Mã QR &amp; Đối Soát Trong 140ms
                 </h3>
-                <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-                  Chỉ cần đưa thẻ One Connect chạm nhẹ vào mặt lưng điện thoại thông minh (iOS hoặc Android). Hệ thống lập tức mở danh thiếp điện tử đa phương tiện với đầy đủ hồ sơ doanh nghiệp, sản phẩm và danh mục liên hệ.
-                </p>
-
-                <div className="pt-2">
-                  <Button
-                    onClick={handleSimulateNfcTap}
-                    disabled={nfcTapping}
-                    className="w-full sm:w-auto gap-2 bg-[#0066FF] hover:bg-blue-600 text-white font-bold rounded-xl px-6 h-10 text-xs shadow-md cursor-pointer"
-                  >
-                    {nfcTapping ? (
-                      <>
-                        <RefreshCw className="w-4 h-4 animate-spin" /> Đang truyền sóng NFC...
-                      </>
-                    ) : (
-                      <>
-                        <Radio className="w-4 h-4 text-cyan-300" /> Bấm Thử Nghiệm Chạm Thẻ Vào Điện Thoại
-                      </>
-                    )}
-                  </Button>
-                </div>
-              </div>
-
-              <div className="md:col-span-6 flex flex-col items-center justify-center p-6 sm:p-8 bg-slate-950 rounded-2xl border border-slate-800 text-center relative overflow-hidden min-h-[280px]">
-                {nfcTapping ? (
-                  <div className="space-y-3 z-10 animate-pulse">
-                    <div className="w-16 h-16 rounded-full bg-blue-500/30 border border-cyan-400 flex items-center justify-center mx-auto text-cyan-300">
-                      <Radio className="w-8 h-8 animate-spin" />
-                    </div>
-                    <div className="text-cyan-300 font-bold text-xs">Đang nhận diện chip NFC NTAG215...</div>
-                  </div>
-                ) : nfcTapped ? (
-                  <div className="space-y-3 z-10 animate-in fade-in zoom-in duration-300">
-                    <div className="w-14 h-14 rounded-full bg-emerald-500/20 border border-emerald-400 flex items-center justify-center mx-auto text-emerald-400">
-                      <Check className="w-7 h-7" />
-                    </div>
-                    <div className="text-emerald-400 font-extrabold text-sm sm:text-base">
-                      ĐÃ MỞ KHÓA PROFILE ({tapLatency}ms)
-                    </div>
-                    <div className="bg-slate-900/95 rounded-xl p-3.5 text-left border border-slate-800 max-w-sm mx-auto text-xs space-y-1.5 shadow-lg">
-                      <div className="font-bold text-white text-sm">Hồ Hoàng Long</div>
-                      <div className="text-cyan-400 font-medium">Quản lý Dự án & Phát triển Sản phẩm</div>
-                      <div className="text-slate-400 text-[11px]">Tập đoàn Công nghệ số A+ (A PLUSVN)</div>
-                      <div className="text-emerald-400 text-[10px] font-mono pt-1">✓ Thẻ đã kích hoạt mã định danh 1C-NFC-KH2026</div>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="space-y-3 z-10 text-slate-400">
-                    <Smartphone className="w-12 h-12 text-slate-500 mx-auto" />
-                    <div className="text-sm font-semibold text-slate-300">Sẵn sàng nhận diện sóng NFC</div>
-                    <div className="text-xs text-slate-500 max-w-xs">
-                      Bấm nút bên trái để kích hoạt truyền tải danh thiếp số tức thì
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
-
-          {/* TAB 2: FAST CHECK-IN */}
-          {activeSimTab === 'checkin' && (
-            <div id="checkin" className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
-              <div className="md:col-span-6 space-y-4">
-                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-slate-800 text-cyan-300 text-xs font-bold">
-                  <Zap className="w-4 h-4 text-cyan-400" /> Trạm Điểm Danh Cửa Tốc Độ Cao
-                </div>
-                <h3 className="text-xl sm:text-2xl font-extrabold text-white font-heading">
-                  Check-in Dưới 1 Giây & Cơ Chế Offline Sync
-                </h3>
-                <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-                  Loại bỏ hoàn toàn việc in danh thiếp giấy và danh sách dò tên thủ công. Quét mã QR vé hoặc chạm thẻ NFC lập tức xác thực đại biểu kèm âm thanh xác nhận tức thì.
+                <p className="text-xs text-slate-600 leading-relaxed">
+                  Đại biểu đưa mã vé điện tử hoặc chạm thẻ vào trạm quét. Hệ thống lập tức xác thực thông tin, báo cáo vị trí bàn tiệc và đồng bộ dữ liệu vào danh sách ban tổ chức.
                 </p>
 
                 <div className="flex items-center gap-4 py-1">
-                  <div className="p-3.5 bg-slate-950 rounded-xl border border-slate-800 flex-1">
-                    <div className="text-xs text-slate-400 font-medium">Đại biểu đã có mặt</div>
-                    <div className="text-xl font-extrabold text-emerald-400 font-mono">{attendeeCount} / 300</div>
+                  <div className="p-3 bg-slate-50 rounded-xl border border-slate-100 flex-1">
+                    <div className="text-[11px] text-slate-500 font-medium">Đại biểu đã có mặt</div>
+                    <div className="text-xl font-black text-emerald-600 font-mono">{attendeeCount} / 300</div>
                   </div>
-                  <div className="p-3.5 bg-slate-950 rounded-xl border border-slate-800 flex-1">
-                    <div className="text-xs text-slate-400 font-medium">Tốc độ đo được</div>
-                    <div className="text-xl font-extrabold text-cyan-400 font-mono">140 ms</div>
+                  <div className="p-3 bg-slate-50 rounded-xl border border-slate-100 flex-1">
+                    <div className="text-[11px] text-slate-500 font-medium">Tốc độ xử lý</div>
+                    <div className="text-xl font-black text-blue-600 font-mono">140 ms</div>
                   </div>
                 </div>
 
@@ -663,49 +563,49 @@ export default function HomePage() {
                   <Button
                     onClick={handleSimulateCheckin}
                     disabled={checkinScanning}
-                    className="w-full sm:w-auto gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl px-6 h-10 text-xs shadow-md cursor-pointer"
+                    className="w-full sm:w-auto gap-2 bg-[#0066FF] hover:bg-blue-700 text-white font-bold rounded-xl px-5 h-10 text-xs shadow-sm cursor-pointer"
                   >
                     {checkinScanning ? (
                       <>
-                        <RefreshCw className="w-4 h-4 animate-spin" /> Đang quét mã QR vé...
+                        <RefreshCw className="w-4 h-4 animate-spin" /> Đang quét mã...
                       </>
                     ) : (
                       <>
-                        <QrCode className="w-4 h-4" /> Quét Thử Nghiệm 1 Đại Biểu Tại Cửa
+                        <QrCode className="w-4 h-4" /> Quét Thử Nghiệm 1 Khách Mời
                       </>
                     )}
                   </Button>
                 </div>
               </div>
 
-              <div className="md:col-span-6 flex flex-col items-center justify-center p-6 sm:p-8 bg-slate-950 rounded-2xl border border-slate-800 text-center relative overflow-hidden min-h-[280px]">
+              <div className="md:col-span-6 flex flex-col items-center justify-center p-6 bg-slate-50 rounded-2xl border border-slate-200 text-center min-h-[250px]">
                 {checkinScanning ? (
-                  <div className="space-y-3 z-10">
-                    <div className="w-16 h-16 border-2 border-emerald-400 border-dashed rounded-xl flex items-center justify-center mx-auto text-emerald-400 animate-pulse">
-                      <QrCode className="w-8 h-8" />
+                  <div className="space-y-3">
+                    <div className="w-14 h-14 border-2 border-blue-600 border-dashed rounded-xl flex items-center justify-center mx-auto text-blue-600 animate-pulse">
+                      <QrCode className="w-7 h-7" />
                     </div>
-                    <div className="text-emerald-400 font-bold text-xs">Đang đối soát danh sách khách mời...</div>
+                    <div className="text-blue-600 font-bold text-xs">Đang đối soát danh sách khách mời...</div>
                   </div>
                 ) : checkinSuccess ? (
-                  <div className="space-y-3 z-10 animate-in fade-in zoom-in duration-300">
-                    <div className="w-14 h-14 rounded-full bg-emerald-500/20 border border-emerald-400 flex items-center justify-center mx-auto text-emerald-400">
-                      <Check className="w-7 h-7" />
+                  <div className="space-y-2.5 animate-in fade-in zoom-in duration-200">
+                    <div className="w-12 h-12 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto">
+                      <Check className="w-6 h-6" />
                     </div>
-                    <div className="text-emerald-400 font-extrabold text-base">
+                    <div className="text-emerald-700 font-extrabold text-sm">
                       ĐÃ CHECK-IN THÀNH CÔNG (140ms)
                     </div>
-                    <div className="bg-slate-900 rounded-xl p-3 text-left border border-slate-800 max-w-sm mx-auto text-xs space-y-1">
-                      <div className="text-slate-400 text-[11px]">Đại biểu vừa check-in:</div>
-                      <div className="text-white font-bold">ThS. Nguyễn Văn Bình — Phó Giám Đốc Sở TT&TT</div>
-                      <div className="text-cyan-400 text-[11px]">Vị trí bàn tiệc: Bàn VIP B3 (Hàng ghế đầu)</div>
+                    <div className="bg-white rounded-xl p-3 text-left border border-slate-200 shadow-2xs max-w-xs mx-auto text-xs space-y-1">
+                      <div className="text-slate-400 text-[10px]">Đại biểu vừa check-in:</div>
+                      <div className="font-bold text-slate-900">ThS. Nguyễn Văn Bình — Khách VIP</div>
+                      <div className="text-blue-600 text-[11px]">Vị trí bàn tiệc: Bàn VIP B3 (Hàng ghế đầu)</div>
                     </div>
                   </div>
                 ) : (
-                  <div className="space-y-3 z-10 text-slate-400">
-                    <QrCode className="w-12 h-12 text-slate-500 mx-auto" />
-                    <div className="text-sm font-semibold text-slate-300">Camera Quét QR Trạm Cửa</div>
-                    <div className="text-xs text-slate-500 max-w-xs">
-                      Bấm nút để mô phỏng một đại biểu quét mã check-in qua cổng an ninh
+                  <div className="space-y-2.5 text-slate-400">
+                    <QrCode className="w-10 h-10 text-slate-400 mx-auto" />
+                    <div className="text-xs font-semibold text-slate-700">Trạm Quét QR Sẵn Sàng</div>
+                    <div className="text-[11px] text-slate-500 max-w-xs">
+                      Bấm nút bên trái để thử nghiệm quét mã của 1 đại biểu tại cửa
                     </div>
                   </div>
                 )}
@@ -713,118 +613,118 @@ export default function HomePage() {
             </div>
           )}
 
-          {/* TAB 3: 2-WAY CONSENT PDPL 91 */}
-          {activeSimTab === 'consent' && (
+          {/* TAB 2: CONSENT PDPL 91 */}
+          {activeTab === 'consent' && (
             <div id="security" className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
               <div className="md:col-span-6 space-y-4">
-                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-slate-800 text-emerald-400 text-xs font-bold">
-                  <ShieldCheck className="w-4 h-4" /> Bảo Mật & Pháp Lý Dữ Liệu
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-emerald-50 text-emerald-700 text-xs font-bold">
+                  <ShieldCheck className="w-3.5 h-3.5" /> Chuẩn Nghị Định 13 &amp; Luật PDPL 91
                 </div>
-                <h3 className="text-xl sm:text-2xl font-extrabold text-white font-heading">
-                  Cơ Chế Đồng Thuận 2 Chiều Chuẩn Luật PDPL 91
+                <h3 className="text-xl font-extrabold text-slate-900 font-heading">
+                  Cơ Chế Đồng Thuận 2 Chiều (2-Way Consent)
                 </h3>
-                <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-                  Thông tin cá nhân (SĐT, Email) mặc định được che giấu. Chỉ khi <strong>cả hai doanh nhân cùng đồng ý</strong> chia sẻ, dữ liệu liên hệ chi tiết mới được giải mã minh bạch.
+                <p className="text-xs text-slate-600 leading-relaxed">
+                  Số điện thoại và email cá nhân mặc định được ẩn. Thông tin liên hệ chỉ hiển thị khi cả 2 doanh nhân cùng xác nhận trao đổi, đảm bảo tuân thủ pháp lý bảo vệ dữ liệu.
                 </p>
 
-                <div className="pt-2">
+                <div className="pt-1">
                   <Button
                     onClick={() => setConsentGranted(!consentGranted)}
-                    className={`w-full sm:w-auto gap-2 font-bold rounded-xl px-6 h-10 text-xs shadow-md transition-all cursor-pointer ${
+                    className={`gap-2 font-bold rounded-xl px-5 h-10 text-xs shadow-sm transition-all cursor-pointer ${
                       consentGranted
-                        ? 'bg-slate-800 hover:bg-slate-700 text-white'
+                        ? 'bg-slate-800 hover:bg-slate-900 text-white'
                         : 'bg-emerald-600 hover:bg-emerald-700 text-white'
                     }`}
                   >
                     {consentGranted ? (
                       <>
-                        <Lock className="w-4 h-4" /> Khóa Lại (Thu Hồi Consent)
+                        <Lock className="w-3.5 h-3.5" /> Khóa Lại (Thu Hồi Quyền)
                       </>
                     ) : (
                       <>
-                        <Unlock className="w-4 h-4" /> Bấm Đồng Thuận 2 Chiều (Grant Consent)
+                        <Unlock className="w-3.5 h-3.5" /> Bấm Đồng Thuận Chia Sẻ Thông Tin
                       </>
                     )}
                   </Button>
                 </div>
               </div>
 
-              <div className="md:col-span-6 p-6 bg-slate-950 rounded-2xl border border-slate-800 text-xs space-y-3">
-                <div className="flex items-center justify-between pb-2.5 border-b border-slate-800">
-                  <span className="font-bold text-white text-sm">Hồ Sơ Đối Tác B2B</span>
-                  <span className={`px-2.5 py-1 rounded text-[10px] font-bold ${
-                    consentGranted ? 'bg-emerald-500/20 text-emerald-400' : 'bg-amber-500/20 text-amber-400'
-                  }`}>
-                    {consentGranted ? '✓ ĐÃ ĐỒNG THUẬN (CONSENTED)' : 'CHẾ ĐỘ CÔNG KHAI (MASKED)'}
-                  </span>
+              <div className="md:col-span-6 p-5 bg-slate-50 rounded-2xl border border-slate-200 text-xs space-y-3">
+                <div className="flex items-center justify-between pb-2 border-b border-slate-200">
+                  <span className="font-bold text-slate-800">Dữ Liệu Đối Tác Giao Thương</span>
+                  <Badge variant="outline" className={
+                    consentGranted ? 'bg-emerald-100 text-emerald-800 border-emerald-300 font-bold' : 'bg-slate-100 text-slate-600 font-bold'
+                  }>
+                    {consentGranted ? '✓ ĐÃ ĐỒNG THUẬN (HIỂN THỊ)' : 'CHẾ ĐỘ CHE MỜ (MASKED)'}
+                  </Badge>
                 </div>
 
                 <div className="space-y-2">
                   <div>
-                    <div className="text-[11px] text-slate-400">Họ và tên / Chức vụ:</div>
-                    <div className="font-bold text-slate-200 text-sm">Trần Minh Đức — Chủ tịch TechCorp</div>
+                    <div className="text-[10px] text-slate-400">Họ và tên / Chức vụ:</div>
+                    <div className="font-bold text-slate-800">Trần Minh Đức — Chủ tịch TechCorp</div>
                   </div>
 
                   <div>
-                    <div className="text-[11px] text-slate-400">Số Điện Thoại Bảo Mật:</div>
-                    <div className="font-mono font-bold text-xs sm:text-sm">
+                    <div className="text-[10px] text-slate-400">Số Điện Thoại Cá Nhân:</div>
+                    <div className="font-mono font-bold text-xs">
                       {consentGranted ? (
-                        <span className="text-emerald-400 animate-in fade-in duration-300">0923.456.789</span>
+                        <span className="text-emerald-600">0923.456.789</span>
                       ) : (
-                        <span className="text-slate-500">0923.•••.••• (Cần Consent 2 Chiều)</span>
+                        <span className="text-slate-400">0923.•••.••• (Cần 2 bên đồng thuận)</span>
                       )}
                     </div>
                   </div>
 
                   <div>
-                    <div className="text-[11px] text-slate-400">Email Giao Thương:</div>
-                    <div className="font-mono font-bold text-xs sm:text-sm">
+                    <div className="text-[10px] text-slate-400">Email Trực Tiếp:</div>
+                    <div className="font-mono font-bold text-xs">
                       {consentGranted ? (
-                        <span className="text-emerald-400 animate-in fade-in duration-300">minhduc@techcorp.vn</span>
+                        <span className="text-emerald-600">minhduc@techcorp.vn</span>
                       ) : (
-                        <span className="text-slate-500">m••••••@techcorp.vn (Cần Consent 2 Chiều)</span>
+                        <span className="text-slate-400">m••••••@techcorp.vn (Cần 2 bên đồng thuận)</span>
                       )}
                     </div>
                   </div>
                 </div>
 
-                <div className="pt-2.5 border-t border-slate-800 text-[10px] text-slate-400 flex items-center gap-1.5">
-                  <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
-                  <span>Tuân thủ Nghị định 13/2023/NĐ-CP & Luật Dữ liệu Cá nhân số 91/2025/QH15</span>
+                <div className="pt-2 border-t border-slate-200 text-[10px] text-slate-500 flex items-center gap-1.5">
+                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+                  <span>Tuân thủ Luật Bảo vệ Dữ liệu Cá nhân số 91/2025/QH15</span>
                 </div>
               </div>
             </div>
           )}
 
-          {/* TAB 4: RELATIONSHIP MEMORY CRM */}
-          {activeSimTab === 'memory' && (
-            <div id="crm" className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
+          {/* TAB 3: RELATIONSHIP CRM */}
+          {activeTab === 'crm' && (
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
               <div className="md:col-span-6 space-y-4">
-                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-slate-800 text-cyan-300 text-xs font-bold">
-                  <MessageSquare className="w-4 h-4 text-cyan-400" /> Sổ Tay Quan Hệ (Pre-CRM)
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-blue-50 text-blue-700 text-xs font-bold">
+                  <MessageSquare className="w-3.5 h-3.5" /> Sổ Tay Quan Hệ &amp; CRM B2B
                 </div>
-                <h3 className="text-xl sm:text-2xl font-extrabold text-white font-heading">
-                  Ghi Nhớ Bối Cảnh & Phân Loại Cơ Hội Giao Thương
+                <h3 className="text-xl font-extrabold text-slate-900 font-heading">
+                  Ghi Chú Bối Cảnh &amp; Phân Loại Cơ Hội
                 </h3>
-                <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-                  Lưu lại ngay lập tức bối cảnh cuộc gặp tại sự kiện, nhu cầu Cung - Cầu và gắn thẻ Lead WARM / HOT để đội ngũ kinh doanh chuyển hóa thành hợp đồng ký kết.
+                <p className="text-xs text-slate-600 leading-relaxed">
+                  Lưu lại ngay lập tức nhu cầu hợp tác tại sự kiện, gắn nhãn phân loại Lead để chuyển giao cho đội ngũ bán hàng chăm sóc kịp thời.
                 </p>
 
-                <div className="space-y-2">
-                  <label className="text-xs font-bold text-slate-300">Phân Loại Mức Độ Tiềm Năng (Lead Tag):</label>
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-slate-700">Phân loại mức độ tiềm năng:</label>
                   <div className="flex gap-2">
                     {(['WARM', 'HOT', 'CONVERTED'] as const).map((tag) => (
                       <button
                         key={tag}
                         onClick={() => setLeadStatus(tag)}
-                        className={`px-3.5 py-1.5 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
+                        className={`px-3 py-1.5 rounded-lg text-xs font-bold border transition-all cursor-pointer ${
                           leadStatus === tag
                             ? tag === 'HOT'
-                              ? 'bg-red-600 text-white border-red-500'
+                              ? 'bg-rose-500 text-white border-rose-600'
                               : tag === 'WARM'
-                              ? 'bg-amber-600 text-white border-amber-500'
-                              : 'bg-emerald-600 text-white border-emerald-500'
-                            : 'bg-slate-950 text-slate-400 border-slate-800 hover:text-white'
+                              ? 'bg-amber-500 text-white border-amber-600'
+                              : 'bg-emerald-600 text-white border-emerald-700'
+                            : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
                         }`}
                       >
                         {tag}
@@ -834,13 +734,13 @@ export default function HomePage() {
                 </div>
               </div>
 
-              <div className="md:col-span-6 p-6 bg-slate-950 rounded-2xl border border-slate-800 text-xs space-y-3">
-                <div className="flex items-center justify-between pb-2 border-b border-slate-800">
-                  <span className="font-bold text-white flex items-center gap-1.5">
-                    <Tag className="w-4 h-4 text-cyan-400" /> Ghi Chú Riêng Tư (Private Note)
+              <div className="md:col-span-6 p-5 bg-slate-50 rounded-2xl border border-slate-200 text-xs space-y-3">
+                <div className="flex items-center justify-between pb-2 border-b border-slate-200">
+                  <span className="font-bold text-slate-800 flex items-center gap-1.5">
+                    <Tag className="w-3.5 h-3.5 text-blue-600" /> Ghi Chú Riêng Tư
                   </span>
                   <Badge className={
-                    leadStatus === 'HOT' ? 'bg-red-500' : leadStatus === 'WARM' ? 'bg-amber-500' : 'bg-emerald-500'
+                    leadStatus === 'HOT' ? 'bg-rose-500' : leadStatus === 'WARM' ? 'bg-amber-500' : 'bg-emerald-600'
                   }>
                     {leadStatus} LEAD
                   </Badge>
@@ -850,72 +750,13 @@ export default function HomePage() {
                   value={noteText}
                   onChange={(e) => setNoteText(e.target.value)}
                   rows={3}
-                  className="w-full bg-slate-900 border border-slate-800 rounded-xl p-3 text-slate-200 text-xs focus:outline-none focus:border-blue-500"
+                  className="w-full bg-white border border-slate-200 rounded-xl p-3 text-slate-800 text-xs focus:outline-none focus:border-blue-500 shadow-2xs"
                   placeholder="Nhập ghi chú cuộc gặp..."
                 />
 
-                <div className="flex items-center justify-between text-[11px] text-slate-400 pt-1">
-                  <span>Hẹn gặp lại: Sáng Thứ 5 tuần tới tại Nha Trang</span>
-                  <span className="text-emerald-400 font-bold">✓ Tự động đồng bộ CRM</span>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* TAB 5: AI MATCHMAKING */}
-          {activeSimTab === 'ai' && (
-            <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
-              <div className="md:col-span-6 space-y-4">
-                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-slate-800 text-cyan-300 text-xs font-bold">
-                  <Cpu className="w-4 h-4 text-cyan-400" /> Thuật Toán Ghép Đôi Giao Thương
-                </div>
-                <h3 className="text-xl sm:text-2xl font-extrabold text-white font-heading">
-                  AI Matchmaking & Tự Động Xếp Bàn Tiệc
-                </h3>
-                <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-                  Hệ thống phân tích ma trận Cung (Supply) và Cầu (Demand) của từng đại biểu để đề xuất đối tác giao thương tiềm năng nhất và chỉ định vị trí bàn tiệc tương thích.
-                </p>
-
-                <div className="grid grid-cols-2 gap-3 text-xs">
-                  <div>
-                    <label className="font-bold text-slate-300 block mb-1.5">Bên Cung Ứng:</label>
-                    <select
-                      value={supplyIndustry}
-                      onChange={(e) => setSupplyIndustry(e.target.value)}
-                      className="w-full p-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-slate-200"
-                    >
-                      <option>Công Nghệ & AI</option>
-                      <option>Nông Sản Xuất Khẩu</option>
-                      <option>Truyền Thông MICE</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="font-bold text-slate-300 block mb-1.5">Bên Nhu Cầu:</label>
-                    <select
-                      value={demandIndustry}
-                      onChange={(e) => setDemandIndustry(e.target.value)}
-                      className="w-full p-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-slate-200"
-                    >
-                      <option>Khách Sạn & MICE</option>
-                      <option>Chuỗi Bán Lẻ</option>
-                      <option>Chuyển Đổi Số</option>
-                    </select>
-                  </div>
-                </div>
-              </div>
-
-              <div className="md:col-span-6 p-6 bg-slate-950 rounded-2xl border border-slate-800 text-xs space-y-3 text-center">
-                <div className="w-14 h-14 rounded-full bg-blue-500/20 border border-blue-400 flex items-center justify-center mx-auto text-cyan-300">
-                  <Sparkles className="w-7 h-7 animate-spin" />
-                </div>
-                <div>
-                  <div className="text-xs text-slate-400">Độ Tương Thích AI Đánh Giá</div>
-                  <div className="text-2xl font-black text-cyan-300 font-heading">96% COMPATIBILITY</div>
-                </div>
-                <div className="p-3 bg-slate-900 rounded-xl border border-slate-800 text-left text-xs space-y-1">
-                  <div className="text-white font-bold">Chỉ định phiên giao thương:</div>
-                  <div className="text-cyan-300 font-semibold">Bàn VIP A1 — Phiên Kết Nối Công Nghệ & Du Lịch MICE</div>
-                  <div className="text-[11px] text-slate-400">Dự kiến giá trị thương thảo: 250,000,000 VNĐ</div>
+                <div className="flex items-center justify-between text-[11px] text-slate-500 pt-1">
+                  <span>Lịch hẹn: Sáng Thứ 5 tuần tới</span>
+                  <span className="text-emerald-600 font-bold">✓ Tự động lưu vào hệ thống</span>
                 </div>
               </div>
             </div>
@@ -925,93 +766,29 @@ export default function HomePage() {
       </section>
 
       {/* ================================================================= */}
-      {/* 4. 4 TRỤ CỘT GIÁ TRỊ CỐT LÕI */}
+      {/* 5. BỘ TÍNH TOÁN HIỆU QUẢ KINH TẾ & TIẾT KIỆM (ROI) (#roi) */}
       {/* ================================================================= */}
-      <section className="py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-6">
-        <div className="text-center max-w-3xl mx-auto space-y-2">
-          <Badge variant="outline" className="px-3 py-1 bg-emerald-500/10 text-emerald-400 border-emerald-500/30 text-xs font-bold uppercase tracking-wider">
-            GIÁ TRỊ VƯỢT TRỘI
-          </Badge>
-          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white tracking-tight font-heading">
-            Tại Sao Doanh Nghiệp & Ban Tổ Chức Chọn One Connect?
-          </h2>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-          <Card className="border-slate-800 hover:border-cyan-500/50 hover:shadow-xl transition-all rounded-3xl bg-slate-900/90 text-slate-100">
-            <CardHeader className="pb-2 p-5">
-              <div className="w-10 h-10 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center text-cyan-400 mb-2">
-                <Leaf className="w-5 h-5" />
-              </div>
-              <CardTitle className="text-sm sm:text-base font-bold text-white">MICE Xanh & Net-Zero</CardTitle>
-            </CardHeader>
-            <CardContent className="text-xs text-slate-300 leading-relaxed px-5 pb-5 pt-0">
-              Cắt giảm 100% rác thải danh thiếp giấy và dây đeo thẻ nhựa dùng một lần. Tiết kiệm hàng trăm triệu đồng chi phí in ấn cho mỗi kỳ hội nghị.
-            </CardContent>
-          </Card>
-
-          <Card className="border-slate-800 hover:border-cyan-500/50 hover:shadow-xl transition-all rounded-3xl bg-slate-900/90 text-slate-100">
-            <CardHeader className="pb-2 p-5">
-              <div className="w-10 h-10 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center text-cyan-400 mb-2">
-                <RefreshCw className="w-5 h-5" />
-              </div>
-              <CardTitle className="text-sm sm:text-base font-bold text-white">Bảo Toàn Dữ Liệu Thẻ</CardTitle>
-            </CardHeader>
-            <CardContent className="text-xs text-slate-300 leading-relaxed px-5 pb-5 pt-0">
-              Tách biệt UID chip NFC vật lý khỏi mã định danh. Đổi/cấp lại phôi thẻ kim loại trong 30 giây mà không bao giờ mất danh bạ đã kết nối.
-            </CardContent>
-          </Card>
-
-          <Card className="border-slate-800 hover:border-cyan-500/50 hover:shadow-xl transition-all rounded-3xl bg-slate-900/90 text-slate-100">
-            <CardHeader className="pb-2 p-5">
-              <div className="w-10 h-10 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center text-emerald-400 mb-2">
-                <ShieldCheck className="w-5 h-5" />
-              </div>
-              <CardTitle className="text-sm sm:text-base font-bold text-white">Chuẩn Luật PDPL 91</CardTitle>
-            </CardHeader>
-            <CardContent className="text-xs text-slate-300 leading-relaxed px-5 pb-5 pt-0">
-              Tiên phong tuân thủ Luật Bảo vệ Dữ liệu Cá nhân số 91/2025/QH15. Cơ chế Đồng thuận 2 chiều minh bạch, quyền xuất dữ liệu và xóa bỏ.
-            </CardContent>
-          </Card>
-
-          <Card className="border-slate-800 hover:border-cyan-500/50 hover:shadow-xl transition-all rounded-3xl bg-slate-900/90 text-slate-100">
-            <CardHeader className="pb-2 p-5">
-              <div className="w-10 h-10 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center text-cyan-400 mb-2">
-                <TrendingUp className="w-5 h-5" />
-              </div>
-              <CardTitle className="text-sm sm:text-base font-bold text-white">Chuyển Hóa Hợp Đồng</CardTitle>
-            </CardHeader>
-            <CardContent className="text-xs text-slate-300 leading-relaxed px-5 pb-5 pt-0">
-              Biến điểm chạm thoáng qua thành hợp đồng giao thương qua Sổ tay quan hệ, gắn thẻ phân loại Lead WARM/HOT và nhắc lịch hẹn tự động.
-            </CardContent>
-          </Card>
-        </div>
-      </section>
-
-      {/* ================================================================= */}
-      {/* 5. INTERACTIVE ESG & ROI CALCULATOR */}
-      {/* ================================================================= */}
-      <section id="calculator" className="py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <div className="bg-slate-900/95 rounded-3xl p-6 sm:p-10 text-white border border-slate-800 shadow-2xl space-y-6">
-          <div className="text-center space-y-2 max-w-3xl mx-auto">
-            <Badge className="bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 font-bold text-xs">
-              BỘ TÍNH TOÁN HIỆU QUẢ KINH TẾ & MÔI TRƯỜNG
+      <section id="roi" className="py-12 sm:py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <div className="bg-slate-50 rounded-3xl p-6 sm:p-10 border border-slate-200/90 shadow-sm space-y-6">
+          <div className="text-center space-y-2 max-w-2xl mx-auto">
+            <Badge className="bg-emerald-100 text-emerald-800 border-emerald-200 font-bold text-xs">
+              HIỆU QUẢ KINH TẾ &amp; MÔI TRƯỜNG
             </Badge>
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black font-heading text-white">
-              Ước Tính Giá Trị Tiết Kiệm Khi Áp Dụng One Connect
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight font-heading">
+              Ước Tính Chi Phí Tiết Kiệm Khi Sử Dụng One Connect
             </h2>
-            <p className="text-xs sm:text-sm text-slate-400">
-              Kéo thanh trượt bên dưới để ước tính chi phí in ấn tiết kiệm và chỉ số Xanh (ESG) theo quy mô tổ chức của bạn.
+            <p className="text-xs sm:text-sm text-slate-600">
+              Kéo thanh trượt để tính toán chi phí in ấn thẻ giấy và thời gian đón tiếp được cắt giảm theo quy mô tổ chức của bạn.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-slate-950 p-6 rounded-2xl border border-slate-800">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white p-6 rounded-2xl border border-slate-200 shadow-2xs">
             {/* Sliders */}
             <div className="space-y-4">
               <div className="space-y-1.5">
-                <div className="flex justify-between text-xs sm:text-sm font-bold text-slate-300">
+                <div className="flex justify-between text-xs sm:text-sm font-bold text-slate-700">
                   <span>Số lượng Đại biểu / Sự kiện:</span>
-                  <span className="text-cyan-400 font-mono font-bold">{attendeesPerEvent} Người</span>
+                  <span className="text-blue-600 font-mono font-bold">{attendeesPerEvent} Người</span>
                 </div>
                 <input
                   type="range"
@@ -1020,14 +797,14 @@ export default function HomePage() {
                   step="50"
                   value={attendeesPerEvent}
                   onChange={(e) => setAttendeesPerEvent(Number(e.target.value))}
-                  className="w-full accent-blue-500 cursor-pointer"
+                  className="w-full accent-blue-600 cursor-pointer"
                 />
               </div>
 
               <div className="space-y-1.5">
-                <div className="flex justify-between text-xs sm:text-sm font-bold text-slate-300">
+                <div className="flex justify-between text-xs sm:text-sm font-bold text-slate-700">
                   <span>Số Sự Kiện / Năm:</span>
-                  <span className="text-cyan-400 font-mono font-bold">{eventsPerYear} Sự kiện</span>
+                  <span className="text-blue-600 font-mono font-bold">{eventsPerYear} Sự kiện</span>
                 </div>
                 <input
                   type="range"
@@ -1036,37 +813,37 @@ export default function HomePage() {
                   step="1"
                   value={eventsPerYear}
                   onChange={(e) => setEventsPerYear(Number(e.target.value))}
-                  className="w-full accent-blue-500 cursor-pointer"
+                  className="w-full accent-blue-600 cursor-pointer"
                 />
               </div>
             </div>
 
-            {/* Realtime Computed Metrics */}
+            {/* Computed Metrics */}
             <div className="grid grid-cols-2 gap-3 text-center">
-              <div className="bg-slate-900 p-4 rounded-xl border border-slate-800">
-                <div className="text-xs text-slate-400">Tiết Kiệm In Ấn</div>
-                <div className="text-lg sm:text-2xl font-extrabold text-emerald-400 font-mono">
+              <div className="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                <div className="text-xs text-slate-500 font-medium">Tiết Kiệm In Ấn</div>
+                <div className="text-lg sm:text-2xl font-black text-emerald-600 font-mono">
                   {(paperCostSaved / 1000000).toFixed(1)} Triệu
                 </div>
               </div>
 
-              <div className="bg-slate-900 p-4 rounded-xl border border-slate-800">
-                <div className="text-xs text-slate-400">Cắt Giảm CO2</div>
-                <div className="text-lg sm:text-2xl font-extrabold text-cyan-400 font-mono">
+              <div className="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                <div className="text-xs text-slate-500 font-medium">Cắt Giảm Khí CO2</div>
+                <div className="text-lg sm:text-2xl font-black text-blue-600 font-mono">
                   {co2SavedKg} kg CO2
                 </div>
               </div>
 
-              <div className="bg-slate-900 p-4 rounded-xl border border-slate-800">
-                <div className="text-xs text-slate-400">Giảm Danh Thiếp Rác</div>
-                <div className="text-lg sm:text-2xl font-extrabold text-slate-200 font-mono">
+              <div className="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                <div className="text-xs text-slate-500 font-medium">Giảm Thẻ Giấy Rác</div>
+                <div className="text-lg sm:text-2xl font-black text-slate-800 font-mono">
                   {totalDelegates.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')} Tờ
                 </div>
               </div>
 
-              <div className="bg-slate-900 p-4 rounded-xl border border-slate-800">
-                <div className="text-xs text-slate-400">Thời Gian Đón Tiếp Giảm</div>
-                <div className="text-lg sm:text-2xl font-extrabold text-cyan-400 font-mono">
+              <div className="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                <div className="text-xs text-slate-500 font-medium">Thời Gian Đón Tiếp Giảm</div>
+                <div className="text-lg sm:text-2xl font-black text-blue-600 font-mono">
                   {checkinHoursSaved} Giờ
                 </div>
               </div>
@@ -1076,88 +853,88 @@ export default function HomePage() {
       </section>
 
       {/* ================================================================= */}
-      {/* 6. GÓI DỊCH VỤ & HỘI VIÊN */}
+      {/* 6. BÁO GIÁ & GÓI HỘI VIÊN (#pricing) */}
       {/* ================================================================= */}
-      <section id="pricing" className="py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-6">
-        <div className="text-center max-w-3xl mx-auto space-y-2">
-          <Badge variant="outline" className="px-3 py-1 bg-blue-500/10 text-cyan-400 border-cyan-500/30 text-xs font-bold uppercase tracking-wider">
-            GÓI HỘI VIÊN & GIẢI PHÁP DOANH NGHIỆP
+      <section id="pricing" className="py-12 sm:py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-6">
+        <div className="text-center max-w-2xl mx-auto space-y-2">
+          <Badge variant="outline" className="px-3 py-1 bg-blue-50 text-[#0066FF] border-blue-100 text-xs font-bold uppercase tracking-wider">
+            GÓI DỊCH VỤ
           </Badge>
-          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white tracking-tight font-heading">
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight font-heading">
             Lựa Chọn Giải Pháp Phù Hợp
           </h2>
-          <p className="text-xs sm:text-sm text-slate-400">
-            Từ doanh nhân độc lập đến các tổ chức Hiệp hội, One Connect cung cấp đầy đủ công cụ định danh và kết nối thông minh.
+          <p className="text-xs sm:text-sm text-slate-600">
+            Từ doanh nhân cá nhân đến các tổ chức sự kiện và hiệp hội doanh nghiệp.
           </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Plan 1 */}
-          <div className="rounded-3xl bg-slate-900 border border-slate-800 p-6 flex flex-col justify-between space-y-6 hover:border-slate-700 transition-all">
-            <div className="space-y-4">
-              <Badge className="bg-slate-800 text-slate-300 text-xs font-bold">CÁ NHÂN & DOANH NHÂN</Badge>
-              <div className="text-xl font-extrabold text-white font-heading">Thẻ Danh Thiếp Số</div>
-              <p className="text-xs text-slate-400">Dành cho chủ doanh nghiệp, chuyên viên kinh doanh và tư vấn độc lập.</p>
+          <div className="rounded-3xl bg-white border border-slate-200 p-6 flex flex-col justify-between space-y-6 hover:shadow-lg transition-all shadow-2xs">
+            <div className="space-y-3">
+              <Badge className="bg-slate-100 text-slate-700 text-xs font-bold">DOANH NHÂN CÁ NHÂN</Badge>
+              <div className="text-xl font-extrabold text-slate-900 font-heading">Thẻ Danh Thiếp Số</div>
+              <p className="text-xs text-slate-500">Dành cho chủ doanh nghiệp, giám đốc kinh doanh và chuyên gia tư vấn.</p>
               
-              <ul className="space-y-2 text-xs text-slate-300">
-                <li className="flex items-center gap-2">✓ 01 Phôi thẻ kim loại khắc tên Laser cá nhân</li>
+              <ul className="space-y-2 text-xs text-slate-600 pt-2">
+                <li className="flex items-center gap-2">✓ 01 Phôi thẻ kim loại khắc tên Laser theo yêu cầu</li>
                 <li className="flex items-center gap-2">✓ Profile số không giới hạn chỉnh sửa</li>
                 <li className="flex items-center gap-2">✓ Dynamic QR Code chống giả mạo</li>
-                <li className="flex items-center gap-2">✓ Sổ tay quan hệ & lưu danh bạ 1-chạm</li>
+                <li className="flex items-center gap-2">✓ Lưu danh bạ điện thoại 1-chạm (.vcf)</li>
               </ul>
             </div>
 
             <Link href="/login" className="w-full">
-              <Button className="w-full bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl text-xs h-10 cursor-pointer">
+              <Button className="w-full bg-slate-900 hover:bg-black text-white font-bold rounded-xl text-xs h-10 cursor-pointer">
                 Trải nghiệm miễn phí
               </Button>
             </Link>
           </div>
 
           {/* Plan 2: Highlighted */}
-          <div className="rounded-3xl bg-gradient-to-b from-blue-950/60 to-slate-900 border-2 border-[#0066FF] p-6 flex flex-col justify-between space-y-6 shadow-2xl relative">
-            <div className="absolute -top-3 right-6 bg-[#0066FF] text-white text-[10px] font-black uppercase px-3 py-1 rounded-full tracking-wider">
+          <div className="rounded-3xl bg-white border-2 border-[#0066FF] p-6 flex flex-col justify-between space-y-6 shadow-xl relative">
+            <div className="absolute -top-3 right-6 bg-[#0066FF] text-white text-[10px] font-extrabold uppercase px-3 py-1 rounded-full tracking-wider">
               PHỔ BIẾN NHẤT
             </div>
             
-            <div className="space-y-4">
-              <Badge className="bg-blue-500/20 text-cyan-300 text-xs font-bold">DOANH NGHIỆP & EVENT MICE</Badge>
-              <div className="text-xl font-extrabold text-white font-heading">Trạm Check-in & CRM B2B</div>
-              <p className="text-xs text-slate-300">Dành cho công ty tổ chức sự kiện, diễn đàn và kết nối giao thương.</p>
+            <div className="space-y-3">
+              <Badge className="bg-blue-50 text-blue-700 border-blue-200 text-xs font-bold">DOANH NGHIỆP &amp; SỰ KIỆN MICE</Badge>
+              <div className="text-xl font-extrabold text-slate-900 font-heading">Trạm Check-in &amp; CRM B2B</div>
+              <p className="text-xs text-slate-500">Dành cho công ty tổ chức hội nghị, triển lãm và diễn đàn thương mại.</p>
               
-              <ul className="space-y-2 text-xs text-slate-200">
-                <li className="flex items-center gap-2 text-cyan-300">✓ Toàn bộ tính năng gói Cá Nhân</li>
+              <ul className="space-y-2 text-xs text-slate-700 pt-2">
+                <li className="flex items-center gap-2 text-blue-600 font-semibold">✓ Đầy đủ tính năng gói Doanh Nhân</li>
                 <li className="flex items-center gap-2">✓ Trạm Check-in tốc độ cao &lt; 1s tại cửa</li>
-                <li className="flex items-center gap-2">✓ B2B Matching & Xếp bàn tiệc AI</li>
-                <li className="flex items-center gap-2">✓ Dashboard báo cáo & Xuất dữ liệu Excel</li>
-                <li className="flex items-center gap-2">✓ Cơ chế Offline-First khi mất mạng</li>
+                <li className="flex items-center gap-2">✓ B2B Matching &amp; Phân loại Lead WARM/HOT</li>
+                <li className="flex items-center gap-2">✓ Dashboard báo cáo &amp; Xuất dữ liệu Excel</li>
+                <li className="flex items-center gap-2">✓ Cơ chế Offline Sync khi mất kết nối mạng</li>
               </ul>
             </div>
 
             <Link href="/login" className="w-full">
-              <Button className="w-full bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 text-white font-bold rounded-xl text-xs h-10 shadow-lg shadow-blue-500/25 cursor-pointer">
+              <Button className="w-full bg-[#0066FF] hover:bg-blue-700 text-white font-bold rounded-xl text-xs h-10 shadow-md shadow-blue-500/25 cursor-pointer">
                 Trải nghiệm dự án ngay
               </Button>
             </Link>
           </div>
 
           {/* Plan 3 */}
-          <div className="rounded-3xl bg-slate-900 border border-slate-800 p-6 flex flex-col justify-between space-y-6 hover:border-slate-700 transition-all">
-            <div className="space-y-4">
-              <Badge className="bg-slate-800 text-slate-300 text-xs font-bold">HIỆP HỘI & TỔ CHỨC</Badge>
-              <div className="text-xl font-extrabold text-white font-heading">Mạng Lưới Hội Viên Toàn Diện</div>
-              <p className="text-xs text-slate-400">Dành cho YBA, BNI, VCCI, Hội Doanh nhân trẻ các tỉnh thành.</p>
+          <div className="rounded-3xl bg-white border border-slate-200 p-6 flex flex-col justify-between space-y-6 hover:shadow-lg transition-all shadow-2xs">
+            <div className="space-y-3">
+              <Badge className="bg-slate-100 text-slate-700 text-xs font-bold">HIỆP HỘI &amp; TỔ CHỨC</Badge>
+              <div className="text-xl font-extrabold text-slate-900 font-heading">Mạng Lưới Hội Viên Tập Trung</div>
+              <p className="text-xs text-slate-500">Dành cho các Hội Doanh nhân, Hiệp hội ngành nghề, Câu lạc bộ B2B.</p>
               
-              <ul className="space-y-2 text-xs text-slate-300">
-                <li className="flex items-center gap-2">✓ Quản trị danh bạ hội viên tập trung</li>
+              <ul className="space-y-2 text-xs text-slate-600 pt-2">
+                <li className="flex items-center gap-2">✓ Quản trị danh bạ hội viên tập trung toàn tỉnh/thành</li>
                 <li className="flex items-center gap-2">✓ Phân quyền Ban Chấp Hành / Hội Viên (RBAC)</li>
-                <li className="flex items-center gap-2">✓ Cấp tên miền riêng & Thương hiệu tổ chức</li>
+                <li className="flex items-center gap-2">✓ Hỗ trợ tên miền riêng &amp; Logo tổ chức</li>
                 <li className="flex items-center gap-2">✓ Cổng kết nối Cung - Cầu nội bộ</li>
               </ul>
             </div>
 
             <Link href="/register" className="w-full">
-              <Button variant="outline" className="w-full border-slate-700 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl text-xs h-10 cursor-pointer">
+              <Button variant="outline" className="w-full border-slate-200 text-slate-700 hover:bg-slate-50 font-semibold rounded-xl text-xs h-10 cursor-pointer">
                 Liên hệ hợp tác
               </Button>
             </Link>
@@ -1166,126 +943,31 @@ export default function HomePage() {
       </section>
 
       {/* ================================================================= */}
-      {/* 7. SHOWCASE BỘ HỒ SƠ CUỘC THI KHỞI NGHIỆP ĐMST 2026 */}
+      {/* 7. CALL TO ACTION BANNER (CLEAN BLUE) */}
       {/* ================================================================= */}
-      <section id="dossier" className="py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-6">
-        <div className="text-center max-w-3xl mx-auto space-y-2">
-          <Badge variant="outline" className="px-3 py-1 bg-blue-500/10 text-cyan-400 border-cyan-500/30 text-xs font-bold uppercase tracking-wider">
-            HỒ SƠ CHÍNH THỨC
-          </Badge>
-          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white tracking-tight font-heading">
-            Bộ Hồ Sơ Tham Dự Cuộc Thi Khởi Nghiệp ĐMST 2026
+      <section className="py-12 sm:py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <div className="text-center bg-gradient-to-r from-blue-600 via-blue-600 to-blue-700 text-white rounded-3xl p-8 sm:p-12 space-y-4 shadow-xl shadow-blue-500/10">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight font-heading">
+            Sẵn Sàng Nâng Tầm Kết Nối Doanh Nghiệp &amp; Sự Kiện Xanh?
           </h2>
-          <p className="text-xs sm:text-sm text-slate-400">
-            Toàn bộ 5 tài liệu đã được chuẩn hóa và đồng bộ 100% theo thông tin đăng ký chính thức của đại diện dự án Hồ Hoàng Long.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 max-w-5xl mx-auto">
-          {/* Doc 1 */}
-          <Card className="border-slate-800 rounded-2xl bg-slate-900 hover:border-cyan-500/50 transition-all text-slate-100">
-            <CardHeader className="pb-2 p-5">
-              <Badge className="w-fit bg-blue-500/20 text-cyan-300 text-[10px] font-bold">VĂN BẢN 01</Badge>
-              <CardTitle className="text-sm font-bold text-white">Đơn Đăng Ký Dự Thi</CardTitle>
-            </CardHeader>
-            <CardContent className="text-xs text-slate-300 space-y-1.5 px-5 pb-5 pt-0">
-              <p>Đại diện Hồ Hoàng Long (CCCD 056095014168), Tập đoàn Công nghệ số A+ (A PLUSVN).</p>
-              <div className="text-cyan-400 font-semibold text-[11px]">✓ Đầy đủ chữ ký & cam kết SHTT</div>
-            </CardContent>
-          </Card>
-
-          {/* Doc 2 */}
-          <Card className="border-slate-800 rounded-2xl bg-slate-900 hover:border-emerald-500/50 transition-all text-slate-100">
-            <CardHeader className="pb-2 p-5">
-              <Badge className="w-fit bg-emerald-500/20 text-emerald-300 text-[10px] font-bold">VĂN BẢN 02</Badge>
-              <CardTitle className="text-sm font-bold text-white">Bản Thuyết Minh Dự Án</CardTitle>
-            </CardHeader>
-            <CardContent className="text-xs text-slate-300 space-y-1.5 px-5 pb-5 pt-0">
-              <p>Đặc tả 8 phần: Tính cấp thiết MICE Khánh Hòa, giải pháp công nghệ, Lean Canvas, ESG và kế hoạch Pilot.</p>
-              <div className="text-emerald-400 font-semibold text-[11px]">✓ Khảo sát & Luận chứng thực tế</div>
-            </CardContent>
-          </Card>
-
-          {/* Doc 3 */}
-          <Card className="border-slate-800 rounded-2xl bg-slate-900 hover:border-purple-500/50 transition-all text-slate-100">
-            <CardHeader className="pb-2 p-5">
-              <Badge className="w-fit bg-purple-500/20 text-purple-300 text-[10px] font-bold">VĂN BẢN 03</Badge>
-              <CardTitle className="text-sm font-bold text-white">Kịch Bản Pitching 10 Slides</CardTitle>
-            </CardHeader>
-            <CardContent className="text-xs text-slate-300 space-y-1.5 px-5 pb-5 pt-0">
-              <p>Khung thuyết trình 3 - 5 phút chuẩn quốc tế kèm lời thoại chi tiết và kịch bản Live Demo trực tiếp.</p>
-              <div className="text-purple-400 font-semibold text-[11px]">✓ Kèm lời thoại từng slide</div>
-            </CardContent>
-          </Card>
-
-          {/* Doc 4 */}
-          <Card className="border-slate-800 rounded-2xl bg-slate-900 hover:border-amber-500/50 transition-all text-slate-100">
-            <CardHeader className="pb-2 p-5">
-              <Badge className="w-fit bg-amber-500/20 text-amber-300 text-[10px] font-bold">VĂN BẢN 04</Badge>
-              <CardTitle className="text-sm font-bold text-white">Ma Trận SWOT & Rủi Ro</CardTitle>
-            </CardHeader>
-            <CardContent className="text-xs text-slate-300 space-y-1.5 px-5 pb-5 pt-0">
-              <p>Phân tích 4 góc độ SWOT và biện pháp xử lý rủi ro mất mạng (Offline-First), hỏng thẻ, pháp lý dữ liệu.</p>
-              <div className="text-amber-400 font-semibold text-[11px]">✓ Cơ chế Offline Sync & Backup</div>
-            </CardContent>
-          </Card>
-
-          {/* Doc 5 */}
-          <Card className="border-slate-800 rounded-2xl bg-slate-900 hover:border-indigo-500/50 transition-all text-slate-100">
-            <CardHeader className="pb-2 p-5">
-              <Badge className="w-fit bg-indigo-500/20 text-indigo-300 text-[10px] font-bold">VĂN BẢN 05</Badge>
-              <CardTitle className="text-sm font-bold text-white">Kế Hoạch Tài Chính 2026-2028</CardTitle>
-            </CardHeader>
-            <CardContent className="text-xs text-slate-300 space-y-1.5 px-5 pb-5 pt-0">
-              <p>Unit Economics: CAC = 85k, LTV = 1.45M, LTV/CAC = 17x. Kế hoạch sử dụng vốn mồi 30k – 50k USD.</p>
-              <div className="text-indigo-400 font-semibold text-[11px]">✓ Điểm hòa vốn trong 1.5 tháng</div>
-            </CardContent>
-          </Card>
-
-          {/* Team Box */}
-          <Card className="border-blue-500/40 bg-blue-950/20 rounded-2xl flex flex-col justify-between text-slate-100">
-            <CardHeader className="pb-2 p-5">
-              <Badge className="w-fit bg-[#0066FF] text-white text-[10px] font-bold">ĐỘI NGŨ SÁNG LẬP</Badge>
-              <CardTitle className="text-sm font-bold text-white">Tập Đoàn Công Nghệ Số A+</CardTitle>
-            </CardHeader>
-            <CardContent className="text-xs text-slate-300 space-y-1 px-5 pb-5 pt-0">
-              <div>• <strong>Hồ Hoàng Long:</strong> Quản lý dự án & sản phẩm</div>
-              <div>• <strong>Nguyễn Nhật Thanh:</strong> Trưởng phòng phát triển AI</div>
-              <div>• <strong>Trần Tuấn Kiệt:</strong> Định hướng kinh doanh</div>
-              <div className="pt-1.5 text-[11px] text-slate-400">Địa chỉ: Tầng 8, Tòa nhà ASIA, 25 Lê Lợi, TP. Nha Trang</div>
-            </CardContent>
-          </Card>
-        </div>
-      </section>
-
-      {/* ================================================================= */}
-      {/* 8. CALL TO ACTION FOOTER BANNER */}
-      {/* ================================================================= */}
-      <section className="py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <div className="text-center bg-gradient-to-r from-blue-950 via-slate-900 to-cyan-950 border border-slate-800 rounded-3xl p-8 sm:p-12 space-y-4 shadow-2xl relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
-          
-          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white tracking-tight font-heading relative z-10">
-            Sẵn Sàng Kiến Tạo Du Lịch MICE Xanh & Định Danh Số Doanh Nghiệp
-          </h2>
-          <p className="text-xs sm:text-sm text-slate-300 max-w-xl mx-auto relative z-10">
-            Dự án One Connect đã sẵn sàng cho sự kiện Pilot 150 - 300 đại biểu tại tỉnh Khánh Hòa trong Quý 4/2026.
+          <p className="text-xs sm:text-sm text-blue-100 max-w-xl mx-auto">
+            Gia nhập mạng lưới One Connect ngay hôm nay để trải nghiệm danh thiếp số thông minh và giải pháp điểm danh sự kiện không giấy.
           </p>
           
-          <div className="flex flex-wrap items-center justify-center gap-3 pt-3 relative z-10">
+          <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
             <Link href="/login">
               <Button
                 size="lg"
-                className="gap-2 bg-gradient-to-r from-blue-600 via-blue-500 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 text-white font-extrabold rounded-xl h-11 px-6 text-sm shadow-xl shadow-blue-500/25 active:scale-95 transition-all cursor-pointer"
+                className="gap-2 bg-white hover:bg-slate-100 text-[#0066FF] font-bold rounded-xl h-11 px-6 text-sm shadow-md cursor-pointer"
               >
-                <Play className="w-4 h-4 fill-white" /> Trải Nghiệm Dự Án Ngay
+                <Play className="w-4 h-4 fill-[#0066FF]" /> Trải Nghiệm Dự Án Ngay
               </Button>
             </Link>
             <Link href="/register">
               <Button
                 size="lg"
                 variant="outline"
-                className="gap-2 border-slate-700 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl h-11 px-5 text-sm cursor-pointer"
+                className="gap-2 border-white/40 bg-blue-700/40 hover:bg-blue-700 text-white font-semibold rounded-xl h-11 px-5 text-sm cursor-pointer"
               >
                 Đăng ký tài khoản mới
               </Button>
@@ -1295,27 +977,27 @@ export default function HomePage() {
       </section>
 
       {/* ================================================================= */}
-      {/* 9. GLOBAL FOOTER */}
+      {/* 8. CLEAN GLOBAL FOOTER */}
       {/* ================================================================= */}
-      <footer className="border-t border-slate-800/80 bg-[#040814] py-8 px-4 sm:px-6 lg:px-8 text-xs text-slate-400">
+      <footer className="border-t border-slate-100 bg-white py-8 px-4 sm:px-6 lg:px-8 text-xs text-slate-500">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <img
-              src="/one_connect_final_logo_orange.png"
-              alt="One Connect Logo"
-              className="h-7 w-auto object-contain"
+              src="/one_connect_logo_transparent.png"
+              alt="One Connect"
+              className="h-6 w-auto object-contain"
             />
-            <span>© 2026 ONE CONNECT NETWORK. Bảo lưu mọi quyền.</span>
+            <span>© 2026 One Connect Network. Bảo lưu mọi quyền.</span>
           </div>
 
           <div className="flex items-center gap-4 text-[11px]">
-            <span className="flex items-center gap-1 text-emerald-400">
-              <ShieldCheck className="w-3.5 h-3.5" /> Tuân thủ Nghị định 13 & Luật PDPL 91
+            <span className="flex items-center gap-1 text-emerald-600 font-medium">
+              <ShieldCheck className="w-3.5 h-3.5" /> Tuân thủ Nghị định 13 &amp; Luật PDPL 91
             </span>
-            <Link href="/login" className="hover:text-white transition-colors">
+            <Link href="/login" className="hover:text-slate-900 transition-colors">
               Đăng nhập
             </Link>
-            <Link href="/register" className="hover:text-white transition-colors">
+            <Link href="/register" className="hover:text-slate-900 transition-colors">
               Đăng ký
             </Link>
           </div>

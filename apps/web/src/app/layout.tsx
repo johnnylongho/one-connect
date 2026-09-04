@@ -236,7 +236,7 @@ export default function RootLayout({
           <meta name="zalo-platform-site-verification" content="QFsG8gZ97ozZr9CBk-S0DKcNXm-buLrPCpKm" />
         </head>
         <body
-          className="min-h-screen bg-[#070A12] text-slate-100 font-sans antialiased selection:bg-blue-600 selection:text-white overflow-x-hidden"
+          className="min-h-screen bg-white text-slate-900 font-sans antialiased selection:bg-blue-600 selection:text-white overflow-x-hidden"
           suppressHydrationWarning
         >
           {children}
