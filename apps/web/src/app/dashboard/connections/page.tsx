@@ -24,9 +24,11 @@ import {
   ChevronRight,
   MapPin,
   ExternalLink,
+  FileSpreadsheet,
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { exportLeadsToExcel } from '@/lib/excel-service';
 import {
   Dialog,
   DialogContent,
@@ -192,6 +194,48 @@ export default function MyConnectionsPage() {
     setIsAuditModalOpen(true);
   };
 
+  const handleExportLeads = () => {
+    // Map connectionsList to Connection-compatible array for Excel generation
+    const connsToExport: any[] = filteredList.map((c) => ({
+      id: c.id,
+      requesterIdentityId: 'me',
+      receiverIdentityId: c.partnerId,
+      status: c.status,
+      connectedAt: c.dateMet || c.consentTimestamp,
+      createdAt: c.dateMet,
+      contextEventName: c.contextEvent,
+      notesCount: c.notesCount || 0,
+      partner: {
+        id: c.partnerId,
+        userId: c.partnerId,
+        username: c.fullName
+          ? c.fullName
+              .toLowerCase()
+              .normalize('NFD')
+              .replace(/[\u0300-\u036f]/g, '')
+              .replace(/[^a-z0-9]/g, '')
+          : 'guest',
+        fullName: c.fullName,
+        displayName: c.displayName,
+        title: c.title,
+        phone: c.phone,
+        email: c.email,
+        businesses: [{ businessName: c.company, position: c.title }],
+      },
+    }));
+
+    const leadsToExport: any[] = filteredList.map((c) => ({
+      id: `lead-${c.id}`,
+      connectionId: c.id,
+      ownerIdentityId: 'me',
+      status: c.leadTier === 'HOT' ? 'HOT' : c.leadTier === 'WARM' ? 'WARM' : 'NEW',
+      priority: c.leadTier === 'HOT' ? 'HIGH' : c.leadTier === 'WARM' ? 'MEDIUM' : 'LOW',
+      source: c.contextEvent || 'Chạm Thẻ NFC (<1s)',
+    }));
+
+    exportLeadsToExcel(connsToExport, leadsToExport);
+  };
+
   return (
     <div className="space-y-6 w-full pb-12 antialiased">
       {/* 1. STANDARDIZED PAGE HEADER */}
@@ -205,16 +249,26 @@ export default function MyConnectionsPage() {
         backHref="/dashboard"
         backLabel="Về Tổng quan"
         actions={
-          <div className="flex items-center gap-2">
-            <div className="px-3.5 py-1.5 rounded-xl bg-white border border-slate-200 shadow-2xs text-center">
+          <div className="flex flex-wrap items-center gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleExportLeads}
+              className="text-xs font-bold rounded-xl border-emerald-200 text-emerald-700 bg-emerald-50/70 hover:bg-emerald-100/80 py-2 px-3.5 cursor-pointer flex items-center gap-1.5 shadow-2xs active:scale-95"
+              title="Xuất file Excel danh sách Leads & Kết nối cho CSKH / Sales"
+            >
+              <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-600" />
+              <span>Xuất Excel CSKH ({filteredList.length})</span>
+            </Button>
+            <div className="px-3 py-1.5 rounded-xl bg-white border border-slate-200 shadow-2xs text-center">
               <span className="text-[10px] font-bold text-slate-400 uppercase block">Tổng</span>
               <strong className="text-sm font-black text-slate-900 font-mono">{connectionsList.length}</strong>
             </div>
-            <div className="px-3.5 py-1.5 rounded-xl bg-emerald-50 border border-emerald-200 text-center">
+            <div className="px-3 py-1.5 rounded-xl bg-emerald-50 border border-emerald-200 text-center">
               <span className="text-[10px] font-bold text-emerald-700 uppercase block">Đã Kết Nối</span>
               <strong className="text-sm font-black text-emerald-700 font-mono">{totalConnected}</strong>
             </div>
-            <div className="px-3.5 py-1.5 rounded-xl bg-amber-50 border border-amber-200 text-center">
+            <div className="px-3 py-1.5 rounded-xl bg-amber-50 border border-amber-200 text-center">
               <span className="text-[10px] font-bold text-amber-700 uppercase block">Chờ Đồng Ý</span>
               <strong className="text-sm font-black text-amber-700 font-mono">{totalPending}</strong>
             </div>
