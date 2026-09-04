@@ -646,7 +646,7 @@ export default function LoginPage() {
                     <img
                       src="/zalo-icon.png"
                       alt="Zalo"
-                      className="w-7 h-7 shrink-0 rounded-lg object-contain transition-transform group-hover:scale-110 duration-200"
+                      className="w-7 h-7 shrink-0 object-contain transition-transform group-hover:scale-110 duration-200"
                     />
                   </button>
                 </div>
