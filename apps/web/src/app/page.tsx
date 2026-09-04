@@ -30,6 +30,7 @@ import {
   Calendar,
   Activity,
   CheckCircle2,
+  ArrowUp,
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -96,9 +97,9 @@ export default function HomePage() {
       </div>
 
       {/* ================================================================= */}
-      {/* 1. LIQUID GLASS STICKY HEADER */}
+      {/* 1. DEEP MIDNIGHT NAVY GLASS HEADER (HIGH CONTRAST & ACCENT) */}
       {/* ================================================================= */}
-      <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-2xl border-b border-slate-200/80 shadow-[0_4px_24px_rgba(0,0,0,0.03)] transition-all">
+      <header className="sticky top-0 z-50 bg-[#0A1124]/95 backdrop-blur-2xl border-b border-slate-800 shadow-[0_4px_24px_rgba(0,0,0,0.18)] transition-all">
         <div className="max-w-7xl mx-auto flex items-center justify-between h-16 sm:h-18 px-4 sm:px-6 lg:px-8">
           
           {/* Brand Logo - Transparent Isolated PNG */}
@@ -111,34 +112,34 @@ export default function HomePage() {
           </Link>
 
           {/* Desktop Navigation Links */}
-          <nav className="hidden lg:flex items-center gap-7 text-xs font-bold text-slate-700">
+          <nav className="hidden lg:flex items-center gap-6 text-xs font-bold text-slate-300">
             <button
               onClick={() => scrollToSection('features')}
-              className="hover:text-[#0055EE] transition-colors cursor-pointer"
+              className="hover:text-white hover:bg-white/10 px-3 py-1.5 rounded-xl transition-all cursor-pointer"
             >
               Tính Năng
             </button>
             <button
               onClick={() => scrollToSection('checkin')}
-              className="hover:text-[#0055EE] transition-colors cursor-pointer"
+              className="hover:text-white hover:bg-white/10 px-3 py-1.5 rounded-xl transition-all cursor-pointer"
             >
               Check-in Sự Kiện
             </button>
             <button
               onClick={() => scrollToSection('security')}
-              className="hover:text-[#0055EE] transition-colors cursor-pointer"
+              className="hover:text-white hover:bg-white/10 px-3 py-1.5 rounded-xl transition-all cursor-pointer"
             >
               Bảo Mật PDPL 91
             </button>
             <button
               onClick={() => scrollToSection('roi')}
-              className="hover:text-[#0055EE] transition-colors cursor-pointer"
+              className="hover:text-white hover:bg-white/10 px-3 py-1.5 rounded-xl transition-all cursor-pointer"
             >
               Hiệu Quả (ROI)
             </button>
             <button
               onClick={() => scrollToSection('pricing')}
-              className="hover:text-[#0055EE] transition-colors cursor-pointer"
+              className="hover:text-white hover:bg-white/10 px-3 py-1.5 rounded-xl transition-all cursor-pointer"
             >
               Báo Giá
             </button>
@@ -148,7 +149,7 @@ export default function HomePage() {
           <div className="hidden sm:flex items-center gap-2.5">
             <button
               onClick={() => scrollToSection('features')}
-              className="text-xs font-bold text-slate-700 hover:text-slate-950 px-3 py-2 rounded-xl hover:bg-slate-100/80 transition-colors cursor-pointer"
+              className="text-xs font-bold text-slate-300 hover:text-white px-3 py-2 rounded-xl hover:bg-white/10 transition-colors cursor-pointer"
             >
               Tìm hiểu thêm
             </button>
@@ -157,7 +158,7 @@ export default function HomePage() {
             <Link href="/login">
               <Button
                 size="sm"
-                className="gap-1.5 bg-gradient-to-r from-[#0066FF] to-[#0052CC] hover:from-blue-700 hover:to-blue-800 text-white font-extrabold rounded-xl text-xs h-9 px-4 shadow-sm shadow-blue-500/25 active:scale-95 transition-all cursor-pointer"
+                className="gap-1.5 bg-gradient-to-r from-[#0066FF] to-[#0052CC] hover:from-blue-600 hover:to-blue-700 text-white font-extrabold rounded-xl text-xs h-9 px-4 shadow-sm shadow-blue-500/25 active:scale-95 transition-all cursor-pointer"
               >
                 <Sparkles className="w-3.5 h-3.5" />
                 Trải nghiệm dự án
@@ -170,9 +171,9 @@ export default function HomePage() {
                 <Button
                   size="sm"
                   variant="outline"
-                  className="gap-1.5 border-slate-300/80 bg-white/90 text-slate-800 hover:bg-slate-50 font-bold rounded-xl text-xs h-9 px-3.5 cursor-pointer shadow-2xs"
+                  className="gap-1.5 border-slate-700 bg-slate-800/90 text-slate-100 hover:bg-slate-700 font-bold rounded-xl text-xs h-9 px-3.5 cursor-pointer shadow-2xs"
                 >
-                  <Layers className="w-3.5 h-3.5 text-blue-600" />
+                  <Layers className="w-3.5 h-3.5 text-blue-400" />
                   Vào Dashboard
                 </Button>
               </Link>
@@ -181,7 +182,7 @@ export default function HomePage() {
                 <Button
                   size="sm"
                   variant="outline"
-                  className="border-slate-300/90 bg-white/90 hover:bg-slate-50 text-slate-800 font-bold rounded-xl text-xs h-9 px-3.5 cursor-pointer shadow-2xs"
+                  className="border-slate-700 bg-slate-800/90 hover:bg-slate-700 text-slate-100 font-bold rounded-xl text-xs h-9 px-3.5 cursor-pointer shadow-2xs"
                 >
                   Đăng nhập
                 </Button>
@@ -193,7 +194,7 @@ export default function HomePage() {
                 <Button
                   size="sm"
                   variant="ghost"
-                  className="text-slate-700 hover:text-slate-950 hover:bg-slate-100/80 font-bold rounded-xl text-xs h-9 px-3 cursor-pointer"
+                  className="text-slate-300 hover:text-white hover:bg-white/10 font-bold rounded-xl text-xs h-9 px-3 cursor-pointer"
                 >
                   Đăng ký
                 </Button>
@@ -204,7 +205,7 @@ export default function HomePage() {
           {/* Mobile Hamburger Toggle */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="p-2.5 rounded-xl text-slate-700 hover:text-slate-950 hover:bg-slate-100 lg:hidden cursor-pointer touch-manipulation"
+            className="p-2.5 rounded-xl text-slate-200 hover:text-white hover:bg-slate-800/80 lg:hidden cursor-pointer touch-manipulation"
             aria-label="Toggle Menu"
           >
             {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -213,39 +214,39 @@ export default function HomePage() {
 
         {/* Mobile Dropdown Menu */}
         {mobileMenuOpen && (
-          <div className="lg:hidden border-t border-slate-200/80 bg-white/95 backdrop-blur-2xl py-4 px-4 space-y-2.5 shadow-xl animate-in fade-in slide-in-from-top-2 duration-150">
+          <div className="lg:hidden border-t border-slate-800 bg-[#0A1124]/98 backdrop-blur-2xl py-4 px-4 space-y-2.5 shadow-2xl animate-in fade-in slide-in-from-top-2 duration-150">
             <button
               onClick={() => scrollToSection('features')}
-              className="w-full text-left px-3.5 py-2.5 text-xs font-bold text-slate-800 hover:bg-slate-100 rounded-xl"
+              className="w-full text-left px-3.5 py-2.5 text-xs font-bold text-slate-200 hover:bg-slate-800 rounded-xl"
             >
               Tính Năng Cốt Lõi
             </button>
             <button
               onClick={() => scrollToSection('checkin')}
-              className="w-full text-left px-3.5 py-2.5 text-xs font-bold text-slate-800 hover:bg-slate-100 rounded-xl"
+              className="w-full text-left px-3.5 py-2.5 text-xs font-bold text-slate-200 hover:bg-slate-800 rounded-xl"
             >
               Check-in Sự Kiện
             </button>
             <button
               onClick={() => scrollToSection('security')}
-              className="w-full text-left px-3.5 py-2.5 text-xs font-bold text-slate-800 hover:bg-slate-100 rounded-xl"
+              className="w-full text-left px-3.5 py-2.5 text-xs font-bold text-slate-200 hover:bg-slate-800 rounded-xl"
             >
               Bảo Mật PDPL 91
             </button>
             <button
               onClick={() => scrollToSection('roi')}
-              className="w-full text-left px-3.5 py-2.5 text-xs font-bold text-slate-800 hover:bg-slate-100 rounded-xl"
+              className="w-full text-left px-3.5 py-2.5 text-xs font-bold text-slate-200 hover:bg-slate-800 rounded-xl"
             >
               Tính Hiệu Quả (ROI)
             </button>
             <button
               onClick={() => scrollToSection('pricing')}
-              className="w-full text-left px-3.5 py-2.5 text-xs font-bold text-slate-800 hover:bg-slate-100 rounded-xl"
+              className="w-full text-left px-3.5 py-2.5 text-xs font-bold text-slate-200 hover:bg-slate-800 rounded-xl"
             >
               Báo Giá
             </button>
 
-            <div className="pt-3 border-t border-slate-200 flex flex-col gap-2">
+            <div className="pt-3 border-t border-slate-800 flex flex-col gap-2">
               <Link href="/login" className="w-full">
                 <Button className="w-full gap-2 bg-[#0066FF] hover:bg-blue-700 text-white font-extrabold rounded-xl text-xs h-11 shadow-sm">
                   <Sparkles className="w-4 h-4" /> Trải nghiệm dự án
@@ -253,12 +254,12 @@ export default function HomePage() {
               </Link>
               <div className="grid grid-cols-2 gap-2">
                 <Link href="/login" className="w-full">
-                  <Button variant="outline" className="w-full border-slate-300 bg-white text-slate-800 font-bold rounded-xl text-xs h-10">
+                  <Button variant="outline" className="w-full border-slate-700 bg-slate-800/80 text-white font-bold rounded-xl text-xs h-10">
                     Đăng nhập
                   </Button>
                 </Link>
                 <Link href="/register" className="w-full">
-                  <Button variant="ghost" className="w-full bg-slate-100 text-slate-800 font-bold rounded-xl text-xs h-10">
+                  <Button variant="ghost" className="w-full bg-slate-800/50 hover:bg-slate-800 text-slate-200 font-bold rounded-xl text-xs h-10">
                     Đăng ký
                   </Button>
                 </Link>
@@ -280,12 +281,12 @@ export default function HomePage() {
             <span>Hạ Tầng Định Danh Số B2B &amp; Quản Trị Sự Kiện MICE Thông Minh</span>
           </div>
 
-          {/* Broad Headline Container - Ensures Headline Won't Wrap Awkwardly */}
-          <div className="w-full max-w-4xl space-y-2">
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-slate-950 tracking-tight leading-[1.15] font-heading">
+          {/* Broad Headline Container - Ensures Headline Stays on Single Lines */}
+          <div className="w-full max-w-6xl space-y-2">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-[42px] xl:text-[48px] font-black text-slate-950 tracking-tight leading-tight font-heading sm:whitespace-nowrap">
               Kết Nối Doanh Nghiệp Thông Minh
             </h1>
-            <p className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold text-[#0066FF] tracking-tight leading-[1.2] font-heading">
+            <p className="text-xl sm:text-2xl md:text-3xl lg:text-[36px] xl:text-[42px] font-extrabold text-[#0066FF] tracking-tight leading-tight font-heading sm:whitespace-nowrap">
               Chạm 1 Giây, Giao Thương Bền Vững
             </p>
           </div>
@@ -357,86 +358,92 @@ export default function HomePage() {
       {/* ================================================================= */}
       {/* 3. 4 TRỤ CỘT GIẢI PHÁP CỐT LÕI (LIQUID GLASS CARDS) (#features) */}
       {/* ================================================================= */}
-      <section id="features" className="py-12 sm:py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-8">
-        
-        <div className="text-center max-w-3xl mx-auto space-y-2">
-          <Badge variant="outline" className="px-3.5 py-1 bg-blue-50 text-[#0066FF] border-blue-200 text-xs font-extrabold uppercase tracking-wider">
-            TÍNH NĂNG NỔI BẬT
-          </Badge>
-          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-slate-950 tracking-tight font-heading">
-            Giải Pháp Toàn Diện Cho Doanh Nghiệp &amp; Sự Kiện
-          </h2>
-          <p className="text-xs sm:text-sm text-slate-700 font-medium max-w-2xl mx-auto">
-            Hỗ trợ toàn bộ hành trình gặp gỡ và kết nối giao thương B2B từ điểm chạm đầu tiên đến khâu chốt hợp đồng.
-          </p>
+      <section id="features" className="py-12 sm:py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <div className="relative bg-gradient-to-b from-blue-100/70 via-slate-50/95 to-blue-50/70 rounded-3xl border border-blue-200/80 shadow-xl shadow-blue-500/5 p-6 sm:p-10 lg:p-12 space-y-8 overflow-hidden">
+          
+          {/* Accent Ambient Glow Orbs */}
+          <div className="absolute -top-24 -right-24 w-96 h-96 bg-blue-400/15 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-cyan-400/15 rounded-full blur-3xl pointer-events-none" />
+
+          <div className="text-center max-w-4xl lg:max-w-5xl mx-auto space-y-2 relative z-10">
+            <Badge variant="outline" className="px-3.5 py-1 bg-blue-50 text-[#0066FF] border-blue-200 text-xs font-extrabold uppercase tracking-wider shadow-2xs">
+              TÍNH NĂNG NỔI BẬT
+            </Badge>
+            <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-[32px] font-black text-slate-950 tracking-tight font-heading sm:whitespace-nowrap">
+              Giải Pháp Toàn Diện Cho Doanh Nghiệp &amp; Sự Kiện
+            </h2>
+            <p className="text-xs sm:text-sm text-slate-700 font-medium max-w-2xl mx-auto">
+              Hỗ trợ toàn bộ hành trình gặp gỡ và kết nối giao thương B2B từ điểm chạm đầu tiên đến khâu chốt hợp đồng.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 relative z-10">
+            {/* Card 1 */}
+            <div className="bg-white/95 backdrop-blur-xl border border-white hover:border-blue-400 hover:shadow-xl hover:shadow-blue-500/8 transition-all rounded-3xl p-6 shadow-sm flex flex-col justify-between space-y-4">
+              <div className="space-y-3">
+                <div className="w-12 h-12 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-center text-[#0066FF]">
+                  <CreditCard className="w-6 h-6" />
+                </div>
+                <h3 className="text-lg font-black text-slate-950 font-heading">Danh Thiếp Số Thông Minh</h3>
+                <p className="text-xs sm:text-sm text-slate-700 leading-relaxed font-normal">
+                  Chạm thẻ NFC hoặc quét mã QR là mở ngay profile đa phương tiện không cần cài ứng dụng. Tự do cập nhật danh mục sản phẩm và liên hệ.
+                </p>
+              </div>
+              <div className="text-xs font-bold text-blue-600 flex items-center gap-1">
+                <span>Đổi phôi thẻ không mất dữ liệu</span>
+              </div>
+            </div>
+
+            {/* Card 2 */}
+            <div className="bg-white/95 backdrop-blur-xl border border-white hover:border-blue-400 hover:shadow-xl hover:shadow-blue-500/8 transition-all rounded-3xl p-6 shadow-sm flex flex-col justify-between space-y-4">
+              <div className="space-y-3">
+                <div className="w-12 h-12 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-center text-[#0066FF]">
+                  <Zap className="w-6 h-6" />
+                </div>
+                <h3 className="text-lg font-black text-slate-950 font-heading">Check-in MICE &lt; 1s</h3>
+                <p className="text-xs sm:text-sm text-slate-700 leading-relaxed font-normal">
+                  Điểm danh đại biểu siêu tốc bằng QR vé hoặc thẻ NFC. Cắt giảm 100% rác thẻ giấy và tự động đồng bộ thời gian thực khi mất mạng (Offline Sync).
+                </p>
+              </div>
+              <div className="text-xs font-bold text-blue-600 flex items-center gap-1">
+                <span>Tự động xếp chỗ &amp; bàn tiệc VIP</span>
+              </div>
+            </div>
+
+            {/* Card 3 */}
+            <div className="bg-white/95 backdrop-blur-xl border border-white hover:border-emerald-400 hover:shadow-xl hover:shadow-emerald-500/8 transition-all rounded-3xl p-6 shadow-sm flex flex-col justify-between space-y-4">
+              <div className="space-y-3">
+                <div className="w-12 h-12 rounded-2xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600">
+                  <ShieldCheck className="w-6 h-6" />
+                </div>
+                <h3 className="text-lg font-black text-slate-950 font-heading">Chuẩn Luật PDPL 91</h3>
+                <p className="text-xs sm:text-sm text-slate-700 leading-relaxed font-normal">
+                  Tiên phong tuân thủ Luật Bảo vệ Dữ liệu Cá nhân 91/2025/QH15. Cơ chế Đồng thuận 2 chiều minh bạch, chủ động quyền chia sẻ hoặc thu hồi dữ liệu.
+                </p>
+              </div>
+              <div className="text-xs font-bold text-emerald-600 flex items-center gap-1">
+                <span>Bảo vệ quyền riêng tư tuyệt đối</span>
+              </div>
+            </div>
+
+            {/* Card 4 */}
+            <div className="bg-white/95 backdrop-blur-xl border border-white hover:border-blue-400 hover:shadow-xl hover:shadow-blue-500/8 transition-all rounded-3xl p-6 shadow-sm flex flex-col justify-between space-y-4">
+              <div className="space-y-3">
+                <div className="w-12 h-12 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-center text-[#0066FF]">
+                  <TrendingUp className="w-6 h-6" />
+                </div>
+                <h3 className="text-lg font-black text-slate-950 font-heading">Sổ Tay Giao Thương (CRM)</h3>
+                <p className="text-xs sm:text-sm text-slate-700 leading-relaxed font-normal">
+                  Ghi nhớ bối cảnh cuộc gặp tại sự kiện, phân loại mức độ tiềm năng (Lead WARM / HOT) và hỗ trợ đội ngũ kinh doanh chốt hợp đồng nhanh chóng.
+                </p>
+              </div>
+              <div className="text-xs font-bold text-blue-600 flex items-center gap-1">
+                <span>Tự động nhắc lịch hẹn đối tác</span>
+              </div>
+            </div>
+          </div>
+
         </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
-          {/* Card 1 */}
-          <div className="bg-white/85 backdrop-blur-xl border border-white/80 hover:border-blue-400 hover:shadow-xl hover:shadow-blue-500/8 transition-all rounded-3xl p-6 shadow-sm flex flex-col justify-between space-y-4">
-            <div className="space-y-3">
-              <div className="w-12 h-12 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-center text-[#0066FF]">
-                <CreditCard className="w-6 h-6" />
-              </div>
-              <h3 className="text-lg font-black text-slate-950 font-heading">Danh Thiếp Số Thông Minh</h3>
-              <p className="text-xs sm:text-sm text-slate-700 leading-relaxed font-normal">
-                Chạm thẻ NFC hoặc quét mã QR là mở ngay profile đa phương tiện không cần cài ứng dụng. Tự do cập nhật danh mục sản phẩm và liên hệ.
-              </p>
-            </div>
-            <div className="text-xs font-bold text-blue-600 flex items-center gap-1">
-              <span>Đổi phôi thẻ không mất dữ liệu</span>
-            </div>
-          </div>
-
-          {/* Card 2 */}
-          <div className="bg-white/85 backdrop-blur-xl border border-white/80 hover:border-blue-400 hover:shadow-xl hover:shadow-blue-500/8 transition-all rounded-3xl p-6 shadow-sm flex flex-col justify-between space-y-4">
-            <div className="space-y-3">
-              <div className="w-12 h-12 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-center text-[#0066FF]">
-                <Zap className="w-6 h-6" />
-              </div>
-              <h3 className="text-lg font-black text-slate-950 font-heading">Check-in MICE &lt; 1s</h3>
-              <p className="text-xs sm:text-sm text-slate-700 leading-relaxed font-normal">
-                Điểm danh đại biểu siêu tốc bằng QR vé hoặc thẻ NFC. Cắt giảm 100% rác thẻ giấy và tự động đồng bộ thời gian thực khi mất mạng (Offline Sync).
-              </p>
-            </div>
-            <div className="text-xs font-bold text-blue-600 flex items-center gap-1">
-              <span>Tự động xếp chỗ &amp; bàn tiệc VIP</span>
-            </div>
-          </div>
-
-          {/* Card 3 */}
-          <div className="bg-white/85 backdrop-blur-xl border border-white/80 hover:border-emerald-400 hover:shadow-xl hover:shadow-emerald-500/8 transition-all rounded-3xl p-6 shadow-sm flex flex-col justify-between space-y-4">
-            <div className="space-y-3">
-              <div className="w-12 h-12 rounded-2xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600">
-                <ShieldCheck className="w-6 h-6" />
-              </div>
-              <h3 className="text-lg font-black text-slate-950 font-heading">Chuẩn Luật PDPL 91</h3>
-              <p className="text-xs sm:text-sm text-slate-700 leading-relaxed font-normal">
-                Tiên phong tuân thủ Luật Bảo vệ Dữ liệu Cá nhân 91/2025/QH15. Cơ chế Đồng thuận 2 chiều minh bạch, chủ động quyền chia sẻ hoặc thu hồi dữ liệu.
-              </p>
-            </div>
-            <div className="text-xs font-bold text-emerald-600 flex items-center gap-1">
-              <span>Bảo vệ quyền riêng tư tuyệt đối</span>
-            </div>
-          </div>
-
-          {/* Card 4 */}
-          <div className="bg-white/85 backdrop-blur-xl border border-white/80 hover:border-blue-400 hover:shadow-xl hover:shadow-blue-500/8 transition-all rounded-3xl p-6 shadow-sm flex flex-col justify-between space-y-4">
-            <div className="space-y-3">
-              <div className="w-12 h-12 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-center text-[#0066FF]">
-                <TrendingUp className="w-6 h-6" />
-              </div>
-              <h3 className="text-lg font-black text-slate-950 font-heading">Sổ Tay Giao Thương (CRM)</h3>
-              <p className="text-xs sm:text-sm text-slate-700 leading-relaxed font-normal">
-                Ghi nhớ bối cảnh cuộc gặp tại sự kiện, phân loại mức độ tiềm năng (Lead WARM / HOT) và hỗ trợ đội ngũ kinh doanh chốt hợp đồng nhanh chóng.
-              </p>
-            </div>
-            <div className="text-xs font-bold text-blue-600 flex items-center gap-1">
-              <span>Tự động nhắc lịch hẹn đối tác</span>
-            </div>
-          </div>
-        </div>
-
       </section>
 
       {/* ================================================================= */}
@@ -444,11 +451,11 @@ export default function HomePage() {
       {/* ================================================================= */}
       <section id="checkin" className="py-12 sm:py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-6">
         
-        <div className="text-center max-w-3xl mx-auto space-y-2">
+        <div className="text-center max-w-4xl lg:max-w-5xl mx-auto space-y-2">
           <Badge variant="outline" className="px-3.5 py-1 bg-slate-100 text-slate-800 border-slate-300 text-xs font-extrabold uppercase tracking-wider">
             TRẢI NGHIỆM TRỰC QUAN
           </Badge>
-          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-slate-950 tracking-tight font-heading">
+          <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-[32px] font-black text-slate-950 tracking-tight font-heading sm:whitespace-nowrap">
             Kiểm Chứng Tính Năng Trực Tiếp Trên Trình Duyệt
           </h2>
           <p className="text-xs sm:text-sm text-slate-700 font-medium">
@@ -725,11 +732,11 @@ export default function HomePage() {
       {/* ================================================================= */}
       <section id="roi" className="py-12 sm:py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         <div className="bg-white/85 backdrop-blur-2xl rounded-3xl p-6 sm:p-10 border border-white shadow-xl shadow-slate-200/50 space-y-6">
-          <div className="text-center space-y-2 max-w-3xl mx-auto">
+          <div className="text-center space-y-2 max-w-4xl lg:max-w-5xl mx-auto">
             <Badge className="bg-emerald-100 text-emerald-900 border-emerald-300 font-extrabold text-xs">
               HIỆU QUẢ KINH TẾ &amp; MÔI TRƯỜNG
             </Badge>
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-slate-950 tracking-tight font-heading">
+            <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-[32px] font-black text-slate-950 tracking-tight font-heading sm:whitespace-nowrap">
               Ước Tính Chi Phí Tiết Kiệm Khi Sử Dụng One Connect
             </h2>
             <p className="text-xs sm:text-sm text-slate-700 font-medium">
@@ -889,7 +896,7 @@ export default function HomePage() {
             </div>
 
             <Link href="/register" className="w-full">
-              <Button variant="outline" className="w-full border-slate-300 text-slate-800 hover:bg-slate-50 font-extrabold rounded-xl text-xs h-11 cursor-pointer">
+              <Button className="w-full bg-slate-950 hover:bg-black text-white font-extrabold rounded-xl text-xs h-11 cursor-pointer">
                 Liên hệ hợp tác
               </Button>
             </Link>
@@ -904,7 +911,7 @@ export default function HomePage() {
         <div className="text-center bg-gradient-to-r from-[#0055EE] via-[#0066FF] to-[#0052CC] text-white rounded-3xl p-8 sm:p-14 space-y-5 shadow-2xl shadow-blue-500/20 relative overflow-hidden">
           <div className="absolute top-0 right-0 w-96 h-96 bg-cyan-400/20 rounded-full blur-3xl pointer-events-none" />
           
-          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black tracking-tight font-heading relative z-10">
+          <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-[32px] font-black tracking-tight font-heading relative z-10 sm:whitespace-nowrap">
             Sẵn Sàng Nâng Tầm Kết Nối Doanh Nghiệp &amp; Sự Kiện Xanh?
           </h2>
           <p className="text-xs sm:text-sm text-blue-50 max-w-xl mx-auto relative z-10 font-medium leading-relaxed">
@@ -934,32 +941,61 @@ export default function HomePage() {
       </section>
 
       {/* ================================================================= */}
-      {/* 8. CLEAN GLOBAL FOOTER */}
+      {/* 8. CLEAN GLOBAL FOOTER (OPTIMIZED FOR MOBILE & BACK TO TOP) */}
       {/* ================================================================= */}
-      <footer className="border-t border-slate-200/80 bg-white py-8 px-4 sm:px-6 lg:px-8 text-xs text-slate-600">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <img
-              src="/one_connect_logo_transparent.png"
-              alt="One Connect"
-              className="h-6 w-auto object-contain"
-            />
-            <span className="font-medium">© 2026 One Connect Network. Bảo lưu mọi quyền.</span>
+      <footer className="border-t border-slate-200/80 bg-white py-10 px-4 sm:px-6 lg:px-8 text-xs text-slate-600">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-6">
+          
+          {/* Mobile: Centered Logo with Copyright Stacked Directly Below */}
+          <div className="flex flex-col items-center sm:items-start gap-2.5 text-center sm:text-left">
+            <Link href="/" title="One Connect Network" className="inline-block">
+              <img
+                src="/one_connect_logo_transparent.png"
+                alt="One Connect"
+                className="h-7 sm:h-7 w-auto object-contain mx-auto sm:mx-0"
+              />
+            </Link>
+            <span className="font-medium text-slate-600 block">
+              © 2026 One Connect Network. Bảo lưu mọi quyền.
+            </span>
           </div>
 
-          <div className="flex items-center gap-4 text-[11px] font-semibold">
-            <span className="flex items-center gap-1 text-emerald-700">
-              <ShieldCheck className="w-3.5 h-3.5" /> Tuân thủ Nghị định 13 &amp; Luật PDPL 91
-            </span>
-            <Link href="/login" className="hover:text-blue-600 transition-colors">
-              Đăng nhập
-            </Link>
-            <Link href="/register" className="hover:text-blue-600 transition-colors">
-              Đăng ký
-            </Link>
+          {/* Right Actions & Back To Top */}
+          <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 text-center sm:text-right">
+            <div className="flex items-center gap-4 text-[11px] font-semibold">
+              <span className="flex items-center gap-1 text-emerald-700">
+                <ShieldCheck className="w-3.5 h-3.5" /> Tuân thủ Nghị định 13 &amp; Luật PDPL 91
+              </span>
+              <Link href="/login" className="hover:text-blue-600 transition-colors">
+                Đăng nhập
+              </Link>
+              <Link href="/register" className="hover:text-blue-600 transition-colors">
+                Đăng ký
+              </Link>
+            </div>
+
+            {/* Back to top button */}
+            <button
+              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-800 font-bold text-xs transition-all shadow-2xs hover:shadow-xs cursor-pointer group"
+              title="Cuộn lên đầu trang"
+            >
+              <ArrowUp className="w-3.5 h-3.5 text-blue-600 transition-transform group-hover:-translate-y-0.5" />
+              <span>Trở lại đầu trang</span>
+            </button>
           </div>
         </div>
       </footer>
+
+      {/* Floating Back-To-Top Button (Mobile & Desktop) */}
+      <button
+        onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+        className="fixed bottom-6 right-6 z-40 p-3 rounded-2xl bg-[#0A1124]/90 hover:bg-black text-white shadow-xl shadow-slate-900/20 border border-slate-700/60 backdrop-blur-md transition-all active:scale-95 cursor-pointer flex items-center justify-center group"
+        title="Về đầu trang"
+        aria-label="Về đầu trang"
+      >
+        <ArrowUp className="w-4 h-4 transition-transform group-hover:-translate-y-0.5 text-blue-400" />
+      </button>
 
     </div>
   );

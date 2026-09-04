@@ -307,14 +307,25 @@ export default function LoginPage() {
       <header className="p-4 sm:p-6 flex items-center justify-between max-w-7xl mx-auto w-full z-10">
         {/* Mobile Brand (Desktop already has Logo in background) */}
         <div className="flex items-center lg:invisible select-none">
-          <img
-            src="/one_connect_logo_transparent.png"
-            alt="One Connect"
-            className="h-8 sm:h-9 w-auto object-contain shrink-0"
-          />
+          <Link href="/" title="Về trang chủ giới thiệu">
+            <img
+              src="/one_connect_logo_transparent.png"
+              alt="One Connect"
+              className="h-8 sm:h-9 w-auto object-contain shrink-0"
+            />
+          </Link>
         </div>
 
-        <div className="flex items-center gap-3 ml-auto">
+        <div className="flex items-center gap-2.5 ml-auto">
+          {/* Back to intro/landing page */}
+          <Link
+            href="/"
+            className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-300 hover:text-white px-3.5 py-2 rounded-xl bg-slate-900/80 hover:bg-slate-800 border border-slate-700/80 backdrop-blur-md transition-all shadow-xs cursor-pointer"
+          >
+            <ArrowLeft className="w-3.5 h-3.5" />
+            <span>Trang chủ giới thiệu</span>
+          </Link>
+
           <Link
             href="/register"
             className="inline-flex items-center gap-1.5 text-xs font-black text-amber-400 hover:text-amber-300 px-4 py-2 rounded-xl border border-amber-400/30 hover:bg-amber-400/10 transition-all shadow-xs"
@@ -344,8 +355,15 @@ export default function LoginPage() {
         {/* Right Column: Modern High-Security Auth Box */}
         <div className="w-full max-w-md lg:mr-2 xl:mr-8 shrink-0">
           <div className="rounded-3xl bg-slate-950/85 border border-slate-700/60 backdrop-blur-2xl p-6 sm:p-8 shadow-2xl shadow-blue-950/50 space-y-6">
-            {/* Header (No lightning icon) */}
+            {/* Header (With Back to Intro link) */}
             <div className="text-center space-y-1.5">
+              <Link
+                href="/"
+                className="inline-flex items-center gap-1.5 text-[11px] font-bold text-slate-400 hover:text-white mb-1 transition-colors group cursor-pointer"
+              >
+                <ArrowLeft className="w-3.5 h-3.5 transition-transform group-hover:-translate-x-0.5 text-blue-400" />
+                <span>Quay lại trang chính giới thiệu</span>
+              </Link>
               <h2 className="text-2xl font-black text-white font-heading">
                 Đăng Nhập Hệ Thống
               </h2>
