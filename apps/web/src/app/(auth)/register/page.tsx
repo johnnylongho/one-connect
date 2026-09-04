@@ -672,7 +672,10 @@ function RegisterForm() {
 
                   <button
                     type="button"
-                    onClick={() => setErrorMsg('Đăng ký tài khoản qua Zalo đang được hoàn tất xác thực.')}
+                    onClick={() => {
+                      setLoading(true);
+                      window.location.href = '/api/auth/zalo/login';
+                    }}
                     title="Đăng ký bằng Zalo"
                     className="w-12 h-12 rounded-2xl bg-blue-600 hover:bg-blue-500 border border-blue-500 flex items-center justify-center transition-all cursor-pointer shadow-md hover:shadow-blue-500/30 active:scale-95 group"
                   >

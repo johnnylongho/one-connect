@@ -24,11 +24,32 @@ function AuthCallbackContent() {
     if (errorParam || errorDesc) {
       if (errorDesc?.includes('not enabled') || errorParam === 'unsupported_provider') {
         setStatus('provider_disabled');
-        setErrorMessage(errorDesc || 'Google Provider chưa được bật trong Supabase Dashboard.');
+        setErrorMessage(errorDesc || 'Nhà cung cấp xác thực chưa được bật trong hệ thống.');
         return;
       }
       setStatus('error');
-      setErrorMessage(errorDesc || errorParam || 'Xác thực Google không thành công.');
+      setErrorMessage(errorDesc || errorParam || 'Xác thực không thành công.');
+      return;
+    }
+
+    // 1.1 Kiểm tra callback từ Zalo OAuth
+    const provider = searchParams.get('provider');
+    if (provider === 'zalo') {
+      const zaloName = searchParams.get('name') || 'Hội viên Zalo';
+      const zaloId = searchParams.get('id') || `usr_zalo_${Date.now()}`;
+      const zaloUser = searchParams.get('user') || `zalo_${Date.now().toString().slice(-6)}`;
+      const zaloAvatar = searchParams.get('avatar') || '';
+
+      processUserSession({
+        id: zaloId,
+        email: `${zaloUser}@oneconnect.id.vn`,
+        user_metadata: {
+          full_name: zaloName,
+          name: zaloName,
+          user_name: zaloUser,
+          avatar_url: zaloAvatar,
+        },
+      });
       return;
     }
 
