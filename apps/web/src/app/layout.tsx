@@ -161,7 +161,7 @@ export default function RootLayout({
 }>) {
   const router = useRouter();
   const pathname = usePathname();
-  const { currentIdentity, state, setCurrentRole, logoutUser } = useOneConnectStore();
+  const { currentIdentity, state, setCurrentRole, logoutUser, isHydrated } = useOneConnectStore();
   const [isRoleDropdownOpen, setIsRoleDropdownOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
@@ -217,10 +217,16 @@ export default function RootLayout({
     pathname?.startsWith('/c/');
 
   useEffect(() => {
-    if (!state.currentIdentityId && !isStandalonePage) {
+    // Only verify auth AFTER hydration is complete to avoid false-positive redirects
+    if (!isHydrated) return;
+
+    const cookieExists = typeof document !== 'undefined' && 
+      (document.cookie.includes('one_connect_auth_session=') || document.cookie.includes('sb-access-token='));
+
+    if (!state.currentIdentityId && !cookieExists && !isStandalonePage) {
       router.replace('/login');
     }
-  }, [state.currentIdentityId, isStandalonePage, router]);
+  }, [state.currentIdentityId, isStandalonePage, isHydrated, router]);
 
   if (isStandalonePage) {
     return (
@@ -245,7 +251,10 @@ export default function RootLayout({
     );
   }
 
-  if (!state.currentIdentityId && !isStandalonePage) {
+  const hasClientAuthCookie = typeof document !== 'undefined' && 
+    (document.cookie.includes('one_connect_auth_session=') || document.cookie.includes('sb-access-token='));
+
+  if (!isStandalonePage && (!isHydrated || (!state.currentIdentityId && !hasClientAuthCookie))) {
     return (
       <html
         lang="vi"

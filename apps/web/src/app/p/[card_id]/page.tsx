@@ -712,9 +712,9 @@ END:VCARD`;
         <header className="bg-white/95 border-b border-slate-100 px-3.5 sm:px-4 py-2.5 flex items-center justify-between sticky top-0 z-30 backdrop-blur-md">
           <div className="flex items-center gap-2 min-w-0">
             <Link
-              href="/dashboard"
+              href={state.currentIdentityId ? "/dashboard/card" : "/dashboard"}
               className="p-1.5 sm:p-2 rounded-full bg-slate-50 border border-slate-200 text-slate-700 hover:bg-blue-50 hover:text-[#0066FF] hover:border-blue-200 transition-all active:scale-95 cursor-pointer shadow-2xs shrink-0"
-              title="Quay lại Trang Tổng Quan Dashboard"
+              title="Quay lại Trang Quản Lý & Dashboard"
             >
               <ArrowLeft className="w-4 h-4" />
             </Link>

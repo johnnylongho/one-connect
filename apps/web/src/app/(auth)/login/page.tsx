@@ -23,6 +23,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { useOneConnectStore } from '@/lib/store';
 import { supabase } from '@/lib/supabaseClient';
+import { DbService } from '@/lib/db-service';
 import {
   initGoogleOneTap,
   triggerGooglePopupAuth,
@@ -108,9 +109,12 @@ export default function LoginPage() {
       setSuccessUser(isJohnny ? 'Hồ Hoàng Long (Johnny Long Hồ)' : (fullName || 'Thành viên'));
       setLoading(false);
 
+      const searchParams = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '');
+      const redirectUrl = searchParams.get('redirect') || '/dashboard/card';
+
       setTimeout(() => {
-        router.push('/dashboard/card');
-      }, 1000);
+        window.location.href = redirectUrl;
+      }, 800);
     } catch (err: any) {
       setLoading(false);
       setErrorMsg(`Lỗi hoàn tất đăng nhập: ${err?.message || err}`);
@@ -234,10 +238,17 @@ export default function LoginPage() {
     setTimeout(() => {
       const user = loginUser(identifier);
       if (user) {
+        if (typeof document !== 'undefined') {
+          document.cookie = `one_connect_auth_session=${user.id}; path=/; max-age=2592000; SameSite=Lax`;
+        }
         setSuccessUser(user.fullName);
         setLoading(false);
+
+        const searchParams = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '');
+        const redirectUrl = searchParams.get('redirect') || '/dashboard/card';
+
         setTimeout(() => {
-          router.push('/dashboard/card');
+          window.location.href = redirectUrl;
         }, 800);
       } else {
         setLoading(false);
@@ -247,7 +258,7 @@ export default function LoginPage() {
   };
 
   // Handle Password Login
-  const handlePasswordLogin = (e: React.FormEvent) => {
+  const handlePasswordLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!identifier.trim()) {
       setErrorMsg('Vui lòng nhập Email, SĐT hoặc Tên đăng nhập');
@@ -256,19 +267,68 @@ export default function LoginPage() {
     setErrorMsg('');
     setLoading(true);
 
-    setTimeout(() => {
-      const user = loginUser(identifier, password);
+    try {
+      const cleanIdentifier = identifier.trim();
+      const isEmail = cleanIdentifier.includes('@');
+
+      // 1. Parallel Supabase Auth sign-in if email & password provided (for SSR cookie sync)
+      if (isEmail && password) {
+        try {
+          await supabase.auth.signInWithPassword({
+            email: cleanIdentifier.toLowerCase(),
+            password: password,
+          });
+        } catch (authErr) {
+          console.warn('Supabase signInWithPassword notice:', authErr);
+        }
+      }
+
+      // 2. Local store login
+      let user = loginUser(cleanIdentifier, password);
+
+      // 3. If user is not yet in local state, fetch latest cloud identities from Supabase
+      if (!user) {
+        try {
+          const cloudIdentities = await DbService.fetchCloudIdentities();
+          if (cloudIdentities && cloudIdentities.length > 0) {
+            const clean = cleanIdentifier.toLowerCase();
+            const foundCloud = cloudIdentities.find(
+              (i) =>
+                i.username.toLowerCase() === clean ||
+                i.id.toLowerCase() === clean ||
+                (i.email && i.email.toLowerCase() === clean) ||
+                (i.phone && i.phone.replace(/[^0-9]/g, '') === clean.replace(/[^0-9]/g, ''))
+            );
+            if (foundCloud && (!password || !foundCloud.password || foundCloud.password === password)) {
+              user = loginUser(foundCloud.id);
+            }
+          }
+        } catch (fetchErr) {
+          console.warn('Fetch cloud identities error:', fetchErr);
+        }
+      }
+
       if (user) {
-        setSuccessUser(user.fullName);
+        setSuccessUser(user.fullName || user.displayName || 'Thành viên');
+        if (typeof document !== 'undefined') {
+          document.cookie = `one_connect_auth_session=${user.id}; path=/; max-age=2592000; SameSite=Lax`;
+        }
         setLoading(false);
+
+        const searchParams = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '');
+        const redirectUrl = searchParams.get('redirect') || '/dashboard/card';
+
         setTimeout(() => {
-          router.push('/dashboard/card');
-        }, 800);
+          window.location.href = redirectUrl;
+        }, 600);
       } else {
         setLoading(false);
-        setErrorMsg(`Tên đăng nhập, Email hoặc Mật khẩu không chính xác.`);
+        setErrorMsg('Tên đăng nhập, Email hoặc Mật khẩu không chính xác.');
       }
-    }, 600);
+    } catch (err: any) {
+      setLoading(false);
+      setErrorMsg(`Lỗi đăng nhập: ${err?.message || 'Vui lòng thử lại'}`);
+    }
   };
 
   return (

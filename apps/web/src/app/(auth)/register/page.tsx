@@ -494,6 +494,9 @@ function RegisterForm() {
         });
 
         setCurrentIdentityId(identity.id);
+        if (typeof document !== 'undefined') {
+          document.cookie = `one_connect_auth_session=${identity.id}; path=/; max-age=2592000; SameSite=Lax`;
+        }
         const targetUrl = `/p/${identity.username}`;
         setRegisteredProfileUrl(targetUrl);
         setStep('success');
@@ -530,7 +533,7 @@ function RegisterForm() {
         }).catch((err) => console.warn('Send welcome email error:', err));
 
         setTimeout(() => {
-          router.push(targetUrl);
+          window.location.href = targetUrl;
         }, 1600);
       } else {
         const { organization, admin } = registerOrganization({
@@ -545,6 +548,9 @@ function RegisterForm() {
         });
 
         setCurrentIdentityId(admin.id);
+        if (typeof document !== 'undefined') {
+          document.cookie = `one_connect_auth_session=${admin.id}; path=/; max-age=2592000; SameSite=Lax`;
+        }
         const targetUrl = `/admin/org/members`;
         setRegisteredProfileUrl(targetUrl);
         setStep('success');
@@ -557,14 +563,14 @@ function RegisterForm() {
           body: JSON.stringify({
             email: adminEmail,
             fullName: adminFullName,
-            title: adminTitle || 'Trưởng Ban Quản Trị Tổ Chức',
+            title: adminTitle || 'Đại diện Tổ chức',
             businessName: orgName,
-            profileUrl: typeof window !== 'undefined' ? `${window.location.origin}/admin/org/members` : `https://one-connect-network.vercel.app/admin/org/members`,
+            profileUrl: typeof window !== 'undefined' ? `${window.location.origin}${targetUrl}` : `https://one-connect-network.vercel.app${targetUrl}`,
           }),
-        }).catch((err) => console.warn('Send welcome email error:', err));
+        }).catch((err) => console.warn('Send welcome org email error:', err));
 
         setTimeout(() => {
-          router.push(targetUrl);
+          window.location.href = targetUrl;
         }, 1600);
       }
     }, 800);

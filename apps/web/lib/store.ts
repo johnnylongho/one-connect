@@ -172,45 +172,87 @@ export function useOneConnectStore() {
       localStorage.removeItem('one_connect_app_state_v1');
       localStorage.removeItem('one_connect_app_state_v2');
       const saved = localStorage.getItem(STORAGE_KEY);
+      let parsed: AppState | null = null;
       if (saved) {
-        const parsed: AppState = JSON.parse(saved);
-        // Ensure strictly deduplicated identities
-        parsed.identities = deduplicateIdentities(parsed.identities || []).map((idnt) => {
-          if (idnt.id === 'id-001' || idnt.id === '11111111-1111-1111-1111-111111111111' || idnt.username === 'johnnylongho') {
-            return {
-              ...idnt,
-              id: '11111111-1111-1111-1111-111111111111',
-              username: idnt.username || 'johnnylongho',
-              fullName: idnt.fullName || 'Hồ Hoàng Long',
-              displayName: idnt.displayName || idnt.fullName || 'Johnny Long Hồ',
-              phone: idnt.phone || '0794677369',
-              email: idnt.email || 'contact.johnnylongho@gmail.com',
-              website: idnt.website || 'https://aplusvn.net',
-              avatarUrl: (idnt.avatarUrl && !idnt.avatarUrl.startsWith('blob:') && idnt.avatarUrl.trim() !== '') ? idnt.avatarUrl : '/avatar-johnny-long.jpg',
-            };
-          }
-          return idnt;
-        });
+        try {
+          parsed = JSON.parse(saved);
+        } catch (e) {}
+      }
 
-        parsed.cards = deduplicateCards(parsed.cards || []).map((c) => {
-          if (c.personIdentityId === 'id-001' || c.personIdentityId === '11111111-1111-1111-1111-111111111111') {
-            return {
-              ...c,
-              personIdentityId: '11111111-1111-1111-1111-111111111111',
-              cardUid: '04:8F:2A:1B:9C:5D:80',
-              nfcIdentifier: 'NFC-2026-APLUS-001',
-              dynamicUrl: 'https://www.oneconnect.id.vn/p/johnnylongho',
-              qrValue: 'https://www.oneconnect.id.vn/p/johnnylongho',
-            };
-          }
-          return c;
-        });
-        setState(parsed);
+      // Check active session cookie fallback
+      const cookieMatch = typeof document !== 'undefined' ? document.cookie.match(/one_connect_auth_session=([^;]+)/) : null;
+      const sessionCookieId = cookieMatch && cookieMatch[1] ? decodeURIComponent(cookieMatch[1].trim()) : null;
+
+      if (!parsed) {
+        parsed = { ...defaultState };
+      }
+
+      if (sessionCookieId && !parsed.currentIdentityId) {
+        parsed.currentIdentityId = sessionCookieId;
+      }
+
+      // Ensure strictly deduplicated identities
+      parsed.identities = deduplicateIdentities(parsed.identities || []).map((idnt) => {
+        if (idnt.id === 'id-001' || idnt.id === '11111111-1111-1111-1111-111111111111' || idnt.username === 'johnnylongho') {
+          return {
+            ...idnt,
+            id: '11111111-1111-1111-1111-111111111111',
+            username: idnt.username || 'johnnylongho',
+            fullName: idnt.fullName || 'Hồ Hoàng Long',
+            displayName: idnt.displayName || idnt.fullName || 'Johnny Long Hồ',
+            phone: idnt.phone || '0794677369',
+            email: idnt.email || 'contact.johnnylongho@gmail.com',
+            website: idnt.website || 'https://aplusvn.net',
+            avatarUrl: (idnt.avatarUrl && !idnt.avatarUrl.startsWith('blob:') && idnt.avatarUrl.trim() !== '') ? idnt.avatarUrl : '/avatar-johnny-long.jpg',
+          };
+        }
+        return idnt;
+      });
+
+      parsed.cards = deduplicateCards(parsed.cards || []).map((c) => {
+        if (c.personIdentityId === 'id-001' || c.personIdentityId === '11111111-1111-1111-1111-111111111111') {
+          return {
+            ...c,
+            personIdentityId: '11111111-1111-1111-1111-111111111111',
+            cardUid: '04:8F:2A:1B:9C:5D:80',
+            nfcIdentifier: 'NFC-2026-APLUS-001',
+            dynamicUrl: 'https://www.oneconnect.id.vn/p/johnnylongho',
+            qrValue: 'https://www.oneconnect.id.vn/p/johnnylongho',
+          };
+        }
+        return c;
+      });
+
+      setState(parsed);
+
+      if (parsed.currentIdentityId && typeof document !== 'undefined') {
+        document.cookie = `one_connect_auth_session=${parsed.currentIdentityId}; path=/; max-age=2592000; SameSite=Lax`;
       }
     } catch (e) {
       console.error('Failed to load state from localStorage', e);
     }
     setIsHydrated(true);
+
+    // Cross-component and cross-tab real-time state synchronization
+    const handleStateSync = (e: any) => {
+      if (e.detail) {
+        setState(e.detail);
+      } else {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) {
+          try {
+            setState(JSON.parse(saved));
+          } catch {}
+        }
+      }
+    };
+    window.addEventListener('one_connect_state_updated', handleStateSync);
+    window.addEventListener('storage', handleStateSync);
+
+    return () => {
+      window.removeEventListener('one_connect_state_updated', handleStateSync);
+      window.removeEventListener('storage', handleStateSync);
+    };
   }, []);
 
   // Save changes to localStorage only after state has been hydrated
@@ -541,6 +583,12 @@ export function useOneConnectStore() {
       const updated = { ...prev, currentIdentityId: id };
       if (typeof window !== 'undefined') {
         try { localStorage.setItem(STORAGE_KEY, JSON.stringify(updated)); } catch {}
+        if (id) {
+          document.cookie = `one_connect_auth_session=${id}; path=/; max-age=2592000; SameSite=Lax`;
+        } else {
+          document.cookie = 'one_connect_auth_session=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+        }
+        window.dispatchEvent(new CustomEvent('one_connect_state_updated', { detail: updated }));
       }
       return updated;
     });
@@ -1025,17 +1073,21 @@ export function useOneConnectStore() {
       createdAt: new Date().toISOString(),
     };
 
-    setState(prev => ({
-      ...prev,
+    const updatedState = {
+      ...state,
       currentRole: userRole,
       currentIdentityId: newId,
-      identities: [newIdentity, ...prev.identities],
-      cards: [newCard, ...prev.cards],
-      auditLogs: [newAuditLog, ...prev.auditLogs],
-    }));
+      identities: [newIdentity, ...state.identities],
+      cards: [newCard, ...state.cards],
+      auditLogs: [newAuditLog, ...state.auditLogs],
+    };
+
+    setState(updatedState);
 
     if (typeof window !== 'undefined') {
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedState)); } catch {}
       document.cookie = `one_connect_auth_session=${newId}; path=/; max-age=2592000; SameSite=Lax`;
+      window.dispatchEvent(new CustomEvent('one_connect_state_updated', { detail: updatedState }));
     }
 
     // Sync with Cloud Database
@@ -1202,13 +1254,13 @@ export function useOneConnectStore() {
       issuedAt: new Date().toISOString(),
     };
 
-    setState(prev => ({
-      ...prev,
-      currentRole: 'ORG_ADMIN',
+    const updatedState = {
+      ...state,
+      currentRole: 'ORG_ADMIN' as RoleType,
       currentIdentityId: adminId,
-      organizations: [newOrg, ...prev.organizations],
-      identities: [newAdminIdentity, ...prev.identities],
-      cards: [newCard, ...prev.cards],
+      organizations: [newOrg, ...state.organizations],
+      identities: [newAdminIdentity, ...state.identities],
+      cards: [newCard, ...state.cards],
       auditLogs: [
         {
           id: `aud-${Date.now()}`,
@@ -1219,12 +1271,16 @@ export function useOneConnectStore() {
           objectId: orgId,
           createdAt: new Date().toISOString(),
         },
-        ...prev.auditLogs,
+        ...state.auditLogs,
       ],
-    }));
+    };
+
+    setState(updatedState);
 
     if (typeof window !== 'undefined') {
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedState)); } catch {}
       document.cookie = `one_connect_auth_session=${adminId}; path=/; max-age=2592000; SameSite=Lax`;
+      window.dispatchEvent(new CustomEvent('one_connect_state_updated', { detail: updatedState }));
     }
 
     return { organization: newOrg, admin: newAdminIdentity, card: newCard };
@@ -1251,13 +1307,17 @@ export function useOneConnectStore() {
                            (found.email && found.email.toLowerCase() === 'contact.johnnylongho@gmail.com');
       const determinedRole: RoleType = isSuperAdmin ? 'SUPER_ADMIN' : 'MEMBER';
 
-      setState(prev => ({
-        ...prev,
+      const updatedState = {
+        ...state,
         currentRole: determinedRole,
         currentIdentityId: found.id,
-      }));
+      };
+
+      setState(updatedState);
       if (typeof window !== 'undefined') {
+        try { localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedState)); } catch {}
         document.cookie = `one_connect_auth_session=${found.id}; path=/; max-age=2592000; SameSite=Lax`;
+        window.dispatchEvent(new CustomEvent('one_connect_state_updated', { detail: updatedState }));
       }
       return found;
     }
@@ -1306,17 +1366,19 @@ export function useOneConnectStore() {
 
   // Logout User & clear persistent sessions
   const logoutUser = () => {
-    setState(prev => ({
-      ...prev,
+    const updatedState = {
+      ...state,
       currentIdentityId: '',
-      currentRole: 'MEMBER',
-    }));
+      currentRole: 'MEMBER' as RoleType,
+    };
+    setState(updatedState);
     if (typeof window !== 'undefined') {
       try {
         localStorage.removeItem(STORAGE_KEY);
         document.cookie = 'one_connect_auth_session=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
         document.cookie = 'sb-access-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
         document.cookie = 'sb-refresh-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+        window.dispatchEvent(new CustomEvent('one_connect_state_updated', { detail: updatedState }));
       } catch (e) {
         console.warn('Logout clear error:', e);
       }
@@ -1356,6 +1418,7 @@ export function useOneConnectStore() {
 
   return {
     state,
+    isHydrated,
     currentIdentity,
     currentCard,
     setCurrentRole,
