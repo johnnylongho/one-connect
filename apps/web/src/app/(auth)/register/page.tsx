@@ -606,8 +606,9 @@ function RegisterForm() {
               <Sparkles className="w-3.5 h-3.5" />
               <span>GIA NHẬP HỆ SINH THÁI ONE CONNECT</span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-black text-white font-heading">
-              Đăng Ký & Khởi Tạo Danh Tính Số
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-black text-white font-heading leading-tight">
+              Đăng Ký & Khởi Tạo <br className="sm:hidden" />
+              <span>Danh Tính Số</span>
             </h1>
           </div>
 
@@ -704,37 +705,31 @@ function RegisterForm() {
               </div>
 
               {/* Account Type Selector */}
-              <div className="grid grid-cols-2 p-1.5 rounded-2xl bg-slate-950/90 border border-slate-800 gap-1.5 text-xs font-bold">
+              <div className="grid grid-cols-2 p-1 rounded-xl bg-slate-950 border border-slate-800 gap-1 text-xs">
                 <button
                   type="button"
                   onClick={() => setAccountType('personal')}
-                  className={`p-3 rounded-xl transition-all flex flex-col items-center justify-center gap-1 text-center cursor-pointer ${
+                  className={`py-2 px-3 rounded-lg transition-all flex items-center justify-center gap-2 cursor-pointer font-semibold ${
                     accountType === 'personal'
-                      ? 'bg-blue-600 text-white shadow-md'
-                      : 'text-slate-400 hover:text-white hover:bg-white/5'
+                      ? 'bg-blue-600 text-white shadow-sm'
+                      : 'text-slate-400 hover:text-slate-200 hover:bg-white/5'
                   }`}
                 >
-                  <div className="flex items-center gap-1.5">
-                    <User className="w-4 h-4" />
-                    <span className="text-xs font-bold">Doanh Nhân Cá Nhân</span>
-                  </div>
-                  <span className="text-[10px] opacity-80">Danh thiếp số VIP & Thẻ NFC</span>
+                  <User className="w-4 h-4 shrink-0" />
+                  <span className="truncate">Doanh Nhân</span>
                 </button>
 
                 <button
                   type="button"
                   onClick={() => setAccountType('org')}
-                  className={`p-3 rounded-xl transition-all flex flex-col items-center justify-center gap-1 text-center cursor-pointer ${
+                  className={`py-2 px-3 rounded-lg transition-all flex items-center justify-center gap-2 cursor-pointer font-semibold ${
                     accountType === 'org'
-                      ? 'bg-purple-600 text-white shadow-md'
-                      : 'text-slate-400 hover:text-white hover:bg-white/5'
+                      ? 'bg-purple-600 text-white shadow-sm'
+                      : 'text-slate-400 hover:text-slate-200 hover:bg-white/5'
                   }`}
                 >
-                  <div className="flex items-center gap-1.5">
-                    <Crown className="w-4 h-4 text-amber-300" />
-                    <span className="text-xs font-bold">Tổ Chức / Hiệp Hội B2B</span>
-                  </div>
-                  <span className="text-[10px] opacity-80">Không gian YBA & Quản trị hội viên</span>
+                  <Building2 className="w-4 h-4 shrink-0" />
+                  <span className="truncate">Tổ Chức</span>
                 </button>
               </div>
 
@@ -818,11 +813,9 @@ function RegisterForm() {
                   </div>
 
                   {/* Feature: Live URL Preview & Username Availability Status Bar */}
-                  <div className="p-2.5 rounded-xl bg-slate-950/80 border border-slate-800/90 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs transition-all">
-                    <div className="flex items-center gap-1.5 min-w-0 overflow-hidden text-slate-400">
-                      <span className="text-slate-500 shrink-0 font-mono">🔗</span>
-                      <span className="text-[11px] text-slate-400 shrink-0">Đường dẫn danh thiếp số:</span>
-                      <span className="font-mono text-xs text-slate-300 truncate">
+                  <div className="p-2.5 rounded-xl bg-slate-950/80 border border-slate-800/90 flex items-center justify-between gap-2 text-xs transition-all">
+                    <div className="min-w-0 overflow-hidden">
+                      <span className="font-mono text-xs text-slate-300 truncate block">
                         oneconnect.id.vn/p/<span className={`font-bold ${username ? 'text-[#00C2FF]' : 'text-slate-500 italic'}`}>{username || '[username]'}</span>
                       </span>
                     </div>
