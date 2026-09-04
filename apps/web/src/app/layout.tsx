@@ -346,6 +346,7 @@ export default function RootLayout({
         <link rel="manifest" href="/manifest.json" />
         <meta name="theme-color" content="#0066FF" />
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+        <meta name="zalo-platform-site-verification" content="QFsG8gZ97ozZr9CBk-S0DKcNXm-buLrPCpKm" />
       </head>
       <body
         className="min-h-screen bg-[#F8FAFC] text-slate-900 font-sans antialiased selection:bg-blue-600 selection:text-white overflow-x-hidden"
