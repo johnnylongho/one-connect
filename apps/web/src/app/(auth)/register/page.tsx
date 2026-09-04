@@ -677,14 +677,13 @@ function RegisterForm() {
                       window.location.href = '/api/auth/zalo/login';
                     }}
                     title="Đăng ký bằng Zalo"
-                    className="w-12 h-12 rounded-2xl bg-blue-600 hover:bg-blue-500 border border-blue-500 flex items-center justify-center transition-all cursor-pointer shadow-md hover:shadow-blue-500/30 active:scale-95 group"
+                    className="w-12 h-12 rounded-2xl bg-slate-900 hover:bg-slate-800 border border-slate-700/80 hover:border-blue-500/50 flex items-center justify-center transition-all cursor-pointer shadow-md hover:shadow-blue-500/20 active:scale-95 group overflow-hidden"
                   >
-                    <svg className="w-6 h-6 shrink-0 transition-transform group-hover:scale-110 duration-200" viewBox="0 0 48 48" fill="none">
-                      <rect width="48" height="48" rx="12" fill="#0068FF" />
-                      <path d="M12 33L21 21H13V18H25V21L16 33H25V36H12V33Z" fill="white" />
-                      <path d="M27 25C27 22.8 28.8 21 31 21C33.2 21 35 22.8 35 25V36H32V25C32 24.4 31.6 24 31 24C30.4 24 30 24.4 30 25V36H27V25Z" fill="white" />
-                      <circle cx="37" cy="28.5" r="2.5" fill="white" />
-                    </svg>
+                    <img
+                      src="/zalo-icon.png"
+                      alt="Zalo"
+                      className="w-7 h-7 shrink-0 rounded-lg object-contain transition-transform group-hover:scale-110 duration-200"
+                    />
                   </button>
                 </div>
 
