@@ -14,10 +14,9 @@ export async function GET(req: NextRequest) {
   const errorDesc = searchParams.get('error_description');
   const code = searchParams.get('code');
 
-  const origin =
-    req.nextUrl.origin ||
-    process.env.NEXT_PUBLIC_APP_URL ||
-    'https://oneconnect.id.vn';
+  const host = req.headers.get('host') || '';
+  const isLocal = host.includes('localhost') || host.includes('127.0.0.1');
+  const origin = isLocal ? `http://${host}` : 'https://oneconnect.id.vn';
 
   if (error || !code) {
     console.error('Zalo OAuth callback error:', error, errorDesc);

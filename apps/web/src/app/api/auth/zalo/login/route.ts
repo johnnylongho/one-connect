@@ -7,11 +7,11 @@ export async function GET(req: NextRequest) {
     process.env.NEXT_PUBLIC_ZALO_APP_ID ||
     '208082851799800309';
 
-  const origin =
-    req.nextUrl.origin ||
-    process.env.NEXT_PUBLIC_APP_URL ||
-    'https://oneconnect.id.vn';
-  const redirectUri = `${origin}/api/auth/zalo/callback`;
+  const host = req.headers.get('host') || '';
+  const isLocal = host.includes('localhost') || host.includes('127.0.0.1');
+  const redirectUri = isLocal
+    ? `http://${host}/api/auth/zalo/callback`
+    : 'https://oneconnect.id.vn/api/auth/zalo/callback';
 
   // PKCE Code Verifier: 43 characters Base64URL string
   const codeVerifier = crypto.randomBytes(32).toString('base64url');
