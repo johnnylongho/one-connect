@@ -33,7 +33,7 @@ function RegisterForm() {
   const searchParams = useSearchParams();
   const initialType = searchParams?.get('type') === 'org' ? 'org' : 'personal';
 
-  const { registerIdentity, registerOrganization, setCurrentIdentityId } = useOneConnectStore();
+  const { registerIdentity, registerOrganization, setCurrentIdentityId, state } = useOneConnectStore();
 
   const [accountType, setAccountType] = useState<'personal' | 'org'>(initialType);
   const [step, setStep] = useState<'form' | 'otp' | 'success'>('form');
@@ -42,6 +42,8 @@ function RegisterForm() {
   const [fullName, setFullName] = useState('');
   const [username, setUsername] = useState('');
   const [isUsernameCustomized, setIsUsernameCustomized] = useState(false);
+  const [usernameStatus, setUsernameStatus] = useState<'idle' | 'checking' | 'available' | 'unavailable' | 'invalid'>('idle');
+  const [usernameMsg, setUsernameMsg] = useState('');
   const [title, setTitle] = useState('');
   const [businessName, setBusinessName] = useState('');
   const [phone, setPhone] = useState('');
@@ -80,6 +82,94 @@ function RegisterForm() {
       setAccountType('org');
     }
   }, [searchParams]);
+
+  // Real-time debounced username availability validation
+  useEffect(() => {
+    const trimmed = username.trim().toLowerCase();
+    if (!trimmed) {
+      setUsernameStatus('idle');
+      setUsernameMsg('');
+      return;
+    }
+
+    if (trimmed.length < 3) {
+      setUsernameStatus('invalid');
+      setUsernameMsg('Tên đăng nhập phải từ 3 - 30 ký tự');
+      return;
+    }
+
+    const validCharsRegex = /^[a-z0-9][a-z0-9_.-]{1,28}[a-z0-9]$/;
+    if (!validCharsRegex.test(trimmed)) {
+      setUsernameStatus('invalid');
+      setUsernameMsg('Chỉ dùng chữ thường (a-z), số (0-9), gạch dưới (_)');
+      return;
+    }
+
+    const reserved = [
+      'admin',
+      'administrator',
+      'root',
+      'system',
+      'support',
+      'oneconnect',
+      'yba',
+      'api',
+      'auth',
+      'login',
+      'register',
+      'dashboard',
+      'settings',
+      'demo',
+      'events',
+      'checkout',
+      'card',
+      'cards',
+      'p',
+      'c',
+      'operator',
+      'null',
+      'undefined',
+    ];
+    if (reserved.includes(trimmed)) {
+      setUsernameStatus('unavailable');
+      setUsernameMsg('Tên đăng nhập đã được hệ thống bảo lưu');
+      return;
+    }
+
+    // Check local store collision
+    const isLocalDuplicate = state?.identities?.some(
+      (id) => id.username?.toLowerCase() === trimmed
+    );
+    if (isLocalDuplicate) {
+      setUsernameStatus('unavailable');
+      setUsernameMsg('Tên đăng nhập đã được sử dụng');
+      return;
+    }
+
+    // Query Cloud Supabase API for availability
+    setUsernameStatus('checking');
+    setUsernameMsg('Đang kiểm tra tính khả dụng...');
+
+    const timer = setTimeout(async () => {
+      try {
+        const res = await fetch(`/api/auth/check-username?username=${encodeURIComponent(trimmed)}`);
+        const data = await res.json();
+        if (data.available) {
+          setUsernameStatus('available');
+          setUsernameMsg('Tên đăng nhập khả dụng');
+        } else {
+          setUsernameStatus('unavailable');
+          setUsernameMsg(data.reason || 'Tên đăng nhập đã tồn tại');
+        }
+      } catch {
+        // If offline or network issue, fallback to available since local check passed
+        setUsernameStatus('available');
+        setUsernameMsg('Tên đăng nhập khả dụng');
+      }
+    }, 350);
+
+    return () => clearTimeout(timer);
+  }, [username, state?.identities]);
 
   // Countdown timer for OTP
   useEffect(() => {
@@ -130,6 +220,18 @@ function RegisterForm() {
     if (accountType === 'personal') {
       if (!fullName.trim() || !businessName.trim() || !email.trim()) {
         setErrorMsg('Vui lòng điền đầy đủ Họ tên, Tên doanh nghiệp và Email');
+        return;
+      }
+      if (usernameStatus === 'unavailable') {
+        setErrorMsg('Tên đăng nhập đã được sử dụng. Vui lòng chọn tên đăng nhập khác');
+        return;
+      }
+      if (usernameStatus === 'invalid') {
+        setErrorMsg('Tên đăng nhập không hợp lệ (tối thiểu 3 ký tự, không dấu cách)');
+        return;
+      }
+      if (usernameStatus === 'checking') {
+        setErrorMsg('Đang kiểm tra tính khả dụng của tên đăng nhập. Vui lòng chờ');
         return;
       }
       if (!password || password.length < 6) {
@@ -357,16 +459,8 @@ function RegisterForm() {
       <div className="absolute -top-40 right-1/4 w-96 h-96 bg-purple-600/15 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute -bottom-40 left-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
 
-      {/* Top Header */}
-      <header className="p-4 sm:p-6 flex items-center justify-between max-w-7xl mx-auto w-full z-10">
-        <div className="flex items-center select-none cursor-default">
-          <img
-            src="/one_connect_logo_transparent.png"
-            alt="One Connect"
-            className="h-8 sm:h-9 w-auto object-contain shrink-0"
-          />
-        </div>
-
+      {/* Top Header (Clean layout without logo) */}
+      <header className="p-4 sm:p-6 flex items-center justify-end max-w-7xl mx-auto w-full z-10">
         <Link
           href="/login"
           className="flex items-center gap-1.5 text-xs font-bold text-slate-300 hover:text-white px-3.5 py-2 rounded-xl bg-slate-900/70 hover:bg-slate-800 transition-all border border-slate-700/60 backdrop-blur-md shadow-xs"
@@ -388,9 +482,6 @@ function RegisterForm() {
             <h1 className="text-2xl sm:text-3xl font-black text-white font-heading">
               Đăng Ký & Khởi Tạo Danh Tính Số
             </h1>
-            <p className="text-xs text-slate-400 max-w-md mx-auto">
-              Tạo mật khẩu đăng nhập bảo mật và xác thực OTP 2 lớp theo tiêu chuẩn PDPL 91/2025
-            </p>
           </div>
 
           {/* Progress Step Bar */}
@@ -430,39 +521,55 @@ function RegisterForm() {
           {/* ============================================================= */}
           {step === 'form' && (
             <div className="space-y-5">
-              {/* 1-Click Fast Register via Google */}
-              <div className="space-y-3">
-                <button
-                  type="button"
-                  onClick={handleGoogleSignUp}
-                  disabled={loading}
-                  className="w-full py-3 px-4 rounded-2xl bg-white hover:bg-slate-100 text-slate-900 font-bold text-xs flex items-center justify-center gap-2.5 transition-all cursor-pointer shadow-md active:scale-98"
-                >
-                  <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24">
-                    <path
-                      fill="#4285F4"
-                      d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"
-                    />
-                    <path
-                      fill="#34A853"
-                      d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z"
-                    />
-                    <path
-                      fill="#FBBC05"
-                      d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 10.03 0 12s.45 3.82 1.25 5.42l4.03-3.15z"
-                    />
-                    <path
-                      fill="#EA4335"
-                      d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"
-                    />
-                  </svg>
-                  <span>Đăng ký qua Google</span>
-                </button>
+              {/* 1-Click Fast Register via Google & Zalo Icons */}
+              <div className="space-y-3 flex flex-col items-center">
+                <div className="flex items-center justify-center gap-4">
+                  <button
+                    type="button"
+                    onClick={handleGoogleSignUp}
+                    disabled={loading}
+                    title="Đăng ký bằng Google"
+                    className="w-12 h-12 rounded-2xl bg-slate-900 hover:bg-slate-800 border border-slate-700/80 hover:border-blue-500/50 flex items-center justify-center transition-all cursor-pointer shadow-md hover:shadow-blue-500/20 active:scale-95 group"
+                  >
+                    <svg className="w-5 h-5 shrink-0 transition-transform group-hover:scale-110 duration-200" viewBox="0 0 24 24">
+                      <path
+                        fill="#4285F4"
+                        d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"
+                      />
+                      <path
+                        fill="#34A853"
+                        d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z"
+                      />
+                      <path
+                        fill="#FBBC05"
+                        d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 10.03 0 12s.45 3.82 1.25 5.42l4.03-3.15z"
+                      />
+                      <path
+                        fill="#EA4335"
+                        d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"
+                      />
+                    </svg>
+                  </button>
 
-                <div className="relative flex items-center justify-center">
+                  <button
+                    type="button"
+                    onClick={() => setErrorMsg('Đăng ký tài khoản qua Zalo đang được hoàn tất xác thực.')}
+                    title="Đăng ký bằng Zalo"
+                    className="w-12 h-12 rounded-2xl bg-blue-600 hover:bg-blue-500 border border-blue-500 flex items-center justify-center transition-all cursor-pointer shadow-md hover:shadow-blue-500/30 active:scale-95 group"
+                  >
+                    <svg className="w-6 h-6 shrink-0 transition-transform group-hover:scale-110 duration-200" viewBox="0 0 48 48" fill="none">
+                      <rect width="48" height="48" rx="12" fill="#0068FF" />
+                      <path d="M12 33L21 21H13V18H25V21L16 33H25V36H12V33Z" fill="white" />
+                      <path d="M27 25C27 22.8 28.8 21 31 21C33.2 21 35 22.8 35 25V36H32V25C32 24.4 31.6 24 31 24C30.4 24 30 24.4 30 25V36H27V25Z" fill="white" />
+                      <circle cx="37" cy="28.5" r="2.5" fill="white" />
+                    </svg>
+                  </button>
+                </div>
+
+                <div className="relative flex items-center justify-center w-full">
                   <div className="w-full border-t border-slate-800" />
                   <span className="bg-slate-900 px-3 text-[10px] uppercase font-mono tracking-wider text-slate-500 absolute">
-                    Hoặc điền thông tin trực tiếp
+                    Hoặc đăng ký tài khoản mới
                   </span>
                 </div>
               </div>
@@ -504,14 +611,15 @@ function RegisterForm() {
 
               {/* Personal Form */}
               {accountType === 'personal' && (
-                <form onSubmit={handleProceedToOtp} className="space-y-4 text-left">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <form onSubmit={handleProceedToOtp} className="space-y-3.5 text-left">
+                  {/* Row 1: Full name & Username */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                     <div className="space-y-1">
-                      <label className="text-xs font-semibold text-slate-300">
+                      <label className="text-xs font-semibold text-slate-300 block">
                         Họ và tên <span className="text-red-400">*</span>
                       </label>
                       <div className="relative">
-                        <User className="w-4 h-4 absolute left-3 top-3 text-slate-500" />
+                        <User className="w-4 h-4 absolute left-3 top-3 text-slate-500 pointer-events-none" />
                         <input
                           type="text"
                           required
@@ -542,28 +650,89 @@ function RegisterForm() {
                         <span className="text-[10px] text-slate-500 font-mono">/p/{username || '...'}</span>
                       </label>
                       <div className="relative">
-                        <AtSign className="w-4 h-4 absolute left-3 top-3 text-slate-500" />
+                        <AtSign className="w-4 h-4 absolute left-3 top-3 text-slate-500 pointer-events-none" />
                         <input
                           type="text"
                           required
-                          placeholder="Nhập tên đăng nhập (viết liền, không dấu)"
+                          placeholder="Nhập tên đăng nhập viết liền"
                           value={username}
                           onChange={(e) => {
                             setIsUsernameCustomized(true);
-                            setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ''));
+                            setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_.-]/g, ''));
                           }}
-                          className="w-full pl-9 pr-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 font-mono"
+                          className={`w-full pl-9 pr-9 py-2.5 bg-slate-950 border rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none font-mono transition-colors ${
+                            usernameStatus === 'available'
+                              ? 'border-emerald-500/60 focus:border-emerald-500'
+                              : usernameStatus === 'unavailable'
+                              ? 'border-red-500/60 focus:border-red-500'
+                              : usernameStatus === 'invalid' && username.length > 0
+                              ? 'border-amber-500/60 focus:border-amber-500'
+                              : 'border-slate-800 focus:border-blue-500'
+                          }`}
                         />
+                        <div className="absolute right-3 top-3 flex items-center pointer-events-none">
+                          {usernameStatus === 'checking' && (
+                            <span className="w-3.5 h-3.5 border-2 border-blue-400 border-t-transparent rounded-full animate-spin" />
+                          )}
+                          {usernameStatus === 'available' && (
+                            <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                          )}
+                          {usernameStatus === 'unavailable' && (
+                            <AlertCircle className="w-4 h-4 text-red-400" />
+                          )}
+                          {usernameStatus === 'invalid' && username.length > 0 && (
+                            <AlertCircle className="w-4 h-4 text-amber-400" />
+                          )}
+                        </div>
                       </div>
                     </div>
                   </div>
 
+                  {/* Feature: Live URL Preview & Username Availability Status Bar */}
+                  <div className="p-2.5 rounded-xl bg-slate-950/80 border border-slate-800/90 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs transition-all">
+                    <div className="flex items-center gap-1.5 min-w-0 overflow-hidden text-slate-400">
+                      <span className="text-slate-500 shrink-0 font-mono">🔗</span>
+                      <span className="text-[11px] text-slate-400 shrink-0">Đường dẫn danh thiếp số:</span>
+                      <span className="font-mono text-xs text-slate-300 truncate">
+                        oneconnect.id.vn/p/<span className={`font-bold ${username ? 'text-[#00C2FF]' : 'text-slate-500 italic'}`}>{username || '[username]'}</span>
+                      </span>
+                    </div>
+
+                    <div className="shrink-0 flex items-center">
+                      {usernameStatus === 'checking' && (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-blue-500/10 text-blue-400 border border-blue-500/20 text-[10px] font-medium animate-pulse">
+                          <span className="w-2.5 h-2.5 border-2 border-blue-400 border-t-transparent rounded-full animate-spin" />
+                          Đang kiểm tra...
+                        </span>
+                      )}
+                      {usernameStatus === 'available' && (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[10px] font-semibold">
+                          <CheckCircle2 className="w-3 h-3" />
+                          Khả dụng
+                        </span>
+                      )}
+                      {usernameStatus === 'unavailable' && (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-red-500/10 text-red-400 border border-red-500/20 text-[10px] font-semibold">
+                          <AlertCircle className="w-3 h-3" />
+                          Đã có người dùng
+                        </span>
+                      )}
+                      {usernameStatus === 'invalid' && username.length > 0 && (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-500/10 text-amber-400 border border-amber-500/20 text-[10px] font-medium">
+                          <AlertCircle className="w-3 h-3" />
+                          {usernameMsg}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Row 2: Business name */}
                   <div className="space-y-1">
-                    <label className="text-xs font-semibold text-slate-300">
+                    <label className="text-xs font-semibold text-slate-300 block">
                       Tên Doanh nghiệp / Công ty <span className="text-red-400">*</span>
                     </label>
                     <div className="relative">
-                      <Building2 className="w-4 h-4 absolute left-3 top-3 text-slate-500" />
+                      <Building2 className="w-4 h-4 absolute left-3 top-3 text-slate-500 pointer-events-none" />
                       <input
                         type="text"
                         required
@@ -575,13 +744,14 @@ function RegisterForm() {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {/* Row 3: Phone & Email */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                     <div className="space-y-1">
-                      <label className="text-xs font-semibold text-slate-300">
+                      <label className="text-xs font-semibold text-slate-300 block">
                         Số điện thoại <span className="text-red-400">*</span>
                       </label>
                       <div className="relative">
-                        <Phone className="w-4 h-4 absolute left-3 top-3 text-slate-500" />
+                        <Phone className="w-4 h-4 absolute left-3 top-3 text-slate-500 pointer-events-none" />
                         <input
                           type="tel"
                           required
@@ -594,11 +764,11 @@ function RegisterForm() {
                     </div>
 
                     <div className="space-y-1">
-                      <label className="text-xs font-semibold text-slate-300">
+                      <label className="text-xs font-semibold text-slate-300 block">
                         Địa chỉ Email <span className="text-red-400">*</span>
                       </label>
                       <div className="relative">
-                        <Mail className="w-4 h-4 absolute left-3 top-3 text-slate-500" />
+                        <Mail className="w-4 h-4 absolute left-3 top-3 text-slate-500 pointer-events-none" />
                         <input
                           type="email"
                           required
@@ -611,14 +781,14 @@ function RegisterForm() {
                     </div>
                   </div>
 
-                  {/* Password Fields */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-slate-800/80 pt-3">
+                  {/* Row 4: Password Fields */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 border-t border-slate-800/80 pt-3">
                     <div className="space-y-1">
-                      <label className="text-xs font-semibold text-slate-300">
-                        Tạo mật khẩu đăng nhập <span className="text-red-400">*</span>
+                      <label className="text-xs font-semibold text-slate-300 block">
+                        Mật khẩu <span className="text-red-400">*</span>
                       </label>
                       <div className="relative">
-                        <Lock className="w-4 h-4 absolute left-3 top-3 text-slate-500" />
+                        <Lock className="w-4 h-4 absolute left-3 top-3 text-slate-500 pointer-events-none" />
                         <input
                           type={showPassword ? 'text' : 'password'}
                           required
@@ -638,11 +808,11 @@ function RegisterForm() {
                     </div>
 
                     <div className="space-y-1">
-                      <label className="text-xs font-semibold text-slate-300">
+                      <label className="text-xs font-semibold text-slate-300 block">
                         Xác nhận lại mật khẩu <span className="text-red-400">*</span>
                       </label>
                       <div className="relative">
-                        <Lock className="w-4 h-4 absolute left-3 top-3 text-slate-500" />
+                        <Lock className="w-4 h-4 absolute left-3 top-3 text-slate-500 pointer-events-none" />
                         <input
                           type={showPassword ? 'text' : 'password'}
                           required
@@ -676,13 +846,13 @@ function RegisterForm() {
 
               {/* Organization Form */}
               {accountType === 'org' && (
-                <form onSubmit={handleProceedToOtp} className="space-y-4 text-left">
+                <form onSubmit={handleProceedToOtp} className="space-y-3.5 text-left">
                   <div className="space-y-1">
-                    <label className="text-xs font-semibold text-slate-300">
+                    <label className="text-xs font-semibold text-slate-300 block">
                       Tên Tổ chức / Hiệp hội / Doanh nghiệp <span className="text-red-400">*</span>
                     </label>
                     <div className="relative">
-                      <Building2 className="w-4 h-4 absolute left-3 top-3 text-purple-400" />
+                      <Building2 className="w-4 h-4 absolute left-3 top-3 text-purple-400 pointer-events-none" />
                       <input
                         type="text"
                         required
@@ -694,9 +864,9 @@ function RegisterForm() {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                     <div className="space-y-1">
-                      <label className="text-xs font-semibold text-slate-300">
+                      <label className="text-xs font-semibold text-slate-300 block">
                         Lĩnh vực hoạt động
                       </label>
                       <select
@@ -712,7 +882,7 @@ function RegisterForm() {
                     </div>
 
                     <div className="space-y-1">
-                      <label className="text-xs font-semibold text-slate-300">
+                      <label className="text-xs font-semibold text-slate-300 block">
                         Quy mô Hội viên / Nhân sự
                       </label>
                       <select
@@ -733,9 +903,9 @@ function RegisterForm() {
                       Thông Tin Người Đại Diện Quản Trị:
                     </p>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                       <div className="space-y-1">
-                        <label className="text-xs font-semibold text-slate-300">
+                        <label className="text-xs font-semibold text-slate-300 block">
                           Họ và tên người đại diện <span className="text-red-400">*</span>
                         </label>
                         <input
@@ -744,12 +914,12 @@ function RegisterForm() {
                           placeholder="Nhập họ và tên người đại diện"
                           value={adminFullName}
                           onChange={(e) => setAdminFullName(e.target.value)}
-                          className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-purple-500"
+                          className="w-full px-3 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-purple-500"
                         />
                       </div>
 
                       <div className="space-y-1">
-                        <label className="text-xs font-semibold text-slate-300">
+                        <label className="text-xs font-semibold text-slate-300 block">
                           Chức vụ trong tổ chức
                         </label>
                         <input
@@ -757,14 +927,14 @@ function RegisterForm() {
                           placeholder="Nhập chức danh / vị trí công tác"
                           value={adminTitle}
                           onChange={(e) => setAdminTitle(e.target.value)}
-                          className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-purple-500"
+                          className="w-full px-3 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-purple-500"
                         />
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                       <div className="space-y-1">
-                        <label className="text-xs font-semibold text-slate-300">
+                        <label className="text-xs font-semibold text-slate-300 block">
                           Email công vụ nhận mã OTP <span className="text-red-400">*</span>
                         </label>
                         <input
@@ -773,12 +943,12 @@ function RegisterForm() {
                           placeholder="Nhập địa chỉ email công vụ"
                           value={adminEmail}
                           onChange={(e) => setAdminEmail(e.target.value)}
-                          className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-purple-500 font-mono"
+                          className="w-full px-3 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-purple-500 font-mono"
                         />
                       </div>
 
                       <div className="space-y-1">
-                        <label className="text-xs font-semibold text-slate-300">
+                        <label className="text-xs font-semibold text-slate-300 block">
                           Số điện thoại liên hệ
                         </label>
                         <input
@@ -786,16 +956,16 @@ function RegisterForm() {
                           placeholder="Nhập số điện thoại người đại diện"
                           value={adminPhone}
                           onChange={(e) => setAdminPhone(e.target.value)}
-                          className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-purple-500 font-mono"
+                          className="w-full px-3 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-purple-500 font-mono"
                         />
                       </div>
                     </div>
 
                     {/* Admin Password */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-slate-800/80 pt-2">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 border-t border-slate-800/80 pt-3">
                       <div className="space-y-1">
-                        <label className="text-xs font-semibold text-slate-300">
-                          Tạo mật khẩu quản trị <span className="text-red-400">*</span>
+                        <label className="text-xs font-semibold text-slate-300 block">
+                          Mật khẩu quản trị <span className="text-red-400">*</span>
                         </label>
                         <input
                           type="password"
@@ -803,13 +973,13 @@ function RegisterForm() {
                           placeholder="Nhập mật khẩu quản trị (tối thiểu 6 ký tự)"
                           value={adminPassword}
                           onChange={(e) => setAdminPassword(e.target.value)}
-                          className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-purple-500 font-mono"
+                          className="w-full px-3 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-purple-500 font-mono"
                         />
                       </div>
 
                       <div className="space-y-1">
-                        <label className="text-xs font-semibold text-slate-300">
-                          Xác nhận mật khẩu quản trị <span className="text-red-400">*</span>
+                        <label className="text-xs font-semibold text-slate-300 block">
+                          Xác nhận lại mật khẩu quản trị <span className="text-red-400">*</span>
                         </label>
                         <input
                           type="password"
@@ -817,7 +987,7 @@ function RegisterForm() {
                           placeholder="Nhập lại mật khẩu quản trị"
                           value={adminConfirmPassword}
                           onChange={(e) => setAdminConfirmPassword(e.target.value)}
-                          className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-purple-500 font-mono"
+                          className="w-full px-3 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-purple-500 font-mono"
                         />
                       </div>
                     </div>

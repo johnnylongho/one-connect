@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { Plus_Jakarta_Sans, Inter, Be_Vietnam_Pro } from 'next/font/google';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import {
   LayoutDashboard,
   CreditCard,
@@ -49,103 +49,99 @@ const inter = Inter({
   display: 'swap',
 });
 
-export interface NavItem {
+interface NavItem {
   href: string;
   label: string;
-  icon: any;
+  icon: React.ElementType;
   badge?: string;
-  highlight?: boolean;
-  isCoreFeature?: boolean;
-  allowedRoles: ('SUPER_ADMIN' | 'ORG_ADMIN' | 'EVENT_OPERATOR' | 'MEMBER' | 'GUEST')[];
+  allowedRoles: string[];
   section: 'PERSONAL' | 'OPERATION' | 'ADMIN' | 'PITCHING';
-  deviceTag?: string;
 }
 
-export const ALL_NAV_ITEMS: NavItem[] = [
-  // TRỤ CỘT 1: ĐỊNH DANH DOANH NHÂN (Identity Layer)
+const ALL_NAV_ITEMS: NavItem[] = [
+  // PHÂN HỆ 1: DOANH NHÂN & B2B (MEMBER, EXECUTIVE_BOARD, ORG_ADMIN, SUPER_ADMIN)
   {
     href: '/dashboard',
-    label: 'Tổng Quan Bảng Điều Khiển',
+    label: 'Trung Tâm Điều Hành',
     icon: LayoutDashboard,
-    allowedRoles: ['SUPER_ADMIN', 'ORG_ADMIN', 'EVENT_OPERATOR', 'MEMBER', 'GUEST'],
+    allowedRoles: ['MEMBER', 'EXECUTIVE_BOARD', 'ORG_ADMIN', 'SUPER_ADMIN'],
     section: 'PERSONAL',
   },
   {
     href: '/dashboard/card',
-    label: 'Thẻ Định Danh 3D & NFC',
+    label: 'Danh Thiếp Số & Thẻ NFC',
     icon: CreditCard,
-    isCoreFeature: true,
-    badge: 'CORE',
-    allowedRoles: ['SUPER_ADMIN', 'ORG_ADMIN', 'MEMBER'],
+    allowedRoles: ['MEMBER', 'EXECUTIVE_BOARD', 'ORG_ADMIN', 'SUPER_ADMIN'],
     section: 'PERSONAL',
   },
   {
-    href: '/dashboard/settings',
-    label: 'Quyền Riêng Tư PDPL 91/2025',
-    icon: ShieldCheck,
-    allowedRoles: ['SUPER_ADMIN', 'ORG_ADMIN', 'MEMBER'],
+    href: '/dashboard/connections',
+    label: 'Sổ Tay Quan Hệ & CRM',
+    icon: Users,
+    allowedRoles: ['MEMBER', 'EXECUTIVE_BOARD', 'ORG_ADMIN', 'SUPER_ADMIN'],
+    section: 'PERSONAL',
+  },
+  {
+    href: '/matching',
+    label: 'Kết Nối Cung Cầu AI',
+    icon: Sparkles,
+    badge: 'AI Smart',
+    allowedRoles: ['MEMBER', 'EXECUTIVE_BOARD', 'ORG_ADMIN', 'SUPER_ADMIN'],
     section: 'PERSONAL',
   },
 
-  // TRỤ CỘT 2: SỰ KIỆN & CHECK-IN (Event Operations & Check-in)
+  // PHÂN HỆ 2: QUẢN LÝ SỰ KIỆN MICE (OPERATOR, EXECUTIVE_BOARD, ORG_ADMIN, SUPER_ADMIN)
   {
-    href: '/events',
-    label: 'Lịch Trình & Sự Kiện',
+    href: '/operator/events',
+    label: 'Hội Nghị & Diễn Đàn',
     icon: Calendar,
-    allowedRoles: ['SUPER_ADMIN', 'ORG_ADMIN', 'EVENT_OPERATOR', 'MEMBER', 'GUEST'],
+    allowedRoles: ['OPERATOR', 'EXECUTIVE_BOARD', 'ORG_ADMIN', 'SUPER_ADMIN'],
     section: 'OPERATION',
   },
   {
     href: '/operator/checkin',
-    label: 'Trạm Check-in Siêu Tốc',
-    icon: Smartphone,
-    isCoreFeature: true,
-    badge: '<1s',
-    allowedRoles: ['SUPER_ADMIN', 'ORG_ADMIN', 'EVENT_OPERATOR'],
+    label: 'Trạm Check-in NFC (<1s)',
+    icon: Zap,
+    badge: '<0.42s',
+    allowedRoles: ['OPERATOR', 'EXECUTIVE_BOARD', 'ORG_ADMIN', 'SUPER_ADMIN'],
     section: 'OPERATION',
   },
   {
     href: '/operator/attendees',
-    label: 'Danh Sách Điểm Danh Live',
+    label: 'Khách Mời & Thẻ Đại Biểu',
     icon: UserCheck,
-    allowedRoles: ['SUPER_ADMIN', 'ORG_ADMIN', 'EVENT_OPERATOR'],
+    allowedRoles: ['OPERATOR', 'EXECUTIVE_BOARD', 'ORG_ADMIN', 'SUPER_ADMIN'],
     section: 'OPERATION',
   },
 
-  // TRỤ CỘT 3: KẾT NỐI & BỘ NHỚ QUAN HỆ (Connection & Relationship Memory)
+  // PHÂN HỆ 3: QUẢN TRỊ HIỆP HỘI & TỔ CHỨC (Chỉ ORG_ADMIN, SUPER_ADMIN)
   {
-    href: '/dashboard/connections',
-    label: 'Danh Bạ B2B & Ghi Chú Riêng Tư',
-    icon: UserCheck,
-    isCoreFeature: true,
-    badge: 'CORE',
-    allowedRoles: ['SUPER_ADMIN', 'ORG_ADMIN', 'MEMBER'],
+    href: '/admin/org',
+    label: 'Không Gian Hiệp Hội YBA',
+    icon: Layers,
+    allowedRoles: ['ORG_ADMIN', 'SUPER_ADMIN'],
     section: 'ADMIN',
   },
-  {
-    href: '/matching',
-    label: 'Kết Nối Cung - Cầu Giao Thương',
-    icon: Zap,
-    isCoreFeature: true,
-    badge: 'CORE',
-    allowedRoles: ['SUPER_ADMIN', 'ORG_ADMIN', 'EVENT_OPERATOR', 'MEMBER'],
-    section: 'ADMIN',
-  },
-
-  // TRỤ CỘT 4: QUẢN TRỊ HIỆP HỘI & BÁO CÁO (Association Hub)
   {
     href: '/admin/org/members',
-    label: 'Danh Bạ Hội Viên Hiệp Hội',
+    label: 'Hội Viên & Cấp Quyền RBAC',
     icon: Users,
-    allowedRoles: ['SUPER_ADMIN', 'ORG_ADMIN'],
-    section: 'PITCHING',
+    allowedRoles: ['ORG_ADMIN', 'SUPER_ADMIN'],
+    section: 'ADMIN',
   },
   {
-    href: '/reports',
-    label: 'Đo Lường Tương Tác & KPI',
+    href: '/admin/nfc-cards',
+    label: 'Cấp Phát Phôi Thẻ NFC',
+    icon: Smartphone,
+    allowedRoles: ['ORG_ADMIN', 'SUPER_ADMIN'],
+    section: 'ADMIN',
+  },
+  {
+    href: '/admin/reports',
+    label: 'Báo Cáo & Tuân Thủ PDPL',
     icon: BarChart3,
-    allowedRoles: ['SUPER_ADMIN', 'ORG_ADMIN'],
-    section: 'PITCHING',
+    allowedRoles: ['ORG_ADMIN', 'SUPER_ADMIN'],
+    section: 'ADMIN',
   },
 
   // TIỆN ÍCH: DEMO HUB (Chỉ Super Admin)
@@ -163,8 +159,9 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const router = useRouter();
   const pathname = usePathname();
-  const { currentIdentity, state, setCurrentRole } = useOneConnectStore();
+  const { currentIdentity, state, setCurrentRole, logoutUser } = useOneConnectStore();
   const [isRoleDropdownOpen, setIsRoleDropdownOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
@@ -173,23 +170,19 @@ export default function RootLayout({
   const currentUserName = currentIdentity?.displayName || currentIdentity?.fullName || 'Hội Viên One Connect';
   const currentUserAvatar = currentIdentity?.avatarUrl || (currentIdentity?.username === 'johnnylongho' ? '/avatar-johnny-long.jpg' : `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(currentUserName)}`);
   
-  // DUY NHẤT Johnny Long Hồ được nhận diện và cấp quyền SUPER_ADMIN
   const isJohnnySuperAdmin = currentIdentity?.username === 'johnnylongho' || 
                              currentIdentity?.email === 'contact.johnnylongho@gmail.com' ||
                              currentIdentity?.id === 'id-001' || 
                              currentIdentity?.id === '11111111-1111-1111-1111-111111111111';
-  const effectiveRole = isJohnnySuperAdmin ? (state?.currentRole || 'SUPER_ADMIN') : 'MEMBER';
+  const effectiveRole = isJohnnySuperAdmin ? (state?.currentRole || 'SUPER_ADMIN') : (currentIdentity?.role || 'MEMBER');
 
-  // Load saved sidebar state from localStorage
   useEffect(() => {
     try {
       const saved = localStorage.getItem('one_connect_sidebar_collapsed');
       if (saved !== null) {
         setIsSidebarCollapsed(saved === 'true');
       }
-    } catch (e) {
-      // ignore
-    }
+    } catch (e) {}
   }, []);
 
   const toggleSidebar = () => {
@@ -197,14 +190,11 @@ export default function RootLayout({
       const next = !prev;
       try {
         localStorage.setItem('one_connect_sidebar_collapsed', String(next));
-      } catch (e) {
-        // ignore
-      }
+      } catch (e) {}
       return next;
     });
   };
 
-  // Filter navigation items by active user role (RBAC)
   const allowedNavItems = ALL_NAV_ITEMS.filter((item) =>
     item.allowedRoles.includes(effectiveRole as any)
   );
@@ -214,13 +204,21 @@ export default function RootLayout({
   const adminItems = allowedNavItems.filter((item) => item.section === 'ADMIN');
   const pitchingItems = allowedNavItems.filter((item) => item.section === 'PITCHING');
 
-  // Chỉ các trang Auth (Đăng nhập, Đăng ký) và Thẻ số công khai mới không hiển thị Sidebar:
   const isStandalonePage = 
+    pathname === '/' ||
+    pathname === '/intro' ||
+    pathname === '/demo' ||
     pathname === '/login' ||
     pathname === '/register' ||
     pathname?.startsWith('/auth') ||
     pathname?.startsWith('/p/') || 
     pathname?.startsWith('/c/');
+
+  useEffect(() => {
+    if (!state.currentIdentityId && !isStandalonePage) {
+      router.replace('/login');
+    }
+  }, [state.currentIdentityId, isStandalonePage, router]);
 
   if (isStandalonePage) {
     return (
@@ -239,6 +237,29 @@ export default function RootLayout({
           suppressHydrationWarning
         >
           {children}
+        </body>
+      </html>
+    );
+  }
+
+  if (!state.currentIdentityId && !isStandalonePage) {
+    return (
+      <html
+        lang="vi"
+        className={`${plusJakartaSans.variable} ${beVietnamPro.variable} ${inter.variable}`}
+        suppressHydrationWarning
+      >
+        <head>
+          <link rel="manifest" href="/manifest.json" />
+          <meta name="theme-color" content="#FFFFFF" />
+          <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+        </head>
+        <body
+          className="min-h-screen bg-[#070A12] text-slate-100 font-sans antialiased flex flex-col items-center justify-center p-4"
+          suppressHydrationWarning
+        >
+          <div className="w-9 h-9 border-3 border-[#0066FF] border-t-transparent rounded-full animate-spin mb-3" />
+          <p className="text-xs text-slate-400 font-mono">Đang kiểm tra quyền truy cập hệ thống...</p>
         </body>
       </html>
     );
@@ -499,9 +520,17 @@ export default function RootLayout({
                         <p className="text-[9.5px] text-blue-600 font-bold truncate uppercase" suppressHydrationWarning>{effectiveRole}</p>
                       </div>
                     </div>
-                    <Link href="/login" title="Đăng xuất" className="p-1 text-slate-400 hover:text-rose-600 transition-colors shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        logoutUser();
+                        router.push('/login');
+                      }}
+                      title="Đăng xuất"
+                      className="p-1 text-slate-400 hover:text-rose-600 transition-colors shrink-0 cursor-pointer"
+                    >
                       <LogOut className="w-4 h-4" />
-                    </Link>
+                    </button>
                   </>
                 ) : (
                   <div className="w-full flex flex-col items-center gap-2">
@@ -517,9 +546,17 @@ export default function RootLayout({
                       />
                       <span className="absolute bottom-1 right-1 w-2 h-2 rounded-full bg-emerald-500 border border-white" />
                     </div>
-                    <Link href="/login" title="Đăng xuất" className="w-9 h-9 flex items-center justify-center text-slate-400 hover:text-rose-600 transition-colors">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        logoutUser();
+                        router.push('/login');
+                      }}
+                      title="Đăng xuất"
+                      className="w-9 h-9 flex items-center justify-center text-slate-400 hover:text-rose-600 transition-colors cursor-pointer"
+                    >
                       <LogOut className="w-4 h-4" />
-                    </Link>
+                    </button>
                   </div>
                 )}
               </div>
@@ -538,7 +575,7 @@ export default function RootLayout({
                       />
                       <button
                         onClick={() => setIsMobileMenuOpen(false)}
-                        className="p-1.5 rounded-xl text-slate-500 hover:bg-slate-100"
+                        className="p-1.5 rounded-xl text-slate-500 hover:bg-slate-100 cursor-pointer"
                       >
                         <X className="w-5 h-5" />
                       </button>
@@ -574,9 +611,18 @@ export default function RootLayout({
                       <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
                       <span className="text-[10px] font-semibold text-slate-700">PDPL 91/2025</span>
                     </div>
-                    <Link href="/login" onClick={() => setIsMobileMenuOpen(false)} className="text-slate-400 hover:text-rose-600">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsMobileMenuOpen(false);
+                        logoutUser();
+                        router.push('/login');
+                      }}
+                      title="Đăng xuất"
+                      className="text-slate-400 hover:text-rose-600 cursor-pointer p-1"
+                    >
                       <LogOut className="w-3.5 h-3.5" />
-                    </Link>
+                    </button>
                   </div>
                 </div>
               </div>

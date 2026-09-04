@@ -7,7 +7,6 @@ import {
   Lock,
   Mail,
   ArrowRight,
-  Zap,
   ShieldCheck,
   CheckCircle2,
   AlertCircle,
@@ -75,8 +74,8 @@ export default function LoginPage() {
   // Handle Request OTP
   const handleRequestOtp = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!identifier.trim()) {
-      setErrorMsg('Vui lòng nhập Email hoặc Số điện thoại của bạn');
+    if (!identifier.trim() || !identifier.includes('@')) {
+      setErrorMsg('Vui lòng nhập địa chỉ Email hợp lệ (ví dụ: name@company.com)');
       return;
     }
     setErrorMsg('');
@@ -178,7 +177,7 @@ export default function LoginPage() {
         <img
           src="/login-bg.jpg"
           alt="One Connect Background"
-          className="w-full h-full object-cover object-left-top lg:object-center select-none pointer-events-none"
+          className="w-full h-full object-cover object-left-top select-none pointer-events-none"
         />
         {/* Subtle right-side dark gradient to ensure crystal-clear contrast for login box */}
         <div className="absolute inset-0 bg-gradient-to-t lg:bg-gradient-to-r from-transparent via-slate-950/20 to-slate-950/85 pointer-events-none" />
@@ -190,18 +189,18 @@ export default function LoginPage() {
         title="Đăng Ký Thành Viên One Connect"
         className="hidden lg:flex absolute z-20 items-center justify-center rounded-full transition-all duration-300 group cursor-pointer"
         style={{
-          left: '3.8%',
-          top: '40.5%',
-          width: '17.5%',
-          height: '5.6%',
-          minWidth: '170px',
-          minHeight: '32px',
-          maxWidth: '280px',
-          maxHeight: '52px',
+          left: '3.75%',
+          top: '40.0%',
+          width: '17.6%',
+          height: '6.0%',
+          minWidth: '220px',
+          minHeight: '44px',
+          maxWidth: '360px',
+          maxHeight: '68px',
         }}
       >
         {/* Glowing golden halo ring on hover */}
-        <span className="absolute inset-0 rounded-full border-2 border-amber-300/80 bg-amber-400/10 opacity-0 group-hover:opacity-100 group-hover:shadow-[0_0_35px_rgba(251,191,36,0.7)] group-hover:scale-105 transition-all duration-300 pointer-events-none" />
+        <span className="absolute inset-0 rounded-full border-2 border-amber-300/85 bg-amber-400/15 opacity-0 group-hover:opacity-100 group-hover:shadow-[0_0_35px_rgba(251,191,36,0.7)] group-hover:scale-105 transition-all duration-300 pointer-events-none" />
         <span className="sr-only">Đăng Ký Thành Viên</span>
       </Link>
 
@@ -246,11 +245,8 @@ export default function LoginPage() {
         {/* Right Column: Modern High-Security Auth Box */}
         <div className="w-full max-w-md lg:mr-2 xl:mr-8 shrink-0">
           <div className="rounded-3xl bg-slate-950/85 border border-slate-700/60 backdrop-blur-2xl p-6 sm:p-8 shadow-2xl shadow-blue-950/50 space-y-6">
-            {/* Header */}
+            {/* Header (No lightning icon) */}
             <div className="text-center space-y-1.5">
-              <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-blue-600 to-cyan-500 text-white flex items-center justify-center mx-auto shadow-lg shadow-blue-500/25">
-                <Zap className="w-6 h-6" />
-              </div>
               <h2 className="text-2xl font-black text-white font-heading">
                 Đăng Nhập Hệ Thống
               </h2>
@@ -323,21 +319,21 @@ export default function LoginPage() {
                       <form onSubmit={handleRequestOtp} className="space-y-4">
                         <div className="space-y-1.5 text-left">
                           <label className="text-xs font-bold text-slate-300">
-                            Email công tác hoặc Số điện thoại:
+                            Email công tác:
                           </label>
                           <div className="relative">
                             <Mail className="w-4 h-4 absolute left-3.5 top-3.5 text-slate-500" />
                             <input
-                              type="text"
+                              type="email"
                               required
-                              placeholder="Nhập email hoặc số điện thoại"
+                              placeholder="name@company.com"
                               value={identifier}
                               onChange={(e) => setIdentifier(e.target.value)}
                               className="w-full pl-10 pr-4 py-2.5 bg-slate-950 border border-slate-800 rounded-2xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all font-sans"
                             />
                           </div>
                           <p className="text-[10.5px] text-slate-500">
-                            Hệ thống sẽ gửi mã bảo mật 6 số qua Email/SMS để đăng nhập không cần mật khẩu.
+                            Hệ thống sẽ gửi mã bảo mật 6 số qua Email để đăng nhập không cần mật khẩu.
                           </p>
                         </div>
 
@@ -397,7 +393,7 @@ export default function LoginPage() {
                               onClick={() => setOtpStep('request')}
                               className="text-slate-400 hover:text-white underline cursor-pointer"
                             >
-                              Đổi Email / SĐT
+                              Đổi Email
                             </button>
                             <button
                               type="button"
@@ -439,14 +435,14 @@ export default function LoginPage() {
                   <form onSubmit={handlePasswordLogin} className="space-y-4">
                     <div className="space-y-1.5 text-left">
                       <label className="text-xs font-bold text-slate-300">
-                        Tài khoản, Email hoặc Username:
+                        Tên đăng nhập hoặc Email:
                       </label>
                       <div className="relative">
                         <Mail className="w-4 h-4 absolute left-3.5 top-3.5 text-slate-500" />
                         <input
                           type="text"
                           required
-                          placeholder="Nhập tên đăng nhập, email hoặc SĐT"
+                          placeholder="Nhập tên đăng nhập hoặc email"
                           value={identifier}
                           onChange={(e) => setIdentifier(e.target.value)}
                           className="w-full pl-10 pr-4 py-2.5 bg-slate-950 border border-slate-800 rounded-2xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all font-sans"
@@ -510,15 +506,16 @@ export default function LoginPage() {
                   </div>
                 </div>
 
-                {/* 1-Click Google & Zalo OAuth Buttons */}
-                <div className="grid grid-cols-2 gap-2.5">
+                {/* 1-Click Google & Zalo OAuth Icon Buttons */}
+                <div className="flex items-center justify-center gap-4">
                   <button
                     type="button"
                     onClick={handleGoogleSignIn}
                     disabled={loading}
-                    className="py-2.5 px-3 rounded-2xl bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-200 text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer shadow-xs active:scale-98"
+                    title="Đăng nhập bằng Google"
+                    className="w-12 h-12 rounded-2xl bg-slate-900 hover:bg-slate-800 border border-slate-700/80 hover:border-blue-500/50 flex items-center justify-center transition-all cursor-pointer shadow-md hover:shadow-blue-500/20 active:scale-95 group"
                   >
-                    <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24">
+                    <svg className="w-5 h-5 shrink-0 transition-transform group-hover:scale-110 duration-200" viewBox="0 0 24 24">
                       <path
                         fill="#4285F4"
                         d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"
@@ -536,16 +533,20 @@ export default function LoginPage() {
                         d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"
                       />
                     </svg>
-                    <span>Google Mail</span>
                   </button>
 
                   <button
                     type="button"
                     onClick={() => setErrorMsg('Cổng đăng nhập Zalo Business đang được hoàn tất xác thực OAuth2.')}
-                    className="py-2.5 px-3 rounded-2xl bg-blue-950/40 hover:bg-blue-900/50 border border-blue-800/50 text-blue-200 text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer shadow-xs"
+                    title="Đăng nhập bằng Zalo"
+                    className="w-12 h-12 rounded-2xl bg-blue-600 hover:bg-blue-500 border border-blue-500 flex items-center justify-center transition-all cursor-pointer shadow-md hover:shadow-blue-500/30 active:scale-95 group"
                   >
-                    <span className="w-4 h-4 rounded bg-blue-600 text-white font-black text-[10px] flex items-center justify-center">Z</span>
-                    <span>Zalo Business</span>
+                    <svg className="w-6 h-6 shrink-0 transition-transform group-hover:scale-110 duration-200" viewBox="0 0 48 48" fill="none">
+                      <rect width="48" height="48" rx="12" fill="#0068FF" />
+                      <path d="M12 33L21 21H13V18H25V21L16 33H25V36H12V33Z" fill="white" />
+                      <path d="M27 25C27 22.8 28.8 21 31 21C33.2 21 35 22.8 35 25V36H32V25C32 24.4 31.6 24 31 24C30.4 24 30 24.4 30 25V36H27V25Z" fill="white" />
+                      <circle cx="37" cy="28.5" r="2.5" fill="white" />
+                    </svg>
                   </button>
                 </div>
               </div>

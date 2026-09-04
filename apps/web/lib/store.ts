@@ -30,7 +30,7 @@ import {
   INITIAL_AUDIT_LOGS
 } from './mock-data';
 
-const STORAGE_KEY = 'one_connect_app_state_v2';
+const STORAGE_KEY = 'one_connect_app_state_v3';
 
 export interface AppState {
   currentRole: RoleType;
@@ -58,8 +58,8 @@ export interface AppState {
 }
 
 const defaultState: AppState = {
-  currentRole: 'SUPER_ADMIN',
-  currentIdentityId: 'id-001', // Hồ Hoàng Long by default
+  currentRole: 'MEMBER',
+  currentIdentityId: '', // Empty by default = Guest / Requires Login
   identities: INITIAL_IDENTITIES,
   cards: INITIAL_CARDS,
   organizations: INITIAL_ORGANIZATIONS,
@@ -82,6 +82,7 @@ export function useOneConnectStore() {
   useEffect(() => {
     try {
       localStorage.removeItem('one_connect_app_state_v1');
+      localStorage.removeItem('one_connect_app_state_v2');
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
         const parsed: AppState = JSON.parse(saved);
@@ -409,12 +410,14 @@ export function useOneConnectStore() {
     };
   }, []);
 
-  const currentIdentity = state.identities.find(
-    (i) =>
-      i.id === state.currentIdentityId ||
-      (state.currentIdentityId === 'id-001' && (i.id === '11111111-1111-1111-1111-111111111111' || i.username === 'johnnylongho')) ||
-      (state.currentIdentityId === '11111111-1111-1111-1111-111111111111' && (i.id === 'id-001' || i.username === 'johnnylongho'))
-  ) || (state.currentIdentityId === 'id-001' || state.currentRole === 'SUPER_ADMIN' ? state.identities.find(i => i.id === 'id-001' || i.username === 'johnnylongho') : null) || state.identities.find(i => i.id === 'id-001') || state.identities[0];
+  const currentIdentity = state.currentIdentityId
+    ? state.identities.find(
+        (i) =>
+          i.id === state.currentIdentityId ||
+          (state.currentIdentityId === 'id-001' && (i.id === '11111111-1111-1111-1111-111111111111' || i.username === 'johnnylongho')) ||
+          (state.currentIdentityId === '11111111-1111-1111-1111-111111111111' && (i.id === 'id-001' || i.username === 'johnnylongho'))
+      ) || null
+    : null;
 
   const currentCard = currentIdentity
     ? state.cards.find(
@@ -422,7 +425,7 @@ export function useOneConnectStore() {
           c.personIdentityId === currentIdentity.id ||
           (currentIdentity.id === 'id-001' && c.personIdentityId === '11111111-1111-1111-1111-111111111111') ||
           (currentIdentity.id === '11111111-1111-1111-1111-111111111111' && c.personIdentityId === 'id-001')
-      ) || state.cards[0]
+      ) || undefined
     : undefined;
 
   // Actions
@@ -950,6 +953,10 @@ export function useOneConnectStore() {
       auditLogs: [newAuditLog, ...prev.auditLogs],
     }));
 
+    if (typeof window !== 'undefined') {
+      document.cookie = `one_connect_auth_session=${newId}; path=/; max-age=2592000; SameSite=Lax`;
+    }
+
     // Sync with Cloud Database
     DbService.createIdentity(newIdentity, newCard, data.password).catch(console.error);
 
@@ -1135,6 +1142,10 @@ export function useOneConnectStore() {
       ],
     }));
 
+    if (typeof window !== 'undefined') {
+      document.cookie = `one_connect_auth_session=${adminId}; path=/; max-age=2592000; SameSite=Lax`;
+    }
+
     return { organization: newOrg, admin: newAdminIdentity, card: newCard };
   };
 
@@ -1164,6 +1175,9 @@ export function useOneConnectStore() {
         currentRole: determinedRole,
         currentIdentityId: found.id,
       }));
+      if (typeof window !== 'undefined') {
+        document.cookie = `one_connect_auth_session=${found.id}; path=/; max-age=2592000; SameSite=Lax`;
+      }
       return found;
     }
 
@@ -1209,6 +1223,25 @@ export function useOneConnectStore() {
     }));
   };
 
+  // Logout User & clear persistent sessions
+  const logoutUser = () => {
+    setState(prev => ({
+      ...prev,
+      currentIdentityId: '',
+      currentRole: 'MEMBER',
+    }));
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.removeItem(STORAGE_KEY);
+        document.cookie = 'one_connect_auth_session=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+        document.cookie = 'sb-access-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+        document.cookie = 'sb-refresh-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+      } catch (e) {
+        console.warn('Logout clear error:', e);
+      }
+    }
+  };
+
   return {
     state,
     currentIdentity,
@@ -1218,6 +1251,7 @@ export function useOneConnectStore() {
     registerIdentity,
     registerOrganization,
     loginUser,
+    logoutUser,
     changeUserRole,
     switchWorkspace,
     updateIdentity,
