@@ -142,6 +142,7 @@ function AuthCallbackContent() {
           parsed.currentRole = role;
           localStorage.setItem('one_connect_app_state_v2', JSON.stringify(parsed));
         } catch (e) {}
+        document.cookie = `one_connect_auth_session=${targetId}; path=/; max-age=2592000; SameSite=Lax`;
       }
     }
 

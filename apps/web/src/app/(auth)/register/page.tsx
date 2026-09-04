@@ -27,6 +27,11 @@ import {
 import { Button } from '@/components/ui/button';
 import { useOneConnectStore } from '@/lib/store';
 import { supabase } from '@/lib/supabaseClient';
+import {
+  initGoogleOneTap,
+  triggerGooglePopupAuth,
+  GoogleUserInfo,
+} from '@/lib/google-auth';
 
 function RegisterForm() {
   const router = useRouter();
@@ -180,12 +185,106 @@ function RegisterForm() {
     return () => clearTimeout(timer);
   }, [step, countdown]);
 
-  // Đăng ký nhanh qua Google Mail OAuth2
-  const handleGoogleSignUp = async () => {
+  // Unified Google Account Handler (Popup & One Tap) for Registration
+  const handleGoogleSuccess = async (googleUser: GoogleUserInfo) => {
     try {
       setLoading(true);
       setErrorMsg('');
-      const origin = typeof window !== 'undefined' ? window.location.origin : (process.env.NEXT_PUBLIC_APP_URL || 'https://oneconnect.id.vn');
+      const email = (googleUser.email || '').trim().toLowerCase();
+      const emailParts = email.split('@');
+      const emailName = emailParts[0] || 'user';
+      const userFullName = googleUser.name || emailName;
+      const isJohnny =
+        email === 'contact.johnnylongho@gmail.com' ||
+        email.includes('johnnylongho');
+
+      // Check if user already exists
+      let found = state.identities.find(
+        (i) =>
+          (i.email && i.email.toLowerCase() === email) ||
+          (i.username && i.username.toLowerCase() === emailName)
+      );
+
+      let targetId: string | undefined = isJohnny ? 'id-001' : found?.id;
+      let targetUsername: string | undefined = isJohnny ? 'johnnylongho' : found?.username;
+
+      if (!found && !isJohnny) {
+        const slug =
+          emailName.replace(/[^a-z0-9]/g, '') ||
+          `user${Date.now().toString().slice(-4)}`;
+
+        const { identity } = registerIdentity({
+          fullName: userFullName,
+          username: slug,
+          title: 'Hội Viên Doanh Nhân',
+          businessName: 'Doanh Nghiệp Hội Viên',
+          phone: '0794677369',
+          email: email,
+          password: `google-auth-${Date.now()}`,
+          role: 'MEMBER',
+        });
+        targetId = identity.id;
+        targetUsername = identity.username;
+
+        // Sync to cloud database
+        fetch('/api/auth/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            id: targetId,
+            username: slug,
+            email: email,
+            fullName: userFullName,
+            cardUid: `NFC-GOOGLE-${Date.now().toString().slice(-4)}`,
+          }),
+        }).catch((e) => console.warn('Cloud sync error:', e));
+
+        // Send VIP Welcome Email
+        fetch('/api/auth/send-welcome', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email,
+            fullName: userFullName,
+            title: 'Hội Viên Doanh Nhân',
+            businessName: 'Doanh Nghiệp Hội Viên',
+            profileUrl: `https://oneconnect.id.vn/p/${slug}`,
+          }),
+        }).catch((err) => console.warn('Send welcome email error:', err));
+      } else if (targetId) {
+        setCurrentIdentityId(targetId);
+      }
+
+      // Set cookie for middleware recognition
+      if (typeof window !== 'undefined' && targetId) {
+        document.cookie = `one_connect_auth_session=${targetId}; path=/; max-age=2592000; SameSite=Lax`;
+      }
+
+      setFullName(userFullName || 'Thành viên');
+      setRegisteredProfileUrl(
+        `https://oneconnect.id.vn/p/${targetUsername || 'member'}`
+      );
+      setStep('success');
+      setLoading(false);
+
+      setTimeout(() => {
+        router.push(`/p/${targetUsername || 'johnnylongho'}`);
+      }, 1800);
+    } catch (err: any) {
+      setLoading(false);
+      setErrorMsg(`Lỗi hoàn tất đăng ký: ${err?.message || err}`);
+    }
+  };
+
+  // Google OAuth Fallback Redirect (in case GIS popup is blocked)
+  const handleGoogleOAuthFallback = async () => {
+    try {
+      setLoading(true);
+      setErrorMsg('');
+      const origin =
+        typeof window !== 'undefined'
+          ? window.location.origin
+          : process.env.NEXT_PUBLIC_APP_URL || 'https://oneconnect.id.vn';
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
@@ -208,9 +307,29 @@ function RegisterForm() {
       }
     } catch (err: any) {
       setLoading(false);
-      setErrorMsg(`Không thể kết nối dịch vụ Google: ${err?.message || 'Lỗi không xác định'}`);
+      setErrorMsg(
+        `Không thể kết nối dịch vụ Google: ${err?.message || 'Lỗi không xác định'}`
+      );
     }
   };
+
+  // Google Popup Sign Up (origin: oneconnect.id.vn)
+  const handleGoogleSignUp = async () => {
+    setErrorMsg('');
+    await triggerGooglePopupAuth(
+      (user) => handleGoogleSuccess(user),
+      (err) => setErrorMsg(err),
+      () => handleGoogleOAuthFallback()
+    );
+  };
+
+  // Initialize Google One Tap on mount
+  useEffect(() => {
+    initGoogleOneTap(
+      (user) => handleGoogleSuccess(user),
+      (msg) => console.log('One Tap notice:', msg)
+    );
+  }, []);
 
   // Step 1: Proceed to OTP Verification
   const handleProceedToOtp = (e: React.FormEvent) => {
