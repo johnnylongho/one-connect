@@ -364,7 +364,7 @@ export default function MemberDirectoryAdminPage() {
             <div className="p-5 rounded-2xl bg-gradient-to-br from-slate-900 via-blue-950 to-indigo-950 text-white space-y-4 shadow-lg text-left relative overflow-hidden">
               <div className="flex items-center justify-between border-b border-white/10 pb-2">
                 <div className="flex items-center gap-2">
-                  <img src="/one_connect_final_logo_orange.png" alt="Logo" className="h-6 w-auto object-contain" />
+                  <img src="/one_connect_final_logo_orange.png?v=20260904_tagline" alt="Logo" className="h-6 w-auto object-contain" />
                   <span className="text-[11px] font-bold text-white uppercase tracking-wider">HỘI DOANH NHÂN</span>
                 </div>
                 <Badge className="bg-amber-500/20 text-amber-300 border-amber-400/30 text-[9.5px]">

@@ -31,13 +31,15 @@ import {
   Activity,
   CheckCircle2,
   ArrowUp,
+  User,
+  LogOut,
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 
 export default function HomePage() {
-  const { state } = useOneConnectStore();
+  const { state, currentIdentity, logoutUser } = useOneConnectStore();
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -102,10 +104,10 @@ export default function HomePage() {
       <header className="sticky top-0 z-50 bg-[#0A1124]/95 backdrop-blur-2xl border-b border-slate-800 shadow-[0_4px_24px_rgba(0,0,0,0.18)] transition-all">
         <div className="max-w-7xl mx-auto flex items-center justify-between h-16 sm:h-18 px-4 sm:px-6 lg:px-8">
           
-          {/* Brand Logo - Transparent Isolated PNG with Cache Buster */}
+          {/* Brand Logo - Transparent Isolated PNG with Tagline */}
           <Link href="/" className="flex items-center group select-none shrink-0" title="One Connect Network">
             <img
-              src="/brand_logo_transparent.png?v=20260904"
+              src="/brand_logo_transparent.png?v=20260904_tagline"
               alt="One Connect Logo"
               className="h-8 sm:h-9 w-auto object-contain transition-transform duration-200 group-hover:scale-105"
             />
@@ -154,67 +156,150 @@ export default function HomePage() {
               Tìm hiểu thêm
             </button>
 
-            {/* Primary Action: Trải nghiệm dự án -> /login */}
-            <Link href="/login">
-              <Button
-                size="sm"
-                className="gap-1.5 bg-gradient-to-r from-[#0066FF] to-[#0052CC] hover:from-blue-600 hover:to-blue-700 text-white font-extrabold rounded-xl text-xs h-9 px-4 shadow-sm shadow-blue-500/25 active:scale-95 transition-all cursor-pointer"
-              >
-                <Sparkles className="w-3.5 h-3.5" />
-                Trải nghiệm dự án
-              </Button>
-            </Link>
-
-            {/* Login / Dashboard Link */}
-            {state.currentIdentityId ? (
-              <Link href="/dashboard">
-                <Button
-                  size="sm"
-                  variant="outline"
-                  className="gap-1.5 border-slate-700 bg-slate-800/90 text-slate-100 hover:bg-slate-700 font-bold rounded-xl text-xs h-9 px-3.5 cursor-pointer shadow-2xs"
+            {/* When logged in: Render Avatar + User Full Name + Dashboard Link */}
+            {currentIdentity ? (
+              <div className="flex items-center gap-2">
+                <Link
+                  href="/dashboard/card"
+                  title="Xem hồ sơ danh thiếp số của bạn"
+                  className="flex items-center gap-2.5 p-1 pl-1.5 pr-3.5 rounded-full bg-slate-900/90 hover:bg-slate-800 border border-slate-700/80 hover:border-blue-500/60 transition-all group select-none shadow-sm"
                 >
-                  <Layers className="w-3.5 h-3.5 text-blue-400" />
-                  Vào Dashboard
-                </Button>
-              </Link>
+                  <img
+                    src={
+                      currentIdentity.avatarUrl && currentIdentity.avatarUrl.trim() !== ''
+                        ? currentIdentity.avatarUrl
+                        : `https://ui-avatars.com/api/?name=${encodeURIComponent(currentIdentity.fullName || 'User')}&background=0066FF&color=fff&bold=true`
+                    }
+                    alt={currentIdentity.fullName}
+                    className="w-7 h-7 rounded-full object-cover border border-blue-400/50 shadow-xs shrink-0"
+                  />
+                  <div className="flex flex-col text-left leading-tight">
+                    <span className="text-xs font-bold text-white group-hover:text-blue-300 transition-colors max-w-[140px] truncate">
+                      {currentIdentity.displayName || currentIdentity.fullName}
+                    </span>
+                    <span className="text-[10px] text-emerald-400 font-mono flex items-center gap-1">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse shrink-0" />
+                      Đã đăng nhập
+                    </span>
+                  </div>
+                </Link>
+
+                <Link href="/dashboard">
+                  <Button
+                    size="sm"
+                    className="gap-1.5 bg-[#0066FF] hover:bg-blue-600 text-white font-extrabold rounded-xl text-xs h-9 px-3.5 shadow-sm shadow-blue-500/25 cursor-pointer"
+                  >
+                    <Layers className="w-3.5 h-3.5" />
+                    Dashboard
+                  </Button>
+                </Link>
+              </div>
             ) : (
-              <Link href="/login">
-                <Button
-                  size="sm"
-                  variant="outline"
-                  className="border-slate-700 bg-slate-800/90 hover:bg-slate-700 text-slate-100 font-bold rounded-xl text-xs h-9 px-3.5 cursor-pointer shadow-2xs"
-                >
-                  Đăng nhập
-                </Button>
-              </Link>
-            )}
+              <>
+                {/* Primary Action: Trải nghiệm dự án -> /login */}
+                <Link href="/login">
+                  <Button
+                    size="sm"
+                    className="gap-1.5 bg-gradient-to-r from-[#0066FF] to-[#0052CC] hover:from-blue-600 hover:to-blue-700 text-white font-extrabold rounded-xl text-xs h-9 px-4 shadow-sm shadow-blue-500/25 active:scale-95 transition-all cursor-pointer"
+                  >
+                    <Sparkles className="w-3.5 h-3.5" />
+                    Trải nghiệm dự án
+                  </Button>
+                </Link>
 
-            {!state.currentIdentityId && (
-              <Link href="/register">
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  className="text-slate-300 hover:text-white hover:bg-white/10 font-bold rounded-xl text-xs h-9 px-3 cursor-pointer"
-                >
-                  Đăng ký
-                </Button>
-              </Link>
+                <Link href="/login">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="border-slate-700 bg-slate-800/90 hover:bg-slate-700 text-slate-100 font-bold rounded-xl text-xs h-9 px-3.5 cursor-pointer shadow-2xs"
+                  >
+                    Đăng nhập
+                  </Button>
+                </Link>
+
+                <Link href="/register">
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="text-slate-300 hover:text-white hover:bg-white/10 font-bold rounded-xl text-xs h-9 px-3 cursor-pointer"
+                  >
+                    Đăng ký
+                  </Button>
+                </Link>
+              </>
             )}
           </div>
 
-          {/* Mobile Hamburger Toggle */}
-          <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="p-2.5 rounded-xl text-slate-200 hover:text-white hover:bg-slate-800/80 lg:hidden cursor-pointer touch-manipulation"
-            aria-label="Toggle Menu"
-          >
-            {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-          </button>
+          {/* Mobile Right Action Area: User Avatar if Logged In + Hamburger Toggle */}
+          <div className="flex items-center gap-2 lg:hidden">
+            {currentIdentity && (
+              <Link
+                href="/dashboard/card"
+                className="flex items-center gap-1.5 p-1 pr-2.5 rounded-full bg-slate-900/90 border border-slate-700/80 select-none"
+                title="Hồ sơ danh thiếp của bạn"
+              >
+                <img
+                  src={
+                    currentIdentity.avatarUrl && currentIdentity.avatarUrl.trim() !== ''
+                      ? currentIdentity.avatarUrl
+                      : `https://ui-avatars.com/api/?name=${encodeURIComponent(currentIdentity.fullName || 'User')}&background=0066FF&color=fff&bold=true`
+                  }
+                  alt={currentIdentity.fullName}
+                  className="w-7 h-7 rounded-full object-cover border border-emerald-400/80 shrink-0"
+                />
+                <span className="text-[11px] font-bold text-white max-w-[75px] truncate">
+                  {currentIdentity.displayName || currentIdentity.fullName?.split(' ').pop() || 'User'}
+                </span>
+              </Link>
+            )}
+
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="p-2.5 rounded-xl text-slate-200 hover:text-white hover:bg-slate-800/80 cursor-pointer touch-manipulation"
+              aria-label="Toggle Menu"
+            >
+              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            </button>
+          </div>
         </div>
 
         {/* Mobile Dropdown Menu */}
         {mobileMenuOpen && (
-          <div className="lg:hidden border-t border-slate-800 bg-[#0A1124]/98 backdrop-blur-2xl py-4 px-4 space-y-2.5 shadow-2xl animate-in fade-in slide-in-from-top-2 duration-150">
+          <div className="lg:hidden border-t border-slate-800 bg-[#0A1124]/98 backdrop-blur-2xl py-4 px-4 space-y-3 shadow-2xl animate-in fade-in slide-in-from-top-2 duration-150">
+            {/* If Logged In on Mobile: Prominent User Profile Card */}
+            {currentIdentity && (
+              <div className="p-3.5 rounded-2xl bg-slate-900/90 border border-slate-700/80 flex items-center justify-between gap-3 shadow-inner">
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <img
+                    src={
+                      currentIdentity.avatarUrl && currentIdentity.avatarUrl.trim() !== ''
+                        ? currentIdentity.avatarUrl
+                        : `https://ui-avatars.com/api/?name=${encodeURIComponent(currentIdentity.fullName || 'User')}&background=0066FF&color=fff&bold=true`
+                    }
+                    alt={currentIdentity.fullName}
+                    className="w-10 h-10 rounded-full object-cover border border-blue-400/50 shrink-0"
+                  />
+                  <div className="flex flex-col min-w-0">
+                    <span className="text-xs font-bold text-white truncate">
+                      {currentIdentity.fullName}
+                    </span>
+                    <span className="text-[10px] text-slate-400 truncate">
+                      {currentIdentity.title || 'Thành viên One Connect'}
+                    </span>
+                    <span className="text-[10px] text-emerald-400 font-mono flex items-center gap-1 mt-0.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0" />
+                      Đã đăng nhập hệ thống
+                    </span>
+                  </div>
+                </div>
+                <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)}>
+                  <Button size="sm" className="bg-[#0066FF] hover:bg-blue-600 text-white text-xs font-bold rounded-xl h-8 px-3 shrink-0">
+                    Dashboard
+                  </Button>
+                </Link>
+              </div>
+            )}
+
             <button
               onClick={() => scrollToSection('features')}
               className="w-full text-left px-3.5 py-2.5 text-xs font-bold text-slate-200 hover:bg-slate-800 rounded-xl"
@@ -247,23 +332,42 @@ export default function HomePage() {
             </button>
 
             <div className="pt-3 border-t border-slate-800 flex flex-col gap-2">
-              <Link href="/login" className="w-full">
-                <Button className="w-full gap-2 bg-[#0066FF] hover:bg-blue-700 text-white font-extrabold rounded-xl text-xs h-11 shadow-sm">
-                  <Sparkles className="w-4 h-4" /> Trải nghiệm dự án
-                </Button>
-              </Link>
-              <div className="grid grid-cols-2 gap-2">
-                <Link href="/login" className="w-full">
-                  <Button variant="outline" className="w-full border-slate-700 bg-slate-800/80 text-white font-bold rounded-xl text-xs h-10">
-                    Đăng nhập
-                  </Button>
-                </Link>
-                <Link href="/register" className="w-full">
-                  <Button variant="ghost" className="w-full bg-slate-800/50 hover:bg-slate-800 text-slate-200 font-bold rounded-xl text-xs h-10">
-                    Đăng ký
-                  </Button>
-                </Link>
-              </div>
+              {currentIdentity ? (
+                <div className="grid grid-cols-2 gap-2">
+                  <Link href="/dashboard/card" className="w-full" onClick={() => setMobileMenuOpen(false)}>
+                    <Button variant="outline" className="w-full gap-1.5 border-slate-700 bg-slate-800/80 text-white font-bold rounded-xl text-xs h-10">
+                      <CreditCard className="w-3.5 h-3.5 text-blue-400" />
+                      Danh thiếp VIP
+                    </Button>
+                  </Link>
+                  <Link href="/dashboard" className="w-full" onClick={() => setMobileMenuOpen(false)}>
+                    <Button className="w-full gap-1.5 bg-[#0066FF] hover:bg-blue-600 text-white font-bold rounded-xl text-xs h-10 shadow-sm">
+                      <Layers className="w-3.5 h-3.5" />
+                      Vào Dashboard
+                    </Button>
+                  </Link>
+                </div>
+              ) : (
+                <>
+                  <Link href="/login" className="w-full">
+                    <Button className="w-full gap-2 bg-[#0066FF] hover:bg-blue-700 text-white font-extrabold rounded-xl text-xs h-11 shadow-sm">
+                      <Sparkles className="w-4 h-4" /> Trải nghiệm dự án
+                    </Button>
+                  </Link>
+                  <div className="grid grid-cols-2 gap-2">
+                    <Link href="/login" className="w-full">
+                      <Button variant="outline" className="w-full border-slate-700 bg-slate-800/80 text-white font-bold rounded-xl text-xs h-10">
+                        Đăng nhập
+                      </Button>
+                    </Link>
+                    <Link href="/register" className="w-full">
+                      <Button variant="ghost" className="w-full bg-slate-800/50 hover:bg-slate-800 text-slate-200 font-bold rounded-xl text-xs h-10">
+                        Đăng ký
+                      </Button>
+                    </Link>
+                  </div>
+                </>
+              )}
             </div>
           </div>
         )}
@@ -298,32 +402,66 @@ export default function HomePage() {
 
           {/* Action CTAs: Full width on mobile, inline on desktop */}
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 w-full sm:w-auto pt-2">
-            <Link href="/login" className="w-full sm:w-auto">
-              <Button
-                size="lg"
-                className="w-full sm:w-auto gap-2 bg-[#0066FF] hover:bg-blue-700 text-white font-extrabold rounded-2xl text-sm h-12 px-7 shadow-lg shadow-blue-500/25 active:scale-95 transition-all cursor-pointer"
-              >
-                <Play className="w-4 h-4 fill-white" /> Trải Nghiệm Dự Án Ngay
-              </Button>
-            </Link>
+            {currentIdentity ? (
+              <>
+                <Link href="/dashboard" className="w-full sm:w-auto">
+                  <Button
+                    size="lg"
+                    className="w-full sm:w-auto gap-2 bg-[#0066FF] hover:bg-blue-700 text-white font-extrabold rounded-2xl text-sm h-12 px-7 shadow-lg shadow-blue-500/25 active:scale-95 transition-all cursor-pointer"
+                  >
+                    <Layers className="w-4 h-4" /> Bảng Điều Khiển Dashboard
+                  </Button>
+                </Link>
 
-            <button
-              onClick={() => scrollToSection('features')}
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 border border-slate-300 bg-white/90 backdrop-blur-md hover:bg-white text-slate-800 font-bold rounded-2xl text-sm h-12 px-6 transition-all shadow-xs cursor-pointer"
-            >
-              <span>Tìm Hiểu Tính Năng</span>
-              <ChevronDown className="w-4 h-4 text-slate-500" />
-            </button>
+                <Link href="/dashboard/card" className="w-full sm:w-auto">
+                  <Button
+                    size="lg"
+                    variant="outline"
+                    className="w-full sm:w-auto gap-2 border border-slate-300 bg-white/90 backdrop-blur-md hover:bg-white text-slate-800 font-bold rounded-2xl text-sm h-12 px-6 transition-all shadow-xs cursor-pointer"
+                  >
+                    <CreditCard className="w-4 h-4 text-blue-600" />
+                    <span>Danh Thiếp Số Của Bạn</span>
+                  </Button>
+                </Link>
 
-            <Link href="/register" className="w-full sm:w-auto">
-              <Button
-                size="lg"
-                variant="ghost"
-                className="w-full sm:w-auto gap-1.5 text-slate-700 hover:text-slate-950 hover:bg-slate-100 font-bold text-sm h-12 px-5 cursor-pointer"
-              >
-                Đăng ký tài khoản <ArrowRight className="w-4 h-4 text-slate-500" />
-              </Button>
-            </Link>
+                <button
+                  onClick={() => scrollToSection('features')}
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 text-slate-700 hover:text-slate-950 font-bold text-sm h-12 px-4 cursor-pointer"
+                >
+                  <span>Tìm Hiểu Tính Năng</span>
+                  <ChevronDown className="w-4 h-4 text-slate-500" />
+                </button>
+              </>
+            ) : (
+              <>
+                <Link href="/login" className="w-full sm:w-auto">
+                  <Button
+                    size="lg"
+                    className="w-full sm:w-auto gap-2 bg-[#0066FF] hover:bg-blue-700 text-white font-extrabold rounded-2xl text-sm h-12 px-7 shadow-lg shadow-blue-500/25 active:scale-95 transition-all cursor-pointer"
+                  >
+                    <Play className="w-4 h-4 fill-white" /> Trải Nghiệm Dự Án Ngay
+                  </Button>
+                </Link>
+
+                <button
+                  onClick={() => scrollToSection('features')}
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 border border-slate-300 bg-white/90 backdrop-blur-md hover:bg-white text-slate-800 font-bold rounded-2xl text-sm h-12 px-6 transition-all shadow-xs cursor-pointer"
+                >
+                  <span>Tìm Hiểu Tính Năng</span>
+                  <ChevronDown className="w-4 h-4 text-slate-500" />
+                </button>
+
+                <Link href="/register" className="w-full sm:w-auto">
+                  <Button
+                    size="lg"
+                    variant="ghost"
+                    className="w-full sm:w-auto gap-1.5 text-slate-700 hover:text-slate-950 hover:bg-slate-100 font-bold text-sm h-12 px-5 cursor-pointer"
+                  >
+                    Đăng ký tài khoản <ArrowRight className="w-4 h-4 text-slate-500" />
+                  </Button>
+                </Link>
+              </>
+            )}
           </div>
 
           {/* Liquid Glass Metric Strip */}
@@ -950,7 +1088,7 @@ export default function HomePage() {
           <div className="flex flex-col items-center sm:items-start gap-2.5 text-center sm:text-left">
             <Link href="/" title="One Connect Network" className="inline-block">
               <img
-                src="/brand_logo_transparent.png?v=20260904"
+                src="/brand_logo_transparent.png?v=20260904_tagline"
                 alt="One Connect"
                 className="h-7 sm:h-7 w-auto object-contain mx-auto sm:mx-0"
               />

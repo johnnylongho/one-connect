@@ -309,7 +309,7 @@ export default function LoginPage() {
         <div className="hidden sm:flex items-center lg:invisible select-none">
           <Link href="/" title="Về trang chủ giới thiệu">
             <img
-              src="/brand_logo_transparent.png?v=20260904"
+              src="/brand_logo_transparent.png?v=20260904_tagline"
               alt="One Connect"
               className="h-8 sm:h-9 w-auto object-contain shrink-0"
             />

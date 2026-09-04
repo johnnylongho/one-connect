@@ -370,7 +370,7 @@ export default function RootLayout({
                 title="One Connect Network"
               >
                 <img
-                  src="/one_connect_final_logo_orange.png"
+                  src="/one_connect_final_logo_orange.png?v=20260904_tagline"
                   alt="One Connect"
                   className="h-7 sm:h-8 w-auto object-contain shrink-0 group-hover:scale-105 transition-transform"
                 />
@@ -573,7 +573,7 @@ export default function RootLayout({
                   <div className="space-y-4 overflow-y-auto">
                     <div className="flex items-center justify-between pb-3 border-b border-slate-100">
                       <img
-                        src="/one_connect_final_logo_orange.png"
+                        src="/one_connect_final_logo_orange.png?v=20260904_tagline"
                         alt="One Connect"
                         className="h-7 w-auto object-contain"
                       />

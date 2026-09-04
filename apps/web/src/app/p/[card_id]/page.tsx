@@ -720,7 +720,7 @@ END:VCARD`;
             </Link>
 
             <img
-              src="/one_connect_final_logo_orange.png"
+              src="/one_connect_final_logo_orange.png?v=20260904_tagline"
               alt="One Connect Logo"
               className="h-6 sm:h-7 w-auto object-contain shrink-0 drop-shadow-xs"
             />

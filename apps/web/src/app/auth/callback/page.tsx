@@ -157,11 +157,11 @@ function AuthCallbackContent() {
       // Lưu tức thì vào localStorage để các trang tiếp theo đọc được ngay
       if (typeof window !== 'undefined') {
         try {
-          const raw = localStorage.getItem('one_connect_app_state_v2');
+          const raw = localStorage.getItem('one_connect_app_state_v3');
           const parsed = raw ? JSON.parse(raw) : { ...state };
           parsed.currentIdentityId = targetId;
           parsed.currentRole = role;
-          localStorage.setItem('one_connect_app_state_v2', JSON.stringify(parsed));
+          localStorage.setItem('one_connect_app_state_v3', JSON.stringify(parsed));
         } catch (e) {}
         document.cookie = `one_connect_auth_session=${targetId}; path=/; max-age=2592000; SameSite=Lax`;
       }
