@@ -183,11 +183,11 @@ export default function LoginPage() {
         <div className="absolute inset-0 bg-gradient-to-t lg:bg-gradient-to-r from-transparent via-slate-950/20 to-slate-950/85 pointer-events-none" />
       </div>
 
-      {/* 2. Desktop Interactive Clickable Hotspot over "ĐĂNG KÝ THÀNH VIÊN" on Background */}
+      {/* 2. Desktop Interactive Clickable Hotspot over "ĐĂNG KÝ THÀNH VIÊN" on Background (No border) */}
       <Link
         href="/register"
         title="Đăng Ký Thành Viên One Connect"
-        className="hidden lg:flex absolute z-20 items-center justify-center rounded-full transition-all duration-300 group cursor-pointer"
+        className="hidden lg:flex absolute z-20 items-center justify-center rounded-full transition-all duration-200 cursor-pointer border-none outline-none focus:outline-none focus:ring-0 select-none"
         style={{
           left: '3.75%',
           top: '40.0%',
@@ -199,8 +199,6 @@ export default function LoginPage() {
           maxHeight: '68px',
         }}
       >
-        {/* Glowing golden halo ring on hover */}
-        <span className="absolute inset-0 rounded-full border-2 border-amber-300/85 bg-amber-400/15 opacity-0 group-hover:opacity-100 group-hover:shadow-[0_0_35px_rgba(251,191,36,0.7)] group-hover:scale-105 transition-all duration-300 pointer-events-none" />
         <span className="sr-only">Đăng Ký Thành Viên</span>
       </Link>
 
