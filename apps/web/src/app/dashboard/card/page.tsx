@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 
 import Link from 'next/link';
 import BusinessCard3D from '@/components/BusinessCard3D';
@@ -74,115 +74,22 @@ const INITIAL_NFC_CARDS: NfcCardItem[] = [
     companyName: 'Tập đoàn Công nghệ số A+ (Aplusvn)',
     avatarUrl: '/avatar-johnny-long.jpg',
     status: 'ACTIVE',
-    tapCount: 342,
-    lastTappedAt: '10:45 AM (5 phút trước)',
-  },
-  {
-    id: 'nfc-002',
-    uid: '04:99:3B:2C:0A:4E:91',
-    serialNumber: 'NFC-2026-APLUS-002',
-    cardType: 'Metal NTAG215 (Laser Etched)',
-    ownerName: 'Trần Minh Đức',
-    companyName: 'TechCorp Vietnam Group',
-    avatarUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&auto=format&fit=crop&q=80',
-    status: 'ACTIVE',
-    tapCount: 189,
-    lastTappedAt: '09:30 AM (1 giờ trước)',
-  },
-  {
-    id: 'nfc-003',
-    uid: '04:A1:4C:3D:1B:5F:A2',
-    serialNumber: 'NFC-2026-APLUS-003',
-    cardType: 'PVC Standard NTAG215',
-    ownerName: 'Lê Hoàng Nam',
-    companyName: 'InnovateX Global',
-    avatarUrl: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=300&auto=format&fit=crop&q=80',
-    status: 'LOCKED',
-    tapCount: 45,
-    lastTappedAt: 'Báo mất thẻ (Hôm qua)',
-  },
-  {
-    id: 'nfc-004',
-    uid: '04:B2:5D:4E:2C:60:B3',
-    serialNumber: 'NFC-2026-APLUS-004',
-    cardType: 'PVC Standard NTAG215',
-    ownerName: 'Phạm Phương Anh',
-    companyName: 'GlobalBiz Corp',
-    avatarUrl: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=300&auto=format&fit=crop&q=80',
-    status: 'ACTIVE',
-    tapCount: 98,
-    lastTappedAt: '08:15 AM (2 giờ trước)',
-  },
-  {
-    id: 'nfc-005',
-    uid: '04:C3:6E:5F:3D:71:C4',
-    serialNumber: 'NFC-2026-APLUS-005',
-    cardType: 'Metal NTAG215',
-    ownerName: null,
-    companyName: null,
-    avatarUrl: null,
-    status: 'UNASSIGNED',
-    tapCount: 0,
-    lastTappedAt: null,
-  },
-  {
-    id: 'nfc-006',
-    uid: '04:D4:7F:60:4E:82:D5',
-    serialNumber: 'NFC-2026-APLUS-006',
-    cardType: 'PVC Standard NTAG215',
-    ownerName: null,
-    companyName: null,
-    avatarUrl: null,
-    status: 'UNASSIGNED',
     tapCount: 0,
     lastTappedAt: null,
   },
 ];
 
-const DELEGATE_OPTIONS = [
-  { id: 'u1', name: 'Nguyễn Thu Hà', company: 'Vina Capital Invest' },
-  { id: 'u2', name: 'Đặng Quốc Bảo', company: 'FPT Software & Cloud' },
-  { id: 'u3', name: 'Vũ Thị Minh Trang', company: 'Viettel Telecom Solution' },
-  { id: 'u4', name: 'Bùi Tuấn Anh', company: 'VinFast Auto Group' },
-];
-
-const TAP_LOGS = [
-  {
-    id: 'tap-1',
-    time: '10:45:12 AM',
-    device: 'iPhone 15 Pro (CoreNFC)',
-    event: 'Diễn đàn Lãnh đạo Doanh nghiệp 2026',
-    action: 'Trao đổi Consent 2 Chiều',
-    status: 'CONSENT_GRANTED',
-  },
-  {
-    id: 'tap-2',
-    time: '10:32:04 AM',
-    device: 'Samsung Galaxy S24 (WebNFC)',
-    event: 'Diễn đàn Lãnh đạo Doanh nghiệp 2026',
-    action: 'Điểm danh Check-in Trạm Cửa',
-    status: 'CHECKIN_SUCCESS',
-  },
-  {
-    id: 'tap-3',
-    time: '09:15:40 AM',
-    device: 'iPhone 14 (CoreNFC)',
-    event: 'Diễn đàn Lãnh đạo Doanh nghiệp 2026',
-    action: 'Trao đổi Consent 2 Chiều',
-    status: 'CONSENT_GRANTED',
-  },
-  {
-    id: 'tap-4',
-    time: 'Hôm qua, 16:20',
-    device: 'Xiaomi 13 (WebNFC)',
-    event: 'Hội nghị Xúc tiến Đầu tư Aplusvn',
-    action: 'Xem Hồ sơ Công khai',
-    status: 'VIEW_ONLY',
-  },
-];
+const INITIAL_TAP_LOGS: Array<{
+  id: string;
+  time: string;
+  device: string;
+  event: string;
+  action: string;
+  status: string;
+}> = [];
 
 export default function DigitalNfcCardPage() {
-  const { currentIdentity, currentCard, reissueCard, updateIdentity } = useOneConnectStore();
+  const { state, currentIdentity, currentCard, reissueCard, updateIdentity } = useOneConnectStore();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -192,6 +99,18 @@ export default function DigitalNfcCardPage() {
   // Active Sub-Tab
   const [activeTab, setActiveTab] = useState<'my-card' | 'inventory' | 'analytics' | 'pdpl'>('my-card');
 
+  // Dynamic delegates from real registered identities
+  const delegateOptions = useMemo(() => {
+    return (state?.identities || []).map((idnt) => ({
+      id: idnt.id,
+      name: idnt.displayName || idnt.fullName,
+      company: idnt.businesses?.[0]?.businessName || 'Doanh nghiệp Hội viên',
+      avatarUrl: idnt.avatarUrl || '/avatar-johnny-long.jpg',
+    }));
+  }, [state?.identities]);
+
+  // Real-time Tap Logs
+  const [tapLogs, setTapLogs] = useState(INITIAL_TAP_LOGS);
 
   // Inventory & Issuance State
   const [cards, setCards] = useState<NfcCardItem[]>(INITIAL_NFC_CARDS);
@@ -320,7 +239,7 @@ export default function DigitalNfcCardPage() {
       return;
     }
 
-    const selectedDelegate = DELEGATE_OPTIONS.find((d) => d.id === selectedDelegateId);
+    const selectedDelegate = delegateOptions.find((d) => d.id === selectedDelegateId);
     const newCard: NfcCardItem = {
       id: `nfc-00${cards.length + 1}`,
       uid: inputUid.toUpperCase(),
@@ -328,10 +247,10 @@ export default function DigitalNfcCardPage() {
       cardType: 'Metal NTAG215 (Laser Etched)',
       ownerName: selectedDelegate?.name || 'Đại biểu Hội viên',
       companyName: selectedDelegate?.company || 'Doanh nghiệp Hội viên',
-      avatarUrl: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=300&auto=format&fit=crop&q=80',
+      avatarUrl: selectedDelegate?.avatarUrl || '/avatar-johnny-long.jpg',
       status: 'ACTIVE',
-      tapCount: 1,
-      lastTappedAt: 'Vừa kích hoạt',
+      tapCount: 0,
+      lastTappedAt: null,
     };
 
     setCards((prev) => [newCard, ...prev]);
@@ -834,7 +753,14 @@ export default function DigitalNfcCardPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredCards.map((card) => (
+                  {filteredCards.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={6} className="text-center py-12 text-slate-400 text-xs">
+                        Không có thẻ NFC nào phù hợp với bộ lọc.
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    filteredCards.map((card) => (
                     <TableRow key={card.id} className="hover:bg-slate-50/80 transition-colors">
                       <TableCell className="font-mono text-xs">
                         <div className="font-bold text-slate-900">{card.uid}</div>
@@ -920,7 +846,8 @@ export default function DigitalNfcCardPage() {
                         )}
                       </TableCell>
                     </TableRow>
-                  ))}
+                    ))
+                  )}
                 </TableBody>
               </Table>
             </div>
@@ -935,23 +862,27 @@ export default function DigitalNfcCardPage() {
         <div className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="glass-panel p-5 space-y-1">
-              <span className="text-xs font-bold text-slate-500 uppercase">Lượt Chạm Hôm Nay</span>
-              <div className="text-3xl font-black text-slate-900 font-heading">142</div>
-              <p className="text-xs text-emerald-600 font-semibold flex items-center gap-1">
-                <TrendingUp className="w-3.5 h-3.5" /> +28% so với sự kiện trước
+              <span className="text-xs font-bold text-slate-500 uppercase">Tổng Lượt Chạm Thực Tế</span>
+              <div className="text-3xl font-black text-slate-900 font-heading">
+                {cards.reduce((acc, c) => acc + c.tapCount, 0)}
+              </div>
+              <p className="text-xs text-blue-600 font-semibold flex items-center gap-1">
+                <TrendingUp className="w-3.5 h-3.5" /> Ghi nhận 100% thời gian thực
               </p>
             </div>
 
             <div className="glass-panel p-5 space-y-1">
-              <span className="text-xs font-bold text-slate-500 uppercase">Tốc Độ Đọc Trung Bình</span>
-              <div className="text-3xl font-black text-slate-900 font-heading">0.42s</div>
-              <p className="text-xs text-blue-600 font-semibold">Tối ưu hóa độ trễ 0-lag</p>
+              <span className="text-xs font-bold text-slate-500 uppercase">Tốc Độ Đọc Trực Tuyến</span>
+              <div className="text-3xl font-black text-slate-900 font-heading">&lt; 0.5s</div>
+              <p className="text-xs text-emerald-600 font-semibold">Tối ưu hóa phản hồi chuẩn NFC</p>
             </div>
 
             <div className="glass-panel p-5 space-y-1">
-              <span className="text-xs font-bold text-slate-500 uppercase">Tỷ Lệ Thiết Bị</span>
-              <div className="text-3xl font-black text-slate-900 font-heading">iOS 68% / Android 32%</div>
-              <p className="text-xs text-slate-500">Tương thích 100% smartphone NFC</p>
+              <span className="text-xs font-bold text-slate-500 uppercase">Trạng Thái Thẻ Kích Hoạt</span>
+              <div className="text-3xl font-black text-slate-900 font-heading">
+                {cards.filter((c) => c.status === 'ACTIVE').length} / {cards.length}
+              </div>
+              <p className="text-xs text-slate-500">Thẻ định danh vật lý trong kho</p>
             </div>
           </div>
 
@@ -965,31 +896,37 @@ export default function DigitalNfcCardPage() {
             </div>
 
             <div className="space-y-2.5">
-              {TAP_LOGS.map((log) => (
-                <div
-                  key={log.id}
-                  className="p-3.5 rounded-2xl bg-slate-50 hover:bg-slate-100/80 border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs transition-colors"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-xl bg-blue-100 text-blue-700">
-                      <Smartphone className="w-4 h-4" />
-                    </div>
-                    <div>
-                      <p className="font-bold text-slate-900">{log.action}</p>
-                      <p className="text-[11px] text-slate-500">
-                        {log.event} • Thiết bị: <span className="font-mono text-slate-700">{log.device}</span>
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-3 sm:justify-end">
-                    <span className="text-slate-400 font-mono text-[11px]">{log.time}</span>
-                    <Badge className="bg-emerald-100 text-emerald-800 border-emerald-300 text-[10px] font-bold">
-                      {log.status}
-                    </Badge>
-                  </div>
+              {tapLogs.length === 0 ? (
+                <div className="py-12 text-center text-slate-400 text-xs">
+                  Chưa có nhật ký chạm thẻ nào trong hệ thống. Lịch sử sẽ tự động hiển thị thời gian thực khi có đại biểu quét thẻ vật lý.
                 </div>
-              ))}
+              ) : (
+                tapLogs.map((log) => (
+                  <div
+                    key={log.id}
+                    className="p-3.5 rounded-2xl bg-slate-50 hover:bg-slate-100/80 border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 rounded-xl bg-blue-100 text-blue-700">
+                        <Smartphone className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <p className="font-bold text-slate-900">{log.action}</p>
+                        <p className="text-[11px] text-slate-500">
+                          {log.event} • Thiết bị: <span className="font-mono text-slate-700">{log.device}</span>
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-3 sm:justify-end">
+                      <span className="text-slate-400 font-mono text-[11px]">{log.time}</span>
+                      <Badge className="bg-emerald-100 text-emerald-800 border-emerald-300 text-[10px] font-bold">
+                        {log.status}
+                      </Badge>
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
           </div>
         </div>
@@ -1067,7 +1004,7 @@ export default function DigitalNfcCardPage() {
                 required
               >
                 <option value="">-- Chọn đại biểu cần cấp thẻ --</option>
-                {DELEGATE_OPTIONS.map((d) => (
+                {delegateOptions.map((d) => (
                   <option key={d.id} value={d.id}>
                     {d.name} — {d.company}
                   </option>

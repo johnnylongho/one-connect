@@ -65,63 +65,14 @@ export const PACKAGE_INFO: Record<PackageType, { name: string; badge: string; ta
   },
 };
 
-// Initial benchmark leads to provide immediate dashboard utility
-const INITIAL_LEADS: MarketLead[] = [
-  {
-    id: 'lead-001',
-    packageType: 'MICE_ENTERPRISE',
-    packageName: 'Doanh Nghiệp & Sự Kiện MICE',
-    fullName: 'Trần Vũ Hoàng',
-    phone: '0908889999',
-    email: 'hoang.tran@micevietnam.vn',
-    companyName: 'MICE Vietnam Events & Media',
-    organizationType: 'Doanh nghiệp tổ chức sự kiện',
-    notes: 'Cần trạm check-in NFC <1s và B2B matching cho diễn đàn 500 khách tại Nha Trang vào tháng 10.',
-    status: 'CONSULTING',
-    source: 'WEBSITE_SERVICES',
-    createdAt: new Date(Date.now() - 3600000 * 5).toISOString(),
-    updatedAt: new Date().toISOString(),
-  },
-  {
-    id: 'lead-002',
-    packageType: 'ASSOCIATION',
-    packageName: 'Hiệp Hội & Tổ Chức',
-    fullName: 'Nguyễn Thị Minh Hạnh',
-    phone: '0918776655',
-    email: 'hanh.nguyen@clbdoanhnhan.org',
-    companyName: 'CLB Doanh Nhân Trẻ Miền Trung',
-    organizationType: 'Hiệp hội / Câu lạc bộ',
-    notes: 'Quan tâm giải pháp quản trị danh bạ 300 hội viên tập trung và thẻ kim loại đồng bộ logo.',
-    status: 'NEW',
-    source: 'WEBSITE_SERVICES',
-    createdAt: new Date(Date.now() - 3600000 * 24).toISOString(),
-    updatedAt: new Date().toISOString(),
-  },
-  {
-    id: 'lead-003',
-    packageType: 'ENTREPRENEUR',
-    packageName: 'Doanh Nhân Cá Nhân',
-    fullName: 'Lê Thành Đạt',
-    phone: '0934112233',
-    email: 'dat.le@vinatechfin.com',
-    companyName: 'VinaTech Financial Solutions',
-    organizationType: 'Doanh nghiệp Tài chính',
-    notes: 'Đăng ký 2 thẻ kim loại khắc tên Laser cho Tổng giám đốc và Giám đốc đầu tư.',
-    status: 'CONTACTED',
-    source: 'WEBSITE_SERVICES',
-    createdAt: new Date(Date.now() - 3600000 * 48).toISOString(),
-    updatedAt: new Date().toISOString(),
-  },
-];
-
-// In-memory fallback event click store
+// Pure real-time volatile memory for running process (Zero mock data)
 let inMemoryClicks: Record<PackageType, number> = {
-  ENTREPRENEUR: 42,
-  MICE_ENTERPRISE: 89,
-  ASSOCIATION: 36,
+  ENTREPRENEUR: 0,
+  MICE_ENTERPRISE: 0,
+  ASSOCIATION: 0,
 };
 
-let inMemoryLeads: MarketLead[] = [...INITIAL_LEADS];
+let inMemoryLeads: MarketLead[] = [];
 
 function getSupabaseClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://aybjbklbkrgoapakgnbs.supabase.co';
@@ -131,10 +82,13 @@ function getSupabaseClient() {
 }
 
 /**
- * 1. Record Market Interest Event (Click CTA or view package)
+ * 1. Record Real-time Market Interest Event (Click CTA or view package)
  */
-export async function trackMarketDemand(packageType: PackageType, eventType: 'VIEW_PACKAGE' | 'CLICK_CTA' | 'OPEN_MODAL' | 'SUBMIT_LEAD', metadata?: Record<string, any>) {
-  // Update in-memory counter
+export async function trackMarketDemand(
+  packageType: PackageType,
+  eventType: 'VIEW_PACKAGE' | 'CLICK_CTA' | 'OPEN_MODAL' | 'SUBMIT_LEAD',
+  metadata?: Record<string, any>
+) {
   if (inMemoryClicks[packageType] !== undefined) {
     inMemoryClicks[packageType] += 1;
   }
@@ -142,13 +96,28 @@ export async function trackMarketDemand(packageType: PackageType, eventType: 'VI
   const supabase = getSupabaseClient();
   if (supabase) {
     try {
-      await supabase.from('market_demand_events').insert({
+      // 1. Attempt primary dedicated table
+      const { error } = await supabase.from('market_demand_events').insert({
         package_type: packageType,
         event_type: eventType,
         metadata: metadata || {},
       });
+
+      // 2. If table doesn't exist yet, insert into live production audit_logs
+      if (error) {
+        await supabase.from('audit_logs').insert({
+          action: 'MARKET_DEMAND_EVENT',
+          entity_type: 'MARKET_DEMAND_EVENT',
+          details: {
+            package_type: packageType,
+            event_type: eventType,
+            metadata: metadata || {},
+            recorded_at: new Date().toISOString(),
+          },
+        });
+      }
     } catch (err) {
-      console.warn('Could not insert market_demand_events to Supabase, fallback retained:', err);
+      console.warn('Could not record demand event to Supabase:', err);
     }
   }
 
@@ -156,7 +125,7 @@ export async function trackMarketDemand(packageType: PackageType, eventType: 'VI
 }
 
 /**
- * 2. Submit and Store Market Lead
+ * 2. Submit and Store Real Market Lead (100% Real data, No mock)
  */
 export async function submitMarketLead(leadData: {
   packageType: PackageType;
@@ -186,32 +155,57 @@ export async function submitMarketLead(leadData: {
     updatedAt: new Date().toISOString(),
   };
 
-  // Prepend to memory
+  // Prepend to current process memory
   inMemoryLeads = [newLead, ...inMemoryLeads];
   trackMarketDemand(leadData.packageType, 'SUBMIT_LEAD', { leadId: newLead.id });
 
-  // Try persist to Supabase
+  // Persist directly to Supabase production database
   const supabase = getSupabaseClient();
   if (supabase) {
     try {
-      const { data, error } = await supabase.from('market_leads').insert({
-        package_type: newLead.packageType,
-        package_name: newLead.packageName,
-        full_name: newLead.fullName,
-        phone: newLead.phone,
-        email: newLead.email,
-        company_name: newLead.companyName,
-        organization_type: newLead.organizationType,
-        notes: newLead.notes,
-        status: newLead.status,
-        source: newLead.source,
-      }).select().single();
+      const { data, error } = await supabase
+        .from('market_leads')
+        .insert({
+          package_type: newLead.packageType,
+          package_name: newLead.packageName,
+          full_name: newLead.fullName,
+          phone: newLead.phone,
+          email: newLead.email,
+          company_name: newLead.companyName,
+          organization_type: newLead.organizationType,
+          notes: newLead.notes,
+          status: newLead.status,
+          source: newLead.source,
+        })
+        .select()
+        .single();
 
       if (!error && data) {
         newLead.id = data.id;
+      } else {
+        // Resilient fallback into production audit_logs table
+        await supabase.from('audit_logs').insert({
+          action: 'MARKET_LEAD_SUBMIT',
+          entity_type: 'MARKET_LEAD',
+          details: {
+            id: newLead.id,
+            package_type: newLead.packageType,
+            package_name: newLead.packageName,
+            full_name: newLead.fullName,
+            phone: newLead.phone,
+            email: newLead.email,
+            company_name: newLead.companyName,
+            organization_type: newLead.organizationType,
+            notes: newLead.notes,
+            status: newLead.status,
+            source: newLead.source,
+            created_at: newLead.createdAt,
+            updated_at: newLead.updatedAt,
+          },
+        });
       }
     } catch (err) {
-      console.warn('Could not write market_lead to Supabase, stored in resilient fallback memory:', err);
+      console.warn('Error saving market lead to Supabase:', err);
     }
   }
 
@@ -219,7 +213,7 @@ export async function submitMarketLead(leadData: {
 }
 
 /**
- * 3. Update Lead Status
+ * 3. Update Real Lead Status
  */
 export async function updateMarketLeadStatus(leadId: string, status: MarketLead['status']): Promise<boolean> {
   const lead = inMemoryLeads.find((l) => l.id === leadId);
@@ -231,9 +225,32 @@ export async function updateMarketLeadStatus(leadId: string, status: MarketLead[
   const supabase = getSupabaseClient();
   if (supabase) {
     try {
-      await supabase.from('market_leads').update({ status, updated_at: new Date().toISOString() }).eq('id', leadId);
+      const { error } = await supabase
+        .from('market_leads')
+        .update({ status, updated_at: new Date().toISOString() })
+        .eq('id', leadId);
+
+      if (error) {
+        // Update in audit_logs
+        const { data: logs } = await supabase
+          .from('audit_logs')
+          .select('id, details')
+          .eq('entity_type', 'MARKET_LEAD');
+
+        if (logs) {
+          const targetLog = logs.find((row: any) => row.details?.id === leadId);
+          if (targetLog) {
+            await supabase
+              .from('audit_logs')
+              .update({
+                details: { ...targetLog.details, status, updated_at: new Date().toISOString() },
+              })
+              .eq('id', targetLog.id);
+          }
+        }
+      }
     } catch (err) {
-      console.warn('Supabase lead update warning:', err);
+      console.warn('Supabase lead status update warning:', err);
     }
   }
 
@@ -241,24 +258,27 @@ export async function updateMarketLeadStatus(leadId: string, status: MarketLead[
 }
 
 /**
- * 4. Fetch Market Demand Analytics Summary
+ * 4. Fetch Real Market Demand Analytics Summary (Strictly 100% Real Data)
  */
 export async function getMarketDemandSummary(): Promise<MarketDemandSummary> {
-  let leads = [...inMemoryLeads];
-  let clicks = { ...inMemoryClicks };
+  let leads: MarketLead[] = [];
+  let clicks: Record<PackageType, number> = {
+    ENTREPRENEUR: 0,
+    MICE_ENTERPRISE: 0,
+    ASSOCIATION: 0,
+  };
 
-  // Try fetch from Supabase if table exists
   const supabase = getSupabaseClient();
   if (supabase) {
     try {
+      // 1. Fetch leads from market_leads
       const { data: dbLeads, error: leadErr } = await supabase
         .from('market_leads')
         .select('*')
         .order('created_at', { ascending: false });
 
       if (!leadErr && dbLeads && dbLeads.length > 0) {
-        // Merge Supabase leads with memory
-        const mapped: MarketLead[] = dbLeads.map((item: any) => ({
+        leads = dbLeads.map((item: any) => ({
           id: item.id,
           packageType: item.package_type as PackageType,
           packageName: item.package_name || PACKAGE_INFO[item.package_type as PackageType]?.name,
@@ -273,39 +293,80 @@ export async function getMarketDemandSummary(): Promise<MarketDemandSummary> {
           createdAt: item.created_at,
           updatedAt: item.updated_at || item.created_at,
         }));
-        leads = mapped;
+      } else {
+        // Query audit_logs
+        const { data: logLeads } = await supabase
+          .from('audit_logs')
+          .select('*')
+          .eq('entity_type', 'MARKET_LEAD')
+          .order('created_at', { ascending: false });
+
+        if (logLeads && logLeads.length > 0) {
+          leads = logLeads.map((row: any) => ({
+            id: row.details?.id || row.id,
+            packageType: row.details?.package_type as PackageType,
+            packageName: row.details?.package_name || PACKAGE_INFO[row.details?.package_type as PackageType]?.name,
+            fullName: row.details?.full_name || 'Khách hàng',
+            phone: row.details?.phone || '',
+            email: row.details?.email || '',
+            companyName: row.details?.company_name || '',
+            organizationType: row.details?.organization_type || '',
+            notes: row.details?.notes || '',
+            status: row.details?.status || 'NEW',
+            source: row.details?.source || 'WEBSITE_SERVICES',
+            createdAt: row.details?.created_at || row.created_at,
+            updatedAt: row.details?.updated_at || row.created_at,
+          }));
+        }
       }
 
-      // Count events
+      // 2. Fetch events from market_demand_events
       const { data: dbEvents, error: evErr } = await supabase
         .from('market_demand_events')
         .select('package_type, event_type');
 
       if (!evErr && dbEvents && dbEvents.length > 0) {
-        const evClicks: Record<PackageType, number> = { ENTREPRENEUR: 0, MICE_ENTERPRISE: 0, ASSOCIATION: 0 };
         dbEvents.forEach((ev: any) => {
-          if (evClicks[ev.package_type as PackageType] !== undefined) {
-            evClicks[ev.package_type as PackageType] += 1;
+          if (clicks[ev.package_type as PackageType] !== undefined) {
+            clicks[ev.package_type as PackageType] += 1;
           }
         });
-        clicks = {
-          ENTREPRENEUR: clicks.ENTREPRENEUR + evClicks.ENTREPRENEUR,
-          MICE_ENTERPRISE: clicks.MICE_ENTERPRISE + evClicks.MICE_ENTERPRISE,
-          ASSOCIATION: clicks.ASSOCIATION + evClicks.ASSOCIATION,
-        };
+      } else {
+        // Query audit_logs
+        const { data: logEvents } = await supabase
+          .from('audit_logs')
+          .select('details')
+          .eq('entity_type', 'MARKET_DEMAND_EVENT');
+
+        if (logEvents && logEvents.length > 0) {
+          logEvents.forEach((row: any) => {
+            const pType = row.details?.package_type as PackageType;
+            if (pType && clicks[pType] !== undefined) {
+              clicks[pType] += 1;
+            }
+          });
+        }
       }
     } catch (err) {
       console.warn('Error reading market stats from Supabase:', err);
     }
   }
 
+  // Merge any leads created in the current runtime if not yet indexed in query
+  inMemoryLeads.forEach((memLead) => {
+    if (!leads.some((l) => l.id === memLead.id || (l.phone === memLead.phone && l.packageType === memLead.packageType))) {
+      leads.unshift(memLead);
+    }
+  });
+
+  // Calculate genuine real-time metrics
   const totalClicks = Object.values(clicks).reduce((a, b) => a + b, 0);
   const totalLeads = leads.length;
 
   const packageStats: PackageDemandStat[] = (['MICE_ENTERPRISE', 'ENTREPRENEUR', 'ASSOCIATION'] as PackageType[]).map((type) => {
     const pClicks = clicks[type] || 0;
     const pLeads = leads.filter((l) => l.packageType === type).length;
-    const percentage = totalClicks > 0 ? Math.round((pClicks / totalClicks) * 100) : 33;
+    const percentage = totalClicks > 0 ? Math.round((pClicks / totalClicks) * 100) : 0;
     const info = PACKAGE_INFO[type];
 
     return {
@@ -319,18 +380,19 @@ export async function getMarketDemandSummary(): Promise<MarketDemandSummary> {
     };
   });
 
-  // Sort by clicks descending to find top package
   const sorted = [...packageStats].sort((a, b) => b.clicks - a.clicks);
-  const topPackage: PackageDemandStat = sorted[0] || {
+  const firstPackage = sorted[0];
+  const topPackage: PackageDemandStat = (firstPackage && firstPackage.clicks > 0 ? firstPackage : null) || {
     type: 'MICE_ENTERPRISE',
-    name: 'Doanh Nghiệp & Sự Kiện MICE',
-    badge: 'PHỔ BIẾN NHẤT',
+    name: (firstPackage && totalClicks > 0) ? firstPackage.name : 'Chưa có dữ liệu tương tác',
+    badge: 'REALTIME',
     clicks: 0,
     leadsCount: 0,
     percentage: 0,
-    targetAudience: '',
+    targetAudience: 'Đang lắng nghe dữ liệu truy cập thực tế từ thị trường',
   };
-  const conversionRate = totalClicks > 0 ? Math.round((totalLeads / totalClicks) * 1000) / 10 : 0;
+
+  const conversionRate = totalClicks > 0 ? Math.round((totalLeads / totalClicks) * 1000) / 10 : (totalLeads > 0 ? 100 : 0);
 
   return {
     totalClicks,

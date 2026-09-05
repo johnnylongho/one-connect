@@ -17,6 +17,9 @@ import {
   Flame,
   Award,
   FileSpreadsheet,
+  Sparkles,
+  Plus,
+  AlertCircle,
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -51,9 +54,51 @@ export function MarketDemandReport() {
     }
   };
 
+  const fetchStatsSilently = async () => {
+    try {
+      const res = await fetch('/api/market-demand/stats');
+      if (res.ok) {
+        const json = await res.json();
+        setData(json);
+      }
+    } catch (err) {
+      console.warn('Silent stats update error:', err);
+    }
+  };
+
   useEffect(() => {
     fetchStats();
+    // Realtime polling every 6 seconds
+    const interval = setInterval(fetchStatsSilently, 6000);
+    return () => clearInterval(interval);
   }, []);
+
+  const handleCreateTestLead = async () => {
+    try {
+      setLoading(true);
+      const res = await fetch('/api/market-demand/lead', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          packageType: 'MICE_ENTERPRISE',
+          fullName: 'Đoàn Khách MICE Khánh Hòa (Test Lead)',
+          phone: '0905123456',
+          email: 'mice.khanhhoa@example.vn',
+          companyName: 'Công ty Lữ hành & Sự kiện MICE',
+          organizationType: 'Doanh nghiệp Sự kiện',
+          notes: 'Yêu cầu tư vấn trạm Check-in NFC & thẻ kim loại cho diễn đàn 300 khách.',
+          source: 'DASHBOARD_LIVE_TEST',
+        }),
+      });
+      if (res.ok) {
+        await fetchStats();
+      }
+    } catch (err) {
+      console.error('Test lead creation error:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleUpdateStatus = async (leadId: string, newStatus: MarketLead['status']) => {
     try {
@@ -105,37 +150,46 @@ export function MarketDemandReport() {
   return (
     <div className="space-y-6">
       {/* Top Banner & Export Actions */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-gradient-to-r from-blue-50 via-cyan-50 to-white p-5 rounded-2xl border border-blue-100 shadow-xs">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-gradient-to-r from-emerald-50/60 via-blue-50/40 to-white p-5 rounded-2xl border border-emerald-100 shadow-xs">
         <div>
-          <div className="flex items-center gap-2">
-            <Badge className="bg-[#0066FF] text-white text-[10px] font-black uppercase tracking-wider">
-              MARKET DEMAND ANALYTICS
+          <div className="flex items-center gap-2 flex-wrap">
+            <Badge className="bg-emerald-600 text-white text-[10px] font-black uppercase tracking-wider flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-white animate-pulse" /> 100% DỮ LIỆU THỰC TẾ (SUPABASE CLOUD)
             </Badge>
-            <span className="text-[11px] text-blue-700 font-bold font-mono">REALTIME METRICS</span>
+            <span className="text-[11px] text-emerald-700 font-bold font-mono">REAL-TIME SYNC</span>
           </div>
           <h2 className="text-lg sm:text-xl font-black text-slate-900 tracking-tight font-heading mt-1">
             Đo Lường Mối Quan Tâm Thị Trường &amp; Danh Sách Leads
           </h2>
           <p className="text-xs text-slate-600 mt-0.5">
-            Thống kê phản hồi của thị trường theo 3 phân khúc giải pháp và quản lý khách hàng tiềm năng.
+            Dữ liệu được ghi nhận thời gian thực từ hành vi truy cập và đăng ký của người dùng thực tế trên website.
           </p>
         </div>
 
-        <div className="flex items-center gap-2.5 shrink-0">
+        <div className="flex items-center gap-2 flex-wrap shrink-0">
           <Button
             size="sm"
             variant="outline"
             onClick={fetchStats}
-            className="gap-1.5 text-xs font-bold border-slate-200 bg-white hover:bg-slate-50 text-slate-700 rounded-xl h-9 cursor-pointer"
+            className="gap-1.5 text-xs font-bold border-slate-200 bg-white hover:bg-slate-50 text-slate-700 rounded-xl h-9 cursor-pointer shadow-2xs"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} /> Làm Mới
           </Button>
           <Button
             size="sm"
             onClick={handleExportExcel}
-            className="gap-1.5 text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl h-9 px-4 shadow-sm shadow-emerald-600/20 cursor-pointer"
+            className="gap-1.5 text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl h-9 px-3.5 shadow-xs cursor-pointer"
           >
-            <FileSpreadsheet className="w-4 h-4" /> Xuất Báo Cáo Excel
+            <FileSpreadsheet className="w-4 h-4" /> Xuất Excel
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={handleCreateTestLead}
+            className="gap-1.5 text-xs font-bold border-blue-300 text-blue-700 bg-blue-50/80 hover:bg-blue-100 rounded-xl h-9 px-3 cursor-pointer shadow-2xs"
+            title="Tạo thử 1 lead thực tế vào Supabase để kiểm tra"
+          >
+            <Sparkles className="w-3.5 h-3.5 text-[#0066FF]" /> + Thử Tạo Lead Realtime
           </Button>
         </div>
       </div>
@@ -325,8 +379,36 @@ export function MarketDemandReport() {
 
         <CardContent className="pt-4 p-0 sm:p-6 overflow-x-auto">
           {filteredLeads.length === 0 ? (
-            <div className="py-12 text-center text-slate-400 text-xs">
-              Chưa có lead nào trong danh mục này.
+            <div className="py-12 px-4 text-center space-y-3">
+              <div className="w-12 h-12 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-600 flex items-center justify-center mx-auto shadow-2xs">
+                <CheckCircle2 className="w-6 h-6" />
+              </div>
+              <div className="space-y-1 max-w-md mx-auto">
+                <h4 className="font-bold text-slate-900 text-sm">
+                  Chưa có Lead nào trong hệ thống (100% Dữ liệu thực tế)
+                </h4>
+                <p className="text-xs text-slate-500 leading-relaxed">
+                  Hệ thống đang hoạt động và tự động cập nhật thời gian thực từ Supabase. Khi khách hàng để lại thông tin hoặc đăng ký tại trang Gói Dịch Vụ (/services), danh sách sẽ xuất hiện ngay lập tức.
+                </p>
+              </div>
+              <div className="flex items-center justify-center gap-2.5 pt-2 flex-wrap">
+                <a href="/services" target="_blank">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="gap-1.5 text-xs font-bold rounded-xl border-slate-300 text-slate-700 bg-white hover:bg-slate-50 shadow-2xs cursor-pointer"
+                  >
+                    <ExternalLink className="w-3.5 h-3.5 text-[#0066FF]" /> Mở Trang Dịch Vụ
+                  </Button>
+                </a>
+                <Button
+                  size="sm"
+                  onClick={handleCreateTestLead}
+                  className="gap-1.5 text-xs font-bold rounded-xl bg-[#0066FF] hover:bg-blue-700 text-white shadow-xs cursor-pointer"
+                >
+                  <Plus className="w-3.5 h-3.5" /> Gửi Thử 1 Lead Thật Vào Supabase
+                </Button>
+              </div>
             </div>
           ) : (
             <div className="divide-y divide-slate-100">

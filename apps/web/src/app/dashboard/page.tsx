@@ -25,83 +25,9 @@ import { DelegateCheckinTable, Delegate } from '@/components/organizer/delegate-
 import { MarketDemandReport } from '@/components/dashboard/MarketDemandReport';
 import { createClient } from '@/lib/supabase/server';
 
-// Fallback seed data matching seed.sql
-const FALLBACK_DELEGATES: Delegate[] = [
-  {
-    id: 'fa111111-1111-1111-1111-111111111111',
-    ticketCode: 'QR_ONECONNECT_JOHNNY_2026',
-    fullName: 'Johnny Long Hồ',
-    email: 'johnny@aplusvn.com',
-    phone: '0901234567',
-    avatarUrl: '/avatar-johnny-long.jpg',
-    company: 'Aplusvn Media & Tech',
-    position: 'Project Manager kiêm Media',
-    associationName: 'Hiệp hội Doanh nhân Công nghệ Aplusvn',
-    ticketType: 'VIP',
-    checkInTime: '10:30 (1 giờ trước)',
-    status: 'checked_in',
-  },
-  {
-    id: 'fa222222-2222-2222-2222-222222222222',
-    ticketCode: 'QR_ONECONNECT_MINHDUC_2026',
-    fullName: 'Trần Minh Đức',
-    email: 'minhduc@techcorp.vn',
-    phone: '0923456789',
-    avatarUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&auto=format&fit=crop&q=80',
-    company: 'TechCorp Vietnam Group',
-    position: 'Chủ tịch HĐQT TechCorp',
-    associationName: 'TechCorp Vietnam Group',
-    ticketType: 'VIP',
-    checkInTime: '11:00 (30 phút trước)',
-    status: 'checked_in',
-  },
-  {
-    id: 'fa333333-3333-3333-3333-333333333333',
-    ticketCode: 'QR_ONECONNECT_HOANGNAM_2026',
-    fullName: 'Lê Hoàng Nam',
-    email: 'hoangnam@innovatex.io',
-    phone: '0934567890',
-    avatarUrl: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=300&auto=format&fit=crop&q=80',
-    company: 'InnovateX Global',
-    position: 'CEO & Founder InnovateX',
-    associationName: 'Hiệp hội Doanh nhân Công nghệ Aplusvn',
-    ticketType: 'Guest',
-    checkInTime: null,
-    status: 'pending',
-  },
-  {
-    id: 'fa444444-4444-4444-4444-444444444444',
-    ticketCode: 'QR_ONECONNECT_PHUONGANH_2026',
-    fullName: 'Phạm Phương Anh',
-    email: 'phuonganh@globalbiz.com',
-    phone: '0945678901',
-    avatarUrl: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=300&auto=format&fit=crop&q=80',
-    company: 'GlobalBiz Corp',
-    position: 'Giám đốc Marketing GlobalBiz',
-    associationName: 'Hiệp hội Doanh nhân Công nghệ Aplusvn',
-    ticketType: 'Standard',
-    checkInTime: '11:20 (10 phút trước)',
-    status: 'checked_in',
-  },
-  {
-    id: 'fa555555-5555-5555-5555-555555555555',
-    ticketCode: 'QR_ONECONNECT_THUHA_2026',
-    fullName: 'Nguyễn Thu Hà',
-    email: 'thuha@aplusvn.com',
-    phone: '0912345678',
-    avatarUrl: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=300&auto=format&fit=crop&q=80',
-    company: 'Vina Capital Invest',
-    position: 'Giám đốc Đầu tư B2B',
-    associationName: 'Hiệp hội Doanh nhân Công nghệ Aplusvn',
-    ticketType: 'VIP',
-    checkInTime: null,
-    status: 'pending',
-  },
-];
-
 export default async function OrganizerDashboardPage() {
-  let delegatesList: Delegate[] = FALLBACK_DELEGATES;
-  let b2bMatchingCount = 48;
+  let delegatesList: Delegate[] = [];
+  let b2bMatchingCount = 0;
 
   try {
     const supabase = await createClient();

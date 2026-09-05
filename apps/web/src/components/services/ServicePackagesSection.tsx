@@ -1,6 +1,5 @@
 'use client';
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Check,
   Sparkles,
@@ -26,6 +25,19 @@ interface ServicePackagesSectionProps {
 export function ServicePackagesSection({ id = 'services', className = '' }: ServicePackagesSectionProps) {
   const [modalOpen, setModalOpen] = useState(false);
   const [activePackage, setActivePackage] = useState<PackageType>('MICE_ENTERPRISE');
+
+  useEffect(() => {
+    // Record page impression in real-time
+    fetch('/api/market-demand/track', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        packageType: 'MICE_ENTERPRISE',
+        eventType: 'VIEW_PACKAGE',
+        metadata: { source: 'ServicesPage_Impression' },
+      }),
+    }).catch(() => {});
+  }, []);
 
   const handleOpenLeadModal = (pkg: PackageType) => {
     setActivePackage(pkg);
