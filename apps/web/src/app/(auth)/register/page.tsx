@@ -460,7 +460,7 @@ function RegisterForm() {
       return;
     }
 
-    if (entered !== generatedOtp && entered !== '123456') {
+    if (entered !== generatedOtp) {
       setErrorMsg('Mã OTP không chính xác hoặc đã hết hạn. Vui lòng kiểm tra lại email.');
       return;
     }
@@ -536,7 +536,7 @@ function RegisterForm() {
           window.location.href = targetUrl;
         }, 1600);
       } else {
-        const { organization, admin } = registerOrganization({
+        const { organization, admin, card } = registerOrganization({
           orgName,
           industry: orgIndustry,
           memberCountEstimate: parseInt(orgMemberCount, 10) || 100,
@@ -555,6 +555,24 @@ function RegisterForm() {
         setRegisteredProfileUrl(targetUrl);
         setStep('success');
         setLoading(false);
+
+        // Lưu trữ tài khoản và mật khẩu Quản Trị Tổ Chức lên Supabase Auth & Cloud Database
+        fetch('/api/auth/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            id: admin.id,
+            username: admin.username,
+            email: adminEmail,
+            phone: adminPhone,
+            password: adminPassword,
+            fullName: adminFullName,
+            title: adminTitle || 'Quản Trị Tổ Chức',
+            businessName: orgName,
+            role: 'ORG_ADMIN',
+            cardUid: card?.cardUid,
+          }),
+        }).catch((err) => console.warn('Sync org admin to cloud error:', err));
 
         // Gửi Thư Chào Mừng Quản Trị Tổ Chức
         fetch('/api/auth/send-welcome', {

@@ -1298,8 +1298,10 @@ export function useOneConnectStore() {
     );
 
     if (found) {
-      if (password && found.password && found.password !== password) {
-        return null;
+      if (password !== undefined) {
+        if (!found.password || found.password !== password) {
+          return null;
+        }
       }
       const isSuperAdmin = found.username === 'johnnylongho' || 
                            found.id === 'id-001' || 

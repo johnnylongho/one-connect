@@ -25,7 +25,7 @@ export const INITIAL_IDENTITIES: PersonIdentity[] = [
     bio: 'Chuyên gia triển khai giải pháp hạ tầng danh thiếp số NFC, định danh doanh nghiệp và tự động hóa giao thương B2B sự kiện.',
     phone: '0794677369',
     email: 'contact.johnnylongho@gmail.com',
-    password: 'password123',
+    password: '$hoanglong1788',
     role: 'SUPER_ADMIN',
     website: 'https://aplusvn.net',
     taxCode: '0316888999',
@@ -64,106 +64,6 @@ export const INITIAL_IDENTITIES: PersonIdentity[] = [
     ],
     createdAt: '2026-08-01T08:00:00Z',
     updatedAt: '2026-08-12T10:00:00Z',
-  },
-  {
-    id: 'id-002',
-    userId: 'user-002',
-    username: 'nguyenthuha',
-    fullName: 'Nguyễn Thu Hà',
-    displayName: 'Thu Hà Vinacoffee',
-    avatarUrl: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&auto=format&fit=crop&q=80',
-    coverUrl: 'https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=1200&auto=format&fit=crop&q=80',
-    title: 'Tổng Giám đốc / Founder',
-    bio: 'Chuyên sản xuất và xuất khẩu cà phê nông sản chất lượng cao. Đang tìm kiếm đối tác mở rộng thị trường Đông Nam Á và Châu Âu.',
-    phone: '0912 345 678',
-    email: 'ha.nguyen@vinacoffee.vn',
-    password: 'password123',
-    role: 'ORG_ADMIN',
-    website: 'https://vinacoffee.vn',
-    socialLinks: [
-      { id: 's-5', identityId: 'id-002', platform: 'linkedin', url: 'https://linkedin.com/in/thuha-vinacoffee', isPublic: true, sortOrder: 1 },
-      { id: 's-6', identityId: 'id-002', platform: 'zalo', url: 'https://zalo.me/0912345678', isPublic: true, sortOrder: 2 },
-    ],
-    businesses: [
-      {
-        id: 'b-2',
-        personIdentityId: 'id-002',
-        businessId: 'biz-102',
-        businessName: 'Công ty Cổ phần Vinacoffee Việt Nam',
-        position: 'CEO & Founder',
-        relationType: 'FOUNDER',
-        isPrimary: true,
-        status: 'ACTIVE',
-      }
-    ],
-    createdAt: '2026-08-02T09:00:00Z',
-    updatedAt: '2026-08-12T11:00:00Z',
-  },
-  {
-    id: 'id-003',
-    userId: 'user-003',
-    username: 'tranquocbao',
-    fullName: 'Trần Quốc Bảo',
-    displayName: 'Bảo TechCorp',
-    avatarUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&auto=format&fit=crop&q=80',
-    coverUrl: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=1200&auto=format&fit=crop&q=80',
-    title: 'Giám đốc Công nghệ (CTO)',
-    bio: 'Cung cấp giải pháp phần mềm doanh nghiệp, Cloud Infrastructure & AI Security. Hơn 12 năm kinh nghiệm tư vấn kiến trúc phần mềm.',
-    phone: '0988 777 666',
-    email: 'bao.tran@techcorp.asia',
-    password: 'password123',
-    role: 'EVENT_OPERATOR',
-    website: 'https://techcorp.asia',
-    socialLinks: [
-      { id: 's-7', identityId: 'id-003', platform: 'linkedin', url: 'https://linkedin.com/in/baotran-cto', isPublic: true, sortOrder: 1 },
-      { id: 's-8', identityId: 'id-003', platform: 'github', url: 'https://github.com/baotechcorp', isPublic: true, sortOrder: 2 },
-    ],
-    businesses: [
-      {
-        id: 'b-3',
-        personIdentityId: 'id-003',
-        businessId: 'biz-103',
-        businessName: 'TechCorp Asia Software Solutions',
-        position: 'CTO',
-        relationType: 'PARTNER',
-        isPrimary: true,
-        status: 'ACTIVE',
-      }
-    ],
-    createdAt: '2026-08-03T10:00:00Z',
-    updatedAt: '2026-08-12T12:00:00Z',
-  },
-  {
-    id: 'id-004',
-    userId: 'user-004',
-    username: 'levannam',
-    fullName: 'Lê Văn Nam',
-    displayName: 'Lê Nam YBA',
-    avatarUrl: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&auto=format&fit=crop&q=80',
-    coverUrl: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1200&auto=format&fit=crop&q=80',
-    title: 'Chủ tịch Hội Doanh nhân Trẻ Khánh Hòa',
-    bio: 'Kết nối cộng đồng 300+ doanh nghiệp SME khu vực Nam Trung Bộ. Thúc đẩy giao thương và chuyển đổi số xanh.',
-    phone: '0933 222 111',
-    email: 'nam.le@ybakhanhhoa.vn',
-    website: 'https://ybakhanhhoa.vn',
-    socialLinks: [
-      { id: 's-9', identityId: 'id-004', platform: 'phone', url: 'tel:0933222111', isPublic: true, sortOrder: 1 },
-      { id: 's-10', identityId: 'id-004', platform: 'zalo', url: 'https://zalo.me/0933222111', isPublic: true, sortOrder: 2 },
-    ],
-    businesses: [
-      {
-        id: 'b-4',
-        personIdentityId: 'id-004',
-        businessId: 'biz-104',
-        businessName: 'Hội Doanh nhân Trẻ Khánh Hòa',
-        position: 'Chủ tịch',
-        relationType: 'EXECUTIVE',
-        isPrimary: true,
-        status: 'ACTIVE',
-      }
-    ],
-    createdAt: '2026-08-04T11:00:00Z',
-    updatedAt: '2026-08-12T13:00:00Z',
   }
 ];
 
@@ -179,42 +79,6 @@ export const INITIAL_CARDS: AccessCard[] = [
     status: 'ACTIVE',
     issuedAt: '2026-08-05T08:00:00Z',
     lastUsedAt: '2026-08-12T16:00:00Z',
-  },
-  {
-    id: 'card-2',
-    personIdentityId: 'id-002',
-    cardUid: 'NFC-HA-777',
-    cardType: 'NFC_BUSINESS_PRO',
-    nfcIdentifier: 'NFC-UID-002-B88',
-    dynamicUrl: 'https://oneconnect.network/NFC-HA-777',
-    qrValue: 'https://oneconnect.network/NFC-HA-777',
-    status: 'ACTIVE',
-    issuedAt: '2026-08-06T09:00:00Z',
-    lastUsedAt: '2026-08-12T15:30:00Z',
-  },
-  {
-    id: 'card-3',
-    personIdentityId: 'id-003',
-    cardUid: 'NFC-BAO-666',
-    cardType: 'NFC_STANDARD',
-    nfcIdentifier: 'NFC-UID-003-C77',
-    dynamicUrl: 'https://oneconnect.network/NFC-BAO-666',
-    qrValue: 'https://oneconnect.network/NFC-BAO-666',
-    status: 'ACTIVE',
-    issuedAt: '2026-08-07T10:00:00Z',
-    lastUsedAt: '2026-08-11T14:00:00Z',
-  },
-  {
-    id: 'card-4',
-    personIdentityId: 'id-004',
-    cardUid: 'NFC-NAM-555',
-    cardType: 'NFC_EXECUTIVE',
-    nfcIdentifier: 'NFC-UID-004-D66',
-    dynamicUrl: 'https://oneconnect.network/NFC-NAM-555',
-    qrValue: 'https://oneconnect.network/NFC-NAM-555',
-    status: 'ACTIVE',
-    issuedAt: '2026-08-08T11:00:00Z',
-    lastUsedAt: '2026-08-12T14:20:00Z',
   }
 ];
 
@@ -285,81 +149,15 @@ export const INITIAL_EVENTS: Event[] = [
 
 export const INITIAL_REGISTRATIONS: EventRegistration[] = [
   { id: 'reg-001', eventId: 'evt-001', personIdentityId: 'id-001', registrationStatus: 'ATTENDED', registeredAt: '2026-08-10T09:00:00Z', ticketType: 'VIP Guest' },
-  { id: 'reg-002', eventId: 'evt-001', personIdentityId: 'id-002', registrationStatus: 'ATTENDED', registeredAt: '2026-08-10T09:15:00Z', ticketType: 'Standard Attendee' },
-  { id: 'reg-003', eventId: 'evt-001', personIdentityId: 'id-003', registrationStatus: 'CONFIRMED', registeredAt: '2026-08-10T10:00:00Z', ticketType: 'Standard Attendee' },
-  { id: 'reg-004', eventId: 'evt-001', personIdentityId: 'id-004', registrationStatus: 'ATTENDED', registeredAt: '2026-08-10T10:30:00Z', ticketType: 'Organizer' },
 ];
 
 export const INITIAL_CHECKINS: CheckIn[] = [
   { id: 'chk-001', eventId: 'evt-001', registrationId: 'reg-001', personIdentityId: 'id-001', method: 'NFC', checkedInAt: '2026-08-20T08:05:12Z', operatorName: 'Trạm Cửa Chín (Gate 01)' },
-  { id: 'chk-002', eventId: 'evt-001', registrationId: 'reg-002', personIdentityId: 'id-002', method: 'NFC', checkedInAt: '2026-08-20T08:12:45Z', operatorName: 'Trạm Cửa Chín (Gate 01)' },
-  { id: 'chk-003', eventId: 'evt-001', registrationId: 'reg-004', personIdentityId: 'id-004', method: 'QR', checkedInAt: '2026-08-20T07:45:00Z', operatorName: 'Trạm VIP (Gate VIP)' },
 ];
 
-export const INITIAL_CONNECTIONS: Connection[] = [
-  {
-    id: 'conn-001',
-    requesterIdentityId: 'id-001',
-    receiverIdentityId: 'id-002',
-    status: 'CONNECTED',
-    connectedAt: '2026-08-20T09:30:00Z',
-    createdAt: '2026-08-20T09:28:00Z',
-    contextEventName: 'StartUp Deal Day One Khánh Hòa 2026',
-    notesCount: 2,
-  },
-  {
-    id: 'conn-002',
-    requesterIdentityId: 'id-001',
-    receiverIdentityId: 'id-003',
-    status: 'PENDING',
-    createdAt: '2026-08-20T10:15:00Z',
-    contextEventName: 'StartUp Deal Day One Khánh Hòa 2026',
-    notesCount: 0,
-  },
-  {
-    id: 'conn-003',
-    requesterIdentityId: 'id-004',
-    receiverIdentityId: 'id-001',
-    status: 'CONNECTED',
-    connectedAt: '2026-08-20T08:00:00Z',
-    createdAt: '2026-08-20T07:55:00Z',
-    contextEventName: 'StartUp Deal Day One Khánh Hòa 2026',
-    notesCount: 1,
-  }
-];
-
-export const INITIAL_NOTES: ConnectionNote[] = [
-  {
-    id: 'note-001',
-    connectionId: 'conn-001',
-    ownerIdentityId: 'id-001',
-    content: 'Gặp chị Thu Hà tại gian hàng nông sản StartUp Deal Day. Cần gửi hồ sơ giới thiệu giải pháp NFC One Connect cho chuỗi 15 đại lý Vinacoffee.',
-    createdAt: '2026-08-20T10:00:00Z',
-    updatedAt: '2026-08-20T10:00:00Z',
-  },
-  {
-    id: 'note-002',
-    connectionId: 'conn-001',
-    ownerIdentityId: 'id-001',
-    content: 'Hẹn gặp cà phê sáng thứ 5 tuần tới bàn hợp đồng mẫu pilot.',
-    createdAt: '2026-08-21T14:20:00Z',
-    updatedAt: '2026-08-21T14:20:00Z',
-  }
-];
-
-export const INITIAL_LEADS: Lead[] = [
-  {
-    id: 'lead-001',
-    connectionId: 'conn-001',
-    ownerIdentityId: 'id-001',
-    status: 'WARM',
-    priority: 'HIGH',
-    estimatedValue: 45000000,
-    source: 'StartUp Deal Day One Khánh Hòa 2026',
-    createdAt: '2026-08-20T10:05:00Z',
-    updatedAt: '2026-08-21T14:20:00Z',
-  }
-];
+export const INITIAL_CONNECTIONS: Connection[] = [];
+export const INITIAL_NOTES: ConnectionNote[] = [];
+export const INITIAL_LEADS: Lead[] = [];
 
 export const INITIAL_PRIVACY: PrivacySetting = {
   userId: 'user-001',

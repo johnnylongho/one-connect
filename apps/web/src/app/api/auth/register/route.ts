@@ -6,7 +6,7 @@ const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { id, username, email, phone, password, fullName, title, businessName, cardUid } = body;
+    const { id, username, email, phone, password, fullName, title, businessName, cardUid, role } = body;
 
     if (!email) {
       return NextResponse.json({ success: false, error: 'Email là bắt buộc' }, { status: 400 });
@@ -80,7 +80,7 @@ export async function POST(req: NextRequest) {
             username: cleanUsername,
             full_name: fullName || cleanUsername,
             phone: phone || null,
-            role: 'MEMBER',
+            role: role || 'MEMBER',
             business_name: businessName || null,
           },
         }),
@@ -175,7 +175,7 @@ export async function POST(req: NextRequest) {
         username: cleanUsername,
         email: cleanEmail,
         fullName,
-        role: 'MEMBER',
+        role: role || 'MEMBER',
       },
     });
   } catch (err: any) {

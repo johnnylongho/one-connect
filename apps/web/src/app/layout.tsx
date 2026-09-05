@@ -23,9 +23,11 @@ import {
   PanelLeftOpen,
   UserCheck,
   Layers,
+  FileText,
 } from 'lucide-react';
 import { useOneConnectStore } from '@/lib/store';
 import { Logo } from '@/components/shared/Logo';
+import { PublicHeader } from '@/components/shared/PublicHeader';
 import { RealtimeConnectionModal } from '@/components/realtime/connection-request-modal';
 import './globals.css';
 
@@ -143,6 +145,13 @@ const ALL_NAV_ITEMS: NavItem[] = [
     allowedRoles: ['ORG_ADMIN', 'SUPER_ADMIN'],
     section: 'ADMIN',
   },
+  {
+    href: '/admin/articles',
+    label: 'Quản Lý Bài Viết & SEO',
+    icon: FileText,
+    allowedRoles: ['ORG_ADMIN', 'SUPER_ADMIN'],
+    section: 'ADMIN',
+  },
 
   // TIỆN ÍCH: DEMO HUB (Chỉ Super Admin)
   {
@@ -207,6 +216,9 @@ export default function RootLayout({
   const isStandalonePage = 
     pathname === '/' ||
     pathname === '/intro' ||
+    pathname === '/social-value' ||
+    pathname === '/posts' ||
+    pathname?.startsWith('/posts/') ||
     pathname === '/demo' ||
     pathname === '/login' ||
     pathname === '/register' ||
@@ -229,6 +241,13 @@ export default function RootLayout({
   }, [state.currentIdentityId, isStandalonePage, isHydrated, router]);
 
   if (isStandalonePage) {
+    const isPublicPortal = 
+      pathname === '/' ||
+      pathname === '/intro' ||
+      pathname === '/social-value' ||
+      pathname === '/posts' ||
+      pathname?.startsWith('/posts');
+
     return (
       <html
         lang="vi"
@@ -237,14 +256,15 @@ export default function RootLayout({
       >
         <head>
           <link rel="manifest" href="/manifest.json" />
-          <meta name="theme-color" content="#FFFFFF" />
+          <meta name="theme-color" content="#0A1124" />
           <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
           <meta name="zalo-platform-site-verification" content="QFsG8gZ97ozZr9CBk-S0DKcNXm-buLrPCpKm" />
         </head>
         <body
-          className="min-h-screen bg-white text-slate-900 font-sans antialiased selection:bg-blue-600 selection:text-white overflow-x-hidden"
+          className={`min-h-screen ${isPublicPortal ? 'bg-[#F8FAFD]' : 'bg-white'} text-slate-900 font-sans antialiased selection:bg-blue-600 selection:text-white overflow-x-hidden`}
           suppressHydrationWarning
         >
+          {isPublicPortal && <PublicHeader />}
           {children}
         </body>
       </html>
