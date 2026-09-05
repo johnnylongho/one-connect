@@ -15,12 +15,14 @@ import {
   Smartphone,
   UserCheck,
   ArrowRight,
+  Target,
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { DelegateCheckinTable, Delegate } from '@/components/organizer/delegate-checkin-table';
+import { MarketDemandReport } from '@/components/dashboard/MarketDemandReport';
 import { createClient } from '@/lib/supabase/server';
 
 // Fallback seed data matching seed.sql
@@ -225,6 +227,15 @@ export default async function OrganizerDashboardPage() {
               </Button>
             </Link>
 
+            <Link href="/dashboard/leads">
+              <Button
+                size="default"
+                className="gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold rounded-xl cursor-pointer shadow-xs h-9 text-xs"
+              >
+                <Target className="w-3.5 h-3.5 text-white" /> Đo Lường Thị Trường &amp; Leads
+              </Button>
+            </Link>
+
             <Link href="/events">
               <Button
                 size="default"
@@ -335,8 +346,8 @@ export default async function OrganizerDashboardPage() {
           </Link>
         </div>
 
-        {/* 3 Step Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4">
+        {/* 4 Step Cards Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-4">
           {/* Step 1: Identity */}
           <Link href="/dashboard/card" className="group block">
             <div className="h-full p-4 rounded-xl bg-white border border-slate-200 group-hover:border-blue-400 group-hover:shadow-md transition-all flex flex-col justify-between space-y-3">
@@ -352,7 +363,7 @@ export default async function OrganizerDashboardPage() {
                 <div className="flex items-center gap-2">
                   <CreditCard className="w-4 h-4 text-[#0066FF]" />
                   <h3 className="font-bold text-slate-900 text-sm group-hover:text-[#0066FF] transition-colors">
-                    Định Danh & Thẻ 3D NFC
+                    Định Danh &amp; Thẻ 3D NFC
                   </h3>
                 </div>
                 <p className="text-xs text-slate-500 leading-relaxed">
@@ -360,7 +371,7 @@ export default async function OrganizerDashboardPage() {
                 </p>
               </div>
               <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-[#0066FF] group-hover:translate-x-0.5 transition-transform">
-                <span>Xem Thẻ & QR Động</span>
+                <span>Xem Thẻ &amp; QR Động</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </div>
             </div>
@@ -381,7 +392,7 @@ export default async function OrganizerDashboardPage() {
                 <div className="flex items-center gap-2">
                   <Smartphone className="w-4 h-4 text-[#0066FF]" />
                   <h3 className="font-bold text-slate-900 text-sm group-hover:text-[#0066FF] transition-colors">
-                    Sự Kiện & Check-in &lt;1s
+                    Sự Kiện &amp; Check-in &lt;1s
                   </h3>
                 </div>
                 <p className="text-xs text-slate-500 leading-relaxed">
@@ -410,7 +421,7 @@ export default async function OrganizerDashboardPage() {
                 <div className="flex items-center gap-2">
                   <UserCheck className="w-4 h-4 text-[#FF6B00]" />
                   <h3 className="font-bold text-slate-900 text-sm group-hover:text-[#FF6B00] transition-colors">
-                    Kết Nối & Ghi Nhớ Quan Hệ
+                    Kết Nối &amp; Ghi Nhớ Quan Hệ
                   </h3>
                 </div>
                 <p className="text-xs text-slate-500 leading-relaxed">
@@ -418,12 +429,59 @@ export default async function OrganizerDashboardPage() {
                 </p>
               </div>
               <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-[#FF6B00] group-hover:translate-x-0.5 transition-transform">
-                <span>Xem Mạng Lưới B2B & Ghi Chú</span>
+                <span>Xem Mạng Lưới B2B</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </div>
+            </div>
+          </Link>
+
+          {/* Step 4: Market Demand & Leads */}
+          <Link href="/dashboard/leads" className="group block">
+            <div className="h-full p-4 rounded-xl bg-gradient-to-br from-emerald-50/50 to-white border border-emerald-200/90 group-hover:border-emerald-500 group-hover:shadow-md transition-all flex flex-col justify-between space-y-3">
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="w-7 h-7 rounded-lg bg-emerald-600 text-white font-black text-xs flex items-center justify-center font-mono shadow-xs">
+                    04
+                  </span>
+                  <Badge className="bg-emerald-100 text-emerald-800 border-emerald-300 text-[9.5px] font-bold">
+                    MARKET LEADS
+                  </Badge>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Target className="w-4 h-4 text-emerald-600" />
+                  <h3 className="font-bold text-slate-900 text-sm group-hover:text-emerald-700 transition-colors">
+                    Đo Lường Leads &amp; Thị Trường
+                  </h3>
+                </div>
+                <p className="text-xs text-slate-600 leading-relaxed">
+                  Đo lường mức độ quan tâm của 3 gói giải pháp, tỷ lệ chuyển đổi và quản lý danh sách Leads tiềm năng.
+                </p>
+              </div>
+              <div className="pt-2 border-t border-emerald-100 flex items-center justify-between text-xs font-bold text-emerald-700 group-hover:translate-x-0.5 transition-transform">
+                <span>Mở Báo Cáo &amp; Leads</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </div>
             </div>
           </Link>
         </div>
+      </div>
+
+      {/* 2.8. BÁO CÁO ĐO LƯỜNG NHU CẦU THỊ TRƯỜNG & DANH SÁCH LEADS */}
+      <div id="market-demand-report" className="space-y-2">
+        <div className="flex items-center justify-between px-1">
+          <div className="flex items-center gap-2">
+            <Target className="w-5 h-5 text-emerald-600" />
+            <h2 className="text-lg font-black text-slate-900 font-heading">
+              Đo Lường Mối Quan Tâm Thị Trường &amp; Danh Sách Leads
+            </h2>
+          </div>
+          <Link href="/dashboard/leads">
+            <Button variant="ghost" size="sm" className="text-xs font-bold text-emerald-700 hover:text-emerald-800 hover:bg-emerald-50 gap-1 cursor-pointer">
+              Mở Trang Chuyên Biệt <ArrowRight className="w-3.5 h-3.5" />
+            </Button>
+          </Link>
+        </div>
+        <MarketDemandReport />
       </div>
 
       {/* 3. DELEGATES TABLE WITH LIGHT THEME */}

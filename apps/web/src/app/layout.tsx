@@ -24,6 +24,7 @@ import {
   UserCheck,
   Layers,
   FileText,
+  Target,
 } from 'lucide-react';
 import { useOneConnectStore } from '@/lib/store';
 import { Logo } from '@/components/shared/Logo';
@@ -88,6 +89,14 @@ const ALL_NAV_ITEMS: NavItem[] = [
     label: 'Kết Nối Cung Cầu AI',
     icon: Sparkles,
     badge: 'AI Smart',
+    allowedRoles: ['MEMBER', 'EXECUTIVE_BOARD', 'ORG_ADMIN', 'SUPER_ADMIN'],
+    section: 'PERSONAL',
+  },
+  {
+    href: '/dashboard/leads',
+    label: 'Đo Lường Leads & Thị Trường',
+    icon: Target,
+    badge: 'LEADS',
     allowedRoles: ['MEMBER', 'EXECUTIVE_BOARD', 'ORG_ADMIN', 'SUPER_ADMIN'],
     section: 'PERSONAL',
   },

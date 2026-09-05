@@ -46,6 +46,10 @@ import {
   TrendingUp,
   Star,
   Edit3,
+  FileText,
+  Plus,
+  X,
+  Trash2,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -315,6 +319,30 @@ function DigitalProfileContent() {
   const [editBio, setEditBio] = useState(matchedIdentity?.bio || 'Chuyên gia triển khai giải pháp hạ tầng danh thiếp số NFC...');
   const [editWebsite, setEditWebsite] = useState(matchedIdentity?.website || 'https://aplusvn.net');
 
+  // Brochure PDF State
+  const [editBrochureUrl, setEditBrochureUrl] = useState(matchedIdentity?.brochureUrl || 'https://aplusvn.net/company-profile-2026.pdf');
+  const pdfFileInputRef = useRef<HTMLInputElement>(null);
+  const [isPdfUploading, setIsPdfUploading] = useState(false);
+
+  // B2B Cung & Cầu States
+  const [editSeekingNeeds, setEditSeekingNeeds] = useState<string[]>(
+    matchedIdentity?.seekingNeeds || [
+      'Đối tác Chuỗi Khách sạn/Resort MICE',
+      'Các Hiệp hội Doanh nghiệp Tỉnh/Thành',
+      'Nhà phân phối phôi thẻ thông minh',
+    ]
+  );
+  const [newSeekingInput, setNewSeekingInput] = useState('');
+
+  const [editOfferingServices, setEditOfferingServices] = useState<string[]>(
+    matchedIdentity?.offeringServices || [
+      'Hạ tầng Định danh số NFC Doanh nghiệp',
+      'Hệ thống Check-in Sự kiện <1s',
+      'Giải pháp CRM Sổ tay quan hệ B2B',
+    ]
+  );
+  const [newOfferingInput, setNewOfferingInput] = useState('');
+
   useEffect(() => {
     const now = new Date();
     setCurrentDateStr(now.toLocaleDateString('vi-VN'));
@@ -442,7 +470,63 @@ function DigitalProfileContent() {
     setEditEmail(matchedIdentity?.email || profile.email);
     setEditBio(matchedIdentity?.bio || profile.bio);
     setEditWebsite(matchedIdentity?.website || profile.website);
+    setEditBrochureUrl(matchedIdentity?.brochureUrl || profile.brochureUrl || '');
+    setEditSeekingNeeds(
+      (matchedIdentity?.seekingNeeds && matchedIdentity.seekingNeeds.length > 0)
+        ? matchedIdentity.seekingNeeds
+        : profile.seekingNeeds
+    );
+    setEditOfferingServices(
+      (matchedIdentity?.offeringServices && matchedIdentity.offeringServices.length > 0)
+        ? matchedIdentity.offeringServices
+        : profile.offeringServices
+    );
     setIsEditModalOpen(true);
+  };
+
+  const handlePdfFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf')) {
+      toast({
+        title: 'ĐỊNH DẠNG KHÔNG HỢP LỆ!',
+        description: 'Vui lòng chọn tệp tin định dạng PDF (.pdf).',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    if (file.size > 20 * 1024 * 1024) {
+      toast({
+        title: 'FILE QUÁ DUNG LƯỢNG!',
+        description: 'Kích thước file PDF không được vượt quá 20MB.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    setIsPdfUploading(true);
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = reader.result as string;
+      setEditBrochureUrl(result);
+      setIsPdfUploading(false);
+      toast({
+        title: 'ĐÃ TẢI FILE BROCHURE (PDF)!',
+        description: `Tệp "${file.name}" đã được tải lên thành công. Hãy bấm "Lưu & Cập Nhật Thẻ".`,
+        variant: 'success',
+      });
+    };
+    reader.onerror = () => {
+      setIsPdfUploading(false);
+      toast({
+        title: 'LỖI ĐỌC FILE!',
+        description: 'Không thể đọc file PDF, vui lòng thử lại.',
+        variant: 'destructive',
+      });
+    };
+    reader.readAsDataURL(file);
   };
 
   const handleSaveProfile = (e: React.FormEvent) => {
@@ -472,6 +556,9 @@ function DigitalProfileContent() {
       bio: editBio,
       website: editWebsite,
       avatarUrl: editAvatarUrl || undefined,
+      brochureUrl: editBrochureUrl || undefined,
+      seekingNeeds: editSeekingNeeds,
+      offeringServices: editOfferingServices,
     });
 
     DbService.updateIdentity(matchedIdentity.id, {
@@ -483,12 +570,15 @@ function DigitalProfileContent() {
       email: editEmail,
       bio: editBio,
       website: editWebsite,
+      brochureUrl: editBrochureUrl || undefined,
+      seekingNeeds: editSeekingNeeds,
+      offeringServices: editOfferingServices,
     }).catch((err) => console.warn('Cloud sync background error:', err));
 
     setIsEditModalOpen(false);
     toast({
       title: 'ĐÃ CẬP NHẬT HỒ SƠ THÀNH CÔNG!',
-      description: 'Lĩnh vực chuyên môn, kỹ năng, doanh nghiệp và MST đã được cập nhật đồng bộ.',
+      description: 'Lĩnh vực, Cung - Cầu B2B và Brochure PDF đã được cập nhật đồng bộ.',
       variant: 'success',
     });
   };
@@ -1065,11 +1155,22 @@ END:VCARD`;
               <div className="p-3.5 rounded-2xl bg-gradient-to-br from-blue-50/80 via-white to-orange-50/60 border border-blue-200/90 shadow-xs space-y-3">
                 <div className="flex items-center justify-between border-b border-slate-100 pb-2">
                   <h3 className="font-black text-slate-900 text-[13.5px] sm:text-[14px] uppercase tracking-wider flex items-center gap-1.5 font-heading">
-                    <Sparkles className="w-4 h-4 text-[#FF6B00]" /> Cung & Cầu Giao Thương B2B
+                    <Sparkles className="w-4 h-4 text-[#FF6B00]" /> Cung &amp; Cầu Giao Thương B2B
                   </h3>
-                  <span className="text-[10px] font-bold text-blue-700 bg-blue-100 px-2 py-0.5 rounded-full border border-blue-200">
-                    AI Match Ready
-                  </span>
+                  <div className="flex items-center gap-2">
+                    {isOwner && (
+                      <button
+                        onClick={handleOpenEditModal}
+                        className="inline-flex items-center gap-1 text-[11px] font-bold text-blue-600 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 px-2.5 py-1 rounded-xl border border-blue-200 transition-colors cursor-pointer"
+                        title="Chỉnh sửa nhu cầu Cung - Cầu của bạn"
+                      >
+                        <Edit3 className="w-3 h-3" /> Điều chỉnh
+                      </button>
+                    )}
+                    <span className="text-[10px] font-bold text-blue-700 bg-blue-100 px-2 py-0.5 rounded-full border border-blue-200">
+                      Chọn thủ công / AI Match
+                    </span>
+                  </div>
                 </div>
 
                 {/* ĐANG TÌM KIẾM (SEEKING) */}
@@ -1107,19 +1208,38 @@ END:VCARD`;
                 </div>
 
                 {/* TÀI LIỆU NĂNG LỰC / BROCHURE */}
-                {profile.brochureUrl && (
-                  <div className="pt-2 border-t border-slate-100">
-                    <a
-                      href={profile.brochureUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="w-full flex items-center justify-center gap-2 p-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-[12px] font-bold transition-all shadow-xs"
+                <div className="pt-2 border-t border-slate-100 space-y-2">
+                  {profile.brochureUrl ? (
+                    <div className="flex items-center gap-2">
+                      <a
+                        href={profile.brochureUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="flex-1 flex items-center justify-center gap-2 p-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-[12px] font-bold transition-all shadow-xs"
+                      >
+                        <Download className="w-4 h-4 text-[#00C2FF]" />
+                        <span>Xem Profile &amp; Brochure Doanh Nghiệp (PDF)</span>
+                      </a>
+                      {isOwner && (
+                        <button
+                          onClick={handleOpenEditModal}
+                          className="p-2.5 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-600 border border-blue-200 text-xs font-bold transition-colors cursor-pointer"
+                          title="Thay đổi file Brochure PDF"
+                        >
+                          <Edit3 className="w-4 h-4" />
+                        </button>
+                      )}
+                    </div>
+                  ) : isOwner ? (
+                    <button
+                      onClick={handleOpenEditModal}
+                      className="w-full flex items-center justify-center gap-2 p-2.5 rounded-xl bg-blue-50 hover:bg-blue-100 border border-dashed border-blue-300 text-blue-700 text-[12px] font-bold transition-all cursor-pointer"
                     >
-                      <Download className="w-4 h-4 text-[#00C2FF]" />
-                      <span>Xem Profile & Brochure Doanh Nghiệp (PDF)</span>
-                    </a>
-                  </div>
-                )}
+                      <Upload className="w-4 h-4 text-blue-600" />
+                      <span>+ Tải Lên Profile &amp; Brochure Doanh Nghiệp (PDF)</span>
+                    </button>
+                  ) : null}
+                </div>
               </div>
 
               {/* Bối cảnh gặp gỡ */}
@@ -1975,6 +2095,279 @@ END:VCARD`;
                     placeholder="Mô tả kinh nghiệm, thế mạnh kinh doanh..."
                     className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-medium text-slate-900 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0066FF]/20 focus:border-[#0066FF]"
                   />
+                </div>
+
+                {/* --- MỤC 1: TÀI LIỆU NĂNG LỰC / BROCHURE (PDF) --- */}
+                <div className="p-3.5 rounded-2xl bg-gradient-to-br from-slate-50 to-blue-50/40 border border-blue-100 space-y-3 text-left">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-1.5">
+                      <FileText className="w-4 h-4 text-[#0066FF]" />
+                      <span className="text-[12px] font-extrabold text-slate-900 uppercase tracking-wider">
+                        Hồ Sơ Năng Lực &amp; Brochure (PDF)
+                      </span>
+                    </div>
+                    <span className="text-[10px] font-bold text-blue-700 bg-blue-100/80 px-2 py-0.5 rounded-full border border-blue-200">
+                      Tối đa 20MB
+                    </span>
+                  </div>
+
+                  <p className="text-[11.5px] text-slate-600 leading-relaxed">
+                    Tải tệp PDF brochure giới thiệu doanh nghiệp hoặc dán đường link tài liệu trực tuyến (Google Drive, Dropbox, Website).
+                  </p>
+
+                  {/* Hidden PDF file input */}
+                  <input
+                    type="file"
+                    ref={pdfFileInputRef}
+                    onChange={handlePdfFileSelect}
+                    accept="application/pdf"
+                    className="hidden"
+                  />
+
+                  {/* PDF Upload Button & Status */}
+                  <div className="flex flex-col sm:flex-row gap-2">
+                    <Button
+                      type="button"
+                      onClick={() => pdfFileInputRef.current?.click()}
+                      disabled={isPdfUploading}
+                      variant="outline"
+                      className="flex-1 bg-white hover:bg-slate-50 border-blue-300 text-blue-700 text-xs font-bold rounded-xl py-2.5 px-3 flex items-center justify-center gap-2 cursor-pointer shadow-2xs"
+                    >
+                      <Upload className="w-4 h-4 text-[#0066FF]" />
+                      {isPdfUploading ? 'Đang Tải File Lên...' : 'Tải File PDF Từ Thiết Bị'}
+                    </Button>
+                    {editBrochureUrl && (
+                      <div className="flex items-center gap-1.5">
+                        <a
+                          href={editBrochureUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="px-3 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold flex items-center gap-1.5 transition-colors shadow-2xs"
+                        >
+                          <ExternalLink className="w-3.5 h-3.5 text-[#00C2FF]" />
+                          <span>Xem Thử</span>
+                        </a>
+                        <button
+                          type="button"
+                          onClick={() => setEditBrochureUrl('')}
+                          className="p-2 rounded-xl bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 text-xs font-bold transition-colors cursor-pointer"
+                          title="Xóa tài liệu"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Hoặc dán link URL */}
+                  <div className="space-y-1">
+                    <label className="text-[10.5px] font-bold text-slate-700">
+                      Hoặc dán trực tiếp đường link PDF / Drive:
+                    </label>
+                    <input
+                      value={editBrochureUrl}
+                      onChange={(e) => setEditBrochureUrl(e.target.value)}
+                      placeholder="VD: https://aplusvn.net/company-profile.pdf"
+                      className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-semibold text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-[#0066FF]"
+                    />
+                  </div>
+                </div>
+
+                {/* --- MỤC 2: CẦU (ĐANG TÌM KIẾM ĐỐI TÁC / SEEKING) --- */}
+                <div className="p-3.5 rounded-2xl bg-gradient-to-br from-orange-50/50 to-amber-50/30 border border-orange-200/80 space-y-3 text-left">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-1.5">
+                      <Briefcase className="w-4 h-4 text-[#FF6B00]" />
+                      <span className="text-[12px] font-extrabold text-slate-900 uppercase tracking-wider">
+                        CẦU: ĐANG TÌM KIẾM ĐỐI TÁC (SEEKING)
+                      </span>
+                    </div>
+                    <span className="text-[10px] font-bold text-orange-800 bg-orange-100 px-2 py-0.5 rounded-full border border-orange-200">
+                      {editSeekingNeeds.length} Nhu cầu
+                    </span>
+                  </div>
+
+                  <p className="text-[11.5px] text-slate-600 leading-relaxed">
+                    Liệt kê đối tác, phân khúc khách hàng, nguồn cung bạn đang cần kết nối (hệ thống sẽ tự động ghép nối thủ công &amp; gợi ý thông minh).
+                  </p>
+
+                  {/* Danh sách các tag CẦU hiện tại */}
+                  <div className="flex flex-wrap gap-1.5 min-h-[32px] p-2 bg-white rounded-xl border border-orange-100">
+                    {editSeekingNeeds.map((need, idx) => (
+                      <span
+                        key={idx}
+                        className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-orange-50 border border-orange-200 text-orange-800 text-[11.5px] font-bold"
+                      >
+                        <span>• {need}</span>
+                        <button
+                          type="button"
+                          onClick={() => setEditSeekingNeeds(editSeekingNeeds.filter((_, i) => i !== idx))}
+                          className="hover:text-red-600 transition-colors p-0.5 cursor-pointer"
+                        >
+                          ✕
+                        </button>
+                      </span>
+                    ))}
+                    {editSeekingNeeds.length === 0 && (
+                      <span className="text-[11.5px] text-slate-400 italic py-1 px-1">Chưa có nhu cầu nào. Hãy thêm bên dưới:</span>
+                    )}
+                  </div>
+
+                  {/* Ô nhập thêm tag CẦU mới */}
+                  <div className="flex gap-1.5">
+                    <input
+                      value={newSeekingInput}
+                      onChange={(e) => setNewSeekingInput(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault();
+                          if (newSeekingInput.trim() && !editSeekingNeeds.includes(newSeekingInput.trim())) {
+                            setEditSeekingNeeds([...editSeekingNeeds, newSeekingInput.trim()]);
+                            setNewSeekingInput('');
+                          }
+                        }
+                      }}
+                      placeholder="VD: Nhà phân phối miền Nam, Đối tác MICE, Nhà đầu tư VC..."
+                      className="flex-1 px-3 py-2 rounded-xl border border-slate-300 text-xs font-semibold text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-[#FF6B00]"
+                    />
+                    <Button
+                      type="button"
+                      size="sm"
+                      onClick={() => {
+                        if (newSeekingInput.trim() && !editSeekingNeeds.includes(newSeekingInput.trim())) {
+                          setEditSeekingNeeds([...editSeekingNeeds, newSeekingInput.trim()]);
+                          setNewSeekingInput('');
+                        }
+                      }}
+                      className="bg-[#FF6B00] hover:bg-orange-600 text-white font-bold text-xs rounded-xl px-3.5 cursor-pointer shadow-xs shrink-0"
+                    >
+                      + Thêm Cầu
+                    </Button>
+                  </div>
+
+                  {/* Gợi ý nhanh */}
+                  <div className="flex items-center flex-wrap gap-1 pt-0.5">
+                    <span className="text-[10.5px] text-slate-500 font-semibold mr-1">Gợi ý nhanh:</span>
+                    {[
+                      'Đối tác Chuỗi Khách sạn/Resort MICE',
+                      'Nhà đầu tư Thiên Thần / VC',
+                      'Đại lý phân phối toàn quốc',
+                      'Doanh nghiệp Logistics & Kho vận',
+                      'Giải pháp Chuyển đổi số & AI',
+                    ].map((sugg, i) => (
+                      <button
+                        key={i}
+                        type="button"
+                        onClick={() => {
+                          if (!editSeekingNeeds.includes(sugg)) {
+                            setEditSeekingNeeds([...editSeekingNeeds, sugg]);
+                          }
+                        }}
+                        className="text-[10px] font-semibold bg-white hover:bg-orange-100 text-slate-700 hover:text-orange-900 px-2 py-0.5 rounded-md border border-slate-200 transition-colors cursor-pointer"
+                      >
+                        + {sugg}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* --- MỤC 3: CUNG (NĂNG LỰC CUNG CẤP / OFFERING) --- */}
+                <div className="p-3.5 rounded-2xl bg-gradient-to-br from-blue-50/50 to-indigo-50/30 border border-blue-200/80 space-y-3 text-left">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-1.5">
+                      <Sparkles className="w-4 h-4 text-[#0066FF]" />
+                      <span className="text-[12px] font-extrabold text-slate-900 uppercase tracking-wider">
+                        CUNG: NĂNG LỰC CUNG CẤP (OFFERING)
+                      </span>
+                    </div>
+                    <span className="text-[10px] font-bold text-blue-800 bg-blue-100 px-2 py-0.5 rounded-full border border-blue-200">
+                      {editOfferingServices.length} Dịch vụ
+                    </span>
+                  </div>
+
+                  <p className="text-[11.5px] text-slate-600 leading-relaxed">
+                    Liệt kê các năng lực cốt lõi, sản phẩm, giải pháp doanh nghiệp bạn sẵn sàng cung ứng và phân phối cho đối tác.
+                  </p>
+
+                  {/* Danh sách các tag CUNG hiện tại */}
+                  <div className="flex flex-wrap gap-1.5 min-h-[32px] p-2 bg-white rounded-xl border border-blue-100">
+                    {editOfferingServices.map((offer, idx) => (
+                      <span
+                        key={idx}
+                        className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-blue-50 border border-blue-200 text-blue-800 text-[11.5px] font-bold"
+                      >
+                        <span>✓ {offer}</span>
+                        <button
+                          type="button"
+                          onClick={() => setEditOfferingServices(editOfferingServices.filter((_, i) => i !== idx))}
+                          className="hover:text-red-600 transition-colors p-0.5 cursor-pointer"
+                        >
+                          ✕
+                        </button>
+                      </span>
+                    ))}
+                    {editOfferingServices.length === 0 && (
+                      <span className="text-[11.5px] text-slate-400 italic py-1 px-1">Chưa có dịch vụ nào. Hãy thêm bên dưới:</span>
+                    )}
+                  </div>
+
+                  {/* Ô nhập thêm tag CUNG mới */}
+                  <div className="flex gap-1.5">
+                    <input
+                      value={newOfferingInput}
+                      onChange={(e) => setNewOfferingInput(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault();
+                          if (newOfferingInput.trim() && !editOfferingServices.includes(newOfferingInput.trim())) {
+                            setEditOfferingServices([...editOfferingServices, newOfferingInput.trim()]);
+                            setNewOfferingInput('');
+                          }
+                        }
+                      }}
+                      placeholder="VD: Hạ tầng NFC, Nền tảng Check-in MICE, CRM B2B..."
+                      className="flex-1 px-3 py-2 rounded-xl border border-slate-300 text-xs font-semibold text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-[#0066FF]"
+                    />
+                    <Button
+                      type="button"
+                      size="sm"
+                      onClick={() => {
+                        if (newOfferingInput.trim() && !editOfferingServices.includes(newOfferingInput.trim())) {
+                          setEditOfferingServices([...editOfferingServices, newOfferingInput.trim()]);
+                          setNewOfferingInput('');
+                        }
+                      }}
+                      className="bg-[#0066FF] hover:bg-blue-700 text-white font-bold text-xs rounded-xl px-3.5 cursor-pointer shadow-xs shrink-0"
+                    >
+                      + Thêm Cung
+                    </Button>
+                  </div>
+
+                  {/* Gợi ý nhanh */}
+                  <div className="flex items-center flex-wrap gap-1 pt-0.5">
+                    <span className="text-[10.5px] text-slate-500 font-semibold mr-1">Gợi ý nhanh:</span>
+                    {[
+                      'Hạ tầng Định danh số NFC Doanh nghiệp',
+                      'Hệ thống Check-in Sự kiện MICE <1s',
+                      'Giải pháp CRM Sổ tay quan hệ B2B',
+                      'Thiết kế Nhận diện & Profile Doanh nghiệp',
+                      'Tổ chức Hội nghị & Triển lãm MICE',
+                      'Tư vấn Chuyển đổi số & AI',
+                    ].map((sugg, i) => (
+                      <button
+                        key={i}
+                        type="button"
+                        onClick={() => {
+                          if (!editOfferingServices.includes(sugg)) {
+                            setEditOfferingServices([...editOfferingServices, sugg]);
+                          }
+                        }}
+                        className="text-[10px] font-semibold bg-white hover:bg-blue-100 text-slate-700 hover:text-blue-900 px-2 py-0.5 rounded-md border border-slate-200 transition-colors cursor-pointer"
+                      >
+                        + {sugg}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
 

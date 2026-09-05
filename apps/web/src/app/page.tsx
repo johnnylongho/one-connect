@@ -49,6 +49,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { INITIAL_ARTICLES, CATEGORY_LABELS } from '@/lib/services/articles';
+import { ServicePackagesSection } from '@/components/services/ServicePackagesSection';
 
 export default function HomePage() {
   const { state, currentIdentity, logoutUser } = useOneConnectStore();
@@ -885,6 +886,11 @@ export default function HomePage() {
         </div>
 
       </section>
+
+      {/* ================================================================= */}
+      {/* 8.5. GÓI DỊCH VỤ & GIẢI PHÁP SỐ (SERVICES & PRICING PACKAGES) */}
+      {/* ================================================================= */}
+      <ServicePackagesSection id="services" className="border-t border-slate-200/60 bg-gradient-to-b from-[#0A1124] to-[#0D162B] text-white rounded-3xl my-8 shadow-xl" />
 
       {/* ================================================================= */}
       {/* 9. THÔNG TIN THÊM & BÀI VIẾT MỚI NHẤT (NEWS & MEDIA HUB) */}

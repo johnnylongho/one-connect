@@ -21,6 +21,7 @@ import {
   Smartphone,
   ExternalLink,
   CheckCircle2,
+  Target,
 } from 'lucide-react';
 
 export default function Navbar() {
@@ -92,6 +93,17 @@ export default function Navbar() {
             }`}
           >
             <Users className="w-4 h-4" /> Mạng Lưới B2B
+          </Link>
+
+          <Link
+            href="/dashboard/leads"
+            className={`px-3 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
+              pathname.startsWith('/dashboard/leads')
+                ? 'bg-emerald-600 text-white shadow-xs'
+                : 'text-emerald-700 bg-emerald-50/70 border border-emerald-200/80 hover:bg-emerald-100'
+            }`}
+          >
+            <Target className="w-4 h-4 text-emerald-600" /> Đo Lường Leads
           </Link>
 
           <Link

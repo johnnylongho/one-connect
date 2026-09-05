@@ -390,3 +390,67 @@ export function exportLeadsToExcel(connections: Connection[], leads: Lead[] = []
   const todayStr = new Date().toISOString().split('T')[0];
   XLSX.writeFile(wb, `OneConnect_Leads_CSKH_${todayStr}.xlsx`);
 }
+
+/**
+ * 4. Xuất Báo Cáo Đo Lường Nhu Cầu Thị Trường & Danh Sách Leads Đăng Ký Gói Dịch Vụ
+ */
+export function exportMarketLeadsToExcel(leads: Array<{
+  id: string;
+  packageType: string;
+  packageName: string;
+  fullName: string;
+  phone: string;
+  email?: string;
+  companyName?: string;
+  organizationType?: string;
+  notes?: string;
+  status: string;
+  createdAt: string;
+}>) {
+  const STATUS_LABELS: Record<string, string> = {
+    NEW: 'Mới nhận (Chưa liên hệ)',
+    CONTACTED: 'Đã liên hệ sơ bộ',
+    CONSULTING: 'Đang tư vấn & Báo giá',
+    WON: 'Đã chốt hợp đồng thành công',
+    LOST: 'Không có nhu cầu / Hủy',
+  };
+
+  const exportData = leads.map((lead, idx) => ({
+    'STT': idx + 1,
+    'Mã Lead': lead.id,
+    'Gói Dịch Vụ Quan Tâm': lead.packageName,
+    'Phân Loại Gói': lead.packageType,
+    'Họ và Tên Khách Hàng': lead.fullName,
+    'Số Điện Thoại': lead.phone,
+    'Email': lead.email || '',
+    'Tên Doanh Nghiệp / Tổ Chức': lead.companyName || '',
+    'Loại Hình Tổ Chức': lead.organizationType || '',
+    'Nhu Cầu Cụ Thể / Quy Mô': lead.notes || '',
+    'Trạng Thái Xử Lý': STATUS_LABELS[lead.status] || lead.status,
+    'Thời Điểm Đăng Ký': lead.createdAt ? new Date(lead.createdAt).toLocaleString('vi-VN') : '',
+  }));
+
+  const wb = XLSX.utils.book_new();
+  const ws = XLSX.utils.json_to_sheet(exportData);
+
+  ws['!cols'] = [
+    { wch: 6 },  // STT
+    { wch: 22 }, // Mã Lead
+    { wch: 32 }, // Gói Dịch Vụ
+    { wch: 20 }, // Phân Loại Gói
+    { wch: 25 }, // Tên KH
+    { wch: 16 }, // SĐT
+    { wch: 28 }, // Email
+    { wch: 35 }, // Công ty
+    { wch: 25 }, // Loại hình
+    { wch: 45 }, // Nhu cầu
+    { wch: 26 }, // Trạng thái
+    { wch: 22 }, // Thời điểm
+  ];
+
+  XLSX.utils.book_append_sheet(wb, ws, 'BaoCao_ThiTruong_Leads');
+
+  const todayStr = new Date().toISOString().split('T')[0];
+  XLSX.writeFile(wb, `OneConnect_BaoCao_NhuCau_ThiTruong_${todayStr}.xlsx`);
+}
+

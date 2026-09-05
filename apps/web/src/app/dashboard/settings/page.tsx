@@ -32,6 +32,8 @@ import {
   Upload,
   User,
   Briefcase,
+  Plus,
+  X,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -92,19 +94,81 @@ export default function SettingsAndPrivacyPage() {
   );
   const [newSkillTag, setNewSkillTag] = useState('');
 
+  // Brochure PDF State
+  const [settingsBrochureUrl, setSettingsBrochureUrl] = useState(
+    currentIdentity?.brochureUrl || 'https://aplusvn.net/company-profile-2026.pdf'
+  );
+  const settingsPdfFileInputRef = useRef<HTMLInputElement>(null);
+  const [isPdfUploading, setIsPdfUploading] = useState(false);
+
+  // B2B Cung & Cầu States
+  const [settingsSeekingNeeds, setSettingsSeekingNeeds] = useState<string[]>(
+    currentIdentity?.seekingNeeds || [
+      'Đối tác Chuỗi Khách sạn/Resort MICE',
+      'Các Hiệp hội Doanh nghiệp Tỉnh/Thành',
+      'Nhà phân phối phôi thẻ thông minh',
+    ]
+  );
+  const [newSeekingTag, setNewSeekingTag] = useState('');
+
+  const [settingsOfferingServices, setSettingsOfferingServices] = useState<string[]>(
+    currentIdentity?.offeringServices || [
+      'Hạ tầng Định danh số NFC Doanh nghiệp',
+      'Hệ thống Check-in Sự kiện <1s',
+      'Giải pháp CRM Sổ tay quan hệ B2B',
+    ]
+  );
+  const [newOfferingTag, setNewOfferingTag] = useState('');
+
   const showToast = (text: string, type: 'success' | 'error' | 'info' = 'success') => {
     setAlertNotice({ text, type });
     setTimeout(() => setAlertNotice(null), 4000);
   };
 
-  // Save Industry & Skills Handler
+  // Upload PDF Handler for Settings
+  const handleUploadPdfSettings = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf')) {
+      showToast('Định dạng không hợp lệ! Vui lòng chọn file PDF (.pdf).', 'error');
+      return;
+    }
+
+    if (file.size > 20 * 1024 * 1024) {
+      showToast('Tệp quá dung lượng! Tối đa 20MB.', 'error');
+      return;
+    }
+
+    setIsPdfUploading(true);
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = reader.result as string;
+      setSettingsBrochureUrl(result);
+      if (currentIdentity) {
+        updateIdentity(currentIdentity.id, { brochureUrl: result });
+      }
+      setIsPdfUploading(false);
+      showToast(`Đã tải lên tệp Brochure PDF "${file.name}" thành công!`, 'success');
+    };
+    reader.onerror = () => {
+      setIsPdfUploading(false);
+      showToast('Lỗi đọc tệp PDF, vui lòng thử lại.', 'error');
+    };
+    reader.readAsDataURL(file);
+  };
+
+  // Save Industry, Skills, Brochure & B2B Handler
   const handleSaveIndustryAndSkills = () => {
     if (!currentIdentity) return;
     updateIdentity(currentIdentity.id, {
       industry: settingsIndustry,
       expertiseSkills: settingsSkills,
+      brochureUrl: settingsBrochureUrl,
+      seekingNeeds: settingsSeekingNeeds,
+      offeringServices: settingsOfferingServices,
     });
-    showToast('Đã lưu tùy chọn lĩnh vực chuyên môn & kỹ năng cốt lõi thành công!', 'success');
+    showToast('Đã lưu tùy chọn Lĩnh vực, Brochure PDF và Cung - Cầu B2B thành công!', 'success');
   };
 
   // Upload Avatar Handler
@@ -472,6 +536,274 @@ export default function SettingsAndPrivacyPage() {
               >
                 + Thêm
               </Button>
+            </div>
+          </div>
+        </div>
+
+        {/* --- TÀI LIỆU NĂNG LỰC / BROCHURE (PDF) --- */}
+        <div className="border-t border-slate-200/80 pt-5 space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div>
+              <h4 className="text-sm font-extrabold text-slate-900 flex items-center gap-2 font-heading">
+                <FileText className="w-4 h-4 text-[#0066FF]" /> Tài Liệu Năng Lực &amp; Brochure Doanh Nghiệp (PDF)
+              </h4>
+              <p className="text-xs text-slate-500 mt-0.5">
+                Hiển thị nút tải và xem trực tiếp trên danh thiếp số để đối tác dễ dàng tìm hiểu về năng lực công ty
+              </p>
+            </div>
+            <Badge className="bg-blue-50 text-blue-700 border-blue-200 text-[10px] font-bold self-start sm:self-auto">
+              Tối đa 20MB
+            </Badge>
+          </div>
+
+          <div className="p-4 rounded-2xl bg-gradient-to-br from-slate-50 to-blue-50/40 border border-blue-200/80 space-y-3">
+            <input
+              type="file"
+              ref={settingsPdfFileInputRef}
+              onChange={handleUploadPdfSettings}
+              accept="application/pdf"
+              className="hidden"
+            />
+            <div className="flex flex-col sm:flex-row gap-2.5">
+              <Button
+                type="button"
+                onClick={() => settingsPdfFileInputRef.current?.click()}
+                disabled={isPdfUploading}
+                variant="outline"
+                className="bg-white hover:bg-slate-50 border-blue-300 text-blue-700 text-xs font-bold rounded-xl py-2.5 px-4 flex items-center justify-center gap-2 cursor-pointer shadow-2xs"
+              >
+                <Upload className="w-4 h-4 text-[#0066FF]" />
+                {isPdfUploading ? 'Đang Tải Tệp Lên...' : 'Tải File PDF Từ Máy Tính / Điện Thoại'}
+              </Button>
+              {settingsBrochureUrl && (
+                <div className="flex items-center gap-2">
+                  <a
+                    href={settingsBrochureUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="px-3.5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold flex items-center gap-1.5 transition-colors shadow-2xs"
+                  >
+                    <ExternalLink className="w-3.5 h-3.5 text-[#00C2FF]" />
+                    <span>Xem Thử PDF</span>
+                  </a>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSettingsBrochureUrl('');
+                      if (currentIdentity) updateIdentity(currentIdentity.id, { brochureUrl: '' });
+                    }}
+                    className="p-2.5 rounded-xl bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 text-xs font-bold transition-colors cursor-pointer"
+                    title="Xóa tài liệu"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+              )}
+            </div>
+
+            <div className="space-y-1">
+              <label className="text-[11px] font-bold text-slate-700">
+                Hoặc dán trực tiếp đường link PDF (Google Drive, Dropbox, Website công ty):
+              </label>
+              <input
+                value={settingsBrochureUrl}
+                onChange={(e) => setSettingsBrochureUrl(e.target.value)}
+                placeholder="VD: https://aplusvn.net/company-profile-2026.pdf"
+                className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-semibold text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-[#0066FF]"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* --- SÀN CUNG - CẦU GIAO THƯƠNG B2B (MATCHMAKING) --- */}
+        <div className="border-t border-slate-200/80 pt-5 space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div>
+              <h4 className="text-sm font-extrabold text-slate-900 flex items-center gap-2 font-heading">
+                <Sparkles className="w-4 h-4 text-[#FF6B00]" /> Cung &amp; Cầu Giao Thương B2B (Chọn Thủ Công &amp; AI Gợi Ý)
+              </h4>
+              <p className="text-xs text-slate-500 mt-0.5">
+                Thiết lập nhu cầu tìm kiếm (CẦU) và năng lực cung ứng (CUNG) để tự chọn đối tác hoặc kích hoạt thuật toán kết nối
+              </p>
+            </div>
+            <Badge className="bg-emerald-50 text-emerald-700 border-emerald-200 text-[10px] font-bold self-start sm:self-auto">
+              Hoạt Động 100% Thủ Công / Tự Động
+            </Badge>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 text-xs">
+            {/* CẦU: ĐANG TÌM KIẾM ĐỐI TÁC */}
+            <div className="p-4 rounded-2xl bg-gradient-to-br from-orange-50/60 to-amber-50/40 border border-orange-200/80 space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="font-bold text-orange-950 text-sm flex items-center gap-1.5 font-heading">
+                  <Briefcase className="w-4 h-4 text-[#FF6B00]" /> CẦU (Đang Tìm Kiếm Đối Tác)
+                </span>
+                <Badge className="bg-orange-100 text-orange-800 border-orange-200 text-[10px] font-bold">
+                  {settingsSeekingNeeds.length} Nhu cầu
+                </Badge>
+              </div>
+
+              <div className="flex flex-wrap gap-1.5 min-h-[36px] p-2 bg-white rounded-xl border border-orange-100">
+                {settingsSeekingNeeds.map((need, idx) => (
+                  <span
+                    key={idx}
+                    className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-orange-50 border border-orange-200 text-orange-800 text-[11.5px] font-bold"
+                  >
+                    <span>• {need}</span>
+                    <button
+                      type="button"
+                      onClick={() => setSettingsSeekingNeeds(settingsSeekingNeeds.filter((_, i) => i !== idx))}
+                      className="w-4 h-4 rounded-full bg-orange-200/80 hover:bg-rose-500 hover:text-white flex items-center justify-center text-[10px] text-orange-900 transition-colors cursor-pointer"
+                    >
+                      ✕
+                    </button>
+                  </span>
+                ))}
+                {settingsSeekingNeeds.length === 0 && (
+                  <span className="text-[11.5px] text-slate-400 italic py-2 px-1">Chưa có nhu cầu nào. Thêm bên dưới:</span>
+                )}
+              </div>
+
+              <div className="flex gap-2">
+                <input
+                  value={newSeekingTag}
+                  onChange={(e) => setNewSeekingTag(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      if (newSeekingTag.trim() && !settingsSeekingNeeds.includes(newSeekingTag.trim())) {
+                        setSettingsSeekingNeeds([...settingsSeekingNeeds, newSeekingTag.trim()]);
+                        setNewSeekingTag('');
+                      }
+                    }
+                  }}
+                  placeholder="VD: Đối tác Khách sạn/Resort MICE, Nhà phân phối..."
+                  className="flex-1 px-3 py-2 rounded-xl border border-slate-300 text-xs font-semibold text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-[#FF6B00]"
+                />
+                <Button
+                  type="button"
+                  size="sm"
+                  onClick={() => {
+                    if (newSeekingTag.trim() && !settingsSeekingNeeds.includes(newSeekingTag.trim())) {
+                      setSettingsSeekingNeeds([...settingsSeekingNeeds, newSeekingTag.trim()]);
+                      setNewSeekingTag('');
+                    }
+                  }}
+                  className="bg-[#FF6B00] hover:bg-orange-600 text-white font-bold text-xs rounded-xl px-3.5 cursor-pointer shadow-xs shrink-0"
+                >
+                  + Thêm Cầu
+                </Button>
+              </div>
+
+              <div className="flex items-center flex-wrap gap-1 pt-0.5">
+                <span className="text-[10.5px] text-slate-500 font-semibold mr-1">Gợi ý nhanh:</span>
+                {[
+                  'Đối tác Chuỗi Khách sạn/Resort MICE',
+                  'Nhà đầu tư Thiên Thần / VC',
+                  'Đại lý phân phối toàn quốc',
+                  'Doanh nghiệp Logistics & Kho vận',
+                ].map((sugg, i) => (
+                  <button
+                    key={i}
+                    type="button"
+                    onClick={() => {
+                      if (!settingsSeekingNeeds.includes(sugg)) {
+                        setSettingsSeekingNeeds([...settingsSeekingNeeds, sugg]);
+                      }
+                    }}
+                    className="text-[10px] font-semibold bg-white hover:bg-orange-100 text-slate-700 hover:text-orange-900 px-2 py-0.5 rounded-md border border-slate-200 transition-colors cursor-pointer"
+                  >
+                    + {sugg}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* CUNG: NĂNG LỰC CUNG CẤP */}
+            <div className="p-4 rounded-2xl bg-gradient-to-br from-blue-50/60 to-indigo-50/40 border border-blue-200/80 space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="font-bold text-blue-950 text-sm flex items-center gap-1.5 font-heading">
+                  <Sparkles className="w-4 h-4 text-[#0066FF]" /> CUNG (Năng Lực Cung Cấp)
+                </span>
+                <Badge className="bg-blue-100 text-blue-800 border-blue-200 text-[10px] font-bold">
+                  {settingsOfferingServices.length} Dịch vụ
+                </Badge>
+              </div>
+
+              <div className="flex flex-wrap gap-1.5 min-h-[36px] p-2 bg-white rounded-xl border border-blue-100">
+                {settingsOfferingServices.map((offer, idx) => (
+                  <span
+                    key={idx}
+                    className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-blue-50 border border-blue-200 text-blue-800 text-[11.5px] font-bold"
+                  >
+                    <span>✓ {offer}</span>
+                    <button
+                      type="button"
+                      onClick={() => setSettingsOfferingServices(settingsOfferingServices.filter((_, i) => i !== idx))}
+                      className="w-4 h-4 rounded-full bg-blue-200/80 hover:bg-rose-500 hover:text-white flex items-center justify-center text-[10px] text-blue-900 transition-colors cursor-pointer"
+                    >
+                      ✕
+                    </button>
+                  </span>
+                ))}
+                {settingsOfferingServices.length === 0 && (
+                  <span className="text-[11.5px] text-slate-400 italic py-2 px-1">Chưa có dịch vụ nào. Thêm bên dưới:</span>
+                )}
+              </div>
+
+              <div className="flex gap-2">
+                <input
+                  value={newOfferingTag}
+                  onChange={(e) => setNewOfferingTag(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      if (newOfferingTag.trim() && !settingsOfferingServices.includes(newOfferingTag.trim())) {
+                        setSettingsOfferingServices([...settingsOfferingServices, newOfferingTag.trim()]);
+                        setNewOfferingTag('');
+                      }
+                    }
+                  }}
+                  placeholder="VD: Hạ tầng NFC, Check-in MICE <1s, CRM B2B..."
+                  className="flex-1 px-3 py-2 rounded-xl border border-slate-300 text-xs font-semibold text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-[#0066FF]"
+                />
+                <Button
+                  type="button"
+                  size="sm"
+                  onClick={() => {
+                    if (newOfferingTag.trim() && !settingsOfferingServices.includes(newOfferingTag.trim())) {
+                      setSettingsOfferingServices([...settingsOfferingServices, newOfferingTag.trim()]);
+                      setNewOfferingTag('');
+                    }
+                  }}
+                  className="bg-[#0066FF] hover:bg-blue-700 text-white font-bold text-xs rounded-xl px-3.5 cursor-pointer shadow-xs shrink-0"
+                >
+                  + Thêm Cung
+                </Button>
+              </div>
+
+              <div className="flex items-center flex-wrap gap-1 pt-0.5">
+                <span className="text-[10.5px] text-slate-500 font-semibold mr-1">Gợi ý nhanh:</span>
+                {[
+                  'Hạ tầng Định danh số NFC Doanh nghiệp',
+                  'Hệ thống Check-in Sự kiện MICE <1s',
+                  'Giải pháp CRM Sổ tay quan hệ B2B',
+                  'Tổ chức Hội nghị & Triển lãm MICE',
+                ].map((sugg, i) => (
+                  <button
+                    key={i}
+                    type="button"
+                    onClick={() => {
+                      if (!settingsOfferingServices.includes(sugg)) {
+                        setSettingsOfferingServices([...settingsOfferingServices, sugg]);
+                      }
+                    }}
+                    className="text-[10px] font-semibold bg-white hover:bg-blue-100 text-slate-700 hover:text-blue-900 px-2 py-0.5 rounded-md border border-slate-200 transition-colors cursor-pointer"
+                  >
+                    + {sugg}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
         </div>

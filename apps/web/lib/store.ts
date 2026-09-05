@@ -1113,6 +1113,9 @@ export function useOneConnectStore() {
     slogan?: string;
     industry?: string;
     expertiseSkills?: string[];
+    brochureUrl?: string;
+    seekingNeeds?: string[];
+    offeringServices?: string[];
   }) => {
     setState(prev => ({
       ...prev,
@@ -1176,6 +1179,9 @@ export function useOneConnectStore() {
           slogan: updates.slogan !== undefined ? updates.slogan : item.slogan,
           industry: updates.industry !== undefined ? updates.industry : item.industry,
           expertiseSkills: updates.expertiseSkills !== undefined ? updates.expertiseSkills : item.expertiseSkills,
+          brochureUrl: updates.brochureUrl !== undefined ? updates.brochureUrl : item.brochureUrl,
+          seekingNeeds: updates.seekingNeeds !== undefined ? updates.seekingNeeds : item.seekingNeeds,
+          offeringServices: updates.offeringServices !== undefined ? updates.offeringServices : item.offeringServices,
           businesses: updatedBusinesses,
           socialLinks: updatedSocialLinks.length > 0 ? updatedSocialLinks : item.socialLinks,
           updatedAt: new Date().toISOString()
