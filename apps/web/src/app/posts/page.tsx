@@ -231,7 +231,8 @@ export default function PostsPortalPage() {
               <ShieldCheck className="w-3.5 h-3.5" /> Tuân thủ PDPL 91
             </span>
             <Link href="/" className="hover:text-blue-600">Trang Chủ</Link>
-            <Link href="/social-value" className="hover:text-blue-600">Giá Trị Xã Hội</Link>
+            <Link href="/social-value" className="hover:text-blue-600">ESG &amp; Xã Hội</Link>
+            <Link href="/services" className="hover:text-blue-600">Dịch Vụ</Link>
             <Link href="/login" className="hover:text-blue-600">Đăng Nhập</Link>
           </div>
         </div>

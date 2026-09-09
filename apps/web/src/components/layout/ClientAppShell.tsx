@@ -200,12 +200,19 @@ export function ClientAppShell({ children }: { children: React.ReactNode }) {
   const adminItems = allowedNavItems.filter((item) => item.section === 'ADMIN');
   const pitchingItems = allowedNavItems.filter((item) => item.section === 'PITCHING');
 
-  const isStandalonePage =
+  // TẦNG 1: BỀ NỔI PUBLISH / PORTAL CÔNG KHAI (Trang Chủ, ESG, Dịch Vụ, Thông Tin Thêm)
+  const isPublicPortal =
     pathname === '/' ||
     pathname === '/intro' ||
     pathname === '/social-value' ||
+    pathname === '/services' ||
+    pathname?.startsWith('/services') ||
     pathname === '/posts' ||
-    pathname?.startsWith('/posts/') ||
+    pathname?.startsWith('/posts');
+
+  // Toàn bộ các trang công khai / độc lập không thuộc Tầng 2 Quản trị
+  const isStandalonePage =
+    isPublicPortal ||
     pathname === '/demo' ||
     pathname === '/login' ||
     pathname === '/register' ||
@@ -223,19 +230,13 @@ export function ClientAppShell({ children }: { children: React.ReactNode }) {
       typeof document !== 'undefined' &&
       (document.cookie.includes('one_connect_auth_session=') || document.cookie.includes('sb-access-token='));
 
+    // BẢO VỆ TẦNG 2: Chỉ người dùng có tài khoản đăng nhập mới truy cập được các trang ngoài isStandalonePage
     if (!state.currentIdentityId && !cookieExists && !isStandalonePage) {
       router.replace('/login');
     }
   }, [state.currentIdentityId, isStandalonePage, isHydrated, router]);
 
   if (isStandalonePage) {
-    const isPublicPortal =
-      pathname === '/' ||
-      pathname === '/intro' ||
-      pathname === '/social-value' ||
-      pathname === '/posts' ||
-      pathname?.startsWith('/posts');
-
     return (
       <div className={`min-h-screen ${isPublicPortal ? 'bg-[#F8FAFD]' : 'bg-white'} text-slate-900 font-sans antialiased selection:bg-blue-600 selection:text-white overflow-x-hidden`}>
         {isPublicPortal && <PublicHeader />}

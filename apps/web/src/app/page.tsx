@@ -1018,6 +1018,9 @@ export default function HomePage() {
               <Link href="/social-value" className="hover:text-emerald-600 text-emerald-700 flex items-center gap-1">
                 <Leaf className="w-3.5 h-3.5" /> Chuẩn ESG Xanh
               </Link>
+              <Link href="/services" className="hover:text-cyan-600 text-slate-600">
+                Dịch Vụ
+              </Link>
               <Link href="/posts" className="hover:text-blue-600">
                 Thông Tin Thêm
               </Link>

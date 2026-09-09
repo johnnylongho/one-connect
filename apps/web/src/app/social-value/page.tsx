@@ -430,7 +430,8 @@ export default function SocialValuePage() {
               <ShieldCheck className="w-3.5 h-3.5" /> Chuẩn ESG &amp; Nghị định 13
             </span>
             <Link href="/" className="hover:text-emerald-600">Trang Chủ</Link>
-            <Link href="/posts" className="hover:text-emerald-600">Bài Viết</Link>
+            <Link href="/services" className="hover:text-emerald-600">Dịch Vụ</Link>
+            <Link href="/posts" className="hover:text-emerald-600">Thông Tin Thêm</Link>
             <Link href="/login" className="hover:text-emerald-600">Đăng Nhập</Link>
           </div>
         </div>

@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import { ArrowRight, Sparkles, ShieldCheck, Zap } from 'lucide-react';
+import { ArrowRight, Sparkles, ShieldCheck, Zap, Leaf } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ServicePackagesSection } from '@/components/services/ServicePackagesSection';
 
@@ -63,6 +63,47 @@ export default function ServicesPage() {
           </div>
         </div>
       </main>
+
+      {/* Global Public Footer */}
+      <footer className="border-t border-slate-800 bg-[#0A1124] py-10 px-4 sm:px-6 lg:px-8 text-xs text-slate-400">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-6">
+          <div className="flex flex-col items-center sm:items-start gap-2.5 text-center sm:text-left">
+            <Link href="/" title="One Connect Network" className="inline-block">
+              <img
+                src="/brand_logo_transparent.png?v=20260904_tagline"
+                alt="One Connect"
+                className="h-7 sm:h-7 w-auto object-contain mx-auto sm:mx-0"
+              />
+            </Link>
+            <span className="font-medium text-slate-400 block">
+              © 2026 One Connect Network. Nền tảng Định danh số B2B &amp; ESG Xanh.
+            </span>
+          </div>
+
+          <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 text-center sm:text-right">
+            <div className="flex items-center gap-4 text-[11px] font-semibold">
+              <Link href="/" className="hover:text-white text-slate-300">
+                Trang Chủ
+              </Link>
+              <Link href="/social-value" className="hover:text-emerald-400 text-emerald-400 flex items-center gap-1">
+                <Leaf className="w-3.5 h-3.5" /> Chuẩn ESG Xanh
+              </Link>
+              <Link href="/services" className="hover:text-cyan-400 text-cyan-400">
+                Dịch Vụ
+              </Link>
+              <Link href="/posts" className="hover:text-blue-400 text-slate-300">
+                Thông Tin Thêm
+              </Link>
+              <Link href="/login" className="hover:text-white text-slate-300">
+                Đăng nhập
+              </Link>
+              <Link href="/register" className="hover:text-white text-slate-300">
+                Đăng ký
+              </Link>
+            </div>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
