@@ -20,44 +20,7 @@ export function PublicHeader() {
   const pathname = usePathname();
   const { currentIdentity } = useOneConnectStore();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [servicesDropdownOpen, setServicesDropdownOpen] = useState(false);
   const [mobileServicesOpen, setMobileServicesOpen] = useState(false);
-
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const dropdownRef = useRef<HTMLDivElement | null>(null);
-
-  const handleMouseEnter = () => {
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-      timeoutRef.current = null;
-    }
-    setServicesDropdownOpen(true);
-  };
-
-  const handleMouseLeave = () => {
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-    }
-    timeoutRef.current = setTimeout(() => {
-      setServicesDropdownOpen(false);
-    }, 300); // 300ms grace period - prevents accidental closing on mouse travel
-  };
-
-  // Close dropdown on click outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setServicesDropdownOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
-    };
-  }, []);
 
   const isHome = pathname === '/' || pathname === '/intro';
   const isSocialValue = pathname === '/social-value';
@@ -130,114 +93,83 @@ export function PublicHeader() {
           </Link>
 
           {/* Dịch Vụ (Dropdown với 3 gói: Cá nhân, Sự kiện MICE, Hiệp hội) */}
-          <div
-            ref={dropdownRef}
-            className="relative"
-            onMouseEnter={handleMouseEnter}
-            onMouseLeave={handleMouseLeave}
-          >
-            <div className="flex items-center">
-              <Link
-                href="/services"
-                onClick={handleServicesClick}
-                className={`px-3 py-1.5 rounded-xl transition-all inline-flex items-center gap-1 cursor-pointer ${
-                  isServices
-                    ? 'text-cyan-300 bg-cyan-500/15 border border-cyan-500/30 shadow-xs'
-                    : 'text-slate-300 hover:text-cyan-400 hover:bg-white/5'
-                }`}
-              >
-                <span>Dịch Vụ</span>
-              </Link>
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  setServicesDropdownOpen((prev) => !prev);
-                }}
-                className="p-1 -ml-1 text-slate-400 hover:text-cyan-400 cursor-pointer rounded-lg hover:bg-white/5 transition-colors"
-                aria-label="Mở danh sách dịch vụ"
-              >
-                <ChevronDown
-                  className={`w-3.5 h-3.5 transition-transform duration-200 ${
-                    servicesDropdownOpen ? 'rotate-180 text-cyan-400' : 'text-slate-400'
-                  }`}
-                />
-              </button>
-            </div>
+          <div className="relative group py-3">
+            <Link
+              href="/services"
+              onClick={handleServicesClick}
+              className={`px-3 py-1.5 rounded-xl transition-all inline-flex items-center gap-1.5 cursor-pointer select-none ${
+                isServices
+                  ? 'text-cyan-300 bg-cyan-500/15 border border-cyan-500/30 shadow-xs'
+                  : 'text-slate-300 group-hover:text-cyan-400 group-hover:bg-white/5'
+              }`}
+            >
+              <span>Dịch Vụ</span>
+              <ChevronDown className="w-3.5 h-3.5 text-slate-400 group-hover:text-cyan-400 transition-transform duration-200 group-hover:rotate-180" />
+            </Link>
 
-            {/* Dropdown Menu Container (Vùng đệm liền mạch pt-2 không có khe hở vật lý) */}
-            {servicesDropdownOpen && (
-              <div
-                className="absolute top-full left-0 pt-2 w-64 z-50 animate-in fade-in slide-in-from-top-1 duration-150"
-                onMouseEnter={handleMouseEnter}
-                onMouseLeave={handleMouseLeave}
-              >
-                <div className="rounded-2xl bg-[#0D162B] border border-slate-700 shadow-2xl p-2 space-y-1 backdrop-blur-2xl">
-                  <Link
-                    href="/services#packages"
-                    onClick={(e) => {
-                      setServicesDropdownOpen(false);
-                      if (isHome) {
-                        e.preventDefault();
-                        document.getElementById('services')?.scrollIntoView({ behavior: 'smooth' });
-                      }
-                    }}
-                    className="block p-2.5 rounded-xl hover:bg-slate-800/80 transition-colors group cursor-pointer"
-                  >
-                    <div className="text-xs font-bold text-white group-hover:text-blue-400 transition-colors">
-                      Doanh Nhân Cá Nhân
-                    </div>
-                    <div className="text-[10px] text-slate-400 font-medium">
-                      Thẻ danh thiếp số 3D &amp; Profile động
-                    </div>
-                  </Link>
+            {/* Dropdown Menu Container (Pure CSS hover - Mở tức thì khi rê chuột, không độ trễ, không giật) */}
+            <div className="absolute top-[calc(100%-6px)] left-0 pt-2 w-64 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-all duration-150 ease-out z-50">
+              <div className="rounded-2xl bg-[#0D162B] border border-slate-700 shadow-2xl p-2 space-y-1 backdrop-blur-2xl">
+                <Link
+                  href="/services#packages"
+                  onClick={(e) => {
+                    if (isHome) {
+                      e.preventDefault();
+                      document.getElementById('services')?.scrollIntoView({ behavior: 'smooth' });
+                    }
+                  }}
+                  className="block p-2.5 rounded-xl hover:bg-slate-800/80 transition-colors group/item cursor-pointer"
+                >
+                  <div className="text-xs font-bold text-white group-hover/item:text-blue-400 transition-colors">
+                    Doanh Nhân Cá Nhân
+                  </div>
+                  <div className="text-[10px] text-slate-400 font-medium">
+                    Thẻ danh thiếp số 3D &amp; Profile động
+                  </div>
+                </Link>
 
-                  <Link
-                    href="/services#packages"
-                    onClick={(e) => {
-                      setServicesDropdownOpen(false);
-                      if (isHome) {
-                        e.preventDefault();
-                        document.getElementById('services')?.scrollIntoView({ behavior: 'smooth' });
-                      }
-                    }}
-                    className="block p-2.5 rounded-xl hover:bg-slate-800/80 transition-colors group cursor-pointer bg-blue-500/10 border border-blue-500/20"
-                  >
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-extrabold text-cyan-300 group-hover:text-white transition-colors">
-                        Doanh Nghiệp Sự Kiện MICE
-                      </span>
-                      <span className="text-[9px] font-black bg-blue-500 text-white px-1.5 py-0.2 rounded-full uppercase">
-                        HOT
-                      </span>
-                    </div>
-                    <div className="text-[10px] text-blue-200 font-medium">
-                      Trạm check-in siêu tốc &lt; 0.42s &amp; CRM
-                    </div>
-                  </Link>
+                <Link
+                  href="/services#packages"
+                  onClick={(e) => {
+                    if (isHome) {
+                      e.preventDefault();
+                      document.getElementById('services')?.scrollIntoView({ behavior: 'smooth' });
+                    }
+                  }}
+                  className="block p-2.5 rounded-xl hover:bg-slate-800/80 transition-colors group/item cursor-pointer bg-blue-500/10 border border-blue-500/20"
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-extrabold text-cyan-300 group-hover/item:text-white transition-colors">
+                      Doanh Nghiệp Sự Kiện MICE
+                    </span>
+                    <span className="text-[9px] font-black bg-blue-500 text-white px-1.5 py-0.2 rounded-full uppercase">
+                      HOT
+                    </span>
+                  </div>
+                  <div className="text-[10px] text-blue-200 font-medium">
+                    Trạm check-in siêu tốc &lt; 0.42s &amp; CRM
+                  </div>
+                </Link>
 
-                  <Link
-                    href="/services#packages"
-                    onClick={(e) => {
-                      setServicesDropdownOpen(false);
-                      if (isHome) {
-                        e.preventDefault();
-                        document.getElementById('services')?.scrollIntoView({ behavior: 'smooth' });
-                      }
-                    }}
-                    className="block p-2.5 rounded-xl hover:bg-slate-800/80 transition-colors group cursor-pointer"
-                  >
-                    <div className="text-xs font-bold text-white group-hover:text-emerald-400 transition-colors">
-                      Hiệp Hội Tổ Chức
-                    </div>
-                    <div className="text-[10px] text-slate-400 font-medium">
-                      Mạng lưới hội viên số tập trung toàn tỉnh
-                    </div>
-                  </Link>
-                </div>
+                <Link
+                  href="/services#packages"
+                  onClick={(e) => {
+                    if (isHome) {
+                      e.preventDefault();
+                      document.getElementById('services')?.scrollIntoView({ behavior: 'smooth' });
+                    }
+                  }}
+                  className="block p-2.5 rounded-xl hover:bg-slate-800/80 transition-colors group/item cursor-pointer"
+                >
+                  <div className="text-xs font-bold text-white group-hover/item:text-emerald-400 transition-colors">
+                    Hiệp Hội Tổ Chức
+                  </div>
+                  <div className="text-[10px] text-slate-400 font-medium">
+                    Mạng lưới hội viên số tập trung toàn tỉnh
+                  </div>
+                </Link>
               </div>
-            )}
+            </div>
           </div>
 
           {/* Thông Tin Thêm */}
