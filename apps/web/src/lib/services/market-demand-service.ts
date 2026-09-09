@@ -21,7 +21,7 @@ export interface MarketLead {
 export interface MarketDemandEvent {
   id: string;
   packageType: PackageType;
-  eventType: 'VIEW_PACKAGE' | 'CLICK_CTA' | 'OPEN_MODAL' | 'SUBMIT_LEAD';
+  eventType: 'VIEW_PACKAGE' | 'CLICK_CTA' | 'OPEN_MODAL' | 'SUBMIT_LEAD' | 'VOTE_INTEREST';
   referrer?: string;
   userAgent?: string;
   metadata?: Record<string, any>;
@@ -33,6 +33,7 @@ export interface PackageDemandStat {
   name: string;
   badge: string;
   clicks: number;
+  votes: number;
   leadsCount: number;
   percentage: number;
   targetAudience: string;
@@ -40,6 +41,7 @@ export interface PackageDemandStat {
 
 export interface MarketDemandSummary {
   totalClicks: number;
+  totalVotes: number;
   totalLeads: number;
   conversionRate: number;
   topPackage: PackageDemandStat;
@@ -72,6 +74,12 @@ let inMemoryClicks: Record<PackageType, number> = {
   ASSOCIATION: 0,
 };
 
+let inMemoryVotes: Record<PackageType, number> = {
+  ENTREPRENEUR: 0,
+  MICE_ENTERPRISE: 0,
+  ASSOCIATION: 0,
+};
+
 let inMemoryLeads: MarketLead[] = [];
 
 function getSupabaseClient() {
@@ -86,7 +94,7 @@ function getSupabaseClient() {
  */
 export async function trackMarketDemand(
   packageType: PackageType,
-  eventType: 'VIEW_PACKAGE' | 'CLICK_CTA' | 'OPEN_MODAL' | 'SUBMIT_LEAD',
+  eventType: 'VIEW_PACKAGE' | 'CLICK_CTA' | 'OPEN_MODAL' | 'SUBMIT_LEAD' | 'VOTE_INTEREST',
   metadata?: Record<string, any>
 ) {
   if (inMemoryClicks[packageType] !== undefined) {
@@ -122,6 +130,116 @@ export async function trackMarketDemand(
   }
 
   return { success: true, packageType, clicks: inMemoryClicks[packageType] };
+}
+
+/**
+ * 1b. Record Real-time Market Survey Vote (Interest Vote)
+ */
+export async function recordMarketVote(
+  packageType: PackageType,
+  metadata?: Record<string, any>
+) {
+  if (inMemoryVotes[packageType] !== undefined) {
+    inMemoryVotes[packageType] += 1;
+  }
+
+  const supabase = getSupabaseClient();
+  if (supabase) {
+    try {
+      const { error } = await supabase.from('market_demand_events').insert({
+        package_type: packageType,
+        event_type: 'VOTE_INTEREST',
+        metadata: metadata || {},
+      });
+
+      if (error) {
+        await supabase.from('audit_logs').insert({
+          action: 'MARKET_DEMAND_EVENT',
+          entity_type: 'MARKET_DEMAND_EVENT',
+          details: {
+            package_type: packageType,
+            event_type: 'VOTE_INTEREST',
+            metadata: metadata || {},
+            recorded_at: new Date().toISOString(),
+          },
+        });
+      }
+    } catch (err) {
+      console.warn('Could not record vote event to Supabase:', err);
+    }
+  }
+
+  return {
+    success: true,
+    packageType,
+    votes: inMemoryVotes[packageType],
+    allVotes: { ...inMemoryVotes },
+  };
+}
+
+/**
+ * 1c. Fetch Real-time Market Survey Votes Count
+ */
+export async function getMarketVotes(): Promise<{
+  votes: Record<PackageType, number>;
+  totalVotes: number;
+  target: number;
+}> {
+  const votes: Record<PackageType, number> = {
+    ENTREPRENEUR: 0,
+    MICE_ENTERPRISE: 0,
+    ASSOCIATION: 0,
+  };
+
+  const supabase = getSupabaseClient();
+  if (supabase) {
+    try {
+      const { data: dbEvents, error: evErr } = await supabase
+        .from('market_demand_events')
+        .select('package_type, event_type')
+        .eq('event_type', 'VOTE_INTEREST');
+
+      if (!evErr && dbEvents && dbEvents.length > 0) {
+        dbEvents.forEach((ev: any) => {
+          const pType = ev.package_type as PackageType;
+          if (votes[pType] !== undefined) {
+            votes[pType] += 1;
+          }
+        });
+      } else {
+        const { data: logEvents } = await supabase
+          .from('audit_logs')
+          .select('details')
+          .eq('entity_type', 'MARKET_DEMAND_EVENT');
+
+        if (logEvents && logEvents.length > 0) {
+          logEvents.forEach((row: any) => {
+            if (row.details?.event_type === 'VOTE_INTEREST') {
+              const pType = row.details?.package_type as PackageType;
+              if (pType && votes[pType] !== undefined) {
+                votes[pType] += 1;
+              }
+            }
+          });
+        }
+      }
+    } catch (err) {
+      console.warn('Error reading votes from Supabase:', err);
+    }
+  }
+
+  // Merge with process in-memory votes if higher
+  (['ENTREPRENEUR', 'MICE_ENTERPRISE', 'ASSOCIATION'] as PackageType[]).forEach((p) => {
+    votes[p] = Math.max(votes[p], inMemoryVotes[p]);
+  });
+
+  const totalVotes = Object.values(votes).reduce((a, b) => a + b, 0);
+
+  return {
+    votes,
+    totalVotes,
+    target: 100,
+  };
 }
 
 /**
@@ -267,6 +385,11 @@ export async function getMarketDemandSummary(): Promise<MarketDemandSummary> {
     MICE_ENTERPRISE: 0,
     ASSOCIATION: 0,
   };
+  let votes: Record<PackageType, number> = {
+    ENTREPRENEUR: 0,
+    MICE_ENTERPRISE: 0,
+    ASSOCIATION: 0,
+  };
 
   const supabase = getSupabaseClient();
   if (supabase) {
@@ -327,8 +450,15 @@ export async function getMarketDemandSummary(): Promise<MarketDemandSummary> {
 
       if (!evErr && dbEvents && dbEvents.length > 0) {
         dbEvents.forEach((ev: any) => {
-          if (clicks[ev.package_type as PackageType] !== undefined) {
-            clicks[ev.package_type as PackageType] += 1;
+          const pType = ev.package_type as PackageType;
+          if (ev.event_type === 'VOTE_INTEREST') {
+            if (votes[pType] !== undefined) {
+              votes[pType] += 1;
+            }
+          } else {
+            if (clicks[pType] !== undefined) {
+              clicks[pType] += 1;
+            }
           }
         });
       } else {
@@ -341,8 +471,14 @@ export async function getMarketDemandSummary(): Promise<MarketDemandSummary> {
         if (logEvents && logEvents.length > 0) {
           logEvents.forEach((row: any) => {
             const pType = row.details?.package_type as PackageType;
-            if (pType && clicks[pType] !== undefined) {
-              clicks[pType] += 1;
+            if (row.details?.event_type === 'VOTE_INTEREST') {
+              if (pType && votes[pType] !== undefined) {
+                votes[pType] += 1;
+              }
+            } else {
+              if (pType && clicks[pType] !== undefined) {
+                clicks[pType] += 1;
+              }
             }
           });
         }
@@ -351,6 +487,11 @@ export async function getMarketDemandSummary(): Promise<MarketDemandSummary> {
       console.warn('Error reading market stats from Supabase:', err);
     }
   }
+
+  // Merge with memory counters
+  (['ENTREPRENEUR', 'MICE_ENTERPRISE', 'ASSOCIATION'] as PackageType[]).forEach((p) => {
+    votes[p] = Math.max(votes[p], inMemoryVotes[p]);
+  });
 
   // Merge any leads created in the current runtime if not yet indexed in query
   inMemoryLeads.forEach((memLead) => {
@@ -361,10 +502,12 @@ export async function getMarketDemandSummary(): Promise<MarketDemandSummary> {
 
   // Calculate genuine real-time metrics
   const totalClicks = Object.values(clicks).reduce((a, b) => a + b, 0);
+  const totalVotes = Object.values(votes).reduce((a, b) => a + b, 0);
   const totalLeads = leads.length;
 
   const packageStats: PackageDemandStat[] = (['MICE_ENTERPRISE', 'ENTREPRENEUR', 'ASSOCIATION'] as PackageType[]).map((type) => {
     const pClicks = clicks[type] || 0;
+    const pVotes = votes[type] || 0;
     const pLeads = leads.filter((l) => l.packageType === type).length;
     const percentage = totalClicks > 0 ? Math.round((pClicks / totalClicks) * 100) : 0;
     const info = PACKAGE_INFO[type];
@@ -374,19 +517,21 @@ export async function getMarketDemandSummary(): Promise<MarketDemandSummary> {
       name: info.name,
       badge: info.badge,
       clicks: pClicks,
+      votes: pVotes,
       leadsCount: pLeads,
       percentage,
       targetAudience: info.targetAudience,
     };
   });
 
-  const sorted = [...packageStats].sort((a, b) => b.clicks - a.clicks);
+  const sorted = [...packageStats].sort((a, b) => (b.clicks + b.votes) - (a.clicks + a.votes));
   const firstPackage = sorted[0];
-  const topPackage: PackageDemandStat = (firstPackage && firstPackage.clicks > 0 ? firstPackage : null) || {
+  const topPackage: PackageDemandStat = (firstPackage && (firstPackage.clicks > 0 || firstPackage.votes > 0) ? firstPackage : null) || {
     type: 'MICE_ENTERPRISE',
-    name: (firstPackage && totalClicks > 0) ? firstPackage.name : 'Chưa có dữ liệu tương tác',
+    name: (firstPackage && (totalClicks > 0 || totalVotes > 0)) ? firstPackage.name : 'Chưa có dữ liệu tương tác',
     badge: 'REALTIME',
     clicks: 0,
+    votes: 0,
     leadsCount: 0,
     percentage: 0,
     targetAudience: 'Đang lắng nghe dữ liệu truy cập thực tế từ thị trường',
@@ -396,6 +541,7 @@ export async function getMarketDemandSummary(): Promise<MarketDemandSummary> {
 
   return {
     totalClicks,
+    totalVotes,
     totalLeads,
     conversionRate,
     topPackage,

@@ -208,10 +208,10 @@ export function MarketDemandReport() {
           </CardHeader>
           <CardContent className="space-y-1">
             <div className="text-2xl sm:text-3xl font-black text-slate-900 font-heading">
-              {data.totalClicks} <span className="text-xs font-normal text-slate-500">lượt</span>
+              {data.totalClicks + (data.totalVotes || 0)} <span className="text-xs font-normal text-slate-500">lượt</span>
             </div>
             <p className="text-[11px] text-blue-600 font-medium flex items-center gap-1 pt-0.5">
-              <span>Clicks CTA &amp; Xem chi tiết</span>
+              <span>{data.totalVotes || 0} phiếu khảo sát • {data.totalClicks} clicks</span>
             </p>
           </CardContent>
         </Card>
@@ -251,7 +251,7 @@ export function MarketDemandReport() {
               {data.conversionRate}%
             </div>
             <p className="text-[11px] text-purple-600 font-medium flex items-center gap-1 pt-0.5">
-              <span>Tỷ lệ điền form / lượt click</span>
+              <span>Tỷ lệ điền form / lượt tương tác</span>
             </p>
           </CardContent>
         </Card>
@@ -285,7 +285,7 @@ export function MarketDemandReport() {
             Tỷ Lệ Quan Tâm Của Thị Trường Đối Với Từng Gói Sản Phẩm (Market Interest Share)
           </CardTitle>
           <CardDescription className="text-xs text-slate-500">
-            Dữ liệu tổng hợp từ các lượt tương tác của khách hàng trên trang dịch vụ và các nút đăng ký tư vấn.
+            Dữ liệu tổng hợp từ các lượt khảo sát quan tâm (mục tiêu 100) và các lượt click tư vấn thực tế.
           </CardDescription>
         </CardHeader>
         <CardContent className="pt-4 space-y-5">
@@ -314,7 +314,11 @@ export function MarketDemandReport() {
                   </div>
                   <div className="flex items-center gap-3 font-mono text-[11px] text-slate-500">
                     <span>
-                      <strong className="text-slate-900">{pkg.clicks}</strong> lượt quan tâm
+                      <strong className="text-blue-600">{pkg.votes || 0}</strong>/100 phiếu survey
+                    </span>
+                    <span>•</span>
+                    <span>
+                      <strong className="text-slate-900">{pkg.clicks}</strong> clicks
                     </span>
                     <span>•</span>
                     <span>
