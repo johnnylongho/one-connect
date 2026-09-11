@@ -291,7 +291,47 @@ export function useOneConnectStore() {
       }
     }).catch(console.warn);
 
-    // 3. Subscribe to Realtime multi-table events
+    // 3. Fetch Cloud Events
+    DbService.fetchCloudEvents().then((cloudEvents) => {
+      if (cloudEvents && cloudEvents.length > 0) {
+        setState(prev => ({
+          ...prev,
+          events: cloudEvents,
+        }));
+      }
+    }).catch(console.warn);
+
+    // 4. Fetch Cloud Cards
+    DbService.fetchCloudCards().then((cloudCards) => {
+      if (cloudCards && cloudCards.length > 0) {
+        setState(prev => ({
+          ...prev,
+          cards: deduplicateCards([...cloudCards, ...prev.cards]),
+        }));
+      }
+    }).catch(console.warn);
+
+    // 5. Fetch Cloud Leads
+    DbService.fetchCloudLeads().then((cloudLeads) => {
+      if (cloudLeads && cloudLeads.length > 0) {
+        setState(prev => ({
+          ...prev,
+          leads: cloudLeads,
+        }));
+      }
+    }).catch(console.warn);
+
+    // 6. Fetch Cloud Organizations
+    DbService.fetchCloudOrganizations().then((cloudOrgs) => {
+      if (cloudOrgs && cloudOrgs.length > 0) {
+        setState(prev => ({
+          ...prev,
+          organizations: cloudOrgs,
+        }));
+      }
+    }).catch(console.warn);
+
+    // 7. Subscribe to Realtime multi-table events
     const unsubscribe = DbService.subscribeToRealtime(({ table, newRecord }) => {
       if (table === 'check_ins' && newRecord) {
         setState(prev => {

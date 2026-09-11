@@ -50,6 +50,7 @@ import {
   Plus,
   X,
   Trash2,
+  UserX,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -209,8 +210,6 @@ function DigitalProfileContent() {
     '04:8f',
   ].some((alias) => cleanCardId.includes(alias));
 
-  const [cloudIdentity, setCloudIdentity] = useState<PersonIdentity | null>(null);
-
   const localMatched = state.identities.find(
     (i) =>
       i.username.toLowerCase() === cleanCardId ||
@@ -218,19 +217,29 @@ function DigitalProfileContent() {
       (isJohnnyLongAlias && (i.username === 'johnnylongho' || i.username === 'johnnylong' || i.id === 'id-001'))
   );
 
+  const [cloudIdentity, setCloudIdentity] = useState<PersonIdentity | null>(null);
+  const [isLoadingCloud, setIsLoadingCloud] = useState<boolean>(!localMatched && !isJohnnyLongAlias);
+
   useEffect(() => {
     if (!localMatched && !isJohnnyLongAlias) {
+      setIsLoadingCloud(true);
       DbService.getIdentity(cleanCardId).then((fetched) => {
         if (fetched) {
           setCloudIdentity(fetched);
         }
+        setIsLoadingCloud(false);
+      }).catch((err) => {
+        console.warn('Cloud identity fetch error:', err);
+        setIsLoadingCloud(false);
       });
     }
   }, [cleanCardId, localMatched, isJohnnyLongAlias]);
 
-  const matchedIdentity = cloudIdentity || localMatched || (isJohnnyLongAlias ? currentIdentity : null) || state.identities[0];
+  const matchedIdentity = cloudIdentity || localMatched || (isJohnnyLongAlias ? currentIdentity : null);
 
-  const matchedCard = state.cards.find(c => c.personIdentityId === matchedIdentity?.id && c.status === 'ACTIVE') || state.cards[0];
+  const matchedCard = matchedIdentity
+    ? (state.cards.find(c => c.personIdentityId === matchedIdentity?.id && c.status === 'ACTIVE') || state.cards.find(c => c.personIdentityId === matchedIdentity?.id))
+    : undefined;
 
   // Quyền chỉnh sửa: Chỉ bật khi chủ tài khoản mở ở chế độ chỉnh sửa hoặc từ Dashboard
   const isOwner = Boolean(
@@ -300,46 +309,38 @@ function DigitalProfileContent() {
   const [isVcardModalOpen, setIsVcardModalOpen] = useState(false);
   const [isZaloModalOpen, setIsZaloModalOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [editFullName, setEditFullName] = useState(matchedIdentity?.fullName || 'Hồ Hoàng Long');
-  const [editDisplayName, setEditDisplayName] = useState(matchedIdentity?.displayName || matchedIdentity?.fullName || 'Johnny Long Hồ');
+  const [editFullName, setEditFullName] = useState(matchedIdentity?.fullName || '');
+  const [editDisplayName, setEditDisplayName] = useState(matchedIdentity?.displayName || matchedIdentity?.fullName || '');
   const [editAvatarUrl, setEditAvatarUrl] = useState(matchedIdentity?.avatarUrl || '');
-  const [editTitle, setEditTitle] = useState(matchedIdentity?.title || 'Project Manager & Media Director');
-  const [editCompany, setEditCompany] = useState(matchedIdentity?.businesses?.[0]?.businessName || 'Tập đoàn Công nghệ Số A+ (APLUSVN)');
-  const [editTaxCode, setEditTaxCode] = useState(matchedIdentity?.taxCode || matchedIdentity?.businesses?.[0]?.taxCode || '0316888999');
-  const [editAddress, setEditAddress] = useState(matchedIdentity?.address || matchedIdentity?.businesses?.[0]?.address || 'Tầng 8, Tòa nhà ASIA, 25 Lê Lợi, TP. Nha Trang, Khánh Hòa');
-  const [editAssociation, setEditAssociation] = useState(matchedIdentity?.association || matchedIdentity?.businesses?.[0]?.association || 'Hội Doanh Nhân Trẻ Khánh Hòa (YBA) • Ban Công Nghệ');
-  const [editSlogan, setEditSlogan] = useState(matchedIdentity?.slogan || 'Bứt Phá Giao Thương - Chuyển Hóa Mối Quan Hệ Kinh Doanh Số');
-  const [editIndustry, setEditIndustry] = useState(matchedIdentity?.industry || matchedIdentity?.businesses?.[0]?.industry || 'Công Nghệ Thông Tin & AI');
+  const [editTitle, setEditTitle] = useState(matchedIdentity?.title || '');
+  const [editCompany, setEditCompany] = useState(matchedIdentity?.businesses?.[0]?.businessName || '');
+  const [editTaxCode, setEditTaxCode] = useState(matchedIdentity?.taxCode || matchedIdentity?.businesses?.[0]?.taxCode || '');
+  const [editAddress, setEditAddress] = useState(matchedIdentity?.address || matchedIdentity?.businesses?.[0]?.address || '');
+  const [editAssociation, setEditAssociation] = useState(matchedIdentity?.association || matchedIdentity?.businesses?.[0]?.association || '');
+  const [editSlogan, setEditSlogan] = useState(matchedIdentity?.slogan || '');
+  const [editIndustry, setEditIndustry] = useState(matchedIdentity?.industry || matchedIdentity?.businesses?.[0]?.industry || '');
   const [editSkills, setEditSkills] = useState<string[]>(
-    matchedIdentity?.expertiseSkills || matchedIdentity?.businesses?.[0]?.expertiseSkills || ['Hạ Tầng IoT & NFC', 'AI B2B Matchmaking', 'Next.js & Turbopack', 'Truyền Thông Số', 'Sự Kiện MICE']
+    matchedIdentity?.expertiseSkills || matchedIdentity?.businesses?.[0]?.expertiseSkills || []
   );
   const [newSkillInput, setNewSkillInput] = useState('');
-  const [editPhone, setEditPhone] = useState(matchedIdentity?.phone || '0794677369');
-  const [editEmail, setEditEmail] = useState(matchedIdentity?.email || 'contact.johnnylongho@gmail.com');
-  const [editBio, setEditBio] = useState(matchedIdentity?.bio || 'Chuyên gia triển khai giải pháp hạ tầng danh thiếp số NFC...');
-  const [editWebsite, setEditWebsite] = useState(matchedIdentity?.website || 'https://aplusvn.net');
+  const [editPhone, setEditPhone] = useState(matchedIdentity?.phone || '');
+  const [editEmail, setEditEmail] = useState(matchedIdentity?.email || '');
+  const [editBio, setEditBio] = useState(matchedIdentity?.bio || '');
+  const [editWebsite, setEditWebsite] = useState(matchedIdentity?.website || '');
 
   // Brochure PDF State
-  const [editBrochureUrl, setEditBrochureUrl] = useState(matchedIdentity?.brochureUrl || 'https://aplusvn.net/company-profile-2026.pdf');
+  const [editBrochureUrl, setEditBrochureUrl] = useState(matchedIdentity?.brochureUrl || '');
   const pdfFileInputRef = useRef<HTMLInputElement>(null);
   const [isPdfUploading, setIsPdfUploading] = useState(false);
 
   // B2B Cung & Cầu States
   const [editSeekingNeeds, setEditSeekingNeeds] = useState<string[]>(
-    matchedIdentity?.seekingNeeds || [
-      'Đối tác Chuỗi Khách sạn/Resort MICE',
-      'Các Hiệp hội Doanh nghiệp Tỉnh/Thành',
-      'Nhà phân phối phôi thẻ thông minh',
-    ]
+    matchedIdentity?.seekingNeeds || []
   );
   const [newSeekingInput, setNewSeekingInput] = useState('');
 
   const [editOfferingServices, setEditOfferingServices] = useState<string[]>(
-    matchedIdentity?.offeringServices || [
-      'Hạ tầng Định danh số NFC Doanh nghiệp',
-      'Hệ thống Check-in Sự kiện <1s',
-      'Giải pháp CRM Sổ tay quan hệ B2B',
-    ]
+    matchedIdentity?.offeringServices || []
   );
   const [newOfferingInput, setNewOfferingInput] = useState('');
 
@@ -393,10 +394,10 @@ function DigitalProfileContent() {
       'Hệ thống Check-in Sự kiện <1s',
       'Giải pháp CRM Sổ tay quan hệ B2B'
     ],
-    brochureUrl: matchedIdentity?.brochureUrl || 'https://aplusvn.net/company-profile-2026.pdf',
-    membershipTier: matchedIdentity?.membershipTier || 'EXECUTIVE_BOARD',
-    experienceYears: '8+',
-    b2bMatchesCount: '350+',
+    brochureUrl: matchedIdentity?.brochureUrl || '',
+    membershipTier: matchedIdentity?.membershipTier || 'MEMBER',
+    experienceYears: matchedIdentity?.id === 'id-001' || matchedIdentity?.username === 'johnnylongho' ? '8+' : '3+',
+    b2bMatchesCount: matchedIdentity?.id === 'id-001' || matchedIdentity?.username === 'johnnylongho' ? '350+' : `${state.connections.filter(c => c.requesterIdentityId === matchedIdentity?.id || c.receiverIdentityId === matchedIdentity?.id).length || 0}+`,
     trustRating: 'Hạng A+',
     verificationLevel: 'Enterprise Level 3 Verified',
     signatureHash: '0x9F4C82A3E1B8D9720066FF',
@@ -781,13 +782,48 @@ END:VCARD`;
     setCarouselIndex((prev) => (prev - 1 + PRODUCTS.length) % PRODUCTS.length);
   };
 
-  if (!mounted) {
+  if (!mounted || isLoadingCloud) {
     return (
       <div className="min-h-screen bg-[#F8FAFC] text-slate-900 flex flex-col items-center justify-center space-y-4">
         <div className="w-12 h-12 rounded-full border-4 border-[#0066FF] border-t-transparent animate-spin" />
         <p className="text-xs font-mono font-bold text-[#0066FF] animate-pulse">
           Đang tải danh thiếp số One Connect...
         </p>
+      </div>
+    );
+  }
+
+  if (!matchedIdentity) {
+    return (
+      <div className="min-h-screen bg-[#F8FAFC] text-slate-900 flex flex-col items-center justify-center p-6 text-center">
+        <div className="max-w-md w-full bg-white rounded-3xl border border-slate-200/90 shadow-xl p-8 space-y-6">
+          <div className="w-16 h-16 bg-blue-50 border border-blue-100 rounded-2xl flex items-center justify-center mx-auto text-[#0066FF]">
+            <UserX className="w-8 h-8" />
+          </div>
+          <div className="space-y-2">
+            <h1 className="text-xl font-bold text-slate-900 font-heading">
+              Hồ Sơ Doanh Nhân Không Tồn Tại
+            </h1>
+            <p className="text-sm text-slate-500 leading-relaxed">
+              Mã định danh hoặc liên kết danh thiếp số <span className="font-mono font-semibold text-slate-700">"{cleanCardId}"</span> chưa được kích hoạt hoặc không tìm thấy trên hệ sinh thái One Connect.
+            </p>
+          </div>
+          <div className="pt-2 flex flex-col gap-3">
+            <Link
+              href="/"
+              className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-[#0066FF] hover:bg-blue-600 text-white text-sm font-semibold shadow-md transition-all active:scale-98"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Về Trang Chủ One Connect
+            </Link>
+            <Link
+              href="/dashboard"
+              className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-700 text-sm font-medium border border-slate-200 transition-all"
+            >
+              Vào Không Gian Doanh Nghiệp
+            </Link>
+          </div>
+        </div>
       </div>
     );
   }

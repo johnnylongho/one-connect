@@ -3,12 +3,13 @@ import { Event, EventRegistration } from '@/lib/types';
 import { INITIAL_EVENTS, INITIAL_REGISTRATIONS } from '@/lib/mock-data';
 
 export async function getEvents(): Promise<Event[]> {
-  if (!isSupabaseConfigured() || !supabase) {
+  const client = supabase;
+  if (!isSupabaseConfigured() || !client) {
     return INITIAL_EVENTS;
   }
 
   try {
-    const { data, error } = await supabase
+    const { data, error } = await client
       .from('events')
       .select('*, organizations(name)')
       .order('start_time', { ascending: true });
@@ -17,23 +18,40 @@ export async function getEvents(): Promise<Event[]> {
       return INITIAL_EVENTS;
     }
 
-    return data.map(e => ({
-      id: e.id,
-      organizationId: e.organization_id || 'org-001',
-      organizationName: e.organizations?.name || 'Hiệp hội Doanh nhân Aplusvn',
-      name: e.title || e.name || 'Sự kiện Doanh nhân',
-      slug: e.slug || `event-${e.id}`,
-      description: e.description || undefined,
-      bannerUrl: e.banner_url || undefined,
-      startAt: e.start_time || e.start_at || new Date().toISOString(),
-      endAt: e.end_time || e.end_at || new Date().toISOString(),
-      locationName: e.location || e.location_name || 'Trung tâm Hội nghị',
-      address: e.address || undefined,
-      registrationCount: e.registration_count || 500,
-      checkInCount: e.check_in_count || 385,
-      capacity: e.capacity || 500,
-      status: e.status || 'PUBLISHED',
-    }));
+    const eventsWithCounts = await Promise.all(
+      data.map(async (e: any) => {
+        const [{ count: regCount }, { count: chkCount }] = await Promise.all([
+          client
+            .from('event_registrations')
+            .select('*', { count: 'exact', head: true })
+            .eq('event_id', e.id),
+          client
+            .from('check_ins')
+            .select('*', { count: 'exact', head: true })
+            .eq('event_id', e.id),
+        ]);
+
+        return {
+          id: e.id,
+          organizationId: e.organization_id || 'org-001',
+          organizationName: e.organizations?.name || 'Hiệp hội Doanh nhân Aplusvn',
+          name: e.title || e.name || 'Sự kiện Doanh nhân',
+          slug: e.slug || `event-${e.id}`,
+          description: e.description || undefined,
+          bannerUrl: e.banner_url || undefined,
+          startAt: e.start_time || e.start_at || new Date().toISOString(),
+          endAt: e.end_time || e.end_at || new Date().toISOString(),
+          locationName: e.location || e.location_name || 'Trung tâm Hội nghị',
+          address: e.address || undefined,
+          registrationCount: regCount ?? e.registration_count ?? 0,
+          checkInCount: chkCount ?? e.check_in_count ?? 0,
+          capacity: e.capacity || 200,
+          status: e.status || 'PUBLISHED',
+        };
+      })
+    );
+
+    return eventsWithCounts;
   } catch (err) {
     console.warn('Failed to fetch events from Supabase:', err);
     return INITIAL_EVENTS;

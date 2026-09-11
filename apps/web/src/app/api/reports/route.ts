@@ -7,7 +7,7 @@ export async function GET(request: Request) {
   const format = searchParams.get('format');
 
   if (format === 'csv') {
-    const csvContent = generateGuardedCsvReport(eventId);
+    const csvContent = await generateGuardedCsvReport(eventId);
     return new NextResponse(csvContent, {
       status: 200,
       headers: {

@@ -1,5 +1,5 @@
 import { supabase, isSupabaseConfigured } from './supabaseClient';
-import { PersonIdentity, AccessCard, CheckIn, Connection, AuditLog, ConnectionStatus } from './types';
+import { PersonIdentity, AccessCard, CheckIn, Connection, AuditLog, ConnectionStatus, Event, Organization, Lead } from './types';
 import { INITIAL_IDENTITIES, INITIAL_CARDS, INITIAL_CONNECTIONS } from './mock-data';
 
 /**
@@ -28,6 +28,11 @@ export const LEGACY_UUID_MAP: Record<string, string> = {
   'id-005': '55555555-5555-5555-5555-555555555555',
   'usr-005': '55555555-5555-5555-5555-555555555555',
   'phuonganh': '55555555-5555-5555-5555-555555555555',
+
+  // Core Events and Organization UUID mappings
+  'evt-001': 'ea111111-1111-1111-1111-111111111111',
+  'evt-002': 'ea222222-2222-2222-2222-222222222222',
+  'org-001': 'ca111111-1111-1111-1111-111111111111',
 };
 
 export function ensureUuid(id: string): string {
@@ -459,6 +464,156 @@ export const DbService = {
     }
 
     return localConnections;
+  },
+
+  /**
+   * 6b. Fetch Events from Cloud Database
+   */
+  async fetchCloudEvents(): Promise<Event[]> {
+    if (!isSupabaseConfigured) return [];
+    try {
+      const { data, error } = await supabase
+        .from('events')
+        .select(`
+          *,
+          organizations(name)
+        `)
+        .order('start_time', { ascending: true });
+
+      if (data && !error && data.length > 0) {
+        const eventsWithCounts: Event[] = await Promise.all(
+          data.map(async (e: any) => {
+            const { count: regCount } = await supabase
+              .from('event_registrations')
+              .select('*', { count: 'exact', head: true })
+              .eq('event_id', e.id);
+
+            const { count: chkCount } = await supabase
+              .from('check_ins')
+              .select('*', { count: 'exact', head: true })
+              .eq('event_id', e.id);
+
+            return {
+              id: e.id,
+              organizationId: e.organization_id || 'ca111111-1111-1111-1111-111111111111',
+              organizationName: e.organizations?.name || 'Hiệp hội Doanh nhân Công nghệ Aplusvn',
+              name: e.title || e.name || 'Sự kiện Doanh nhân',
+              slug: (e.title || 'event')
+                .toLowerCase()
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .replace(/[^a-z0-9]+/g, '-'),
+              description: e.description || undefined,
+              bannerUrl: e.banner_url || undefined,
+              startAt: e.start_time,
+              endAt: e.end_time,
+              locationName: e.location || 'Trung tâm Hội nghị',
+              address: e.address || undefined,
+              registrationCount: regCount || 0,
+              checkInCount: chkCount || 0,
+              capacity: e.capacity || 500,
+              status: (e.status || 'PUBLISHED') as any,
+            };
+          })
+        );
+        return eventsWithCounts;
+      }
+    } catch (err) {
+      console.warn('Supabase fetchCloudEvents error:', err);
+    }
+    return [];
+  },
+
+  /**
+   * 6c. Fetch Access Cards from Cloud Database
+   */
+  async fetchCloudCards(): Promise<AccessCard[]> {
+    if (!isSupabaseConfigured) return localCards;
+    try {
+      const { data, error } = await supabase
+        .from('access_cards')
+        .select('*, person_identities(full_name)')
+        .order('issued_at', { ascending: false });
+
+      if (data && !error && data.length > 0) {
+        const cloudCards: AccessCard[] = data.map((c: any) => ({
+          id: c.id,
+          personIdentityId: c.person_identity_id,
+          cardUid: c.card_uid,
+          cardType: c.card_type || 'NFC_BUSINESS_PRO',
+          dynamicUrl: `https://oneconnect.id.vn/c/${c.card_uid}`,
+          qrValue: `https://oneconnect.id.vn/c/${c.card_uid}`,
+          status: c.status || 'ACTIVE',
+          issuedAt: c.issued_at,
+          lastUsedAt: c.updated_at,
+        }));
+        localCards = cloudCards;
+        return cloudCards;
+      }
+    } catch (err) {
+      console.warn('Supabase fetchCloudCards error:', err);
+    }
+    return localCards;
+  },
+
+  /**
+   * 6d. Fetch Leads from Cloud Database
+   */
+  async fetchCloudLeads(ownerIdentityId?: string): Promise<Lead[]> {
+    if (!isSupabaseConfigured) return [];
+    try {
+      let query = supabase.from('leads').select('*').order('created_at', { ascending: false });
+      if (ownerIdentityId) {
+        const validOwnerId = ensureUuid(ownerIdentityId);
+        query = query.eq('owner_identity_id', validOwnerId);
+      }
+      const { data, error } = await query;
+      if (data && !error && data.length > 0) {
+        return data.map((l: any) => ({
+          id: l.id,
+          connectionId: l.connection_id,
+          ownerIdentityId: l.owner_identity_id,
+          status: (l.status || 'HOT') as any,
+          priority: 'HIGH',
+          estimatedValue: Number(l.potential_value || 0),
+          source: l.next_action || 'Kết nối Trực tiếp',
+          createdAt: l.created_at,
+          updatedAt: l.updated_at,
+        }));
+      }
+    } catch (err) {
+      console.warn('Supabase fetchCloudLeads error:', err);
+    }
+    return [];
+  },
+
+  /**
+   * 6e. Fetch Organizations from Cloud Database
+   */
+  async fetchCloudOrganizations(): Promise<Organization[]> {
+    if (!isSupabaseConfigured) return [];
+    try {
+      const { data, error } = await supabase
+        .from('organizations')
+        .select('*')
+        .order('created_at', { ascending: true });
+
+      if (data && !error && data.length > 0) {
+        return data.map((o: any) => ({
+          id: o.id,
+          name: o.name,
+          slug: o.code ? o.code.toLowerCase().replace(/_/g, '-') : 'org',
+          logoUrl: o.logo_url || undefined,
+          description: o.description || undefined,
+          memberCount: 5,
+          status: o.status || 'ACTIVE',
+          createdAt: o.created_at,
+        }));
+      }
+    } catch (err) {
+      console.warn('Supabase fetchCloudOrganizations error:', err);
+    }
+    return [];
   },
 
   /**

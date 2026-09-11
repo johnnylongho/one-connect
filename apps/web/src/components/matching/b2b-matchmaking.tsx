@@ -66,93 +66,14 @@ export interface MatchingRequest {
   createdAt: string;
 }
 
-const MOCK_COMPANIES: BusinessUser[] = [
-  {
-    id: '33333333-3333-3333-3333-333333333333',
-    fullName: 'Trần Minh Đức',
-    phone: '0923456789',
-    avatarUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&auto=format&fit=crop&q=80',
-    company: 'TechCorp Vietnam',
-    position: 'Chủ tịch HĐQT TechCorp',
-    industry: 'Phần mềm & AI',
-    association: 'Hiệp hội Doanh nhân Công nghệ Aplusvn',
-  },
-  {
-    id: '44444444-4444-4444-4444-444444444444',
-    fullName: 'Lê Hoàng Nam',
-    phone: '0934567890',
-    avatarUrl: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=300&auto=format&fit=crop&q=80',
-    company: 'InnovateX Global',
-    position: 'CEO & Founder InnovateX',
-    industry: 'IoT & Phần cứng NFC',
-    association: 'Hiệp hội Doanh nhân Công nghệ Aplusvn',
-  },
-  {
-    id: '55555555-5555-5555-5555-555555555555',
-    fullName: 'Phạm Phương Anh',
-    phone: '0945678901',
-    avatarUrl: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=300&auto=format&fit=crop&q=80',
-    company: 'GlobalBiz Corp',
-    position: 'Giám đốc Marketing GlobalBiz',
-    industry: 'Truyền thông & Sự kiện',
-    association: 'Hiệp hội Doanh nhân Công nghệ Aplusvn',
-  },
-  {
-    id: '22222222-2222-2222-2222-222222222222',
-    fullName: 'Nguyễn Thu Hà',
-    phone: '0912345678',
-    avatarUrl: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=300&auto=format&fit=crop&q=80',
-    company: 'Vina Capital Invest',
-    position: 'Giám đốc Đầu tư B2B',
-    industry: 'Quỹ Đầu Tư & Tài Chính',
-    association: 'Hiệp hội Doanh nhân Công nghệ Aplusvn',
-  },
-];
-
-const DEFAULT_MATCHINGS: MatchingRequest[] = [
-  {
-    id: 'm1',
-    eventId: 'ea111111-1111-1111-1111-111111111111',
-    senderId: '11111111-1111-1111-1111-111111111111',
-    senderName: 'Johnny Long Hồ',
-    senderCompany: 'Aplusvn Media & Tech',
-    senderAvatar: '/avatar-johnny-long.jpg',
-    receiverId: '33333333-3333-3333-3333-333333333333',
-    receiverName: 'Trần Minh Đức',
-    receiverCompany: 'TechCorp Vietnam',
-    receiverAvatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&auto=format&fit=crop&q=80',
-    status: 'accepted',
-    meetingTime: '14:00 - 14:30',
-    tableNumber: 'Bàn B2B-08',
-    note: 'Trao đổi hợp tác tích hợp hạ tầng giải pháp thẻ danh thiếp số One Connect cho cán bộ TechCorp.',
-    createdAt: '10 phút trước',
-  },
-  {
-    id: 'm2',
-    eventId: 'ea111111-1111-1111-1111-111111111111',
-    senderId: '44444444-4444-4444-4444-444444444444',
-    senderName: 'Lê Hoàng Nam',
-    senderCompany: 'InnovateX Global',
-    senderAvatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=300&auto=format&fit=crop&q=80',
-    receiverId: '11111111-1111-1111-1111-111111111111',
-    receiverName: 'Johnny Long Hồ',
-    receiverCompany: 'Aplusvn Media & Tech',
-    receiverAvatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300&auto=format&fit=crop&q=80',
-    status: 'pending',
-    meetingTime: '15:00 - 15:30',
-    tableNumber: 'Bàn B2B-03',
-    note: 'Đề xuất cung cấp module chip phần cứng NFC và thiết bị quét tốc độ cao.',
-    createdAt: '25 phút trước',
-  },
-];
-
 interface B2BMatchmakingViewProps {
   initialMatchings?: MatchingRequest[];
+  companies?: BusinessUser[];
 }
 
-export function B2BMatchmakingView({ initialMatchings }: B2BMatchmakingViewProps) {
+export function B2BMatchmakingView({ initialMatchings = [], companies = [] }: B2BMatchmakingViewProps) {
   const { toast } = useToast();
-  const [matchings, setMatchings] = useState<MatchingRequest[]>(initialMatchings || DEFAULT_MATCHINGS);
+  const [matchings, setMatchings] = useState<MatchingRequest[]>(initialMatchings);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTarget, setSelectedTarget] = useState<BusinessUser | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -169,7 +90,7 @@ export function B2BMatchmakingView({ initialMatchings }: B2BMatchmakingViewProps
   const acceptedCount = matchings.filter((m) => m.status === 'accepted').length;
   const pendingCount = matchings.filter((m) => m.status === 'pending').length;
 
-  const filteredCompanies = MOCK_COMPANIES.filter(
+  const filteredCompanies = companies.filter(
     (c) =>
       c.fullName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       c.company.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -349,48 +270,56 @@ export function B2BMatchmakingView({ initialMatchings }: B2BMatchmakingViewProps
 
         {/* TAB 1: DANH SÁCH DOANH NGHIỆP GRID */}
         <TabsContent value="directory" className="space-y-4 m-0">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-            {filteredCompanies.map((comp) => (
-              <Card key={comp.id} className="border-slate-200 bg-white hover:border-blue-300 hover:shadow-md transition-all shadow-sm group flex flex-col justify-between">
-                <CardHeader className="p-5 pb-3 space-y-3">
-                  <div className="flex items-start gap-3">
-                    <img
-                      src={comp.avatarUrl}
-                      alt={comp.fullName}
-                      className="w-12 h-12 rounded-2xl object-cover border-2 border-blue-500/20 group-hover:scale-105 transition-transform shrink-0"
-                    />
-                    <div className="min-w-0 flex-1">
-                      <h3 className="font-bold text-slate-900 text-sm truncate group-hover:text-[#0066FF] transition-colors">
-                        {comp.fullName}
-                      </h3>
-                      <p className="text-xs text-slate-500 truncate mt-0.5">{comp.position}</p>
-                      <Badge variant="outline" className="mt-1.5 text-[10px] bg-slate-50 text-slate-600 border-slate-200">
-                        {comp.industry}
-                      </Badge>
+          {filteredCompanies.length === 0 ? (
+            <div className="text-center py-12 bg-white rounded-3xl border border-slate-200 p-8 space-y-2">
+              <Building2 className="w-10 h-10 text-slate-300 mx-auto" />
+              <p className="font-bold text-slate-700 text-sm">Chưa có dữ liệu doanh nghiệp phù hợp</p>
+              <p className="text-xs text-slate-400">Danh bạ kết nối đồng bộ trực tiếp từ cơ sở dữ liệu định danh One Connect.</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+              {filteredCompanies.map((comp) => (
+                <Card key={comp.id} className="border-slate-200 bg-white hover:border-blue-300 hover:shadow-md transition-all shadow-sm group flex flex-col justify-between">
+                  <CardHeader className="p-5 pb-3 space-y-3">
+                    <div className="flex items-start gap-3">
+                      <img
+                        src={comp.avatarUrl}
+                        alt={comp.fullName}
+                        className="w-12 h-12 rounded-2xl object-cover border-2 border-blue-500/20 group-hover:scale-105 transition-transform shrink-0"
+                      />
+                      <div className="min-w-0 flex-1">
+                        <h3 className="font-bold text-slate-900 text-sm truncate group-hover:text-[#0066FF] transition-colors">
+                          {comp.fullName}
+                        </h3>
+                        <p className="text-xs text-slate-500 truncate mt-0.5">{comp.position}</p>
+                        <Badge variant="outline" className="mt-1.5 text-[10px] bg-slate-50 text-slate-600 border-slate-200">
+                          {comp.industry}
+                        </Badge>
+                      </div>
                     </div>
-                  </div>
-                </CardHeader>
+                  </CardHeader>
 
-                <CardContent className="px-5 pb-5 pt-0 space-y-4">
-                  <div className="p-3 rounded-xl bg-slate-50 border border-slate-100 space-y-1">
-                    <div className="flex items-center gap-1.5 text-xs text-slate-800 font-semibold truncate">
-                      <Building2 className="w-3.5 h-3.5 text-[#0066FF] shrink-0" />
-                      {comp.company}
+                  <CardContent className="px-5 pb-5 pt-0 space-y-4">
+                    <div className="p-3 rounded-xl bg-slate-50 border border-slate-100 space-y-1">
+                      <div className="flex items-center gap-1.5 text-xs text-slate-800 font-semibold truncate">
+                        <Building2 className="w-3.5 h-3.5 text-[#0066FF] shrink-0" />
+                        {comp.company}
+                      </div>
+                      <p className="text-[11px] text-slate-500 truncate">{comp.association}</p>
                     </div>
-                    <p className="text-[11px] text-slate-500 truncate">{comp.association}</p>
-                  </div>
 
-                  <Button
-                    onClick={() => handleOpenRequestModal(comp)}
-                    size="sm"
-                    className="w-full gap-2 bg-gradient-to-r from-[#0066FF] to-[#FF6B00] hover:opacity-90 text-white font-bold rounded-xl shadow-sm cursor-pointer text-xs"
-                  >
-                    <Plus className="w-4 h-4" /> Gửi Yêu Cầu Hẹn Gặp
-                  </Button>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+                    <Button
+                      onClick={() => handleOpenRequestModal(comp)}
+                      size="sm"
+                      className="w-full gap-2 bg-gradient-to-r from-[#0066FF] to-[#FF6B00] hover:opacity-90 text-white font-bold rounded-xl shadow-sm cursor-pointer text-xs"
+                    >
+                      <Plus className="w-4 h-4" /> Gửi Yêu Cầu Hẹn Gặp
+                    </Button>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
         </TabsContent>
 
         {/* TAB 2: LỊCH HẸN CỦA TÔI */}
@@ -524,7 +453,14 @@ export function B2BMatchmakingView({ initialMatchings }: B2BMatchmakingViewProps
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {filteredMatchings.map((item) => {
+                    {filteredMatchings.length === 0 ? (
+                      <TableRow>
+                        <TableCell colSpan={6} className="h-32 text-center text-xs text-slate-500">
+                          Chưa có cuộc hẹn giao thương nào phù hợp với bộ lọc.
+                        </TableCell>
+                      </TableRow>
+                    ) : (
+                      filteredMatchings.map((item) => {
                       const isIncoming = item.receiverId === currentUserId;
                       const partnerName = isIncoming ? item.senderName : item.receiverName;
                       const partnerCompany = isIncoming ? item.senderCompany : item.receiverCompany;
@@ -621,7 +557,7 @@ export function B2BMatchmakingView({ initialMatchings }: B2BMatchmakingViewProps
                           </TableCell>
                         </TableRow>
                       );
-                    })}
+                    }))}
                   </TableBody>
                 </Table>
               </div>

@@ -88,16 +88,29 @@ const INITIAL_TAP_LOGS: Array<{
   status: string;
 }> = [];
 
-export default function DigitalNfcCardPage() {
+export default function DigitalNfcCardPage({
+  initialTab,
+}: {
+  initialTab?: 'my-card' | 'inventory' | 'analytics' | 'pdpl';
+} = {}) {
   const { state, currentIdentity, currentCard, reissueCard, updateIdentity } = useOneConnectStore();
   const [mounted, setMounted] = useState(false);
 
+  // Active Sub-Tab
+  const [activeTab, setActiveTab] = useState<'my-card' | 'inventory' | 'analytics' | 'pdpl'>(initialTab || 'my-card');
+
   useEffect(() => {
     setMounted(true);
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const tabParam = params.get('tab');
+      if (tabParam === 'inventory' || tabParam === 'analytics' || tabParam === 'pdpl' || tabParam === 'my-card') {
+        setActiveTab(tabParam);
+      } else if (window.location.pathname.includes('/nfc-cards') || window.location.pathname.includes('/admin/nfc-cards')) {
+        setActiveTab('inventory');
+      }
+    }
   }, []);
-
-  // Active Sub-Tab
-  const [activeTab, setActiveTab] = useState<'my-card' | 'inventory' | 'analytics' | 'pdpl'>('my-card');
 
   // Dynamic delegates from real registered identities
   const delegateOptions = useMemo(() => {
@@ -112,8 +125,30 @@ export default function DigitalNfcCardPage() {
   // Real-time Tap Logs
   const [tapLogs, setTapLogs] = useState(INITIAL_TAP_LOGS);
 
-  // Inventory & Issuance State
+  // Inventory & Issuance State - synchronized with Supabase state.cards & state.identities
   const [cards, setCards] = useState<NfcCardItem[]>(INITIAL_NFC_CARDS);
+
+  useEffect(() => {
+    if (state?.cards && state.cards.length > 0) {
+      const mappedCards: NfcCardItem[] = state.cards.map((c, idx) => {
+        const owner = state.identities.find((i) => i.id === c.personIdentityId);
+        return {
+          id: c.id,
+          uid: c.cardUid,
+          serialNumber: `NFC-2026-APLUS-${String(idx + 1).padStart(3, '0')}`,
+          cardType: c.cardType === 'NFC_EXECUTIVE' ? 'Metal NTAG215 (Laser Etched)' : 'Standard NFC Smart Card',
+          ownerName: owner ? (owner.displayName || owner.fullName) : null,
+          companyName: owner?.businesses?.[0]?.businessName || (owner ? 'Doanh nghiệp Hội viên' : null),
+          avatarUrl: owner?.avatarUrl || null,
+          status: c.status === 'ACTIVE' ? 'ACTIVE' : c.status === 'REVOKED' ? 'LOCKED' : 'UNASSIGNED',
+          tapCount: 0,
+          lastTappedAt: c.lastUsedAt || null,
+        };
+      });
+      setCards(mappedCards);
+    }
+  }, [state?.cards, state?.identities]);
+
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<'ALL' | 'ACTIVE' | 'LOCKED' | 'UNASSIGNED'>('ALL');
   const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);

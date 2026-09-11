@@ -65,9 +65,9 @@ export default function AssociationAdminDashboard() {
             <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Tổng Số Hội Viên</span>
             <Badge className="bg-purple-50 text-purple-700 border-purple-200 text-[10.5px]">ACTIVE</Badge>
           </div>
-          <div className="text-3xl font-black text-purple-700 font-mono">{state.identities.length * 25 + 25}</div>
+          <div className="text-3xl font-black text-purple-700 font-mono">{state.identities.length}</div>
           <p className="text-[12px] text-emerald-600 font-semibold flex items-center gap-1">
-            <TrendingUp className="w-3.5 h-3.5" /> ↑ 18% Tăng trưởng quý này
+            <TrendingUp className="w-3.5 h-3.5" /> Dữ liệu hội viên xác thực
           </p>
         </div>
 
@@ -77,7 +77,7 @@ export default function AssociationAdminDashboard() {
             <Badge className="bg-blue-50 text-[#0066FF] border-blue-200 text-[10.5px]">LIVE</Badge>
           </div>
           <div className="text-3xl font-black text-[#0066FF] font-mono">{state.events.length}</div>
-          <p className="text-[12px] text-slate-600">Tỷ lệ Check-in siêu tốc: <strong>98.5%</strong></p>
+          <p className="text-[12px] text-slate-600">Sự kiện giao thương & MICE</p>
         </div>
 
         <div className="p-5 rounded-3xl bg-white border border-slate-200/90 shadow-xs space-y-1">
@@ -85,7 +85,9 @@ export default function AssociationAdminDashboard() {
             <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Lượt Giao Thương B2B</span>
             <Badge className="bg-emerald-50 text-emerald-700 border-emerald-200 text-[10.5px]">2-WAY CONSENT</Badge>
           </div>
-          <div className="text-3xl font-black text-emerald-600 font-mono">480+</div>
+          <div className="text-3xl font-black text-emerald-600 font-mono">
+            {state.connections.filter((c) => c.status === 'CONNECTED').length}
+          </div>
           <p className="text-[12px] text-slate-500">Đã qua xác thực danh tính doanh nhân</p>
         </div>
       </section>
@@ -103,7 +105,7 @@ export default function AssociationAdminDashboard() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
           {state.identities.map((m) => {
-            const companyName = m.businesses && m.businesses[0] ? m.businesses[0].businessName : 'Tập đoàn Công nghệ Số A+ (APLUSVN)';
+            const companyName = m.businesses && m.businesses[0] ? m.businesses[0].businessName : (m.title ? `${m.title} Corp` : 'Doanh Nghiệp Thành Viên');
             const profileLink = `/p/${m.username || m.id}`;
 
             return (

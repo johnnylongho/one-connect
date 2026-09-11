@@ -73,32 +73,6 @@ export function MarketDemandReport() {
     return () => clearInterval(interval);
   }, []);
 
-  const handleCreateTestLead = async () => {
-    try {
-      setLoading(true);
-      const res = await fetch('/api/market-demand/lead', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          packageType: 'MICE_ENTERPRISE',
-          fullName: 'Đoàn Khách MICE Khánh Hòa (Test Lead)',
-          phone: '0905123456',
-          email: 'mice.khanhhoa@example.vn',
-          companyName: 'Công ty Lữ hành & Sự kiện MICE',
-          organizationType: 'Doanh nghiệp Sự kiện',
-          notes: 'Yêu cầu tư vấn trạm Check-in NFC & thẻ kim loại cho diễn đàn 300 khách.',
-          source: 'DASHBOARD_LIVE_TEST',
-        }),
-      });
-      if (res.ok) {
-        await fetchStats();
-      }
-    } catch (err) {
-      console.error('Test lead creation error:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleUpdateStatus = async (leadId: string, newStatus: MarketLead['status']) => {
     try {
@@ -181,15 +155,6 @@ export function MarketDemandReport() {
             className="gap-1.5 text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl h-9 px-3.5 shadow-xs cursor-pointer"
           >
             <FileSpreadsheet className="w-4 h-4" /> Xuất Excel
-          </Button>
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={handleCreateTestLead}
-            className="gap-1.5 text-xs font-bold border-blue-300 text-blue-700 bg-blue-50/80 hover:bg-blue-100 rounded-xl h-9 px-3 cursor-pointer shadow-2xs"
-            title="Tạo thử 1 lead thực tế vào Supabase để kiểm tra"
-          >
-            <Sparkles className="w-3.5 h-3.5 text-[#0066FF]" /> + Thử Tạo Lead Realtime
           </Button>
         </div>
       </div>
@@ -402,16 +367,9 @@ export function MarketDemandReport() {
                     variant="outline"
                     className="gap-1.5 text-xs font-bold rounded-xl border-slate-300 text-slate-700 bg-white hover:bg-slate-50 shadow-2xs cursor-pointer"
                   >
-                    <ExternalLink className="w-3.5 h-3.5 text-[#0066FF]" /> Mở Trang Dịch Vụ
+                    <ExternalLink className="w-3.5 h-3.5 text-[#0066FF]" /> Mở Trang Gói Dịch Vụ
                   </Button>
                 </a>
-                <Button
-                  size="sm"
-                  onClick={handleCreateTestLead}
-                  className="gap-1.5 text-xs font-bold rounded-xl bg-[#0066FF] hover:bg-blue-700 text-white shadow-xs cursor-pointer"
-                >
-                  <Plus className="w-3.5 h-3.5" /> Gửi Thử 1 Lead Thật Vào Supabase
-                </Button>
               </div>
             </div>
           ) : (

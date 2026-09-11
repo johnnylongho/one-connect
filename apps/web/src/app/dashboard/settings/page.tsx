@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { PageHeader } from '@/components/shared/PageHeader';
 import { useOneConnectStore } from '@/lib/store';
@@ -119,6 +119,27 @@ export default function SettingsAndPrivacyPage() {
     ]
   );
   const [newOfferingTag, setNewOfferingTag] = useState('');
+
+  // Synchronize form states when currentIdentity hydrates from store or Supabase
+  useEffect(() => {
+    if (currentIdentity) {
+      if (currentIdentity.industry || currentIdentity.businesses?.[0]?.industry) {
+        setSettingsIndustry(currentIdentity.industry || currentIdentity.businesses?.[0]?.industry || 'Công Nghệ Thông Tin & AI');
+      }
+      if (currentIdentity.expertiseSkills && currentIdentity.expertiseSkills.length > 0) {
+        setSettingsSkills(currentIdentity.expertiseSkills);
+      }
+      if (currentIdentity.brochureUrl) {
+        setSettingsBrochureUrl(currentIdentity.brochureUrl);
+      }
+      if (currentIdentity.seekingNeeds && currentIdentity.seekingNeeds.length > 0) {
+        setSettingsSeekingNeeds(currentIdentity.seekingNeeds);
+      }
+      if (currentIdentity.offeringServices && currentIdentity.offeringServices.length > 0) {
+        setSettingsOfferingServices(currentIdentity.offeringServices);
+      }
+    }
+  }, [currentIdentity]);
 
   const showToast = (text: string, type: 'success' | 'error' | 'info' = 'success') => {
     setAlertNotice({ text, type });

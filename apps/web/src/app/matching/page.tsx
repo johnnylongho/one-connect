@@ -1,7 +1,9 @@
 import React from 'react';
-import { B2BMatchmakingView, MatchingRequest } from '@/components/matching/b2b-matchmaking';
+import { B2BMatchmakingView, MatchingRequest, BusinessUser } from '@/components/matching/b2b-matchmaking';
 import { ToastProvider } from '@/components/ui/toast';
 import { createClient } from '@/lib/supabase/server';
+
+export const dynamic = 'force-dynamic';
 
 export const metadata = {
   title: 'B2B Matchmaking - Kết Nối Doanh Nghiệp | One Connect',
@@ -9,66 +11,96 @@ export const metadata = {
 };
 
 export default async function MatchingPage() {
-  let initialMatchings: MatchingRequest[] | undefined = undefined;
+  let initialMatchings: MatchingRequest[] = [];
+  let companies: BusinessUser[] = [];
 
   try {
     const supabase = await createClient();
 
-    // Query business_matching records joined with users
-    const { data } = await supabase
-      .from('business_matching')
+    // 1. Query real connections from Supabase
+    const { data: connData } = await supabase
+      .from('connections')
       .select(`
         id,
         event_id,
-        sender_user_id,
-        receiver_user_id,
+        requester_identity_id,
+        receiver_identity_id,
         status,
-        meeting_time,
-        table_number,
-        created_at,
-        sender:users!business_matching_sender_user_id_fkey(
+        requested_at,
+        responded_at,
+        requester:person_identities!requester_identity_id(
           id,
           full_name,
-          avatar_url
+          title,
+          avatar_url,
+          phone
         ),
-        receiver:users!business_matching_receiver_user_id_fkey(
+        receiver:person_identities!receiver_identity_id(
           id,
           full_name,
-          avatar_url
+          title,
+          avatar_url,
+          phone
         )
       `)
+      .order('requested_at', { ascending: false });
+
+    if (connData && connData.length > 0) {
+      initialMatchings = connData.map((item: any) => {
+        const reqP = Array.isArray(item.requester) ? item.requester[0] : item.requester;
+        const recP = Array.isArray(item.receiver) ? item.receiver[0] : item.receiver;
+        const uiStatus: 'pending' | 'accepted' | 'rejected' =
+          item.status === 'ACCEPTED' ? 'accepted' : item.status === 'REJECTED' ? 'rejected' : 'pending';
+
+        return {
+          id: item.id,
+          eventId: item.event_id || 'ea111111-1111-1111-1111-111111111111',
+          senderId: item.requester_identity_id,
+          senderName: reqP?.full_name || 'Đại biểu Doanh nhân',
+          senderCompany: reqP?.title || 'Doanh nghiệp Hội viên',
+          senderAvatar: reqP?.avatar_url || '/avatar-johnny-long.jpg',
+          receiverId: item.receiver_identity_id,
+          receiverName: recP?.full_name || 'Đối tác B2B',
+          receiverCompany: recP?.title || 'Doanh nghiệp Đối tác',
+          receiverAvatar: recP?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(recP?.full_name || 'Partner')}&background=0284c7&color=fff`,
+          status: uiStatus,
+          meetingTime: item.responded_at
+            ? new Date(item.responded_at).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })
+            : '14:30 - 15:00',
+          tableNumber: 'Bàn B2B VIP',
+          note: 'Trao đổi cơ hội giao thương B2B và ký kết biên bản ghi nhớ hợp tác (MOU).',
+          createdAt: item.requested_at
+            ? new Date(item.requested_at).toLocaleDateString('vi-VN')
+            : 'Gần đây',
+        };
+      });
+    }
+
+    // 2. Query real person_identities for available business partners
+    const { data: identData } = await supabase
+      .from('person_identities')
+      .select('id, full_name, phone, avatar_url, title, bio')
       .order('created_at', { ascending: false });
 
-    if (data && data.length > 0) {
-      initialMatchings = data.map((item: any) => ({
-        id: item.id,
-        eventId: item.event_id,
-        senderId: item.sender_user_id,
-        senderName: item.sender?.full_name || 'Đại biểu Doanh nhân',
-        senderCompany: 'Doanh nghiệp Hội viên',
-        senderAvatar: item.sender?.avatar_url || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300&auto=format&fit=crop&q=80',
-        receiverId: item.receiver_user_id,
-        receiverName: item.receiver?.full_name || 'Đối tác B2B',
-        receiverCompany: 'Doanh nghiệp Đối tác',
-        receiverAvatar: item.receiver?.avatar_url || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&auto=format&fit=crop&q=80',
-        status: item.status,
-        meetingTime: item.meeting_time
-          ? new Date(item.meeting_time).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })
-          : '14:30 - 15:00',
-        tableNumber: item.table_number || 'Bàn B2B-01',
-        note: 'Trao đổi hợp tác chiến lược và giao thương sản phẩm dịch vụ',
-        createdAt: item.created_at
-          ? new Date(item.created_at).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })
-          : 'Gần đây',
+    if (identData && identData.length > 0) {
+      companies = identData.map((p: any) => ({
+        id: p.id,
+        fullName: p.full_name,
+        phone: p.phone || '0901234567',
+        avatarUrl: p.avatar_url || (p.id === '11111111-1111-1111-1111-111111111111' ? '/avatar-johnny-long.jpg' : `https://ui-avatars.com/api/?name=${encodeURIComponent(p.full_name)}&background=0284c7&color=fff&bold=true`),
+        company: p.title || 'Hội Viên Doanh Nghiệp',
+        position: p.title || 'Đại Diện Doanh Nghiệp',
+        industry: p.bio || 'Công nghệ & Thương mại B2B',
+        association: 'Hiệp hội Doanh nhân Công nghệ Aplusvn',
       }));
     }
   } catch (error) {
-    // Offline preview fallback
+    console.warn('MatchingPage fetch error:', error);
   }
 
   return (
     <ToastProvider>
-      <B2BMatchmakingView initialMatchings={initialMatchings} />
+      <B2BMatchmakingView initialMatchings={initialMatchings} companies={companies} />
     </ToastProvider>
   );
 }

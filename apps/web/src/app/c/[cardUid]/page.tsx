@@ -8,6 +8,8 @@ import { Zap, ShieldCheck, UserCheck, ArrowRight, Lock, Sparkles, CheckCircle2 }
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 
+import { DbService } from '@/lib/db-service';
+
 export default function NfcLandingRouter() {
   const params = useParams();
   const searchParams = useSearchParams();
@@ -22,6 +24,8 @@ export default function NfcLandingRouter() {
   const [matchedIdentity, setMatchedIdentity] = useState<any>(null);
 
   useEffect(() => {
+    let isCancelled = false;
+
     const RESERVED_PATHS = [
       'dashboard',
       'admin',
@@ -49,13 +53,13 @@ export default function NfcLandingRouter() {
     // Instant High-speed NFC card resolution (<0.05s)
     const cleanUid = decodeURIComponent(cardUid).trim().toLowerCase();
 
-    // 1. Check card by UID, ID or identifier
+    // 1. Check card by UID, ID or identifier in local store
     const card = state.cards.find(
       c => c.cardUid.toLowerCase() === cleanUid ||
            c.id.toLowerCase() === cleanUid ||
            c.nfcIdentifier?.toLowerCase() === cleanUid ||
-           (cleanUid.includes('04:8f') && c.personIdentityId === 'id-001') ||
-           (cleanUid.includes('aplus-001') && c.personIdentityId === 'id-001')
+           (cleanUid.includes('04:8f') && c.personIdentityId === '11111111-1111-1111-1111-111111111111') ||
+           (cleanUid.includes('aplus-001') && c.personIdentityId === '11111111-1111-1111-1111-111111111111')
     );
 
     if (card) {
@@ -82,12 +86,13 @@ export default function NfcLandingRouter() {
       'johnny-long-ho',
       'aplus-001',
       '04:8f',
+      'nfc-ha-777',
     ].some((alias) => cleanUid.includes(alias));
 
     const identity = state.identities.find(
       i => i.username.toLowerCase() === cleanUid ||
            i.id.toLowerCase() === cleanUid ||
-           (isJohnnyLongAlias && (i.username === 'johnnylongho' || i.username === 'johnnylong' || i.id === 'id-001'))
+           (isJohnnyLongAlias && (i.username === 'johnnylongho' || i.username === 'johnnylong' || i.id === '11111111-1111-1111-1111-111111111111' || i.id === 'id-001'))
     ) || (isJohnnyLongAlias ? state.identities[0] : null);
 
     if (identity) {
@@ -99,8 +104,27 @@ export default function NfcLandingRouter() {
       return;
     }
 
-    setLoading(false);
-  }, [cardUid, action, eventId, state, performCheckIn, router]);
+    // 3. Fallback: Query Cloud Supabase directly (handles cold scan on newly issued cards)
+    DbService.resolveCardUid(cleanUid).then((cloudRes) => {
+      if (isCancelled) return;
+      if (cloudRes.card && cloudRes.identity) {
+        setMatchedCard(cloudRes.card);
+        setMatchedIdentity(cloudRes.identity);
+        if (action === 'checkin') {
+          performCheckIn(eventId, cloudRes.card.cardUid, 'NFC');
+        }
+        router.replace(`/p/${cloudRes.identity.username}${action === 'checkin' ? '?checked_in=1' : ''}`);
+      } else {
+        setLoading(false);
+      }
+    }).catch(() => {
+      if (!isCancelled) setLoading(false);
+    });
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [cardUid, action, eventId, state.cards, state.identities, performCheckIn, router]);
 
 
   if (loading) {

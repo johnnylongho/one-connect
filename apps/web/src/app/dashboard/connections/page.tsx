@@ -38,133 +38,65 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog';
 
-// Standard B2B Mock Data with Rich Business Context & PDPL Consent Details
-const INITIAL_DEMO_CONNECTIONS = [
-  {
-    id: 'conn-demo-01',
-    partnerId: 'id-demo-01',
-    fullName: 'Nguyễn Văn Hùng',
-    displayName: 'Hùng Nguyễn VIP',
-    title: 'Chủ Tịch HĐQT & Tổng Giám Đốc',
-    company: 'Tập đoàn Khách sạn & Du lịch MICE Nha Trang Pearl',
-    avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
-    phone: '0905.123.456',
-    email: 'hung.nguyen@nhatrangpearl.vn',
-    status: 'CONNECTED',
-    industry: 'Du Lịch & Khách Sạn MICE',
-    contextEvent: 'Diễn Đàn Doanh Nhân Trẻ Khánh Hòa 2026',
-    tableNo: 'Bàn VIP A12',
-    dateMet: '20/08/2026',
-    consentTimestamp: '20/08/2026 09:15:22',
-    consentHash: 'SHA256:8F92...B41E',
-    notesCount: 3,
-    leadTier: 'HOT',
-  },
-  {
-    id: 'conn-demo-02',
-    partnerId: 'id-demo-02',
-    fullName: 'Trần Thị Mai Anh',
-    displayName: 'Mai Anh CEO',
-    title: 'Giám Đốc Điều Hành (CEO)',
-    company: 'Công ty CP Công Nghệ Xanh & Năng Lượng Biển Nam Trung Bộ',
-    avatarUrl: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=150&auto=format&fit=crop&q=80',
-    phone: '0918.777.888',
-    email: 'maianh.tran@greentech-ntb.com',
-    status: 'CONNECTED',
-    industry: 'Năng Lượng Tái Tạo & IoT',
-    contextEvent: 'TECHFEST Khánh Hòa — Diễn Đàn ĐMST',
-    tableNo: 'Bàn Đàm Phán B04',
-    dateMet: '19/08/2026',
-    consentTimestamp: '19/08/2026 14:40:10',
-    consentHash: 'SHA256:3A71...C92D',
-    notesCount: 2,
-    leadTier: 'HOT',
-  },
-  {
-    id: 'conn-demo-03',
-    partnerId: 'id-demo-03',
-    fullName: 'Lê Hoàng Nam',
-    displayName: 'Nam Cam Ranh Port',
-    title: 'Phó Tổng Giám Đốc Phụ Trách Chuỗi Cung Ứng',
-    company: 'Tổng Công ty Cảng Biển & Logistics Quốc Tế Cam Ranh',
-    avatarUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80',
-    phone: '0988.333.222',
-    email: 'nam.le@camranhport.com.vn',
-    status: 'PENDING',
-    industry: 'Logistics & Cảng Biển',
-    contextEvent: 'Hội Nghị Xúc Tiến Thương Mại Biển 2026',
-    tableNo: 'Bàn A02',
-    dateMet: '20/08/2026',
-    consentTimestamp: null,
-    consentHash: 'PENDING_EXPLICIT_CONSENT',
-    notesCount: 1,
-    leadTier: 'WARM',
-  },
-  {
-    id: 'conn-demo-04',
-    partnerId: 'id-demo-04',
-    fullName: 'Đặng Quốc Huy',
-    displayName: 'Huy Finance',
-    title: 'Giám Đốc Quỹ Đầu Tư (Venture Partner)',
-    company: 'Quỹ Đổi Mới Sáng Tạo Nam Trung Bộ Capital',
-    avatarUrl: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80',
-    phone: '0977.654.321',
-    email: 'huy.dang@ntbcapital.vn',
-    status: 'PENDING',
-    industry: 'Đầu Tư Mạo Hiểm & Tài Chính',
-    contextEvent: 'Diễn Đàn Gọi Vốn Khởi Nghiệp Khánh Hòa 2026',
-    tableNo: 'Bàn VIP 01',
-    dateMet: '20/08/2026',
-    consentTimestamp: null,
-    consentHash: 'PENDING_EXPLICIT_CONSENT',
-    notesCount: 0,
-    leadTier: 'HOT',
-  },
-  {
-    id: 'conn-demo-05',
-    partnerId: 'id-demo-05',
-    fullName: 'Phạm Minh Tuấn',
-    displayName: 'Tuấn Bất Động Sản',
-    title: 'Tổng Giám Đốc',
-    company: 'Công ty CP Đầu Tư & Phát Triển Đô Thị Biển Khánh Hòa',
-    avatarUrl: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&auto=format&fit=crop&q=80',
-    phone: '0903.999.888',
-    email: 'tuan.pm@khanhhoaurban.vn',
-    status: 'CONNECTED',
-    industry: 'Bất Động Sản Nghỉ Dưỡng',
-    contextEvent: 'Đại Hội Hiệp Hội Doanh Nghiệp Tỉnh Khánh Hòa',
-    tableNo: 'Bàn VIP C01',
-    dateMet: '15/08/2026',
-    consentTimestamp: '15/08/2026 10:11:45',
-    consentHash: 'SHA256:1C88...F73A',
-    notesCount: 4,
-    leadTier: 'WARM',
-  },
-];
+import { ensureUuid } from '@/lib/db-service';
 
 export default function MyConnectionsPage() {
+  const { state, acceptConnection } = useOneConnectStore();
   const [filter, setFilter] = useState<'ALL' | 'CONNECTED' | 'PENDING'>('ALL');
   const [search, setSearch] = useState('');
-  const [connectionsList, setConnectionsList] = useState(INITIAL_DEMO_CONNECTIONS);
   const [selectedAuditConn, setSelectedAuditConn] = useState<any>(null);
   const [isAuditModalOpen, setIsAuditModalOpen] = useState(false);
 
+  // Map real store connections and enrich with identities
+  const connectionsList = React.useMemo(() => {
+    return state.connections.map((c) => {
+      const isReqJohnny = c.requesterIdentityId === '11111111-1111-1111-1111-111111111111' || c.requesterIdentityId === 'id-001';
+      const partnerId = isReqJohnny ? c.receiverIdentityId : c.requesterIdentityId;
+      const partner = c.partner || state.identities.find(
+        (i) => i.id === partnerId || ensureUuid(i.id) === partnerId
+      );
+
+      const isConnected = c.status === 'CONNECTED';
+      const formattedDate = c.connectedAt
+        ? new Date(c.connectedAt).toLocaleDateString('vi-VN')
+        : c.createdAt
+        ? new Date(c.createdAt).toLocaleDateString('vi-VN')
+        : 'Chưa cập nhật';
+
+      const consentTime = isConnected
+        ? (c.connectedAt ? new Date(c.connectedAt).toLocaleString('vi-VN') : 'Đã xác thực Consent')
+        : null;
+
+      const consentHash = isConnected
+        ? `SHA256:${c.id.slice(0, 8).toUpperCase()}...MUTUAL_CONSENT`
+        : 'PENDING_EXPLICIT_CONSENT';
+
+      return {
+        id: c.id,
+        partnerId: partner?.id || partnerId,
+        fullName: partner?.fullName || 'Doanh Chủ Thành Viên',
+        displayName: partner?.displayName || '',
+        title: partner?.title || 'Doanh Nhân / CEO',
+        company: partner?.businesses?.[0]?.businessName || (partner?.title ? `${partner.title} Corp` : 'Doanh Nghiệp Thành Viên'),
+        avatarUrl: partner?.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(partner?.fullName || 'User')}&background=0284c7&color=fff&bold=true`,
+        phone: partner?.phone || 'Chưa cung cấp',
+        email: partner?.email || 'Chưa cung cấp',
+        status: isConnected ? 'CONNECTED' : 'PENDING',
+        industry: partner?.bio || 'Giao thương & Xúc tiến Đầu tư',
+        contextEvent: c.contextEventName || 'Sự Kiện Kết Nối Doanh Nghiệp 2026',
+        tableNo: 'Bàn B2B',
+        dateMet: formattedDate,
+        consentTimestamp: consentTime,
+        consentHash,
+        notesCount: c.notesCount || 0,
+        leadTier: isConnected ? 'HOT' : 'WARM',
+      };
+    });
+  }, [state.connections, state.identities]);
+
   // Accept Consent handler
   const handleAcceptConsent = (id: string) => {
-    const now = new Date();
-    const formatted = `${now.toLocaleDateString('vi-VN')} ${now.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}`;
-    setConnectionsList((prev) =>
-      prev.map((c) =>
-        c.id === id
-          ? {
-              ...c,
-              status: 'CONNECTED',
-              consentTimestamp: formatted,
-              consentHash: 'SHA256:' + Math.random().toString(16).substring(2, 6).toUpperCase() + '...MUTUAL_CONSENT',
-            }
-          : c
-      )
-    );
+    acceptConnection(id);
   };
 
   // Filter connections by status and search query
@@ -334,9 +266,16 @@ export default function MyConnectionsPage() {
       {/* 3. PARTNER CONNECTIONS LIST (COMPACT HIGH DENSITY) */}
       <section className="space-y-2.5">
         {filteredList.length === 0 ? (
-          <div className="p-8 rounded-2xl bg-white border border-slate-200 text-center text-slate-400 space-y-2 shadow-2xs">
-            <Users className="w-8 h-8 mx-auto text-slate-300" />
-            <div className="font-bold text-slate-700 text-xs">Không tìm thấy kết nối phù hợp</div>
+          <div className="p-12 rounded-2xl bg-white border border-slate-200/80 text-center text-slate-400 space-y-3 shadow-2xs">
+            <div className="w-12 h-12 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center mx-auto text-slate-400">
+              <Users className="w-6 h-6" />
+            </div>
+            <div className="space-y-1">
+              <p className="font-bold text-slate-700 text-sm">Chưa có kết nối nào phù hợp</p>
+              <p className="text-xs text-slate-400 max-w-sm mx-auto">
+                Khi có đối tác chạm thẻ NFC hoặc gửi yêu cầu giao thương B2B, dữ liệu kết nối đã xác thực sẽ xuất hiện tại đây theo thời gian thực.
+              </p>
+            </div>
           </div>
         ) : (
           filteredList.map((conn) => {
