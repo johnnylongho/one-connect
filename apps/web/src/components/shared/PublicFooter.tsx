@@ -116,7 +116,7 @@ export function PublicFooter({ theme = 'light' }: PublicFooterProps) {
               <div className="flex flex-wrap items-center gap-2">
                 <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20">
                   <ShieldCheck className="w-3 h-3" />
-                  Bảo hộ Sở hữu Trí tuệ
+                  Bản Quyền Tác Giả &amp; Kiến Trúc Độc Quyền
                 </span>
                 <span className="font-semibold text-xs tracking-tight text-slate-900 dark:text-slate-100">
                   © 2024 - 2026 ONE CONNECT NETWORK™. All rights reserved.
@@ -128,7 +128,7 @@ export function PublicFooter({ theme = 'light' }: PublicFooterProps) {
                 <span className="text-slate-500 dark:text-slate-400">(Founder &amp; Solution Architect)</span>.
               </p>
               <p className="text-[10px] text-slate-500 dark:text-slate-400 leading-normal">
-                Dự án được bảo hộ quyền tác giả đối với ý tưởng mô hình kinh doanh, kiến trúc định danh số B2B và quy trình vận hành xúc tiến thương mại. Mọi hành vi sao chép cấu trúc mô hình, quy trình công nghệ hoặc giao diện mà không có văn bản chấp thuận chính thức từ tác giả đều vi phạm pháp luật sở hữu trí tuệ.
+                Toàn bộ thiết kế hệ thống, kiến trúc giải pháp, mã nguồn và tài liệu quy trình One Connect được sáng tạo, phát triển và thuộc quyền sở hữu trí tuệ của tác giả Hồ Hoàng Long. Mọi quyền được bảo lưu theo Luật Sở hữu trí tuệ và Công ước Berne (All Rights Reserved). Mọi hành vi sao chép cấu trúc mô hình, quy trình công nghệ hoặc giao diện mà không có văn bản chấp thuận chính thức từ tác giả đều vi phạm pháp luật.
               </p>
             </div>
 
