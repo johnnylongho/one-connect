@@ -23,6 +23,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/components/ui/toast';
+import { PublicFooter } from '@/components/shared/PublicFooter';
 
 export default function MemberEventHubPage() {
   const { state, currentIdentity, registerForEvent } = useOneConnectStore();
@@ -225,6 +226,7 @@ export default function MemberEventHubPage() {
           })}
         </div>
       </main>
+      <PublicFooter theme="light" />
     </div>
   );
 }

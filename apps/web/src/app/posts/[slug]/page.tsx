@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { PublicFooter } from '@/components/shared/PublicFooter';
 import {
   getArticleBySlug,
   getArticles,
@@ -241,24 +242,9 @@ export default function ArticleDetailPage() {
       </main>
 
       {/* Global Footer */}
-      <footer className="border-t border-slate-200/80 bg-white py-10 px-4 sm:px-6 lg:px-8 text-xs text-slate-600 mt-16">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-6">
-          <div className="flex flex-col items-center sm:items-start gap-2 text-center sm:text-left">
-            <Link href="/" title="One Connect Network">
-              <img src="/brand_logo_transparent.png?v=20260904_tagline" alt="One Connect" className="h-7 w-auto object-contain" />
-            </Link>
-            <span className="font-medium text-slate-600">© 2026 One Connect Network. Bảo lưu mọi quyền.</span>
-          </div>
-
-          <div className="flex items-center gap-4 text-[11px] font-semibold">
-            <Link href="/" className="hover:text-blue-600">Trang Chủ</Link>
-            <Link href="/social-value" className="hover:text-blue-600">Giá Trị Xã Hội</Link>
-            <Link href="/posts" className="hover:text-blue-600">Bài Viết</Link>
-            <Link href="/login" className="hover:text-blue-600">Đăng Nhập</Link>
-          </div>
-        </div>
-      </footer>
-
+      <div className="mt-16">
+        <PublicFooter theme="light" />
+      </div>
     </div>
   );
 }

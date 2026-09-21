@@ -28,6 +28,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
+import { PublicFooter } from '@/components/shared/PublicFooter';
 import { useOneConnectStore } from '@/lib/store';
 
 export default function SocialValuePage() {
@@ -410,32 +411,7 @@ export default function SocialValuePage() {
       </section>
 
       {/* Global Footer */}
-      <footer className="border-t border-slate-200/80 bg-white py-10 px-4 sm:px-6 lg:px-8 text-xs text-slate-600">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-6">
-          <div className="flex flex-col items-center sm:items-start gap-2 text-center sm:text-left">
-            <Link href="/" title="One Connect Network">
-              <img
-                src="/brand_logo_transparent.png?v=20260904_tagline"
-                alt="One Connect"
-                className="h-7 w-auto object-contain"
-              />
-            </Link>
-            <span className="font-medium text-slate-600">
-              © 2026 One Connect Network. Giải pháp Định danh số &amp; ESG Xanh.
-            </span>
-          </div>
-
-          <div className="flex items-center gap-4 text-[11px] font-semibold">
-            <span className="flex items-center gap-1 text-emerald-700">
-              <ShieldCheck className="w-3.5 h-3.5" /> Chuẩn ESG &amp; Nghị định 13
-            </span>
-            <Link href="/" className="hover:text-emerald-600">Trang Chủ</Link>
-            <Link href="/services" className="hover:text-emerald-600">Dịch Vụ</Link>
-            <Link href="/posts" className="hover:text-emerald-600">Thông Tin Thêm</Link>
-            <Link href="/login" className="hover:text-emerald-600">Đăng Nhập</Link>
-          </div>
-        </div>
-      </footer>
+      <PublicFooter theme="light" />
 
     </div>
   );

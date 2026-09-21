@@ -50,6 +50,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { INITIAL_ARTICLES, CATEGORY_LABELS } from '@/lib/services/articles';
 import { ServicePackagesSection } from '@/components/services/ServicePackagesSection';
+import { PublicFooter } from '@/components/shared/PublicFooter';
 
 export default function HomePage() {
   const { state, currentIdentity, logoutUser } = useOneConnectStore();
@@ -997,52 +998,7 @@ export default function HomePage() {
       {/* ================================================================= */}
       {/* 11. GLOBAL FOOTER */}
       {/* ================================================================= */}
-      <footer className="border-t border-slate-200/80 bg-white py-10 px-4 sm:px-6 lg:px-8 text-xs text-slate-600">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-6">
-          
-          <div className="flex flex-col items-center sm:items-start gap-2.5 text-center sm:text-left">
-            <Link href="/" title="One Connect Network" className="inline-block">
-              <img
-                src="/brand_logo_transparent.png?v=20260904_tagline"
-                alt="One Connect"
-                className="h-7 sm:h-7 w-auto object-contain mx-auto sm:mx-0"
-              />
-            </Link>
-            <span className="font-medium text-slate-600 block">
-              © 2026 One Connect Network. Nền tảng Định danh số B2B &amp; ESG Xanh.
-            </span>
-          </div>
-
-          <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 text-center sm:text-right">
-            <div className="flex items-center gap-4 text-[11px] font-semibold">
-              <Link href="/social-value" className="hover:text-emerald-600 text-emerald-700 flex items-center gap-1">
-                <Leaf className="w-3.5 h-3.5" /> Chuẩn ESG Xanh
-              </Link>
-              <Link href="/services" className="hover:text-cyan-600 text-slate-600">
-                Dịch Vụ
-              </Link>
-              <Link href="/posts" className="hover:text-blue-600">
-                Thông Tin Thêm
-              </Link>
-              <Link href="/login" className="hover:text-blue-600">
-                Đăng nhập
-              </Link>
-              <Link href="/register" className="hover:text-blue-600">
-                Đăng ký
-              </Link>
-            </div>
-
-            <button
-              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-800 font-bold text-xs transition-all shadow-2xs hover:shadow-xs cursor-pointer group"
-              title="Cuộn lên đầu trang"
-            >
-              <ArrowUp className="w-3.5 h-3.5 text-blue-600 transition-transform group-hover:-translate-y-0.5" />
-              <span>Trở lại đầu trang</span>
-            </button>
-          </div>
-        </div>
-      </footer>
+      <PublicFooter theme="light" />
 
       {/* Floating Back-To-Top Button */}
       <button
