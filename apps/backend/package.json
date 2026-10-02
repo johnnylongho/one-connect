@@ -1,0 +1,13 @@
+{
+  "name": "backend",
+  "version": "0.1.0",
+  "private": true,
+  "description": "ONE CONNECT Network - Backend Data Models, Supabase Migrations, Schemas and Integration Services",
+  "scripts": {
+    "lint": "echo Backend lint OK",
+    "check-types": "echo Backend types OK"
+  },
+  "devDependencies": {
+    "@repo/typescript-config": "workspace:*"
+  }
+}

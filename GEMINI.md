@@ -11,3 +11,7 @@
 - **Source citation:** For every argument or claim made, include an exact verbatim quote from the referenced document.
 - **Confidence & ambiguity:** If there is any ambiguity, reduce certainty or decline to answer.
 
+## 3. System Architecture & Module Scoping (Frontend vs Backend)
+- **Frontend Scope (`apps/frontend`):** UI pages, React components, Tailwind styling, mobile PWA, NFC card scanning flows, client state, and browser UX. All future UI updates must be placed in `apps/frontend/`.
+- **Backend Scope (`apps/backend`):** Supabase database schemas, SQL migrations (`database/migrations/`), seed data, RLS security policies, API contracts (`api-specs/`), and external integrations (Zalo ZNS, Resend, n8n automations). All future database schema changes or server integrations must be applied within `apps/backend/`.
+
