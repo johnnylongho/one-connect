@@ -77,7 +77,7 @@ export default function MyConnectionsPage() {
         fullName: partner?.fullName || 'Doanh Chủ Thành Viên',
         displayName: partner?.displayName || '',
         title: partner?.title || 'Doanh Nhân / CEO',
-        company: partner?.businesses?.[0]?.businessName || (partner?.title ? `${partner.title} Corp` : 'Doanh Nghiệp Thành Viên'),
+        company: partner?.businesses?.[0]?.businessName || partner?.association || 'Chưa cập nhật doanh nghiệp',
         avatarUrl: partner?.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(partner?.fullName || 'User')}&background=0284c7&color=fff&bold=true`,
         phone: partner?.phone || 'Chưa cung cấp',
         email: partner?.email || 'Chưa cung cấp',

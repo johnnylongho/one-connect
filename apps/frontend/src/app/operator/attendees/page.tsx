@@ -92,69 +92,110 @@ export default function RealtimeAttendeeDirectory() {
 
       {/* 3. ATTENDEES LIST */}
       <section className="space-y-3">
-        {filtered.map((item) => {
-          const company = item.identity.businesses && item.identity.businesses[0] ? item.identity.businesses[0].businessName : 'Tập đoàn Công nghệ Số A+ (APLUSVN)';
-          const profileLink = `/p/${item.identity.username || item.identity.id}`;
-
-          return (
-            <div
-              key={item.identity.id}
-              className="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200/90 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 hover:shadow-md transition-all"
-            >
-              <div className="flex items-center gap-3.5 min-w-0">
-                <img
-                  src={item.identity.avatarUrl || '/avatar-johnny-long.jpg'}
-                  alt={item.identity.fullName}
-                  className="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl object-cover shadow-2xs border border-slate-200 bg-slate-100 shrink-0"
-                  onError={(e) => {
-                    e.currentTarget.onerror = null;
-                    e.currentTarget.src = `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(item.identity.fullName)}&backgroundColor=0066ff,00c2ff`;
-                  }}
-                />
-                <div className="space-y-1 min-w-0">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <h3 className="font-bold text-sm sm:text-base text-slate-900 tracking-tight">
-                      {item.identity.fullName}
-                    </h3>
-                    <Badge className="bg-blue-50 text-[#0066FF] border-blue-200 text-[10px] font-bold">
-                      {item.identity.association || 'Hội viên'}
-                    </Badge>
-                  </div>
-
-                  <p className="text-xs font-bold text-[#0066FF] leading-snug">
-                    {item.identity.title}
-                  </p>
-
-                  <div className="flex items-center gap-1.5 text-xs text-slate-600 truncate">
-                    <Building2 className="w-3.5 h-3.5 text-[#FF6B00] shrink-0" />
-                    <span className="truncate">{company}</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Status & Profile Link */}
-              <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-100">
-                <div className="text-right">
-                  <Badge className="bg-emerald-50 text-emerald-700 border-emerald-200 text-xs font-bold flex items-center gap-1">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                    <span>Đã Điểm Danh</span>
-                  </Badge>
-                  <p className="text-[10.5px] text-slate-400 font-mono mt-0.5">
-                    Trạm NFC 01 • &lt;0.3s
-                  </p>
-                </div>
-
-                <Link
-                  href={profileLink}
-                  className="p-2 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200 text-[#0066FF] transition-all shrink-0 shadow-2xs"
-                  title="Xem Profile Đại Biểu"
-                >
-                  <ExternalLink className="w-4 h-4" />
-                </Link>
-              </div>
+        {filtered.length === 0 ? (
+          <div className="p-12 text-center rounded-2xl bg-white border border-dashed border-slate-200 shadow-xs">
+            <div className="w-12 h-12 mx-auto rounded-2xl bg-slate-100 flex items-center justify-center text-slate-400 mb-3">
+              <Users className="w-6 h-6" />
             </div>
-          );
-        })}
+            <h3 className="font-bold text-slate-800 text-sm">Không tìm thấy đại biểu</h3>
+            <p className="text-xs text-slate-500 max-w-sm mx-auto mt-1">
+              {search
+                ? `Không có đại biểu nào khớp với từ khóa "${search}". Vui lòng thử lại.`
+                : 'Chưa có dữ liệu đại biểu đăng ký cho sự kiện này trong hệ thống.'}
+            </p>
+          </div>
+        ) : (
+          filtered.map((item) => {
+            const company =
+              item.identity.businesses && item.identity.businesses[0]
+                ? item.identity.businesses[0].businessName
+                : item.identity.association || 'Chưa cập nhật doanh nghiệp';
+            const profileLink = `/p/${item.identity.username || item.identity.id}`;
+            const isCheckedIn = !!item.checkIn;
+
+            return (
+              <div
+                key={item.identity.id}
+                className="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200/90 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 hover:shadow-md transition-all"
+              >
+                <div className="flex items-center gap-3.5 min-w-0">
+                  <img
+                    src={item.identity.avatarUrl || '/avatar-johnny-long.jpg'}
+                    alt={item.identity.fullName}
+                    className="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl object-cover shadow-2xs border border-slate-200 bg-slate-100 shrink-0"
+                    onError={(e) => {
+                      e.currentTarget.onerror = null;
+                      e.currentTarget.src = `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(item.identity.fullName)}&backgroundColor=0066ff,00c2ff`;
+                    }}
+                  />
+                  <div className="space-y-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <h3 className="font-bold text-sm sm:text-base text-slate-900 tracking-tight">
+                        {item.identity.fullName}
+                      </h3>
+                      <Badge className="bg-blue-50 text-[#0066FF] border-blue-200 text-[10px] font-bold">
+                        {item.identity.association || 'Hội viên'}
+                      </Badge>
+                    </div>
+
+                    <p className="text-xs font-bold text-[#0066FF] leading-snug">
+                      {item.identity.title || 'Đại biểu khách mời'}
+                    </p>
+
+                    <div className="flex items-center gap-1.5 text-xs text-slate-600 truncate">
+                      <Building2 className="w-3.5 h-3.5 text-[#FF6B00] shrink-0" />
+                      <span className="truncate">{company}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Status & Profile Link */}
+                <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-100">
+                  <div className="text-right">
+                    {isCheckedIn ? (
+                      <>
+                        <Badge className="bg-emerald-50 text-emerald-700 border-emerald-200 text-xs font-bold flex items-center gap-1">
+                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                          <span>Đã Điểm Danh</span>
+                        </Badge>
+                        <p className="text-[10.5px] text-slate-400 font-mono mt-0.5">
+                          {item.checkIn?.method === 'NFC' ? 'Trạm NFC' : 'Cổng QR Code'} •{' '}
+                          {item.checkIn?.checkedInAt
+                            ? new Date(item.checkIn.checkedInAt).toLocaleTimeString('vi-VN', {
+                                hour: '2-digit',
+                                minute: '2-digit',
+                              })
+                            : 'Vừa xong'}
+                        </p>
+                      </>
+                    ) : (
+                      <>
+                        <Badge
+                          variant="outline"
+                          className="bg-slate-50 text-slate-500 border-slate-200 text-xs font-semibold flex items-center gap-1"
+                        >
+                          <Clock className="w-3.5 h-3.5 text-slate-400" />
+                          <span>Chưa Điểm Danh</span>
+                        </Badge>
+                        <p className="text-[10.5px] text-slate-400 font-mono mt-0.5">
+                          Đang chờ tiếp đón
+                        </p>
+                      </>
+                    )}
+                  </div>
+
+                  <Link
+                    href={profileLink}
+                    className="p-2 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200 text-[#0066FF] transition-all shrink-0 shadow-2xs"
+                    title="Xem Profile Đại Biểu"
+                  >
+                    <ExternalLink className="w-4 h-4" />
+                  </Link>
+                </div>
+              </div>
+            );
+          })
+        )}
       </section>
 
     </div>

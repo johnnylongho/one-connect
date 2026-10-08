@@ -17,3 +17,16 @@ export const isSupabaseConfigured = (): boolean => {
 export const supabase = isSupabaseConfigured()
   ? createSupabaseClient(supabaseUrl, supabaseAnonKey)
   : null;
+
+// Server-side privileged client with Service Role Key for low latency
+export const getServiceSupabase = () => {
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || supabaseAnonKey;
+  return isSupabaseConfigured()
+    ? createSupabaseClient(supabaseUrl, serviceKey, {
+        auth: {
+          persistSession: false,
+          autoRefreshToken: false,
+        },
+      })
+    : null;
+};

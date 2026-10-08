@@ -30,6 +30,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Html5Qrcode } from 'html5-qrcode';
+import { ErrorBoundary } from '@/components/shared/ErrorBoundary';
 
 interface OfflineCheckinItem {
   id: string;
@@ -399,7 +400,7 @@ export default function FastCheckinTerminal() {
             <div className="flex flex-col items-end text-xs pl-2 border-l border-slate-100">
               <span className="text-slate-400 text-[10px]">Đã Điểm Danh</span>
               <span suppressHydrationWarning className="font-mono font-bold text-[#0066FF] text-sm">
-                {mounted ? `${activeEvent?.checkInCount || 3} / ${activeEvent?.registrationCount || 5}` : '3 / 5'}
+                {mounted ? `${activeEvent?.checkInCount ?? 0} / ${activeEvent?.registrationCount ?? 0}` : '0 / 0'}
               </span>
             </div>
           </div>
@@ -434,7 +435,11 @@ export default function FastCheckinTerminal() {
         </div>
       )}
 
-      <main className="space-y-6">
+      <ErrorBoundary
+        fallbackTitle="Lỗi Khởi Động Trạm Check-in"
+        fallbackMessage="Trình điều khiển thiết bị (Camera QR hoặc Đầu đọc NFC) gặp sự cố tạm thời hoặc quyền truy cập phần cứng bị từ chối. Vui lòng cấp quyền hoặc khởi động lại thiết bị."
+      >
+        <main className="space-y-6">
         {/* 2. REAL SCANNER MODE SELECTOR */}
         <div className="grid grid-cols-2 gap-3 max-w-md mx-auto">
           <Button
@@ -621,8 +626,8 @@ export default function FastCheckinTerminal() {
           </div>
         )}
 
-        {/* 5. RECENT CHECK-INS LIVE GATE STREAM */}
-        {recentCheckins.length > 0 && (
+        {/* 5. RECENT CHECK-INS LIVE GATE STREAM OR EMPTY STATE */}
+        {recentCheckins.length > 0 ? (
           <div className="p-5 rounded-3xl bg-white border border-slate-200 shadow-sm space-y-3">
             <div className="flex items-center justify-between">
               <h3 className="text-xs sm:text-sm font-bold text-slate-900 flex items-center gap-2">
@@ -663,8 +668,29 @@ export default function FastCheckinTerminal() {
               })}
             </div>
           </div>
+        ) : (
+          <div className="p-8 rounded-3xl bg-white border border-slate-200/90 text-center space-y-3 shadow-xs">
+            <div className="w-12 h-12 rounded-2xl bg-blue-50 text-[#0066FF] border border-blue-200/60 mx-auto flex items-center justify-center">
+              <Users className="w-6 h-6" />
+            </div>
+            <div className="space-y-1">
+              <h4 className="text-sm font-bold text-slate-800">
+                Chưa Có Lượt Check-in Nào Tại Cổng Này
+              </h4>
+              <p className="text-xs text-slate-500 max-w-md mx-auto leading-relaxed">
+                Trạm quét đã kết nối thời gian thực với Supabase Cloud. Hãy áp thẻ NFC hoặc hướng mã QR của đại biểu đầu tiên vào khung quét để bắt đầu ghi nhận điểm danh.
+              </p>
+            </div>
+            <div className="pt-1">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 text-slate-600 border border-slate-200 text-[11px] font-medium">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                SẴN SÀNG ĐÓN TIẾP • CỔNG TRỰC TUYẾN
+              </span>
+            </div>
+          </div>
         )}
       </main>
+      </ErrorBoundary>
     </div>
   );
 }

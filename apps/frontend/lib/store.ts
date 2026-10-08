@@ -680,15 +680,6 @@ export function useOneConnectStore() {
       );
       targetIdentityId = identity?.id;
     }
-    if (!targetIdentityId) {
-      if (cleanCode.includes('johnny') || cleanCode.includes('long') || cleanCode.includes('777')) {
-        targetIdentityId = 'usr-001';
-      } else if (cleanCode.includes('duc') || cleanCode.includes('minh') || cleanCode.includes('888')) {
-        targetIdentityId = 'usr-002';
-      } else if (cleanCode.includes('nam') || cleanCode.includes('999')) {
-        targetIdentityId = 'usr-003';
-      }
-    }
 
     if (!targetIdentityId) {
       return { success: false, message: `Không tìm thấy thẻ hoặc thành viên "${cardUidOrUsername}" trong hệ thống.` };
