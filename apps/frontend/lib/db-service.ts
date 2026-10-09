@@ -90,9 +90,9 @@ export const DbService = {
             coverUrl: d.cover_url || undefined,
             title: d.title || (isJohnny ? 'Quản lý & Triển khai Dự án kiêm Media' : 'Doanh Nhân Hội Viên'),
             bio: d.bio || 'Hội viên Mạng lưới Định danh Doanh nhân One Connect.',
-            phone: d.phone || '0901234567',
-            email: d.email || 'member@oneconnect.id.vn',
-            website: d.website || 'https://oneconnect.id.vn',
+            phone: d.phone || '',
+            email: d.email || '',
+            website: d.website || '',
             role: (isJohnny ? 'SUPER_ADMIN' : 'MEMBER') as any,
             status: (d.status || 'ACTIVE') as any,
             socialLinks: [
@@ -197,7 +197,7 @@ export const DbService = {
            i.username.toLowerCase() === cleanParam ||
            i.userId.toLowerCase() === cleanParam
     );
-    return found || localIdentities[0] || null;
+    return found || null;
   },
 
   /**
@@ -373,9 +373,11 @@ export const DbService = {
 
     const cleanUid = cardUid.toLowerCase();
     const foundCard = localCards.find(c => c.cardUid.toLowerCase() === cleanUid);
-    const card = foundCard || localCards[0] || null;
-    const identity = card ? (localIdentities.find(i => i.id === card.personIdentityId) || localIdentities[0] || null) : null;
-    return { card, identity };
+    if (!foundCard) {
+      return { card: null, identity: null };
+    }
+    const identity = localIdentities.find(i => i.id === foundCard.personIdentityId) || null;
+    return { card: foundCard, identity };
   },
 
   /**

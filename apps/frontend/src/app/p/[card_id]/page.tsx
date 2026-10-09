@@ -118,62 +118,7 @@ export const PRESET_INDUSTRIES = [
   'Giáo Dục & Đổi Mới Sáng Tạo',
 ];
 
-const PRODUCTS: ProductItem[] = [
-  {
-    id: 'p1',
-    title: 'Thẻ Doanh Nhân Số NFC One Connect Premium',
-    category: 'Phần Cứng & Thẻ Kim Loại Khắc Laser',
-    highlight: 'Chip NTAG215 • 1 Chạm Zero Friction',
-    image: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=600&auto=format&fit=crop&q=80',
-    description: 'Thẻ kim loại nguyên khối chống nước IP68, bảo mật UID độc lập, trao đổi danh thiếp và hồ sơ năng lực chỉ với 1 chạm vào lưng điện thoại.',
-  },
-  {
-    id: 'p2',
-    title: 'Trạm Soát Vé & Check-in Sự Kiện Siêu Tốc (<0.5s)',
-    category: 'Giải Pháp Số Hóa Sự Kiện B2B',
-    highlight: 'Xử lý 60 lượt/phút • Không Ùn Tắc',
-    image: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=600&auto=format&fit=crop&q=80',
-    description: 'Hệ thống điểm danh trạm cửa kết hợp Web NFC và Dynamic QR, tự động đối soát vé VIP và kích hoạt thông báo vị trí ngồi tức thì.',
-  },
-  {
-    id: 'p3',
-    title: 'Nền Tảng B2B Matchmaking & Quản Trị Mối Quan Hệ',
-    category: 'Phần Mềm Doanh Nghiệp & CRM Layer',
-    highlight: 'Xác Thực 2 Chiều • 2-Way Consent',
-    image: 'https://images.unsplash.com/photo-1551836022-d5d88e9218df?w=600&auto=format&fit=crop&q=80',
-    description: 'Tầng hạ tầng quản lý mối quan hệ giao thương 1:1, phân bổ bàn hẹn B2B tự động và đồng bộ Lead chất lượng cao về hệ thống CRM.',
-  },
-];
-
-const JOINED_EVENTS = [
-  {
-    id: 'ev-1',
-    title: 'Diễn Đàn Kết Nối Doanh Nghiệp Quốc Gia 2026',
-    role: 'VIP Executive Delegate',
-    date: '14/08/2026',
-    location: 'Khu A - Bàn Đại Biểu VIP #01',
-    status: 'ĐÃ CHECK-IN',
-    statusColor: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-  },
-  {
-    id: 'ev-2',
-    title: 'Hội Nghị Thượng Đỉnh Chuyển Đổi Số & B2B Tech 2026',
-    role: 'Diễn Giả & Khách Mời Danh Dự',
-    date: '28/05/2026',
-    location: 'Trung Tâm Hội Nghị Quốc Gia',
-    status: 'ĐÃ THAM DỰ',
-    statusColor: 'bg-blue-50 text-blue-700 border-blue-200',
-  },
-  {
-    id: 'ev-3',
-    title: 'Gala Doanh Nhân Đổi Mới Sáng Tạo Aplusvn Tech',
-    role: 'Ban Tổ Chức & Media Director',
-    date: '18/01/2026',
-    location: 'Aplusvn Innovation Tower',
-    status: 'HOÀN THÀNH',
-    statusColor: 'bg-purple-50 text-purple-700 border-purple-200',
-  },
-];
+// ZERO MOCK DATA: Static sample products and events removed in favor of genuine database records and empty states
 
 function DigitalProfileContent() {
   const params = useParams();
@@ -198,44 +143,45 @@ function DigitalProfileContent() {
     setCurrentDateStr(now.toLocaleDateString('vi-VN'));
   }, []);
 
-  // Find matched identity from store (supporting all alias slugs)
+  // Find matched identity from store or Cloud Supabase (Pure genuine matching)
   const cleanCardId = decodeURIComponent(cardId).trim().toLowerCase();
-  const isJohnnyLongAlias = [
-    'johnnylong',
-    'johnnylongho',
-    'hoanglong',
-    'johnny-long',
-    'johnny-long-ho',
-    'aplus-001',
-    '04:8f',
-  ].some((alias) => cleanCardId.includes(alias));
 
   const localMatched = state.identities.find(
     (i) =>
       i.username.toLowerCase() === cleanCardId ||
-      i.id.toLowerCase() === cleanCardId ||
-      (isJohnnyLongAlias && (i.username === 'johnnylongho' || i.username === 'johnnylong' || i.id === 'id-001'))
+      i.id.toLowerCase() === cleanCardId
   );
 
   const [cloudIdentity, setCloudIdentity] = useState<PersonIdentity | null>(null);
-  const [isLoadingCloud, setIsLoadingCloud] = useState<boolean>(!localMatched && !isJohnnyLongAlias);
+  const [isLoadingCloud, setIsLoadingCloud] = useState<boolean>(!localMatched);
 
   useEffect(() => {
-    if (!localMatched && !isJohnnyLongAlias) {
+    if (!localMatched) {
       setIsLoadingCloud(true);
-      DbService.getIdentity(cleanCardId).then((fetched) => {
-        if (fetched) {
-          setCloudIdentity(fetched);
-        }
-        setIsLoadingCloud(false);
-      }).catch((err) => {
-        console.warn('Cloud identity fetch error:', err);
-        setIsLoadingCloud(false);
-      });
+      // Try resolving as card UID first
+      DbService.resolveCardUid(cleanCardId)
+        .then((cardRes) => {
+          if (cardRes.identity) {
+            setCloudIdentity(cardRes.identity);
+            setIsLoadingCloud(false);
+            return;
+          }
+          // If not a card UID, query by identity username/ID
+          return DbService.getIdentity(cleanCardId).then((fetched) => {
+            if (fetched) {
+              setCloudIdentity(fetched);
+            }
+            setIsLoadingCloud(false);
+          });
+        })
+        .catch((err) => {
+          console.warn('Cloud identity fetch error:', err);
+          setIsLoadingCloud(false);
+        });
     }
-  }, [cleanCardId, localMatched, isJohnnyLongAlias]);
+  }, [cleanCardId, localMatched]);
 
-  const matchedIdentity = cloudIdentity || localMatched || (isJohnnyLongAlias ? currentIdentity : null);
+  const matchedIdentity = cloudIdentity || localMatched || null;
 
   const matchedCard = matchedIdentity
     ? (state.cards.find(c => c.personIdentityId === matchedIdentity?.id && c.status === 'ACTIVE') || state.cards.find(c => c.personIdentityId === matchedIdentity?.id))
@@ -349,7 +295,38 @@ function DigitalProfileContent() {
     setCurrentDateStr(now.toLocaleDateString('vi-VN'));
   }, []);
 
-  // Synchronized Profile Object (Phản ánh dữ liệu mới nhất ngay khi store cập nhật)
+  // Real Event Registrations and Check-in History for this entrepreneur
+  const userRegistrations = state.registrations.filter(
+    (r) =>
+      r.personIdentityId === matchedIdentity?.id ||
+      ensureUuid(r.personIdentityId) === ensureUuid(matchedIdentity?.id || '')
+  );
+  const latestReg = userRegistrations[0];
+  const latestEvent = latestReg
+    ? state.events.find((e) => e.id === latestReg.eventId || ensureUuid(e.id) === ensureUuid(latestReg.eventId))
+    : null;
+
+  const joinedEvents = userRegistrations.map((reg) => {
+    const event = state.events.find((e) => e.id === reg.eventId || ensureUuid(e.id) === ensureUuid(reg.eventId));
+    const checkin = state.checkIns.find(
+      (c) =>
+        (c.personIdentityId === matchedIdentity?.id || ensureUuid(c.personIdentityId) === ensureUuid(matchedIdentity?.id || '')) &&
+        (c.eventId === reg.eventId || ensureUuid(c.eventId) === ensureUuid(reg.eventId))
+    );
+    return {
+      id: reg.id,
+      title: event?.name || 'Sự Kiện Kết Nối Giao Thương One Connect',
+      role: reg.ticketType || 'Đại Biểu Doanh Nhân',
+      date: event?.startAt ? new Date(event.startAt).toLocaleDateString('vi-VN') : 'Sự kiện 2026',
+      location: event?.locationName || 'Trung Tâm Hội Nghị',
+      status: checkin ? 'ĐÃ CHECK-IN' : (reg.registrationStatus === 'CONFIRMED' ? 'ĐÃ ĐĂNG KÝ' : reg.registrationStatus),
+      statusColor: checkin ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-blue-50 text-blue-700 border-blue-200',
+    };
+  });
+
+  const userProducts: ProductItem[] = (matchedIdentity as any)?.products || [];
+
+  // Synchronized Profile Object (Phản ánh dữ liệu thật từ cơ sở dữ liệu)
   const profile = {
     fullName: matchedIdentity?.fullName || 'Doanh Nhân Hội Viên',
     displayName: matchedIdentity?.displayName || matchedIdentity?.fullName || 'Doanh Nhân VIP',
@@ -365,7 +342,7 @@ function DigitalProfileContent() {
       ? matchedIdentity.expertiseSkills
       : (matchedIdentity?.businesses?.[0]?.expertiseSkills && matchedIdentity.businesses[0].expertiseSkills.length > 0)
       ? matchedIdentity.businesses[0].expertiseSkills
-      : ['Hạ Tầng IoT & NFC', 'AI B2B Matchmaking', 'Next.js & Turbopack', 'Truyền Thông Số', 'Sự Kiện MICE'],
+      : [],
     bio: matchedIdentity?.bio || `Đại diện ${matchedIdentity?.businesses?.[0]?.businessName || 'Doanh nghiệp'} - Thành viên Hệ sinh thái One Connect Network.`,
     phone: matchedIdentity?.phone || '',
     email: matchedIdentity?.email || '',
@@ -381,23 +358,15 @@ function DigitalProfileContent() {
     ticketCode: `QR_ONECONNECT_${(matchedIdentity?.username || 'USER').toUpperCase()}_2026`,
     cardUid: matchedCard?.cardUid || `NFC-${(matchedIdentity?.username || 'VIP').toUpperCase().slice(0, 8)}-888`,
     cardType: 'NFC Executive Black Metal',
-    eventJoined: 'Diễn Đàn Kết Nối Doanh Nghiệp Quốc Gia 2026',
-    ticketTier: 'VIP Executive Pass',
-    seatLocation: 'Khu A - Bàn Đại Biểu VIP #01',
-    seekingNeeds: matchedIdentity?.seekingNeeds || [
-      'Đối tác Chuỗi Khách sạn/Resort MICE',
-      'Các Hiệp hội Doanh nghiệp Tỉnh/Thành',
-      'Nhà phân phối phôi thẻ thông minh'
-    ],
-    offeringServices: matchedIdentity?.offeringServices || [
-      'Hạ tầng Định danh số NFC Doanh nghiệp',
-      'Hệ thống Check-in Sự kiện <1s',
-      'Giải pháp CRM Sổ tay quan hệ B2B'
-    ],
+    eventJoined: latestEvent?.name || 'Mạng Lưới Doanh Nhân One Connect',
+    ticketTier: latestReg?.ticketType || 'VIP Executive Pass',
+    seatLocation: 'Bàn Đại Biểu Doanh Nghiệp',
+    seekingNeeds: matchedIdentity?.seekingNeeds || [],
+    offeringServices: matchedIdentity?.offeringServices || [],
     brochureUrl: matchedIdentity?.brochureUrl || '',
     membershipTier: matchedIdentity?.membershipTier || 'MEMBER',
     experienceYears: matchedIdentity?.id === 'id-001' || matchedIdentity?.username === 'johnnylongho' ? '8+' : '3+',
-    b2bMatchesCount: matchedIdentity?.id === 'id-001' || matchedIdentity?.username === 'johnnylongho' ? '350+' : `${state.connections.filter(c => c.requesterIdentityId === matchedIdentity?.id || c.receiverIdentityId === matchedIdentity?.id).length || 0}+`,
+    b2bMatchesCount: `${state.connections.filter(c => (c.requesterIdentityId === matchedIdentity?.id || c.receiverIdentityId === matchedIdentity?.id) && c.status === 'CONNECTED').length || 0}`,
     trustRating: 'Hạng A+',
     verificationLevel: 'Enterprise Level 3 Verified',
     signatureHash: '0x9F4C82A3E1B8D9720066FF',
@@ -775,11 +744,13 @@ END:VCARD`;
   };
 
   const nextProduct = () => {
-    setCarouselIndex((prev) => (prev + 1) % PRODUCTS.length);
+    if (userProducts.length === 0) return;
+    setCarouselIndex((prev) => (prev + 1) % userProducts.length);
   };
 
   const prevProduct = () => {
-    setCarouselIndex((prev) => (prev - 1 + PRODUCTS.length) % PRODUCTS.length);
+    if (userProducts.length === 0) return;
+    setCarouselIndex((prev) => (prev - 1 + userProducts.length) % userProducts.length);
   };
 
   if (!mounted || isLoadingCloud) {
@@ -1295,74 +1266,100 @@ END:VCARD`;
               </div>
             </TabsContent>
 
-            {/* TAB 2: SẢN PHẨM & GIẢI PHÁP CAROUSEL */}
+            {/* TAB 2: SẢN PHẨM & GIẢI PHÁP */}
             <TabsContent value="products" className="space-y-3 pt-2.5 m-0">
-              <div className="relative rounded-2xl bg-white border border-slate-200 shadow-xs overflow-hidden p-3.5 space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-[13.5px] sm:text-[14px] font-black text-slate-900 flex items-center gap-1.5 font-heading">
-                    <Layers className="w-4 h-4 text-[#FF6B00]" /> Danh Mục Giải Pháp
-                  </span>
-                  <span className="text-[11px] font-mono font-bold text-[#0066FF] bg-blue-50 px-2 py-0.5 rounded-full border border-blue-200">
-                    {carouselIndex + 1} / {PRODUCTS.length}
-                  </span>
-                </div>
+              {userProducts.length > 0 ? (
+                <div className="relative rounded-2xl bg-white border border-slate-200 shadow-xs overflow-hidden p-3.5 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[13.5px] sm:text-[14px] font-black text-slate-900 flex items-center gap-1.5 font-heading">
+                      <Layers className="w-4 h-4 text-[#FF6B00]" /> Danh Mục Giải Pháp
+                    </span>
+                    <span className="text-[11px] font-mono font-bold text-[#0066FF] bg-blue-50 px-2 py-0.5 rounded-full border border-blue-200">
+                      {carouselIndex + 1} / {userProducts.length}
+                    </span>
+                  </div>
 
-                <div className="rounded-xl overflow-hidden border border-slate-200 h-36 sm:h-40 relative bg-slate-100">
-                  <img
-                    src={PRODUCTS[carouselIndex]?.image}
-                    alt={PRODUCTS[carouselIndex]?.title}
-                    className="w-full h-full object-cover transition-all duration-300"
-                  />
-                  <div className="absolute top-2 left-2">
-                    <Badge className="bg-[#0066FF] text-white text-[10px] font-bold border-0 shadow-sm">
-                      {PRODUCTS[carouselIndex]?.category}
-                    </Badge>
+                  <div className="rounded-xl overflow-hidden border border-slate-200 h-36 sm:h-40 relative bg-slate-100">
+                    <img
+                      src={userProducts[carouselIndex]?.image}
+                      alt={userProducts[carouselIndex]?.title}
+                      className="w-full h-full object-cover transition-all duration-300"
+                    />
+                    <div className="absolute top-2 left-2">
+                      <Badge className="bg-[#0066FF] text-white text-[10px] font-bold border-0 shadow-sm">
+                        {userProducts[carouselIndex]?.category}
+                      </Badge>
+                    </div>
+                  </div>
+
+                  <div className="space-y-1 text-left">
+                    <div className="text-[11.5px] font-mono font-bold text-[#FF6B00]">
+                      {userProducts[carouselIndex]?.highlight}
+                    </div>
+                    <h4 className="font-bold text-slate-900 text-[14.5px] leading-snug">
+                      {userProducts[carouselIndex]?.title}
+                    </h4>
+                    <p className="text-[12.5px] text-slate-600 leading-relaxed">
+                      {userProducts[carouselIndex]?.description}
+                    </p>
+                  </div>
+
+                  <div className="flex items-center justify-between pt-1">
+                    <Button
+                      type="button"
+                      onClick={prevProduct}
+                      size="sm"
+                      variant="outline"
+                      className="h-7 w-7 p-0 rounded-full border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100 cursor-pointer"
+                    >
+                      <ChevronLeft className="w-3.5 h-3.5" />
+                    </Button>
+                    <div className="flex gap-1">
+                      {userProducts.map((_, i) => (
+                        <div
+                          key={i}
+                          className={`h-1.5 rounded-full transition-all ${
+                            i === carouselIndex ? 'w-5 bg-[#0066FF]' : 'w-1.5 bg-slate-200'
+                          }`}
+                        />
+                      ))}
+                    </div>
+                    <Button
+                      type="button"
+                      onClick={nextProduct}
+                      size="sm"
+                      variant="outline"
+                      className="h-7 w-7 p-0 rounded-full border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100 cursor-pointer"
+                    >
+                      <ChevronRight className="w-3.5 h-3.5" />
+                    </Button>
                   </div>
                 </div>
-
-                <div className="space-y-1 text-left">
-                  <div className="text-[11.5px] font-mono font-bold text-[#FF6B00]">
-                    {PRODUCTS[carouselIndex]?.highlight}
+              ) : (
+                <div className="rounded-2xl bg-white border border-slate-200 shadow-xs p-6 space-y-3.5 text-center">
+                  <div className="w-14 h-14 mx-auto rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-center text-[#0066FF]">
+                    <Layers className="w-7 h-7" />
                   </div>
-                  <h4 className="font-bold text-slate-900 text-[14.5px] leading-snug">
-                    {PRODUCTS[carouselIndex]?.title}
-                  </h4>
-                  <p className="text-[12.5px] text-slate-600 leading-relaxed">
-                    {PRODUCTS[carouselIndex]?.description}
-                  </p>
-                </div>
-
-                <div className="flex items-center justify-between pt-1">
-                  <Button
-                    type="button"
-                    onClick={prevProduct}
-                    size="sm"
-                    variant="outline"
-                    className="h-7 w-7 p-0 rounded-full border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100 cursor-pointer"
-                  >
-                    <ChevronLeft className="w-3.5 h-3.5" />
-                  </Button>
-                  <div className="flex gap-1">
-                    {PRODUCTS.map((_, i) => (
-                      <div
-                        key={i}
-                        className={`h-1.5 rounded-full transition-all ${
-                          i === carouselIndex ? 'w-5 bg-[#0066FF]' : 'w-1.5 bg-slate-200'
-                        }`}
-                      />
-                    ))}
+                  <div className="space-y-1">
+                    <h4 className="font-bold text-slate-900 text-sm font-heading">
+                      Doanh Nghiệp Đang Cập Nhật Danh Mục Sản Phẩm &amp; Giải Pháp
+                    </h4>
+                    <p className="text-xs text-slate-500 max-w-xs mx-auto leading-relaxed">
+                      Hồ sơ năng lực, giải pháp cốt lõi và sản phẩm của doanh nghiệp sẽ sớm được cập nhật tại đây.
+                    </p>
                   </div>
-                  <Button
-                    type="button"
-                    onClick={nextProduct}
-                    size="sm"
-                    variant="outline"
-                    className="h-7 w-7 p-0 rounded-full border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100 cursor-pointer"
-                  >
-                    <ChevronRight className="w-3.5 h-3.5" />
-                  </Button>
+                  {isOwner && (
+                    <Button
+                      type="button"
+                      onClick={handleOpenEditModal}
+                      size="sm"
+                      className="bg-[#0066FF] hover:bg-blue-700 text-white text-xs font-bold rounded-xl"
+                    >
+                      Cập Nhật Hồ Sơ Năng Lực
+                    </Button>
+                  )}
                 </div>
-              </div>
+              )}
             </TabsContent>
 
             {/* TAB 3: THÔNG TIN SỰ KIỆN & VÉ CHECK-IN */}
@@ -1410,43 +1407,51 @@ END:VCARD`;
                     <CalendarCheck className="w-4 h-4 text-[#0066FF]" /> Lịch Sử Tham Dự Sự Kiện
                   </span>
                   <Badge className="bg-blue-50 text-[#0066FF] border-blue-200 text-[10px] font-bold">
-                    {JOINED_EVENTS.length} Sự Kiện
+                    {joinedEvents.length} Sự Kiện
                   </Badge>
                 </div>
 
-                <div className="space-y-2">
-                  {JOINED_EVENTS.map((ev) => (
-                    <div
-                      key={ev.id}
-                      className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/80 space-y-1 hover:bg-slate-100 transition-colors text-left"
-                    >
-                      <div className="flex items-start justify-between gap-2">
-                        <h4 className="font-bold text-slate-900 text-[13px] leading-snug">
-                          {ev.title}
-                        </h4>
-                        <span className={`text-[9.5px] font-bold px-1.5 py-0.5 rounded-full border shrink-0 ${ev.statusColor}`}>
-                          {ev.status}
-                        </span>
-                      </div>
-
-                      <div className="flex flex-wrap items-center gap-x-2.5 gap-y-0.5 text-[11.5px] text-slate-500">
-                        <div className="flex items-center gap-1 font-semibold text-[#0066FF]">
-                          <Award className="w-3 h-3" />
-                          <span>{ev.role}</span>
+                {joinedEvents.length > 0 ? (
+                  <div className="space-y-2">
+                    {joinedEvents.map((ev) => (
+                      <div
+                        key={ev.id}
+                        className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/80 space-y-1 hover:bg-slate-100 transition-colors text-left"
+                      >
+                        <div className="flex items-start justify-between gap-2">
+                          <h4 className="font-bold text-slate-900 text-[13px] leading-snug">
+                            {ev.title}
+                          </h4>
+                          <span className={`text-[9.5px] font-bold px-1.5 py-0.5 rounded-full border shrink-0 ${ev.statusColor}`}>
+                            {ev.status}
+                          </span>
                         </div>
-                        <div className="flex items-center gap-1 font-mono">
-                          <Calendar className="w-3 h-3 text-slate-400" />
-                          <span>{ev.date}</span>
+
+                        <div className="flex flex-wrap items-center gap-x-2.5 gap-y-0.5 text-[11.5px] text-slate-500">
+                          <div className="flex items-center gap-1 font-semibold text-[#0066FF]">
+                            <Award className="w-3 h-3" />
+                            <span>{ev.role}</span>
+                          </div>
+                          <div className="flex items-center gap-1 font-mono">
+                            <Calendar className="w-3 h-3 text-slate-400" />
+                            <span>{ev.date}</span>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-1 text-[11px] text-slate-600">
+                          <MapPin className="w-3 h-3 text-[#FF6B00] shrink-0" />
+                          <span className="truncate">{ev.location}</span>
                         </div>
                       </div>
-
-                      <div className="flex items-center gap-1 text-[11px] text-slate-600">
-                        <MapPin className="w-3 h-3 text-[#FF6B00] shrink-0" />
-                        <span className="truncate">{ev.location}</span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="py-8 px-4 text-center space-y-2">
+                    <Calendar className="w-8 h-8 text-slate-300 mx-auto" />
+                    <p className="text-xs font-semibold text-slate-700">Chưa có lịch sử tham dự sự kiện</p>
+                    <p className="text-[11px] text-slate-400">Doanh nhân chưa đăng ký hoặc chưa check-in tại sự kiện nào trong hệ sinh thái One Connect.</p>
+                  </div>
+                )}
               </div>
             </TabsContent>
           </Tabs>

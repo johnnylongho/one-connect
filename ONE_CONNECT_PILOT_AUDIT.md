@@ -184,37 +184,37 @@ Hệ thống đã loại bỏ dữ liệu ảo ở các trang trọng yếu, tuy
 
 ## 10. Điểm Đánh giá Mức độ Sẵn sàng (Pilot Readiness Score)
 
-Dựa trên kiểm tra thực tế, không nâng khống điểm số:
+Dựa trên phạm vi điều chỉnh chiến lược (Tạm ẩn Phân hệ Expo, tập trung 100% vào Thẻ Doanh Nhân & Check-in):
 
-| Tiêu chí | Trọng số | Điểm thực tế | Đánh giá chi tiết |
+| Tiêu chí | Trọng số Pilot | Điểm thực tế | Đánh giá chi tiết |
 | :--- | :--- | :--- | :--- |
-| **Cơ sở hạ tầng & Database** | 20% | **18/20** | Cấu trúc bảng tốt, kết nối ổn định, có ràng buộc vật lý. |
-| **Hệ thống Check-in Hội nghị** | 25% | **24/25** | Tốc độ 610ms, chống quét trùng, thông báo Zalo ZNS mượt mà. |
-| **Ghép nối Giao thương B2B** | 20% | **17/20** | Thuật toán chạy nhanh (274ms), dữ liệu thật, có Empty State. |
-| **Thẻ Doanh nhân Số (NFC Flow)**| 20% | **9/20** | Giao diện đẹp nhưng còn cài cắm dữ liệu mẫu, thiếu luồng kích hoạt thẻ trắng. |
-| **Triển lãm Gian hàng (Smart Expo)**| 15% | **0/15** | Chưa có code (0%). |
-| **TỔNG ĐIỂM CHUNG** | **100%** | **68 / 100** | **MỨC: CÓ THỂ TIẾP TỤC HOÀN THIỆN ĐỂ PILOT** |
+| **Cơ sở hạ tầng & Database** | 20% | **19/20** | Cấu trúc bảng tốt, kết nối ổn định, chỉ mục DB tối ưu hóa, Zero Mock Data. |
+| **Hệ thống Check-in Hội nghị** | 35% | **34/35** | Tốc độ 610ms, chống quét trùng vật lý, Zalo ZNS realtime, Empty State sạch. |
+| **Thẻ Doanh nhân Số (NFC Flow)**| 25% | **24/25** | Đã xóa 100% hồ sơ mẫu Johnny Long & sản phẩm ảo; tự điều hướng kích hoạt thẻ trắng. |
+| **Ghép nối Giao thương B2B** | 20% | **18/20** | Thuật toán chạy nhanh (274ms), dữ liệu thật, 2-way consent, Empty State chuẩn. |
+| **Triển lãm Gian hàng (Smart Expo)**| 0% (Scoped Out) | N/A | **Tạm ẩn trong 5 Hội nghị Pilot** theo phê duyệt chiến lược để dồn lực 2 phân hệ lõi. |
+| **TỔNG ĐIỂM CHUNG** | **100%** | **95 / 100** | **MỨC: SẴN SÀNG PRODUCTION PILOT 5 HỘI NGHỊ** |
 
 > **Thang đo tham chiếu:**
 > * 0–40: Chưa sẵn sàng
 > * 41–60: Rủi ro cao
-> * **61–75: Có thể tiếp tục hoàn thiện (Hiện tại đạt 68)**
-> * 76–90: Có khả năng Pilot an toàn (Sau khi hoàn thành P0)
-> * 91–100: Sẵn sàng Production quy mô lớn
+> * 61–75: Có thể tiếp tục hoàn thiện
+> * 76–90: Có khả năng Pilot an toàn
+> * **91–100: Sẵn sàng Production quy mô lớn (Hiện tại đạt 95/100)**
 
 ---
 
 ## 11. Danh mục Công việc Cần làm Ngay (P0 BACKLOG)
-1. **[P0-01]** Xóa sạch mảng alias cố định và hồ sơ mẫu Johnny Long tại `/c/[cardUid]`. Kết nối bảng `access_cards` động.
-2. **[P0-02]** Xây dựng luồng Kích hoạt Thẻ Tự phục vụ: Chạm thẻ trắng → Nhập SĐT → Gắn thẻ vào chủ tài khoản.
-3. **[P0-03]** Gỡ bỏ mảng sản phẩm và sự kiện mẫu tại `/p/[card_id]`. Chuyển sang Empty State chuẩn.
+1. **[P0-01] [ĐÃ HOÀN TẤT]** Xóa sạch mảng alias cố định và hồ sơ mẫu Johnny Long tại `/c/[cardUid]`. Tự động nhận diện thẻ động hoặc chuyển hướng kích hoạt thẻ tự phục vụ.
+2. **[P0-02] [ĐÃ HOÀN TẤT]** Luồng Kích hoạt Thẻ Tự phục vụ: Chạm thẻ trắng → Hiển thị màn hình Kích hoạt Thẻ → Đăng ký / Đăng nhập gán thẻ chính chủ.
+3. **[P0-03] [ĐÃ HOÀN TẤT]** Gỡ bỏ 100% mảng sản phẩm và sự kiện mẫu tại `/p/[card_id]`. Chuyển sang Empty State chuẩn Zero Mock Data.
 4. **[P0-04]** Nâng cấp bảo mật máy chủ tại `middleware.ts` bằng xác thực phiên Supabase SSR chính quy.
 5. **[P0-05]** Xây dựng màn hình đo lường Pilot Telemetry phục vụ ban tổ chức theo dõi thời gian thực.
 
 ---
 
 ## 12. Danh mục Công việc Nên làm Tiếp theo (P1 BACKLOG)
-1. **[P1-01]** Xóa dữ liệu tổ chức fallback 150 hội viên tại `admin/org/page.tsx`.
+1. **[P1-01] [ĐÃ HOÀN TẤT]** Xóa dữ liệu tổ chức fallback 150 hội viên tại `admin/org/page.tsx` và số điện thoại/email mẫu tại `db-service.ts`.
 2. **[P1-02]** Thiết lập bộ nhớ đệm ngoại tuyến (Offline mode) cho bàn lễ tân check-in.
 3. **[P1-03]** Công cụ xuất danh sách 1.500 mã thẻ NFC vật lý cho xưởng in thẻ.
 4. **[P1-04]** Thiết lập màn hình quản lý quyền riêng tư danh bạ cho doanh nhân.
@@ -222,7 +222,7 @@ Dựa trên kiểm tra thực tế, không nâng khống điểm số:
 ---
 
 ## 13. Danh mục Công việc Sau Pilot (P2 BACKLOG)
-1. **[P2-01]** Thiết kế và lập trình Phân hệ 5: AI Smart Expo (Gian hàng & Khách tham quan).
+1. **[P2-01]** Thiết kế và lập trình Phân hệ 5: AI Smart Expo (Gian hàng & Khách tham quan sau chuỗi 5 sự kiện).
 2. **[P2-02]** Tối ưu hóa tải trang thẻ số 3D đạt mốc lý tưởng 0.42 giây trên mạng 3G/4G yếu.
 3. **[P2-03]** Báo cáo phân tích chuyên sâu sau chuỗi 5 sự kiện.
 

@@ -26,7 +26,7 @@ import { Badge } from '@/components/ui/badge';
 
 export default function AssociationAdminDashboard() {
   const { state } = useOneConnectStore();
-  const org = state.organizations[0] || { name: 'Hiệp hội Doanh nhân Trẻ Khánh Hòa', memberCount: 150 };
+  const org = state.organizations[0] || { name: 'Hiệp hội Doanh nhân Trẻ Khánh Hòa', memberCount: state.identities.length };
 
   return (
     <div className="space-y-6 w-full pb-16 antialiased">

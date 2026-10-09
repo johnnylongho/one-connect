@@ -1,19 +1,22 @@
 'use client';
 
-import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import React, { useState, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Navbar from '@/components/Navbar';
 import { useOneConnectStore } from '@/lib/store';
 import { UserCheck, Building2, ShieldCheck, ArrowRight, CheckCircle2 } from 'lucide-react';
 
-export default function OnboardingWizard() {
+function OnboardingContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const cardUidParam = searchParams?.get('cardUid') || '';
   const { currentIdentity } = useOneConnectStore();
 
   const [step, setStep] = useState(1);
   const [fullName, setFullName] = useState(currentIdentity?.fullName || '');
-  const [title, setTitle] = useState(currentIdentity?.title || 'CEO & Founder');
-  const [businessName, setBusinessName] = useState(currentIdentity?.businesses?.[0]?.businessName || 'Tập đoàn Công nghệ Aplusvn');
+  const [title, setTitle] = useState(currentIdentity?.title || '');
+  const [businessName, setBusinessName] = useState(currentIdentity?.businesses?.[0]?.businessName || '');
+  const [taxCode, setTaxCode] = useState(currentIdentity?.taxCode || currentIdentity?.businesses?.[0]?.taxCode || '');
   const [bio, setBio] = useState(currentIdentity?.bio || '');
 
   const handleFinish = () => {
@@ -121,7 +124,9 @@ export default function OnboardingWizard() {
                   <label className="text-xs text-gray-300 font-semibold mb-1 block">Mã Số Thuế (Xác thực Verified Profile)</label>
                   <input
                     type="text"
-                    defaultValue="4201889988"
+                    value={taxCode}
+                    onChange={e => setTaxCode(e.target.value)}
+                    placeholder="VD: 4201889988"
                     className="input-glass font-mono text-cyan-300"
                   />
                 </div>
@@ -168,5 +173,13 @@ export default function OnboardingWizard() {
         </div>
       </main>
     </div>
+  );
+}
+
+export default function OnboardingWizard() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-[#07090e] flex items-center justify-center text-cyan-400">Đang tải...</div>}>
+      <OnboardingContent />
+    </Suspense>
   );
 }

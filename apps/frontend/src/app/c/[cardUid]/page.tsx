@@ -4,10 +4,9 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useOneConnectStore } from '@/lib/store';
-import { Zap, ShieldCheck, UserCheck, ArrowRight, Lock, Sparkles, CheckCircle2 } from 'lucide-react';
+import { ShieldCheck, ArrowRight, CreditCard, Sparkles, UserPlus, LogIn, Compass } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-
 import { DbService } from '@/lib/db-service';
 
 export default function NfcLandingRouter() {
@@ -35,9 +34,13 @@ export default function NfcLandingRouter() {
       'attendee',
       'auth',
       'login',
+      'register',
       'p',
       'api',
       'organizer',
+      'services',
+      'social-value',
+      'posts',
     ];
     if (RESERVED_PATHS.includes(cardUid.toLowerCase())) {
       return;
@@ -50,89 +53,82 @@ export default function NfcLandingRouter() {
       } catch {}
     }
 
-    // Instant High-speed NFC card resolution (<0.05s)
-    const cleanUid = decodeURIComponent(cardUid).trim().toLowerCase();
+    const cleanUid = decodeURIComponent(cardUid).trim();
+    const cleanUidLower = cleanUid.toLowerCase();
 
-    // 1. Check card by UID, ID or identifier in local store
-    const card = state.cards.find(
-      c => c.cardUid.toLowerCase() === cleanUid ||
-           c.id.toLowerCase() === cleanUid ||
-           c.nfcIdentifier?.toLowerCase() === cleanUid ||
-           (cleanUid.includes('04:8f') && c.personIdentityId === '11111111-1111-1111-1111-111111111111') ||
-           (cleanUid.includes('aplus-001') && c.personIdentityId === '11111111-1111-1111-1111-111111111111')
-    );
-
-    if (card) {
-      setMatchedCard(card);
-      const identity = state.identities.find(i => i.id === card.personIdentityId) || state.identities[0];
-      setMatchedIdentity(identity);
-
-      if (action === 'checkin') {
-        performCheckIn(eventId, card.cardUid, 'NFC');
-      }
-
-      if (identity?.username) {
-        router.replace(`/p/${identity.username}${action === 'checkin' ? '?checked_in=1' : ''}`);
-        return;
-      }
-    }
-
-    // 2. Check direct username and alias matching
-    const isJohnnyLongAlias = [
-      'johnnylong',
-      'johnnylongho',
-      'hoanglong',
-      'johnny-long',
-      'johnny-long-ho',
-      'aplus-001',
-      '04:8f',
-      'nfc-ha-777',
-    ].some((alias) => cleanUid.includes(alias));
-
-    const identity = state.identities.find(
-      i => i.username.toLowerCase() === cleanUid ||
-           i.id.toLowerCase() === cleanUid ||
-           (isJohnnyLongAlias && (i.username === 'johnnylongho' || i.username === 'johnnylong' || i.id === '11111111-1111-1111-1111-111111111111' || i.id === 'id-001'))
-    ) || (isJohnnyLongAlias ? state.identities[0] : null);
-
-    if (identity) {
-      setMatchedIdentity(identity);
-      if (action === 'checkin') {
-        performCheckIn(eventId, cleanUid, 'NFC');
-      }
-      router.replace(`/p/${identity.username || 'johnnylongho'}${action === 'checkin' ? '?checked_in=1' : ''}`);
-      return;
-    }
-
-    // 3. Fallback: Query Cloud Supabase directly (handles cold scan on newly issued cards)
-    DbService.resolveCardUid(cleanUid).then((cloudRes) => {
-      if (isCancelled) return;
-      if (cloudRes.card && cloudRes.identity) {
-        setMatchedCard(cloudRes.card);
-        setMatchedIdentity(cloudRes.identity);
-        if (action === 'checkin') {
-          performCheckIn(eventId, cloudRes.card.cardUid, 'NFC');
+    // 1. First priority: Query Production Cloud Supabase directly
+    DbService.resolveCardUid(cleanUid)
+      .then((cloudRes) => {
+        if (isCancelled) return;
+        if (cloudRes.card && cloudRes.identity) {
+          setMatchedCard(cloudRes.card);
+          setMatchedIdentity(cloudRes.identity);
+          if (action === 'checkin') {
+            performCheckIn(eventId, cloudRes.card.cardUid, 'NFC');
+          }
+          const targetUrl = `/p/${cloudRes.identity.username || cloudRes.identity.id}${action === 'checkin' ? '?checked_in=1' : ''}`;
+          router.replace(targetUrl);
+          return;
         }
-        router.replace(`/p/${cloudRes.identity.username}${action === 'checkin' ? '?checked_in=1' : ''}`);
-      } else {
+
+        // 2. Secondary check: Search in local store cards
+        const localCard = state.cards.find(
+          (c) =>
+            c.cardUid.toLowerCase() === cleanUidLower ||
+            c.id.toLowerCase() === cleanUidLower ||
+            c.nfcIdentifier?.toLowerCase() === cleanUidLower
+        );
+
+        if (localCard && localCard.personIdentityId) {
+          const localIdentity = state.identities.find((i) => i.id === localCard.personIdentityId);
+          if (localIdentity) {
+            setMatchedCard(localCard);
+            setMatchedIdentity(localIdentity);
+            if (action === 'checkin') {
+              performCheckIn(eventId, localCard.cardUid, 'NFC');
+            }
+            const targetUrl = `/p/${localIdentity.username || localIdentity.id}${action === 'checkin' ? '?checked_in=1' : ''}`;
+            router.replace(targetUrl);
+            return;
+          }
+        }
+
+        // 3. Check direct username or profile ID matching
+        const directIdentity = state.identities.find(
+          (i) =>
+            i.username.toLowerCase() === cleanUidLower ||
+            i.id.toLowerCase() === cleanUidLower
+        );
+
+        if (directIdentity) {
+          setMatchedIdentity(directIdentity);
+          if (action === 'checkin') {
+            performCheckIn(eventId, cleanUid, 'NFC');
+          }
+          const targetUrl = `/p/${directIdentity.username || directIdentity.id}${action === 'checkin' ? '?checked_in=1' : ''}`;
+          router.replace(targetUrl);
+          return;
+        }
+
+        // Unassigned or new blank card: finish loading and display activation screen
         setLoading(false);
-      }
-    }).catch(() => {
-      if (!isCancelled) setLoading(false);
-    });
+      })
+      .catch((err) => {
+        console.warn('NFC resolution error:', err);
+        if (!isCancelled) setLoading(false);
+      });
 
     return () => {
       isCancelled = true;
     };
   }, [cardUid, action, eventId, state.cards, state.identities, performCheckIn, router]);
 
-
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#F8FAFC] text-slate-900 flex flex-col items-center justify-center space-y-4">
-        <div className="w-12 h-12 rounded-full border-4 border-[#0066FF] border-t-transparent animate-spin" />
-        <p className="text-xs font-mono font-bold text-[#0066FF] animate-pulse">
-          Đang định tuyến thẻ NFC 1-chạm ({cardUid})...
+      <div className="min-h-screen bg-[#0A1124] text-white flex flex-col items-center justify-center space-y-4 px-4 text-center">
+        <div className="w-14 h-14 rounded-full border-4 border-cyan-400 border-t-transparent animate-spin shadow-[0_0_20px_rgba(0,229,255,0.4)]" />
+        <p className="text-xs font-mono font-bold text-cyan-300 tracking-wider animate-pulse">
+          Đang nhận diện thẻ NFC ({cardUid})...
         </p>
       </div>
     );
@@ -140,31 +136,47 @@ export default function NfcLandingRouter() {
 
   if (!matchedIdentity) {
     return (
-      <div className="min-h-screen bg-[#F8FAFC] text-slate-900 flex items-center justify-center p-4">
-        <div className="max-w-md w-full bg-white rounded-3xl p-6 border border-slate-200 shadow-xl text-center space-y-5">
-          <div className="w-16 h-16 mx-auto rounded-full bg-rose-50 text-rose-600 flex items-center justify-center border border-rose-200">
-            <Lock className="w-8 h-8" />
+      <div className="min-h-screen bg-gradient-to-b from-[#0A1124] to-[#050811] text-white flex items-center justify-center p-4">
+        <div className="max-w-md w-full bg-[#0D162B]/90 backdrop-blur-xl rounded-3xl p-6 sm:p-8 border border-cyan-500/30 shadow-[0_10px_40px_rgba(0,0,0,0.5)] text-center space-y-6">
+          <div className="w-20 h-20 mx-auto rounded-3xl bg-cyan-500/10 text-cyan-400 flex items-center justify-center border border-cyan-500/30 shadow-[0_0_30px_rgba(0,229,255,0.25)]">
+            <CreditCard className="w-10 h-10 animate-pulse" />
           </div>
-          <div className="space-y-1">
-            <h2 className="text-xl font-bold text-slate-900 font-heading">
-              Thẻ NFC Chưa Được Gán Hồ Sơ
+
+          <div className="space-y-2">
+            <Badge className="bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 text-[11px] font-mono px-3 py-1 rounded-full">
+              UID: {cardUid}
+            </Badge>
+            <h2 className="text-xl sm:text-2xl font-black text-white font-heading tracking-tight">
+              Thẻ Doanh Nhân Chưa Được Kích Hoạt
             </h2>
-            <p className="text-xs text-slate-500">
-              Mã thẻ <code className="font-mono font-bold text-[#0066FF]">{cardUid}</code> chưa được liên kết với danh tính doanh nhân nào.
+            <p className="text-xs text-slate-300 leading-relaxed max-w-sm mx-auto">
+              Chào mừng Quý Doanh nhân! Thẻ thông minh NFC này đang ở trạng thái phôi chuẩn bị. Vui lòng kích hoạt để liên kết danh thiếp số chính chủ ngay hôm nay.
             </p>
           </div>
 
-          <div className="pt-2 space-y-2">
-            <Link href="/p/hoanglong" className="block w-full">
-              <Button className="w-full bg-[#0066FF] hover:bg-blue-700 text-white font-bold rounded-xl text-xs py-5">
-                <Sparkles className="w-4 h-4 mr-1.5" /> Xem Hồ Sơ Doanh Nhân Mẫu (Johnny Long)
+          <div className="pt-2 space-y-3">
+            <Link href={`/register?cardUid=${encodeURIComponent(cardUid)}`} className="block w-full">
+              <Button className="w-full bg-gradient-to-r from-[#0066FF] to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white font-bold rounded-2xl text-xs sm:text-sm py-5 shadow-lg shadow-cyan-500/20 transition-all active:scale-98 cursor-pointer">
+                <UserPlus className="w-4 h-4 mr-2" /> Kích Hoạt Thẻ &amp; Đăng Ký Hồ Sơ Mới
               </Button>
             </Link>
-            <Link href="/onboarding" className="block w-full">
-              <Button variant="outline" className="w-full border-slate-200 text-slate-700 hover:bg-slate-50 rounded-xl text-xs py-5">
-                Kích Hoạt & Gán Thẻ Số Mới
+
+            <Link href={`/login?cardUid=${encodeURIComponent(cardUid)}`} className="block w-full">
+              <Button variant="outline" className="w-full border-slate-700 bg-white/5 hover:bg-white/10 text-slate-200 rounded-2xl text-xs py-5 transition-all cursor-pointer">
+                <LogIn className="w-4 h-4 mr-2 text-cyan-400" /> Đăng Nhập Để Gán Vào Tài Khoản Có Sẵn
               </Button>
             </Link>
+
+            <Link href="/" className="block w-full">
+              <Button variant="ghost" className="w-full text-slate-400 hover:text-white hover:bg-transparent text-xs py-2">
+                <Compass className="w-3.5 h-3.5 mr-1.5" /> Về Cổng Thông Tin One Connect
+              </Button>
+            </Link>
+          </div>
+
+          <div className="pt-2 border-t border-slate-800 text-[10.5px] text-slate-400 flex items-center justify-center gap-1.5">
+            <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+            <span>Mã hóa chuẩn NFC ISO/IEC 14443A • Bảo vệ dữ liệu PDPL</span>
           </div>
         </div>
       </div>
