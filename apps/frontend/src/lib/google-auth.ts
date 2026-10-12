@@ -54,21 +54,39 @@ export function loadGoogleGsiScript(): Promise<void> {
   return gsiScriptLoadingPromise;
 }
 
+let isOneTapPrompting = false;
+
 export function initGoogleOneTap(
   onSuccess: (user: GoogleUserInfo, idToken?: string) => Promise<void> | void,
   onError?: (msg: string) => void
-) {
-  if (typeof window === 'undefined') return;
+): () => void {
+  if (typeof window === 'undefined') return () => {};
+
+  let isCancelled = false;
 
   loadGoogleGsiScript()
     .then(() => {
+      if (isCancelled) return;
+
       try {
         const google = (window as any).google;
         if (!google?.accounts?.id) return;
 
+        // 1. Cancel any existing FedCM request to prevent "NotAllowedError: Only one navigator.credentials.get"
+        try {
+          google.accounts.id.cancel();
+        } catch {}
+
+        if (isOneTapPrompting) {
+          return;
+        }
+
         google.accounts.id.initialize({
           client_id: GOOGLE_CLIENT_ID,
+          use_fedcm_for_prompt: false, // Prevents conflicting FedCM calls on dev/unauthorized origins
           callback: async (response: any) => {
+            isOneTapPrompting = false;
+            if (isCancelled) return;
             if (!response?.credential) {
               onError?.('Không nhận được thông tin xác thực từ Google');
               return;
@@ -103,21 +121,39 @@ export function initGoogleOneTap(
           cancel_on_tap_outside: true,
         });
 
+        isOneTapPrompting = true;
+
         // Prompt Google One Tap widget
         google.accounts.id.prompt((notification: any) => {
+          isOneTapPrompting = false;
           if (notification.isNotDisplayed()) {
             console.log('Google One Tap not displayed:', notification.getNotDisplayedReason());
           } else if (notification.isSkippedMoment()) {
             console.log('Google One Tap skipped:', notification.getSkippedReason());
+          } else if (notification.isDismissedMoment()) {
+            console.log('Google One Tap dismissed:', notification.getDismissedReason());
           }
         });
       } catch (err) {
+        isOneTapPrompting = false;
         console.warn('Failed to initialize Google One Tap:', err);
       }
     })
     .catch((err) => {
+      isOneTapPrompting = false;
       console.warn('Google GSI script load error for One Tap:', err);
     });
+
+  return () => {
+    isCancelled = true;
+    isOneTapPrompting = false;
+    try {
+      const google = (window as any).google;
+      if (google?.accounts?.id?.cancel) {
+        google.accounts.id.cancel();
+      }
+    } catch {}
+  };
 }
 
 export async function triggerGooglePopupAuth(
@@ -130,6 +166,11 @@ export async function triggerGooglePopupAuth(
   try {
     await loadGoogleGsiScript();
     const google = (window as any).google;
+
+    // Cancel any active One Tap / FedCM request before opening popup
+    try {
+      google?.accounts?.id?.cancel();
+    } catch {}
 
     if (!google?.accounts?.oauth2) {
       if (onFallbackRedirect) {

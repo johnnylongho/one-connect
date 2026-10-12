@@ -325,10 +325,13 @@ function RegisterForm() {
 
   // Initialize Google One Tap on mount
   useEffect(() => {
-    initGoogleOneTap(
+    const cleanup = initGoogleOneTap(
       (user) => handleGoogleSuccess(user),
       (msg) => console.log('One Tap notice:', msg)
     );
+    return () => {
+      cleanup?.();
+    };
   }, []);
 
   // Step 1: Proceed to OTP Verification

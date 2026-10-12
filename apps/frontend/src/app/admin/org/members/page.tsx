@@ -44,11 +44,15 @@ import {
   ParseExcelResult,
 } from '@/lib/excel-service';
 
+import { MembersToolbar } from '@/components/admin/members/MembersToolbar';
+import { MembersList } from '@/components/admin/members/MembersList';
+
 export default function MemberDirectoryAdminPage() {
   const { state, registerIdentity, changeUserRole, toggleIdentityStatus, deleteIdentity } = useOneConnectStore();
   const [searchTerm, setSearchTerm] = useState('');
   const [filterRole, setFilterRole] = useState<string>('ALL');
   const [filterIndustry, setFilterIndustry] = useState<string>('ALL');
+  const [cardStatusFilter, setCardStatusFilter] = useState<'ALL' | 'HAS_CARD' | 'NO_CARD'>('ALL');
   const [selectedMemberForCard, setSelectedMemberForCard] = useState<any | null>(null);
   const [memberToDelete, setMemberToDelete] = useState<any | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -76,19 +80,36 @@ export default function MemberDirectoryAdminPage() {
   const [successToast, setSuccessToast] = useState('');
 
   const filteredMembers = state.identities.filter((m) => {
+    // 1. Role Filter
     const roleMatches = filterRole === 'ALL' || (m.role || 'MEMBER') === filterRole;
+
+    // 2. Industry Filter
     const industryMatches = filterIndustry === 'ALL' || 
       (m.title && m.title.toLowerCase().includes(filterIndustry.toLowerCase())) ||
       (m.bio && m.bio.toLowerCase().includes(filterIndustry.toLowerCase())) ||
       (m.businesses && m.businesses[0]?.businessName.toLowerCase().includes(filterIndustry.toLowerCase()));
+
+    // 3. Card Status Filter: "Tất cả", "Đã nhận thẻ", "Chưa nhận thẻ"
+    const assignedCard = state.cards.find(
+      (c) => c.personIdentityId === m.id && (c.status === 'ACTIVE' || Boolean(c.cardUid))
+    );
+    const hasCard = Boolean(assignedCard && assignedCard.cardUid);
+    const cardMatches =
+      cardStatusFilter === 'ALL' ||
+      (cardStatusFilter === 'HAS_CARD' && hasCard) ||
+      (cardStatusFilter === 'NO_CARD' && !hasCard);
+
+    // 4. Search Filter
     const matchesSearch =
+      !searchTerm ||
       m.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (m.displayName && m.displayName.toLowerCase().includes(searchTerm.toLowerCase())) ||
       (m.title && m.title.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (m.phone && m.phone.toLowerCase().includes(searchTerm.toLowerCase())) ||
       (m.association && m.association.toLowerCase().includes(searchTerm.toLowerCase())) ||
       (m.businesses && m.businesses[0]?.businessName.toLowerCase().includes(searchTerm.toLowerCase()));
 
-    return roleMatches && industryMatches && matchesSearch;
+    return roleMatches && industryMatches && cardMatches && matchesSearch;
   });
 
   const handleCreateMember = (e: React.FormEvent) => {
@@ -295,25 +316,26 @@ export default function MemberDirectoryAdminPage() {
         </div>
       </section>
 
-      {/* 3. SEARCH & FILTER CONTROLS */}
-      <section className="p-3.5 rounded-2xl bg-white border border-slate-200/90 shadow-xs flex flex-col sm:flex-row items-center gap-3">
-        <div className="relative flex-1 w-full">
-          <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
-          <input
-            type="text"
-            placeholder="Tìm kiếm hội viên theo họ tên, chức danh, doanh nghiệp..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-900 focus:outline-none focus:bg-white focus:ring-2 focus:ring-[#0066FF]/20 focus:border-[#0066FF] transition-all"
-          />
-        </div>
+      {/* 3. STICKY TOOLBAR (TABLET-FIRST) */}
+      <MembersToolbar
+        searchTerm={searchTerm}
+        onSearchChange={setSearchTerm}
+        cardStatusFilter={cardStatusFilter}
+        onCardStatusFilterChange={setCardStatusFilter}
+        totalCount={state.identities.length}
+        filteredCount={filteredMembers.length}
+        onAddMember={() => setShowAddModal(true)}
+        onExportExcel={() => exportMembersToExcel(filteredMembers, state.cards)}
+      />
 
-        <div className="flex items-center gap-2 w-full sm:w-auto shrink-0">
+      {/* Role & Industry Secondary Filter Pills for Tablet */}
+      <div className="flex flex-wrap items-center justify-between gap-3 p-3 bg-white border border-slate-200/90 rounded-2xl shadow-2xs">
+        <div className="flex items-center gap-2">
           <Filter className="w-4 h-4 text-slate-400 shrink-0" />
           <select
             value={filterRole}
             onChange={(e) => setFilterRole(e.target.value)}
-            className="px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-xs font-bold text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#0066FF]/20 cursor-pointer"
+            className="h-10 px-3 rounded-xl bg-slate-50 border border-slate-200 text-xs font-bold text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#0066FF]/20 cursor-pointer"
           >
             <option value="ALL">Tất cả vai trò</option>
             <option value="SUPER_ADMIN">Quản trị Hệ thống (SUPER_ADMIN)</option>
@@ -321,14 +343,9 @@ export default function MemberDirectoryAdminPage() {
             <option value="EVENT_OPERATOR">Lễ tân Check-in (EVENT_OPERATOR)</option>
             <option value="MEMBER">Hội viên / Doanh nhân (MEMBER)</option>
           </select>
-
-          <Badge className="bg-slate-100 text-slate-700 border-slate-300 font-mono text-xs shrink-0">
-            {filteredMembers.length} Đại Biểu
-          </Badge>
         </div>
 
-        {/* Industry Filter Pills */}
-        <div className="w-full flex items-center gap-1.5 overflow-x-auto pt-2 border-t border-slate-100">
+        <div className="flex items-center gap-1.5 overflow-x-auto">
           <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider shrink-0 mr-1">
             Ngành Nghề:
           </span>
@@ -342,7 +359,7 @@ export default function MemberDirectoryAdminPage() {
             <button
               key={ind.id}
               onClick={() => setFilterIndustry(ind.id)}
-              className={`px-2.5 py-1 rounded-xl text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
+              className={`h-9 px-3 rounded-xl text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
                 filterIndustry === ind.id
                   ? 'bg-[#0066FF] text-white shadow-xs'
                   : 'bg-slate-50 text-slate-600 hover:bg-slate-100 border border-slate-200/80'
@@ -352,195 +369,42 @@ export default function MemberDirectoryAdminPage() {
             </button>
           ))}
         </div>
-      </section>
+      </div>
 
-      {/* 4. MEMBERS LIST GRID */}
-      <section className="space-y-3">
-        {filteredMembers.map((m) => {
-          const companyName = m.businesses && m.businesses[0] ? m.businesses[0].businessName : 'Tập đoàn Công nghệ Số A+ (APLUSVN)';
-          const profileLink = `/p/${m.username || m.id}`;
-          const memberCard = state.cards.find((c) => c.personIdentityId === m.id && c.status === 'ACTIVE') || state.cards.find((c) => c.personIdentityId === m.id);
-          const currentMemberRole: RoleType = m.role || (m.id === 'id-001' || m.id === '11111111-1111-1111-1111-111111111111' ? 'SUPER_ADMIN' : 'MEMBER');
-          const isSuperAdmin = m.username === 'johnnylongho' || m.id === 'id-001' || m.id === '11111111-1111-1111-1111-111111111111' || (m.email && m.email.toLowerCase() === 'contact.johnnylongho@gmail.com');
+      {/* 4. TABLET-FIRST CARD VIEW MEMBERS LIST (ZERO MOCK DATA) */}
+      <MembersList
+        members={filteredMembers}
+        cards={state.cards}
+        onIssueCard={(m) => {
+          setSelectedMemberForCard(m);
+        }}
+        onViewCard={(m) => {
+          setSelectedMemberForCard(m);
+        }}
+        onChangeRole={(memberId, newRole) => {
+          changeUserRole(memberId, newRole);
+          setSuccessToast(`Đã cập nhật phân quyền [${newRole}] thành công!`);
+          setTimeout(() => setSuccessToast(''), 3500);
+        }}
+        onToggleStatus={async (m) => {
           const isInactive = m.status === 'INACTIVE';
-
-          const roleBadgeConfig: Record<string, { label: string; bg: string }> = {
-            SUPER_ADMIN: { label: 'SUPER ADMIN', bg: 'bg-purple-50 text-purple-700 border-purple-200' },
-            ORG_ADMIN: { label: 'ORG ADMIN', bg: 'bg-blue-50 text-[#0066FF] border-blue-200' },
-            ORGANIZER: { label: 'BAN TỔ CHỨC', bg: 'bg-blue-50 text-[#0066FF] border-blue-200' },
-            EVENT_OPERATOR: { label: 'LỄ TÂN CHECK-IN', bg: 'bg-amber-50 text-amber-700 border-amber-200' },
-            MEMBER: { label: 'HỘI VIÊN', bg: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
-            GUEST: { label: 'KHÁCH MỜI', bg: 'bg-slate-50 text-slate-600 border-slate-200' },
-          };
-          const currentBadge = roleBadgeConfig[currentMemberRole] || { label: currentMemberRole, bg: 'bg-slate-50 text-slate-600 border-slate-200' };
-
-          return (
-            <div
-              key={m.id}
-              className={`p-4 sm:p-5 rounded-2xl border shadow-xs hover:shadow-md transition-all flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 group ${
-                isInactive ? 'bg-slate-50/70 border-slate-300/80 opacity-85' : 'bg-white border-slate-200/90'
-              }`}
-            >
-              {/* Member Info */}
-              <div className="flex items-center gap-3.5 min-w-0 flex-1">
-                <div className="relative shrink-0">
-                  <img
-                    src={m.avatarUrl || '/avatar-johnny-long.jpg'}
-                    alt={m.fullName}
-                    className={`w-13 h-13 sm:w-14 sm:h-14 rounded-2xl object-cover shadow-2xs border bg-slate-100 group-hover:scale-105 transition-transform ${
-                      isInactive ? 'border-rose-300 grayscale-30' : 'border-slate-200'
-                    }`}
-                    onError={(e) => {
-                      e.currentTarget.onerror = null;
-                      e.currentTarget.src = `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(m.fullName)}&backgroundColor=0066ff,00c2ff`;
-                    }}
-                  />
-                  {isInactive && (
-                    <div className="absolute -bottom-1 -right-1 bg-rose-600 text-white rounded-full p-0.5 shadow-xs" title="Tài khoản đã bị vô hiệu hóa">
-                      <Lock className="w-3 h-3" />
-                    </div>
-                  )}
-                </div>
-
-                <div className="space-y-1 min-w-0 flex-1">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <h3 className={`font-bold text-sm sm:text-base tracking-tight ${isInactive ? 'text-slate-500 line-through' : 'text-slate-900'}`}>
-                      {m.fullName}
-                    </h3>
-                    <Badge className={`${currentBadge.bg} text-[10px] font-extrabold uppercase`}>
-                      {currentBadge.label}
-                    </Badge>
-                    {isInactive ? (
-                      <Badge className="bg-rose-50 text-rose-700 border-rose-200 text-[10px] font-bold">
-                        ĐÃ KHÓA
-                      </Badge>
-                    ) : (
-                      <Badge className="bg-emerald-50 text-emerald-700 border-emerald-200 text-[10px] font-mono">
-                        {memberCard?.cardUid || 'NFC-ACTIVE'}
-                      </Badge>
-                    )}
-                  </div>
-
-                  <p className="text-xs sm:text-[13px] font-bold text-[#0066FF] leading-snug">
-                    {m.title}
-                  </p>
-
-                  <div className="flex items-center gap-1.5 text-xs text-slate-600 truncate">
-                    <Building2 className="w-3.5 h-3.5 text-[#FF6B00] shrink-0" />
-                    <span className="truncate">{companyName}</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Quick Contact & Action Buttons */}
-              <div className="flex flex-wrap sm:flex-nowrap items-center gap-2 w-full sm:w-auto pt-3 sm:pt-0 border-t sm:border-t-0 border-slate-100 justify-end">
-                {/* Inline Role Indicator / Changer */}
-                {isSuperAdmin ? (
-                  <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-xs font-black shadow-2xs">
-                    <Crown className="w-3.5 h-3.5 text-amber-600" />
-                    <span>SUPER_ADMIN</span>
-                  </div>
-                ) : (
-                  <div className="flex items-center gap-1">
-                    <UserCheck className="w-3.5 h-3.5 text-slate-400" />
-                    <select
-                      value={currentMemberRole === 'SUPER_ADMIN' ? 'MEMBER' : currentMemberRole}
-                      onChange={(e) => {
-                        const newR = e.target.value as RoleType;
-                        changeUserRole(m.id, newR);
-                        setSuccessToast(`Đã đổi phân quyền của "${m.fullName}" thành [${newR}] thành công!`);
-                        setTimeout(() => setSuccessToast(''), 3500);
-                      }}
-                      className="px-2.5 py-1.5 rounded-xl bg-slate-50 border border-slate-200 text-xs font-bold text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#0066FF]/20 cursor-pointer"
-                      title="Phân quyền tài khoản này"
-                    >
-                      <option value="MEMBER">MEMBER (Hội viên)</option>
-                      <option value="EVENT_OPERATOR">EVENT_OPERATOR (Lễ tân)</option>
-                      <option value="ORG_ADMIN">ORG_ADMIN (Quản trị Hiệp hội)</option>
-                    </select>
-                  </div>
-                )}
-
-                <Link
-                  href={profileLink}
-                  className="px-3 py-1.5 rounded-xl bg-blue-50 text-[#0066FF] hover:bg-blue-100 border border-blue-200 text-xs font-bold transition-all flex items-center gap-1 shadow-2xs"
-                >
-                  <ExternalLink className="w-3.5 h-3.5" /> Profile
-                </Link>
-
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => setSelectedMemberForCard(m)}
-                  className="rounded-xl border-blue-200 text-blue-700 bg-blue-50/60 hover:bg-blue-100 text-xs font-bold py-1.5 cursor-pointer shadow-2xs"
-                >
-                  <Award className="w-3.5 h-3.5 mr-1 text-[#0066FF]" /> Thẻ Hội Viên
-                </Button>
-
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => alert(`Thẻ NFC ${memberCard?.cardUid || 'NFC-EXECUTIVE'} của hội viên ${m.fullName} đang hoạt động bình thường!`)}
-                  className="rounded-xl border-slate-200 text-slate-700 hover:bg-slate-50 text-xs font-bold py-1.5 cursor-pointer shadow-2xs"
-                >
-                  <CreditCard className="w-3.5 h-3.5 mr-1 text-[#FF6B00]" /> Thẻ NFC
-                </Button>
-
-                {/* Deactivate / Activate Button */}
-                {!isSuperAdmin && (
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={async () => {
-                      const targetAction = isInactive ? 'ACTIVE' : 'INACTIVE';
-                      const res = await toggleIdentityStatus(m.id, targetAction);
-                      if (res && res.success === false) {
-                        alert(res.error || 'Thao tác không thành công');
-                      } else {
-                        setSuccessToast(
-                          isInactive
-                            ? `Đã kích hoạt lại tài khoản hội viên "${m.fullName}".`
-                            : `Đã tạm khóa (vô hiệu hóa) tài khoản hội viên "${m.fullName}".`
-                        );
-                        setTimeout(() => setSuccessToast(''), 4000);
-                      }
-                    }}
-                    className={`rounded-xl text-xs font-bold py-1.5 cursor-pointer shadow-2xs transition-all ${
-                      isInactive
-                        ? 'border-emerald-200 text-emerald-700 bg-emerald-50 hover:bg-emerald-100'
-                        : 'border-amber-200 text-amber-700 bg-amber-50/70 hover:bg-amber-100'
-                    }`}
-                    title={isInactive ? 'Kích hoạt lại tài khoản' : 'Khóa tài khoản này'}
-                  >
-                    {isInactive ? (
-                      <>
-                        <Unlock className="w-3.5 h-3.5 mr-1 text-emerald-600" /> Mở khóa
-                      </>
-                    ) : (
-                      <>
-                        <Lock className="w-3.5 h-3.5 mr-1 text-amber-600" /> Khóa
-                      </>
-                    )}
-                  </Button>
-                )}
-
-                {/* Delete Member Button */}
-                {!isSuperAdmin && (
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => setMemberToDelete(m)}
-                    className="rounded-xl border-rose-200 text-rose-600 bg-rose-50/60 hover:bg-rose-100 hover:text-rose-700 text-xs font-bold py-1.5 cursor-pointer shadow-2xs"
-                    title="Xóa vĩnh viễn tài khoản hội viên"
-                  >
-                    <Trash2 className="w-3.5 h-3.5 mr-1 text-rose-600" /> Xóa
-                  </Button>
-                )}
-              </div>
-            </div>
-          );
-        })}
-      </section>
+          const targetAction = isInactive ? 'ACTIVE' : 'INACTIVE';
+          const res = await toggleIdentityStatus(m.id, targetAction);
+          if (res && res.success === false) {
+            alert(res.error || 'Thao tác không thành công');
+          } else {
+            setSuccessToast(
+              isInactive
+                ? `Đã kích hoạt lại tài khoản hội viên "${m.fullName}".`
+                : `Đã tạm khóa (vô hiệu hóa) tài khoản hội viên "${m.fullName}".`
+            );
+            setTimeout(() => setSuccessToast(''), 4000);
+          }
+        }}
+        onDeleteMember={(m) => {
+          setMemberToDelete(m);
+        }}
+      />
 
       {/* MODAL: THẺ HỘI VIÊN SỐ (E-MEMBERSHIP CARD) */}
       {selectedMemberForCard && (

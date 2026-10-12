@@ -170,10 +170,13 @@ export default function LoginPage() {
 
   // Initialize Google One Tap on mount
   useEffect(() => {
-    initGoogleOneTap(
+    const cleanup = initGoogleOneTap(
       (user) => handleGoogleSuccess(user),
       (msg) => console.log('One Tap notice:', msg)
     );
+    return () => {
+      cleanup?.();
+    };
   }, []);
 
   // Handle Request OTP
