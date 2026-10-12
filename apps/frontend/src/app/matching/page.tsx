@@ -1,9 +1,11 @@
 import React from 'react';
+import { cookies } from 'next/headers';
 import { B2BMatchmakingView, MatchingRequest, BusinessUser } from '@/components/matching/b2b-matchmaking';
 import { ToastProvider } from '@/components/ui/toast';
 import { ErrorBoundary } from '@/components/shared/ErrorBoundary';
 import { MatchingService } from '@/lib/services/matching-service';
 import { getServiceSupabase, supabase } from '@/lib/services/supabase-client';
+import { createClient } from '@/lib/supabase/server';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -13,7 +15,7 @@ export const metadata = {
   description: 'Hệ thống gợi ý ghép đôi đàm phán 1:1 B2B thông minh dựa trên ngành nghề, năng lực cung ứng và nhu cầu hợp tác thực tế.',
 };
 
-const CURRENT_USER_ID = '11111111-1111-1111-1111-111111111111';
+const CANONICAL_FALLBACK_USER_ID = '11111111-1111-1111-1111-111111111111';
 
 export default async function MatchingPage() {
   let initialMatchings: MatchingRequest[] = [];
@@ -22,9 +24,43 @@ export default async function MatchingPage() {
 
   const db = getServiceSupabase() || supabase;
 
+  // Dynamically resolve current identity from session cookie or Supabase auth
+  let currentUserId = '';
+  try {
+    const cookieStore = await cookies();
+    const sessionCookie = cookieStore.get('one_connect_auth_session')?.value;
+    if (sessionCookie) {
+      currentUserId = decodeURIComponent(sessionCookie.trim());
+    }
+
+    if (!currentUserId) {
+      const serverSupabase = await createClient();
+      const {
+        data: { user },
+      } = await serverSupabase.auth.getUser();
+
+      if (user && db) {
+        const { data: idnt } = await db
+          .from('person_identities')
+          .select('id')
+          .eq('user_id', user.id)
+          .maybeSingle();
+        if (idnt?.id) {
+          currentUserId = idnt.id;
+        }
+      }
+    }
+  } catch (err) {
+    console.warn('[MatchingPage] Auth resolution warning:', err);
+  }
+
+  if (!currentUserId) {
+    currentUserId = CANONICAL_FALLBACK_USER_ID;
+  }
+
   try {
     // 1. Fetch AI B2B Matchmaking Candidates via algorithmic service
-    const matchResult = await MatchingService.getMatchmakingCandidates(CURRENT_USER_ID);
+    const matchResult = await MatchingService.getMatchmakingCandidates(currentUserId);
     aiCandidates = matchResult.candidates;
 
     if (db) {
@@ -147,7 +183,7 @@ export default async function MatchingPage() {
           initialMatchings={initialMatchings}
           companies={companies}
           aiCandidates={aiCandidates}
-          currentUserId={CURRENT_USER_ID}
+          currentUserId={currentUserId}
         />
       </ErrorBoundary>
     </ToastProvider>
