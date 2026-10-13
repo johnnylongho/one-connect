@@ -1,0 +1,7 @@
+{
+  "name": "One Connect Network - Executive Command Center",
+  "description": "Trung tâm Điều hành & Quản trị Giao thương B2B Doanh nhân Số - One Connect Network (TRL-7 Khánh Hòa)",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
+

@@ -20,6 +20,8 @@ import {
   Smartphone,
   PanelLeftClose,
   PanelLeftOpen,
+  ChevronRight,
+  ChevronLeft,
   UserCheck,
   Layers,
   FileText,
@@ -210,9 +212,12 @@ export function ClientAppShell({ children }: { children: React.ReactNode }) {
     pathname === '/posts' ||
     pathname?.startsWith('/posts');
 
+  const isAdminPortal = pathname?.startsWith('/admin');
+
   // Toàn bộ các trang công khai / độc lập không thuộc Tầng 2 Quản trị
   const isStandalonePage =
     isPublicPortal ||
+    isAdminPortal ||
     pathname === '/demo' ||
     pathname === '/login' ||
     pathname === '/register' ||
@@ -230,15 +235,26 @@ export function ClientAppShell({ children }: { children: React.ReactNode }) {
       typeof document !== 'undefined' &&
       (document.cookie.includes('one_connect_auth_session=') || document.cookie.includes('sb-access-token='));
 
-    // BẢO VỆ TẦNG 2: Chỉ người dùng có tài khoản đăng nhập mới truy cập được các trang ngoài isStandalonePage
-    if (!state.currentIdentityId && !cookieExists && !isStandalonePage) {
+    const isPublicOrAuthPage =
+      isPublicPortal ||
+      pathname === '/demo' ||
+      pathname === '/login' ||
+      pathname === '/register' ||
+      pathname === '/forgot-password' ||
+      pathname === '/reset-password' ||
+      pathname?.startsWith('/auth') ||
+      pathname?.startsWith('/p/') ||
+      pathname?.startsWith('/c/');
+
+    // BẢO VỆ TẦNG 2 & ADMIN: Người dùng chưa đăng nhập thì redirect về /login
+    if (!state.currentIdentityId && !cookieExists && !isPublicOrAuthPage) {
       router.replace('/login');
     }
-  }, [state.currentIdentityId, isStandalonePage, isHydrated, router]);
+  }, [state.currentIdentityId, isPublicPortal, pathname, isHydrated, router]);
 
   if (isStandalonePage) {
     return (
-      <div className={`min-h-screen ${isPublicPortal ? 'bg-[#F8FAFD]' : 'bg-white'} text-slate-900 font-sans antialiased selection:bg-blue-600 selection:text-white overflow-x-hidden`}>
+      <div className={`min-h-screen ${isPublicPortal ? 'bg-[#F8FAFD]' : isAdminPortal ? 'bg-[#0d1627]' : 'bg-white'} text-slate-900 font-sans antialiased selection:bg-blue-600 selection:text-white overflow-x-hidden`}>
         {isPublicPortal && <PublicHeader />}
         {children}
       </div>
@@ -432,28 +448,21 @@ export function ClientAppShell({ children }: { children: React.ReactNode }) {
         {/* 2. BODY LAYOUT */}
         <div className="flex-1 flex w-full min-h-[calc(100vh-3.5rem)]">
           <aside
-            className={`shrink-0 border-r border-slate-200/90 bg-white flex flex-col justify-between hidden md:flex fixed top-14 left-0 bottom-0 h-[calc(100vh-3.5rem)] z-30 shadow-2xs transition-all duration-200 ease-in-out ${
+            className={`relative shrink-0 border-r border-slate-200/90 bg-white flex flex-col justify-between hidden md:flex fixed top-14 left-0 bottom-0 h-[calc(100vh-3.5rem)] z-30 shadow-2xs transition-all duration-200 ease-in-out ${
               isSidebarCollapsed ? 'w-14' : 'w-60'
             }`}
           >
+            {/* Floating Sidebar Toggle Button on right border */}
+            <button
+              onClick={toggleSidebar}
+              className="absolute -right-3 top-4 hidden md:flex h-6 w-6 items-center justify-center rounded-full border border-slate-200 bg-white shadow-sm hover:bg-slate-50 hover:text-blue-600 transition-colors z-40 cursor-pointer text-slate-600"
+              title={isSidebarCollapsed ? 'Mở rộng Sidebar' : 'Thu gọn Sidebar'}
+              aria-label={isSidebarCollapsed ? 'Mở rộng sidebar' : 'Thu gọn sidebar'}
+            >
+              {isSidebarCollapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
+            </button>
+
             <div className="flex-1 space-y-2.5 overflow-y-auto p-2 scrollbar-thin">
-              <div className="pb-2 mb-1 border-b border-slate-100/90 flex items-center">
-                <button
-                  onClick={toggleSidebar}
-                  className="w-9 h-9 flex items-center justify-center rounded-xl text-slate-500 hover:text-[#0066FF] hover:bg-blue-50 transition-colors cursor-pointer shrink-0"
-                  title={isSidebarCollapsed ? 'Mở rộng Sidebar' : 'Thu gọn Sidebar'}
-                >
-                  {isSidebarCollapsed ? <PanelLeftOpen className="w-4 h-4" /> : <PanelLeftClose className="w-4 h-4" />}
-                </button>
-                {!isSidebarCollapsed && (
-                  <span
-                    onClick={toggleSidebar}
-                    className="text-xs font-semibold text-slate-500 hover:text-slate-900 ml-2.5 cursor-pointer truncate transition-colors select-none"
-                  >
-                    Thu gọn Menu
-                  </span>
-                )}
-              </div>
 
               <div className="space-y-2">
                 {renderNavGroup(personalItems, '1. ĐỊNH DANH (IDENTITY)', 'Hồ sơ')}

@@ -1,5 +1,3 @@
-'use client';
-
 import React from 'react';
 import Link from 'next/link';
 import { ArrowLeft, LucideIcon } from 'lucide-react';
@@ -9,7 +7,7 @@ export interface PageHeaderProps {
   supertitle?: string;
   title: string;
   description?: string;
-  icon: LucideIcon;
+  icon?: LucideIcon | React.ComponentType<{ className?: string }>;
   badge?: string;
   badgeVariant?: 'blue' | 'emerald' | 'amber' | 'purple' | 'orange';
   backHref?: string;
@@ -55,9 +53,11 @@ export function PageHeader({
             </Link>
           )}
 
-          <div className="w-11 h-11 rounded-2xl bg-blue-50 text-[#0066FF] border border-blue-100 flex items-center justify-center shrink-0 shadow-2xs">
-            <Icon className="w-5 h-5 text-[#0066FF]" />
-          </div>
+          {Icon && (
+            <div className="w-11 h-11 rounded-2xl bg-blue-50 text-[#0066FF] border border-blue-100 flex items-center justify-center shrink-0 shadow-2xs">
+              <Icon className="w-5 h-5 text-[#0066FF]" />
+            </div>
+          )}
 
           <div className="space-y-1 min-w-0 flex-1">
             {supertitle && (

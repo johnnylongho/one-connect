@@ -42,7 +42,7 @@ function slugify(text: string) {
     .replace(/-+$/, '');
 }
 
-export default function ArticleEditorPage() {
+function ArticleEditorContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const articleId = searchParams?.get('id');
@@ -449,5 +449,13 @@ export default function ArticleEditorPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function ArticleEditorPage() {
+  return (
+    <React.Suspense fallback={<div className="p-8 text-center text-xs text-slate-400">Đang tải trình soạn thảo bài viết...</div>}>
+      <ArticleEditorContent />
+    </React.Suspense>
   );
 }

@@ -38,8 +38,8 @@ export default function AssociationAdminDashboard() {
         icon={Building2}
         badge="OFFICIAL PORTAL"
         badgeVariant="purple"
-        backHref="/dashboard"
-        backLabel="Về Tổng quan"
+        backHref="/admin"
+        backLabel="Về Command Center"
         actions={
           <div className="flex flex-wrap items-center gap-2">
             <Link
