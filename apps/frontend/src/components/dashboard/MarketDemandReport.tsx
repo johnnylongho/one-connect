@@ -24,7 +24,6 @@ import {
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
 import {
   MarketDemandSummary,
   MarketLead,
@@ -68,11 +67,9 @@ export function MarketDemandReport() {
 
   useEffect(() => {
     fetchStats();
-    // Realtime polling every 6 seconds
     const interval = setInterval(fetchStatsSilently, 6000);
     return () => clearInterval(interval);
   }, []);
-
 
   const handleUpdateStatus = async (leadId: string, newStatus: MarketLead['status']) => {
     try {
@@ -107,10 +104,10 @@ export function MarketDemandReport() {
 
   if (loading && !data) {
     return (
-      <Card className="border-slate-200 bg-white p-8 text-center shadow-sm">
-        <RefreshCw className="w-8 h-8 animate-spin text-blue-600 mx-auto mb-2" />
-        <p className="text-xs text-slate-500 font-medium">Đang tải dữ liệu đo lường thị trường...</p>
-      </Card>
+      <div className="bg-white rounded-3xl border border-slate-200/90 p-12 text-center shadow-2xs space-y-3">
+        <RefreshCw className="w-8 h-8 animate-spin text-blue-600 mx-auto" />
+        <p className="text-xs text-slate-500 font-medium">Đang tải dữ liệu đo lường thị trường từ Supabase Cloud...</p>
+      </div>
     );
   }
 
@@ -123,149 +120,120 @@ export function MarketDemandReport() {
 
   return (
     <div className="space-y-6">
-      {/* Top Banner & Export Actions */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-gradient-to-r from-emerald-50/60 via-blue-50/40 to-white p-5 rounded-2xl border border-emerald-100 shadow-xs">
-        <div>
-          <div className="flex items-center gap-2 flex-wrap">
-            <Badge className="bg-emerald-600 text-white text-[10px] font-black uppercase tracking-wider flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-white animate-pulse" /> 100% DỮ LIỆU THỰC TẾ (SUPABASE CLOUD)
-            </Badge>
-            <span className="text-[11px] text-emerald-700 font-bold font-mono">REAL-TIME SYNC</span>
-          </div>
-          <h2 className="text-lg sm:text-xl font-black text-slate-900 tracking-tight font-heading mt-1">
-            Đo Lường Mối Quan Tâm Thị Trường &amp; Danh Sách Leads
-          </h2>
-          <p className="text-xs text-slate-600 mt-0.5">
-            Dữ liệu được ghi nhận thời gian thực từ hành vi truy cập và đăng ký của người dùng thực tế trên website.
-          </p>
-        </div>
-
-        <div className="flex items-center gap-2 flex-wrap shrink-0">
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={fetchStats}
-            className="gap-1.5 text-xs font-bold border-slate-200 bg-white hover:bg-slate-50 text-slate-700 rounded-xl h-9 cursor-pointer shadow-2xs"
-          >
-            <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} /> Làm Mới
-          </Button>
-          <Button
-            size="sm"
-            onClick={handleExportExcel}
-            className="gap-1.5 text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl h-9 px-3.5 shadow-xs cursor-pointer"
-          >
-            <FileSpreadsheet className="w-4 h-4" /> Xuất Excel
-          </Button>
-        </div>
-      </div>
-
-      {/* 1. Metric Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-        {/* Metric 1 */}
-        <Card className="border-slate-200 bg-white shadow-xs hover:border-blue-300 transition-all">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-xs font-bold text-slate-500 uppercase tracking-wider">
-              Lượt Quan Tâm Thị Trường
-            </CardTitle>
+      {/* 1. METRICS CARDS (COMMAND CENTER STATS) */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* Metric 1: Total Clicks & Surveys */}
+        <div className="bg-white rounded-2xl p-5 border border-slate-200/90 shadow-2xs space-y-2">
+          <div className="flex items-center justify-between text-xs text-slate-500">
+            <span className="font-semibold uppercase text-[10px]">Lượt Quan Tâm Thị Trường</span>
             <div className="p-2 rounded-xl bg-blue-50 text-blue-600">
               <TrendingUp className="w-4 h-4" />
             </div>
-          </CardHeader>
-          <CardContent className="space-y-1">
-            <div className="text-2xl sm:text-3xl font-black text-slate-900 font-heading">
-              {data.totalClicks + (data.totalVotes || 0)} <span className="text-xs font-normal text-slate-500">lượt</span>
-            </div>
-            <p className="text-[11px] text-blue-600 font-medium flex items-center gap-1 pt-0.5">
-              <span>{data.totalVotes || 0} phiếu khảo sát • {data.totalClicks} clicks</span>
-            </p>
-          </CardContent>
-        </Card>
+          </div>
+          <div className="text-2xl sm:text-3xl font-black text-slate-900 font-mono">
+            {data.totalClicks + (data.totalVotes || 0)}{' '}
+            <span className="text-xs font-normal text-slate-400">lượt</span>
+          </div>
+          <p className="text-[11px] text-blue-600 font-medium">
+            {data.totalVotes || 0} phiếu survey • {data.totalClicks} clicks
+          </p>
+        </div>
 
-        {/* Metric 2 */}
-        <Card className="border-slate-200 bg-white shadow-xs hover:border-blue-300 transition-all">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-xs font-bold text-slate-500 uppercase tracking-wider">
-              Tổng Số Leads Thu Thập
-            </CardTitle>
+        {/* Metric 2: Total Leads */}
+        <div className="bg-white rounded-2xl p-5 border border-slate-200/90 shadow-2xs space-y-2">
+          <div className="flex items-center justify-between text-xs text-slate-500">
+            <span className="font-semibold uppercase text-[10px]">Hồ Sơ Leads Thu Thập</span>
             <div className="p-2 rounded-xl bg-emerald-50 text-emerald-600">
               <Users className="w-4 h-4" />
             </div>
-          </CardHeader>
-          <CardContent className="space-y-1">
-            <div className="text-2xl sm:text-3xl font-black text-slate-900 font-heading">
-              {data.totalLeads} <span className="text-xs font-normal text-slate-500">hồ sơ</span>
-            </div>
-            <p className="text-[11px] text-emerald-600 font-medium flex items-center gap-1 pt-0.5">
-              <CheckCircle2 className="w-3 h-3" /> Đã xác thực SĐT &amp; Nhu cầu
-            </p>
-          </CardContent>
-        </Card>
+          </div>
+          <div className="text-2xl sm:text-3xl font-black text-slate-900 font-mono">
+            {data.totalLeads}{' '}
+            <span className="text-xs font-normal text-slate-400">hồ sơ</span>
+          </div>
+          <p className="text-[11px] text-emerald-600 font-medium flex items-center gap-1">
+            <CheckCircle2 className="w-3.5 h-3.5" /> Xác thực số điện thoại thực tế
+          </p>
+        </div>
 
-        {/* Metric 3 */}
-        <Card className="border-slate-200 bg-white shadow-xs hover:border-blue-300 transition-all">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-xs font-bold text-slate-500 uppercase tracking-wider">
-              Tỷ Lệ Chuyển Đổi Lead
-            </CardTitle>
+        {/* Metric 3: Conversion Rate */}
+        <div className="bg-white rounded-2xl p-5 border border-slate-200/90 shadow-2xs space-y-2">
+          <div className="flex items-center justify-between text-xs text-slate-500">
+            <span className="font-semibold uppercase text-[10px]">Tỷ Lệ Chuyển Đổi Lead</span>
             <div className="p-2 rounded-xl bg-purple-50 text-purple-600">
               <Target className="w-4 h-4" />
             </div>
-          </CardHeader>
-          <CardContent className="space-y-1">
-            <div className="text-2xl sm:text-3xl font-black text-slate-900 font-heading">
-              {data.conversionRate}%
-            </div>
-            <p className="text-[11px] text-purple-600 font-medium flex items-center gap-1 pt-0.5">
-              <span>Tỷ lệ điền form / lượt tương tác</span>
-            </p>
-          </CardContent>
-        </Card>
+          </div>
+          <div className="text-2xl sm:text-3xl font-black text-slate-900 font-mono">
+            {data.conversionRate}%
+          </div>
+          <p className="text-[11px] text-purple-600 font-medium">
+            Tỷ lệ gửi form / lượt tương tác
+          </p>
+        </div>
 
-        {/* Metric 4 */}
-        <Card className="border-blue-200 bg-gradient-to-br from-blue-50/50 to-white shadow-xs hover:border-blue-400 transition-all">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-xs font-bold text-[#0066FF] uppercase tracking-wider">
-              Gói Dẫn Đầu Nhu Cầu
-            </CardTitle>
-            <div className="p-2 rounded-xl bg-blue-100 text-blue-700">
-              <Flame className="w-4 h-4 text-orange-500 fill-orange-500" />
+        {/* Metric 4: Top Leading Solution */}
+        <div className="bg-white rounded-2xl p-5 border border-blue-200/90 shadow-2xs space-y-2 bg-gradient-to-br from-blue-50/40 to-white">
+          <div className="flex items-center justify-between text-xs text-blue-600">
+            <span className="font-semibold uppercase text-[10px]">Gói Dẫn Đầu Nhu Cầu</span>
+            <div className="p-2 rounded-xl bg-blue-100 text-orange-500">
+              <Flame className="w-4 h-4 fill-orange-500" />
             </div>
-          </CardHeader>
-          <CardContent className="space-y-1">
-            <div className="text-base sm:text-lg font-black text-slate-900 font-heading truncate" title={data.topPackage.name}>
-              {data.topPackage.name}
-            </div>
-            <p className="text-[11px] text-blue-700 font-bold flex items-center gap-1 pt-0.5">
-              <span>{data.topPackage.percentage}% thị phần quan tâm</span>
-            </p>
-          </CardContent>
-        </Card>
+          </div>
+          <div className="text-base sm:text-lg font-black text-slate-900 truncate" title={data.topPackage.name}>
+            {data.topPackage.name}
+          </div>
+          <p className="text-[11px] text-blue-700 font-bold">
+            {data.topPackage.percentage}% thị phần quan tâm
+          </p>
+        </div>
       </div>
 
-      {/* 2. Visual Market Demand Share Progress Bars */}
-      <Card className="border-slate-200 bg-white shadow-xs">
-        <CardHeader className="pb-3 border-b border-slate-100">
-          <CardTitle className="text-sm sm:text-base font-bold text-slate-900 flex items-center gap-2">
-            <Award className="w-4 h-4 text-[#0066FF]" />
-            Tỷ Lệ Quan Tâm Của Thị Trường Đối Với Từng Gói Sản Phẩm (Market Interest Share)
-          </CardTitle>
-          <CardDescription className="text-xs text-slate-500">
-            Dữ liệu tổng hợp từ các lượt khảo sát quan tâm (mục tiêu 100) và các lượt click tư vấn thực tế.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="pt-4 space-y-5">
+      {/* 2. VISUAL MARKET DEMAND SHARE PROGRESS BARS */}
+      <div className="bg-white rounded-3xl p-6 border border-slate-200/90 shadow-2xs space-y-5">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
+          <div>
+            <h3 className="text-sm sm:text-base font-bold text-slate-900 flex items-center gap-2">
+              <Award className="w-4 h-4 text-blue-600" />
+              Tỷ Lệ Quan Tâm Của Thị Trường Theo Từng Gói Giải Pháp
+            </h3>
+            <p className="text-xs text-slate-500 mt-0.5">
+              Dữ liệu tổng hợp từ các lượt khảo sát quan tâm và lượt click tư vấn giải pháp thực tế
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={fetchStats}
+              className="gap-1.5 text-xs font-bold border-slate-200 bg-white hover:bg-slate-50 text-slate-700 rounded-xl h-8 cursor-pointer shadow-2xs"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} /> Làm Mới
+            </Button>
+            <Button
+              size="sm"
+              onClick={handleExportExcel}
+              className="gap-1.5 text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl h-8 px-3.5 shadow-2xs cursor-pointer"
+            >
+              <FileSpreadsheet className="w-3.5 h-3.5" /> Xuất Excel
+            </Button>
+          </div>
+        </div>
+
+        <div className="space-y-5 pt-1">
           {data.packageStats.map((pkg) => {
             const isTop = pkg.type === data.topPackage.type;
             const barColor =
               pkg.type === 'MICE_ENTERPRISE'
-                ? 'bg-[#0066FF]'
+                ? 'bg-blue-600'
                 : pkg.type === 'ENTREPRENEUR'
                 ? 'bg-cyan-500'
                 : 'bg-emerald-500';
 
             return (
               <div key={pkg.type} className="space-y-2">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between text-xs gap-1">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between text-xs gap-1.5">
                   <div className="flex items-center gap-2">
                     <span className="font-bold text-slate-900 text-sm">{pkg.name}</span>
                     <Badge
@@ -279,7 +247,7 @@ export function MarketDemandReport() {
                   </div>
                   <div className="flex items-center gap-3 font-mono text-[11px] text-slate-500">
                     <span>
-                      <strong className="text-blue-600">{pkg.votes || 0}</strong>/100 phiếu survey
+                      <strong className="text-blue-600">{pkg.votes || 0}</strong>/100 khảo sát
                     </span>
                     <span>•</span>
                     <span>
@@ -295,32 +263,32 @@ export function MarketDemandReport() {
                 </div>
 
                 {/* Custom Progress Bar */}
-                <div className="h-3 w-full bg-slate-100 rounded-full overflow-hidden p-0.5 border border-slate-200">
+                <div className="h-2.5 w-full bg-slate-100 rounded-full overflow-hidden p-0.5 border border-slate-200/80">
                   <div
                     className={`h-full rounded-full transition-all duration-700 ${barColor}`}
                     style={{ width: `${Math.max(5, pkg.percentage)}%` }}
                   />
                 </div>
-                <div className="text-[11px] text-slate-500">
+                <div className="text-[11px] text-slate-400">
                   Khách hàng mục tiêu: {pkg.targetAudience}
                 </div>
               </div>
             );
           })}
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
-      {/* 3. Market Leads Management Table */}
-      <Card className="border-slate-200 bg-white shadow-xs">
-        <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100">
+      {/* 3. MARKET LEADS MANAGEMENT TABLE */}
+      <div className="bg-white rounded-3xl border border-slate-200/90 shadow-2xs overflow-hidden">
+        <div className="p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100">
           <div>
-            <CardTitle className="text-sm sm:text-base font-bold text-slate-900 flex items-center gap-2">
-              <Users className="w-4 h-4 text-[#0066FF]" />
+            <h3 className="text-sm sm:text-base font-bold text-slate-900 flex items-center gap-2">
+              <Users className="w-4 h-4 text-blue-600" />
               Danh Sách Khách Hàng Tiềm Năng (Market Leads)
-            </CardTitle>
-            <CardDescription className="text-xs text-slate-500 mt-0.5">
-              Hồ sơ liên hệ từ khách hàng để lại thông tin quan tâm và đăng ký tư vấn giải pháp.
-            </CardDescription>
+            </h3>
+            <p className="text-xs text-slate-500 mt-0.5">
+              Hồ sơ liên hệ từ khách hàng để lại thông tin quan tâm và đăng ký tư vấn giải pháp (Supabase Realtime)
+            </p>
           </div>
 
           {/* Filter Pills */}
@@ -334,9 +302,9 @@ export function MarketDemandReport() {
               <button
                 key={f.key}
                 onClick={() => setSelectedFilter(f.key)}
-                className={`px-3 py-1 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                   selectedFilter === f.key
-                    ? 'bg-[#0066FF] text-white shadow-xs'
+                    ? 'bg-blue-600 text-white shadow-2xs'
                     : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                 }`}
               >
@@ -344,9 +312,9 @@ export function MarketDemandReport() {
               </button>
             ))}
           </div>
-        </CardHeader>
+        </div>
 
-        <CardContent className="pt-4 p-0 sm:p-6 overflow-x-auto">
+        <div className="overflow-x-auto">
           {filteredLeads.length === 0 ? (
             <div className="py-12 px-4 text-center space-y-3">
               <div className="w-12 h-12 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-600 flex items-center justify-center mx-auto shadow-2xs">
@@ -367,7 +335,7 @@ export function MarketDemandReport() {
                     variant="outline"
                     className="gap-1.5 text-xs font-bold rounded-xl border-slate-300 text-slate-700 bg-white hover:bg-slate-50 shadow-2xs cursor-pointer"
                   >
-                    <ExternalLink className="w-3.5 h-3.5 text-[#0066FF]" /> Mở Trang Gói Dịch Vụ
+                    <ExternalLink className="w-3.5 h-3.5 text-blue-600" /> Mở Trang Gói Dịch Vụ
                   </Button>
                 </a>
               </div>
@@ -381,7 +349,7 @@ export function MarketDemandReport() {
                 return (
                   <div
                     key={lead.id}
-                    className="p-4 hover:bg-slate-50/80 transition-colors flex flex-col md:flex-row md:items-center justify-between gap-4 text-xs"
+                    className="p-4 sm:p-5 hover:bg-slate-50/80 transition-colors flex flex-col md:flex-row md:items-center justify-between gap-4 text-xs"
                   >
                     {/* Left: Contact Info */}
                     <div className="space-y-1.5 max-w-md">
@@ -426,7 +394,7 @@ export function MarketDemandReport() {
                       </div>
 
                       {lead.notes && (
-                        <p className="text-slate-500 text-[11px] bg-slate-50 p-2 rounded-xl border border-slate-200/60 leading-relaxed">
+                        <p className="text-slate-500 text-[11px] bg-slate-50 p-2.5 rounded-xl border border-slate-200/60 leading-relaxed">
                           <strong>Nhu cầu:</strong> {lead.notes}
                         </p>
                       )}
@@ -475,8 +443,8 @@ export function MarketDemandReport() {
               })}
             </div>
           )}
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   );
 }

@@ -17,11 +17,10 @@ import {
   Settings, 
   HelpCircle, 
   LogOut,
-  ShieldCheck,
   ChevronRight,
-  ChevronLeft,
   PanelLeftClose,
-  PanelLeftOpen
+  PanelLeftOpen,
+  Target
 } from 'lucide-react';
 import { useOneConnectStore } from '@/lib/store';
 
@@ -40,6 +39,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
 
   const mainNavigation = [
     { id: 'dashboard', label: 'Trung tâm Điều hành', icon: LayoutDashboard, path: '/admin' },
+    { id: 'card', label: 'Danh thiếp 3D & NFC', icon: CreditCard, path: '/dashboard/card' },
     { id: 'members', label: 'Quản lý Hội viên', icon: Users, path: '/admin/org/members' },
     { id: 'events', label: 'Quản lý Sự kiện MICE', icon: CalendarDays, path: '/admin/events' },
     { id: 'nfc-cards', label: 'Kho Thẻ NFC Vật lý', icon: CreditCard, path: '/admin/nfc-cards' },
@@ -49,6 +49,8 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
     { id: 'checkin', label: 'Trạm Check-in <0.8s', icon: ScanLine, path: '/operator/checkin' },
     { id: 'attendees', label: 'Danh bạ Đại biểu', icon: Contact, path: '/operator/attendees' },
     { id: 'matching', label: 'AI Matchmaking 1:1', icon: GitCompare, path: '/matching' },
+    { id: 'leads', label: 'Đo lường Leads B2B', icon: Target, path: '/dashboard/leads' },
+    { id: 'connections', label: 'Sổ tay Quan hệ & CRM', icon: Users, path: '/dashboard/connections' },
   ];
 
   const reportNavigation = [
@@ -70,228 +72,179 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
     router.push('/login');
   };
 
+  // Render a single nav item with FIXED ICON AXIS (zero pixel horizontal shift on collapse)
+  const renderNavItem = (item: { id: string; label: string; icon: React.ElementType; path: string }) => {
+    const Icon = item.icon;
+    const isActive = isLinkActive(item.path);
+
+    return (
+      <div key={item.id} className="relative group">
+        <Link
+          href={item.path}
+          title={collapsed ? item.label : undefined}
+          className={`w-full h-10 px-2 rounded-xl transition-all flex items-center text-left ${
+            isActive
+              ? 'bg-blue-600 text-white shadow-sm shadow-blue-500/30'
+              : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/90'
+          }`}
+        >
+          {/* Fixed Icon Anchor: width & height always 32px at exact same coordinate */}
+          <div className="w-8 h-8 flex items-center justify-center shrink-0 rounded-lg">
+            <Icon className={`w-4 h-4 transition-transform ${
+              isActive ? 'text-white' : 'text-slate-500 group-hover:text-slate-900'
+            }`} />
+          </div>
+
+          {/* Expanded Label Text */}
+          {!collapsed && (
+            <span className="ml-2.5 text-xs font-medium truncate flex-1 min-w-0 animate-in fade-in-50 duration-150">
+              {item.label}
+            </span>
+          )}
+
+          {!collapsed && isActive && (
+            <ChevronRight className="w-3.5 h-3.5 ml-auto text-blue-200 shrink-0" />
+          )}
+        </Link>
+
+        {/* Collapsed Tooltip: appears fixed right next to the icon */}
+        {collapsed && (
+          <div className="fixed left-[76px] top-auto z-50 pointer-events-none hidden group-hover:flex items-center px-3 py-1.5 bg-slate-900 text-white text-xs font-semibold rounded-lg shadow-xl whitespace-nowrap animate-in fade-in-50 duration-100">
+            {item.label}
+            <div className="absolute -left-1 w-2 h-2 bg-slate-900 rotate-45" />
+          </div>
+        )}
+      </div>
+    );
+  };
+
   return (
     <aside 
       className={`relative bg-white border-r border-slate-200/90 transition-all duration-300 ease-in-out flex flex-col justify-between shrink-0 select-none z-20 shadow-2xs h-full ${
-        collapsed ? 'w-20' : 'w-64 lg:w-72'
+        collapsed ? 'w-[72px]' : 'w-64 lg:w-72'
       }`}
     >
-      {/* Floating Sidebar Toggle Button on right border */}
-      <button 
-        onClick={() => setCollapsed((prev) => !prev)}
-        className="absolute -right-3 top-6 flex h-6 w-6 items-center justify-center rounded-full border border-slate-200 bg-white shadow-sm hover:bg-slate-50 hover:text-blue-600 transition-colors z-30 cursor-pointer text-slate-600"
-        title={collapsed ? 'Mở rộng Sidebar (Phím [)' : 'Thu gọn Sidebar (Phím [)'}
-        aria-label={collapsed ? 'Mở rộng sidebar' : 'Thu gọn sidebar'}
-      >
-        {collapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
-      </button>
-
-      {/* Top Logo Brand Zone */}
-      <div className={`border-b border-slate-100/90 transition-all ${
-        collapsed ? 'p-3 flex items-center justify-center' : 'p-4 flex items-center justify-start gap-3'
-      }`}>
-        <Link href="/admin" className="flex items-center gap-3 overflow-hidden group">
-          {/* Logo mark */}
-          <div 
-            className="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-700 via-blue-600 to-indigo-500 flex items-center justify-center text-white shadow-md shadow-blue-500/20 shrink-0 group-hover:scale-105 transition-transform"
-            title="ONE CONNECT NETWORK (TRL-7 Khánh Hòa)"
-          >
-            <CreditCard className="w-5 h-5" />
-          </div>
-
-          {!collapsed && (
-            <div className="flex flex-col truncate">
-              <span className="font-bold text-base tracking-tight text-slate-900 flex items-center gap-1.5 truncate">
-                ONE CONNECT
-              </span>
-              <span className="text-[11px] font-medium text-slate-400 truncate">
-                Executive Command Center
-              </span>
-            </div>
+      {/* 1. TOP HEADER: FIXED TOP-LEFT TOGGLE BUTTON & CENTERED BALANCED LOGO */}
+      <div className="h-16 px-3 border-b border-slate-100/90 flex items-center justify-between shrink-0">
+        {/* Fixed Top-Left Collapse Button (Icon Only - No Text Annotation) */}
+        <button
+          onClick={() => setCollapsed((prev) => !prev)}
+          className="w-8 h-8 rounded-lg text-slate-500 hover:text-blue-600 hover:bg-slate-100 flex items-center justify-center transition-colors cursor-pointer shrink-0"
+          title={collapsed ? "Mở rộng Sidebar (Phím [)" : "Thu gọn Sidebar (Phím [)"}
+          aria-label="Toggle Sidebar"
+        >
+          {collapsed ? (
+            <PanelLeftOpen className="w-4 h-4 text-blue-600" />
+          ) : (
+            <PanelLeftClose className="w-4 h-4 text-slate-600" />
           )}
-        </Link>
+        </button>
+
+        {/* Logo at Center (Balanced) when expanded */}
+        {!collapsed && (
+          <div className="flex-1 flex items-center justify-center px-2 overflow-hidden">
+            <Link href="/admin" className="flex items-center justify-center group" title="ONE CONNECT">
+              <img
+                src="/one_connect_logo_transparent.png"
+                alt="ONE CONNECT"
+                className="h-7 sm:h-8 w-auto object-contain max-w-[155px] group-hover:scale-105 transition-transform"
+              />
+            </Link>
+          </div>
+        )}
+
+        {/* Right Symmetry Spacer when expanded */}
+        {!collapsed && (
+          <div className="w-8 h-8 shrink-0 pointer-events-none" aria-hidden="true" />
+        )}
       </div>
 
-      {/* Navigation Groups */}
-      <div className={`flex-1 overflow-y-auto py-4 transition-all scrollbar-thin ${
-        collapsed ? 'px-2 space-y-4' : 'px-3 space-y-6'
-      }`}>
+      {/* 2. NAVIGATION GROUPS (Fixed Icon Axis) */}
+      <div className="flex-1 overflow-y-auto py-4 px-3 space-y-5 transition-all scrollbar-thin">
         {/* Section 1: Tổng quan */}
         <div>
           {!collapsed ? (
-            <div className="px-3 pb-2 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+            <div className="px-2 pb-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400">
               Tổng Quan & Ban Quản Trị
             </div>
           ) : (
-            <div className="w-8 h-px bg-slate-100 mx-auto my-1" />
+            <div className="w-8 h-px bg-slate-200/80 mx-auto my-1.5" />
           )}
           <nav className="space-y-1">
-            {mainNavigation.map((item) => {
-              const Icon = item.icon;
-              const isActive = isLinkActive(item.path);
-              return (
-                <Link
-                  key={item.id}
-                  href={item.path}
-                  title={item.label}
-                  className={`w-full flex items-center rounded-xl transition-all text-left group ${
-                    collapsed
-                      ? 'justify-center p-2.5'
-                      : 'gap-3 px-3 py-2.5 text-xs font-medium'
-                  } ${
-                    isActive
-                      ? 'bg-blue-600 text-white shadow-sm shadow-blue-500/30'
-                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/80'
-                  }`}
-                >
-                  <Icon className={`w-4 h-4 shrink-0 transition-transform ${
-                    isActive ? 'text-white' : 'text-slate-500 group-hover:text-slate-900'
-                  } ${collapsed && !isActive ? 'group-hover:scale-110' : ''}`} />
-                  {!collapsed && <span className="truncate">{item.label}</span>}
-                  {!collapsed && isActive && <ChevronRight className="w-3.5 h-3.5 ml-auto text-blue-200" />}
-                </Link>
-              );
-            })}
+            {mainNavigation.map(renderNavItem)}
           </nav>
         </div>
 
         {/* Section 2: Vận hành thực địa (Operator Station) */}
         <div>
           {!collapsed ? (
-            <div className="px-3 pb-2 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+            <div className="px-2 pb-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400">
               Vận Hành Thực Địa (Operator)
             </div>
           ) : (
-            <div className="w-8 h-px bg-slate-100 mx-auto my-1" />
+            <div className="w-8 h-px bg-slate-200/80 mx-auto my-1.5" />
           )}
           <nav className="space-y-1">
-            {operatorNavigation.map((item) => {
-              const Icon = item.icon;
-              const isActive = isLinkActive(item.path);
-              return (
-                <Link
-                  key={item.id}
-                  href={item.path}
-                  title={item.label}
-                  className={`w-full flex items-center rounded-xl transition-all text-left group ${
-                    collapsed
-                      ? 'justify-center p-2.5'
-                      : 'gap-3 px-3 py-2.5 text-xs font-medium'
-                  } ${
-                    isActive
-                      ? 'bg-blue-600 text-white shadow-sm shadow-blue-500/30'
-                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/80'
-                  }`}
-                >
-                  <Icon className={`w-4 h-4 shrink-0 transition-transform ${
-                    isActive ? 'text-white' : 'text-slate-500 group-hover:text-slate-900'
-                  } ${collapsed && !isActive ? 'group-hover:scale-110' : ''}`} />
-                  {!collapsed && <span className="truncate">{item.label}</span>}
-                  {!collapsed && isActive && <ChevronRight className="w-3.5 h-3.5 ml-auto text-blue-200" />}
-                </Link>
-              );
-            })}
+            {operatorNavigation.map(renderNavItem)}
           </nav>
         </div>
 
         {/* Section 3: Báo cáo & Cài đặt */}
         <div>
           {!collapsed ? (
-            <div className="px-3 pb-2 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+            <div className="px-2 pb-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400">
               Dữ Liệu & Tuân Thủ
             </div>
           ) : (
-            <div className="w-8 h-px bg-slate-100 mx-auto my-1" />
+            <div className="w-8 h-px bg-slate-200/80 mx-auto my-1.5" />
           )}
           <nav className="space-y-1">
-            {reportNavigation.map((item) => {
-              const Icon = item.icon;
-              const isActive = isLinkActive(item.path);
-              return (
-                <Link
-                  key={item.id}
-                  href={item.path}
-                  title={item.label}
-                  className={`w-full flex items-center rounded-xl transition-all text-left group ${
-                    collapsed
-                      ? 'justify-center p-2.5'
-                      : 'gap-3 px-3 py-2.5 text-xs font-medium'
-                  } ${
-                    isActive
-                      ? 'bg-blue-600 text-white shadow-sm shadow-blue-500/30'
-                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/80'
-                  }`}
-                >
-                  <Icon className={`w-4 h-4 shrink-0 transition-transform ${
-                    isActive ? 'text-white' : 'text-slate-500 group-hover:text-slate-900'
-                  } ${collapsed && !isActive ? 'group-hover:scale-110' : ''}`} />
-                  {!collapsed && <span className="truncate">{item.label}</span>}
-                  {!collapsed && isActive && <ChevronRight className="w-3.5 h-3.5 ml-auto text-blue-200" />}
-                </Link>
-              );
-            })}
+            {reportNavigation.map(renderNavItem)}
           </nav>
         </div>
       </div>
 
-      {/* Bottom Legal Trust & Account Action */}
-      <div className={`border-t border-slate-100 transition-all ${
-        collapsed ? 'p-2 space-y-1.5 flex flex-col items-center' : 'p-3 space-y-1.5'
-      }`}>
-        {!collapsed && (
-          <div className="mb-2 p-2.5 rounded-xl bg-slate-50 border border-slate-100 flex items-center gap-2">
-            <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
-            <div className="text-[11px] leading-tight text-slate-500 truncate">
-              <span className="font-semibold text-slate-700 block">PDPL 91/2025/QH15</span>
-              2-Way Consent Shield
+      {/* 3. BOTTOM ACCOUNT & SUPPORT ZONE (Chỉ để icon, không chú thích rườm rà) */}
+      <div className="border-t border-slate-100/90 p-3 space-y-1 shrink-0">
+        {/* Support */}
+        <div className="relative group">
+          <a
+            href="mailto:contact.johnnylongho@gmail.com?subject=One%20Connect%20Admin%20Support"
+            className="w-full h-10 px-2 rounded-xl text-xs font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors flex items-center text-left"
+            title={collapsed ? "Hỗ trợ Kỹ thuật: contact.johnnylongho@gmail.com" : undefined}
+          >
+            <div className="w-8 h-8 flex items-center justify-center shrink-0 text-slate-400">
+              <HelpCircle className="w-4 h-4" />
             </div>
-          </div>
-        )}
-
-        {/* Dedicated Minimize / Collapse Button at bottom */}
-        <button
-          onClick={() => setCollapsed((prev) => !prev)}
-          className={`w-full flex items-center rounded-xl text-xs font-semibold text-slate-600 hover:text-blue-700 hover:bg-blue-50/80 border border-transparent hover:border-blue-200/60 transition-all cursor-pointer group ${
-            collapsed ? 'justify-center p-2.5' : 'justify-between px-3 py-2'
-          }`}
-          title={collapsed ? 'Mở rộng Sidebar (Phím [)' : 'Thu gọn Sidebar (Phím [)'}
-        >
-          <div className="flex items-center gap-3 truncate">
-            {collapsed ? (
-              <PanelLeftOpen className="w-4 h-4 text-blue-600 shrink-0 group-hover:scale-110 transition-transform" />
-            ) : (
-              <PanelLeftClose className="w-4 h-4 text-slate-500 group-hover:text-blue-600 shrink-0" />
-            )}
-            {!collapsed && <span className="truncate">Thu gọn Menu</span>}
-          </div>
-          {!collapsed && (
-            <kbd className="hidden sm:inline-block px-1.5 py-0.5 text-[9px] font-mono text-slate-400 bg-slate-100 group-hover:bg-blue-100 group-hover:text-blue-700 rounded transition-colors">
-              [
-            </kbd>
+            {!collapsed && <span className="ml-2.5 truncate">Hỗ trợ Kỹ thuật</span>}
+          </a>
+          {collapsed && (
+            <div className="fixed left-[76px] top-auto z-50 pointer-events-none hidden group-hover:flex items-center px-3 py-1.5 bg-slate-900 text-white text-xs font-semibold rounded-lg shadow-xl whitespace-nowrap animate-in fade-in-50 duration-100">
+              Hỗ trợ Kỹ thuật
+              <div className="absolute -left-1 w-2 h-2 bg-slate-900 rotate-45" />
+            </div>
           )}
-        </button>
+        </div>
 
-        <a
-          href="mailto:contact.johnnylongho@gmail.com?subject=One%20Connect%20Admin%20Support"
-          className={`w-full flex items-center rounded-xl text-xs font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors ${
-            collapsed ? 'justify-center p-2.5' : 'gap-3 px-3 py-2'
-          }`}
-          title="Hỗ trợ Kỹ thuật: contact.johnnylongho@gmail.com"
-        >
-          <HelpCircle className="w-4 h-4 text-slate-400 shrink-0" />
-          {!collapsed && <span>Hỗ trợ Kỹ thuật</span>}
-        </a>
-
-        <button
-          onClick={handleLogout}
-          className={`w-full flex items-center rounded-xl text-xs font-medium text-rose-600 hover:text-rose-700 hover:bg-rose-50 transition-colors cursor-pointer ${
-            collapsed ? 'justify-center p-2.5' : 'gap-3 px-3 py-2'
-          }`}
-          title={`Đăng xuất: ${currentIdentity?.fullName || 'Quản trị viên'}`}
-        >
-          <LogOut className="w-4 h-4 text-rose-500 shrink-0" />
-          {!collapsed && <span>Đăng xuất</span>}
-        </button>
+        {/* Logout */}
+        <div className="relative group">
+          <button
+            onClick={handleLogout}
+            className="w-full h-10 px-2 rounded-xl text-xs font-medium text-rose-600 hover:text-rose-700 hover:bg-rose-50 transition-colors cursor-pointer flex items-center text-left"
+            title={collapsed ? `Đăng xuất: ${currentIdentity?.fullName || 'Quản trị viên'}` : undefined}
+          >
+            <div className="w-8 h-8 flex items-center justify-center shrink-0 text-rose-500">
+              <LogOut className="w-4 h-4" />
+            </div>
+            {!collapsed && <span className="ml-2.5 truncate">Đăng xuất</span>}
+          </button>
+          {collapsed && (
+            <div className="fixed left-[76px] top-auto z-50 pointer-events-none hidden group-hover:flex items-center px-3 py-1.5 bg-slate-900 text-white text-xs font-semibold rounded-lg shadow-xl whitespace-nowrap animate-in fade-in-50 duration-100">
+              Đăng xuất
+              <div className="absolute -left-1 w-2 h-2 bg-slate-900 rotate-45" />
+            </div>
+          )}
+        </div>
       </div>
     </aside>
   );

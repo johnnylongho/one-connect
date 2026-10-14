@@ -177,15 +177,17 @@ export default async function MatchingPage() {
   }
 
   return (
-    <ToastProvider>
-      <ErrorBoundary fallbackTitle="Không thể tải dữ liệu B2B Matchmaking">
-        <B2BMatchmakingView
-          initialMatchings={initialMatchings}
-          companies={companies}
-          aiCandidates={aiCandidates}
-          currentUserId={currentUserId}
-        />
-      </ErrorBoundary>
-    </ToastProvider>
+    <div className="min-h-screen bg-[#f8fafc] p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto">
+      <ToastProvider>
+        <ErrorBoundary fallbackTitle="Không thể tải dữ liệu B2B Matchmaking">
+          <B2BMatchmakingView
+            initialMatchings={initialMatchings}
+            companies={companies}
+            aiCandidates={aiCandidates}
+            currentUserId={currentUserId}
+          />
+        </ErrorBoundary>
+      </ToastProvider>
+    </div>
   );
 }

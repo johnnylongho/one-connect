@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { PageHeader } from '@/components/shared/PageHeader';
+import Link from 'next/link';
 import {
   Users,
   CheckCircle2,
@@ -24,6 +24,9 @@ import {
   ExternalLink,
   ShieldCheck,
   Briefcase,
+  ArrowLeft,
+  ChevronRight,
+  GitCompare,
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -136,7 +139,7 @@ export function B2BMatchmakingView({
     avatarUrl: string;
   }) => {
     setSelectedTarget(target);
-    setNote(`Mong muốn hẹn gặp ${target.fullName} (${target.company}) để trao đổi cơ hội hợp tác B2B.`);
+    setNote(`Mong muốn hẹn gặp ${target.fullName} (${target.company}) để trao đổi cơ hội hợp tác B2B và ký kết thỏa thuận hợp tác.`);
     setIsDialogOpen(true);
   };
 
@@ -146,7 +149,6 @@ export function B2BMatchmakingView({
     setIsSubmitting(true);
 
     try {
-      // Direct persistence to Supabase via /api/matching route
       const response = await fetch('/api/matching', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -184,7 +186,6 @@ export function B2BMatchmakingView({
 
         setMatchings([newRequest, ...matchings]);
 
-        // Update candidate status in AI view
         setCandidates((prev) =>
           prev.map((c) =>
             c.identityId === selectedTarget.id ? { ...c, connectionStatus: 'PENDING' } : c
@@ -264,17 +265,32 @@ export function B2BMatchmakingView({
 
   return (
     <div className="space-y-6 w-full pb-16 antialiased">
-      {/* 1. STANDARDIZED PAGE HEADER */}
-      <PageHeader
-        supertitle="ONE CONNECT NETWORK • MODULE 1: DOANH NHÂN & B2B"
-        title="AI B2B Matchmaking & Xếp Bàn Giao Thương"
-        description="Thuật toán ghép đôi đối tác đàm phán 1:1 dựa trên ngành nghề, năng lực cung ứng và nhu cầu hợp tác thực tế giữa các Chủ tịch & CEO. Tuân thủ 100% cơ chế 2-Way Consent."
-        icon={Users}
-        badge="AI MATCHMAKING • TRL-7"
-        badgeVariant="orange"
-        backHref="/dashboard"
-        backLabel="Về Tổng quan"
-        actions={
+      {/* 1. TOP STATUS BAR: BREADCRUMB & REALTIME BADGE */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-white border border-slate-200/90 rounded-2xl p-3 sm:px-5 shadow-2xs">
+        <div className="flex items-center gap-3">
+          <Link
+            href="/admin"
+            className="p-2 rounded-xl text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors"
+            title="Về Command Center Quản Trị"
+          >
+            <ArrowLeft className="w-4 h-4" />
+          </Link>
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="font-bold text-sm text-slate-900">
+                Sàn Giao Thương B2B 1:1 Matchmaking
+              </span>
+              <Badge className="bg-purple-50 text-purple-700 border-purple-200 text-[10px] font-mono font-bold">
+                AI ENGINE · TRL-7
+              </Badge>
+            </div>
+            <p className="text-[11px] text-slate-500 hidden sm:block">
+              Hệ thống ghép đôi đối tác thông minh, tự động xếp bàn đàm phán và bảo mật 2-Way Consent
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-end">
           <Button
             onClick={() => {
               const firstCompany = companies[0];
@@ -284,97 +300,120 @@ export function B2BMatchmakingView({
                 setIsDialogOpen(true);
               }
             }}
-            size="default"
-            className="gap-2 bg-gradient-to-r from-[#0066FF] to-[#FF6B00] hover:opacity-90 text-white font-bold text-xs shadow-xs rounded-xl self-start md:self-center shrink-0 cursor-pointer active:scale-95 transition-all"
+            size="sm"
+            className="gap-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-bold text-xs rounded-xl shadow-2xs cursor-pointer active:scale-95 transition-all"
           >
             <Plus className="w-4 h-4" /> Tạo Yêu Cầu Kết Nối
           </Button>
-        }
-      />
-
-      {/* 2. HEADER METRICS */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
-        <Card className="border-slate-200 bg-white hover:border-blue-300 transition-all shadow-xs">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-xs font-bold text-slate-500 uppercase tracking-wider">
-              Yêu Cầu Đã Gửi
-            </CardTitle>
-            <div className="p-2.5 rounded-xl bg-blue-50 border border-blue-100">
-              <Send className="w-5 h-5 text-[#0066FF]" />
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-1">
-            <div className="text-3xl font-black text-slate-900 font-mono font-extrabold">
-              {sentRequestsCount} <span className="text-sm font-normal text-slate-500">Cuộc hẹn</span>
-            </div>
-            <p className="text-xs text-[#0066FF] flex items-center gap-1 font-medium pt-1">
-              <Sparkles className="w-3.5 h-3.5" /> Khởi tạo từ chạm thẻ NFC & AI Match
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card className="border-emerald-200 bg-white hover:border-emerald-300 transition-all shadow-xs">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-xs font-bold text-slate-500 uppercase tracking-wider">
-              Đã Đồng Ý (Accepted)
-            </CardTitle>
-            <div className="p-2.5 rounded-xl bg-emerald-50 border border-emerald-100">
-              <CheckCircle2 className="w-5 h-5 text-emerald-600" />
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-1">
-            <div className="text-3xl font-black text-emerald-600 font-mono font-extrabold">
-              {acceptedCount} <span className="text-sm font-normal text-slate-500">Đã chốt bàn</span>
-            </div>
-            <p className="text-xs text-emerald-600 flex items-center gap-1 font-medium pt-1">
-              <UserCheck className="w-3.5 h-3.5" /> Đã xếp bàn đàm phán B2B VIP
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card className="border-orange-200 bg-white hover:border-orange-300 transition-all shadow-xs">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-xs font-bold text-slate-500 uppercase tracking-wider">
-              Chờ Phản Hồi (Pending)
-            </CardTitle>
-            <div className="p-2.5 rounded-xl bg-orange-50 border border-orange-100">
-              <Clock className="w-5 h-5 text-[#FF6B00]" />
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-1">
-            <div className="text-3xl font-black text-[#FF6B00] font-mono font-extrabold">
-              {pendingCount} <span className="text-sm font-normal text-slate-500">Đang chờ</span>
-            </div>
-            <p className="text-xs text-[#FF6B00] flex items-center gap-1 font-medium pt-1">
-              <Clock className="w-3.5 h-3.5" /> Thông báo Zalo ZNS realtime
-            </p>
-          </CardContent>
-        </Card>
+        </div>
       </div>
 
-      {/* 3. TAB NAVIGATION & MAIN CONTENT */}
+      {/* 2. HERO BANNER: THEME MỚI (DARK PURPLE/INDIGO GRADIENT) */}
+      <div className="bg-gradient-to-r from-purple-950 via-indigo-950 to-blue-950 rounded-3xl p-6 sm:p-7 text-white border border-purple-800/40 shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-5">
+        <div className="space-y-1.5">
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="px-2.5 py-0.5 rounded-full bg-purple-500/20 text-purple-300 font-mono text-[11px] font-semibold border border-purple-400/30">
+              PHÂN HỆ 4 · THUẬT TOÁN AI MATCHMAKING
+            </span>
+            <span className="flex items-center gap-1 text-[11px] text-emerald-400 font-medium">
+              <Sparkles className="w-3.5 h-3.5" /> Khớp nối Cung - Cầu Tự Động &lt;1s
+            </span>
+          </div>
+          <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-white">
+            Sàn Đàm Phán Giao Thương B2B 1:1 Do AI Điều Phối
+          </h2>
+          <p className="text-xs text-purple-200/80 max-w-xl leading-relaxed">
+            Tự động bóc tách hồ sơ năng lực doanh nghiệp, phân loại nhu cầu Cung - Cầu và bố trí 32 bàn đàm phán 1:1 theo từng khung giờ sự kiện. Tuân thủ 100% cơ chế 2-Way Consent theo Luật PDPL 91/2025.
+          </p>
+        </div>
+
+        {/* METRICS STATS PILLS */}
+        <div className="grid grid-cols-3 gap-2.5 bg-white/10 p-2.5 rounded-2xl border border-white/15 self-start md:self-auto shrink-0 text-center">
+          <div className="px-3 py-1.5 bg-white/5 rounded-xl">
+            <span className="text-[10px] text-purple-200 block uppercase font-medium">Đã Gửi</span>
+            <span className="font-mono font-bold text-sm sm:text-base text-white">{sentRequestsCount}</span>
+          </div>
+          <div className="px-3 py-1.5 bg-emerald-500/20 rounded-xl border border-emerald-400/30">
+            <span className="text-[10px] text-emerald-300 block uppercase font-medium">Đã Khóa Bàn</span>
+            <span className="font-mono font-bold text-sm sm:text-base text-emerald-300">{acceptedCount}</span>
+          </div>
+          <div className="px-3 py-1.5 bg-amber-500/20 rounded-xl border border-amber-400/30">
+            <span className="text-[10px] text-amber-300 block uppercase font-medium">Chờ Phản Hồi</span>
+            <span className="font-mono font-bold text-sm sm:text-base text-amber-300">{pendingCount}</span>
+          </div>
+        </div>
+      </div>
+
+      {/* 3. METRICS CARDS */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="bg-white rounded-2xl p-4 border border-slate-200/90 shadow-2xs space-y-1">
+          <div className="flex items-center justify-between text-xs text-slate-500">
+            <span className="font-semibold uppercase text-[10px]">Cuộc Hẹn Đã Khởi Tạo</span>
+            <Send className="w-4 h-4 text-blue-600" />
+          </div>
+          <div className="text-2xl font-bold font-mono text-slate-900">{sentRequestsCount}</div>
+          <p className="text-[11px] text-blue-600 flex items-center gap-1 font-medium">
+            <Sparkles className="w-3 h-3" /> Chạm thẻ NFC &amp; AI Match
+          </p>
+        </div>
+
+        <div className="bg-white rounded-2xl p-4 border border-slate-200/90 shadow-2xs space-y-1">
+          <div className="flex items-center justify-between text-xs text-slate-500">
+            <span className="font-semibold uppercase text-[10px]">Đã Chốt Bàn Đàm Phán</span>
+            <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+          </div>
+          <div className="text-2xl font-bold font-mono text-emerald-600">{acceptedCount}</div>
+          <p className="text-[11px] text-emerald-600 flex items-center gap-1 font-medium">
+            <UserCheck className="w-3 h-3" /> Sẵn sàng ký MOU hợp tác
+          </p>
+        </div>
+
+        <div className="bg-white rounded-2xl p-4 border border-slate-200/90 shadow-2xs space-y-1">
+          <div className="flex items-center justify-between text-xs text-slate-500">
+            <span className="font-semibold uppercase text-[10px]">Đang Chờ Đối Tác</span>
+            <Clock className="w-4 h-4 text-amber-600" />
+          </div>
+          <div className="text-2xl font-bold font-mono text-amber-600">{pendingCount}</div>
+          <p className="text-[11px] text-amber-600 flex items-center gap-1 font-medium">
+            <Clock className="w-3 h-3" /> Tự động nhắc qua Zalo ZNS
+          </p>
+        </div>
+
+        <div className="bg-white rounded-2xl p-4 border border-slate-200/90 shadow-2xs space-y-1">
+          <div className="flex items-center justify-between text-xs text-slate-500">
+            <span className="font-semibold uppercase text-[10px]">Ứng Viên Khớp Nhu Cầu</span>
+            <GitCompare className="w-4 h-4 text-purple-600" />
+          </div>
+          <div className="text-2xl font-bold font-mono text-purple-600">{filteredCandidates.length}</div>
+          <p className="text-[11px] text-purple-600 flex items-center gap-1 font-medium">
+            <Sparkles className="w-3 h-3" /> Tương hợp trên 85%
+          </p>
+        </div>
+      </div>
+
+      {/* 4. MAIN INTERACTIVE TABS */}
       <Tabs defaultValue="ai-matching" className="w-full space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-3 sm:px-4 rounded-2xl border border-slate-200/90 shadow-2xs">
           <TabsList className="bg-slate-100 p-1 rounded-xl">
-            <TabsTrigger value="ai-matching" className="gap-2 font-bold text-xs">
-              <Sparkles className="w-4 h-4 text-[#FF6B00]" /> AI Đề Xuất Đối Tác ({filteredCandidates.length})
+            <TabsTrigger value="ai-matching" className="gap-2 font-bold text-xs cursor-pointer">
+              <Sparkles className="w-4 h-4 text-amber-500" /> AI Đề Xuất Đối Tác ({filteredCandidates.length})
             </TabsTrigger>
-            <TabsTrigger value="directory" className="gap-2 font-bold text-xs">
-              <Building2 className="w-4 h-4" /> Danh Bạ Doanh Nghiệp ({filteredCompanies.length})
+            <TabsTrigger value="my-schedule" className="gap-2 font-bold text-xs cursor-pointer">
+              <Calendar className="w-4 h-4 text-blue-600" /> Lịch Hẹn Đàm Phán ({matchings.length})
             </TabsTrigger>
-            <TabsTrigger value="my-schedule" className="gap-2 font-bold text-xs">
-              <Calendar className="w-4 h-4" /> Lịch Hẹn Đàm Phán ({matchings.length})
+            <TabsTrigger value="directory" className="gap-2 font-bold text-xs cursor-pointer">
+              <Building2 className="w-4 h-4 text-purple-600" /> Danh Bạ Doanh Nghiệp ({filteredCompanies.length})
             </TabsTrigger>
           </TabsList>
 
           <div className="relative w-full sm:w-72">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-            <Input
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
+            <input
               type="text"
               placeholder="Tìm theo tên, công ty, ngành nghề..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 bg-white border-slate-200 text-xs focus:border-blue-500 rounded-xl"
+              className="w-full pl-9 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs placeholder-slate-400 focus:outline-none focus:bg-white focus:ring-1 focus:ring-purple-500 transition-colors"
             />
           </div>
         </div>
@@ -382,10 +421,12 @@ export function B2BMatchmakingView({
         {/* TAB 1: AI ĐỀ XUẤT ĐỐI TÁC SMART MATCH */}
         <TabsContent value="ai-matching" className="space-y-4 m-0">
           {filteredCandidates.length === 0 ? (
-            <div className="text-center py-12 bg-white rounded-3xl border border-dashed border-slate-200 p-8 space-y-2">
-              <Sparkles className="w-10 h-10 text-slate-300 mx-auto" />
-              <p className="font-bold text-slate-700 text-sm">Chưa có đề xuất đối tác AI phù hợp</p>
-              <p className="text-xs text-slate-400 max-w-sm mx-auto">
+            <div className="text-center py-12 bg-white rounded-3xl border border-dashed border-slate-200 p-8 space-y-2 shadow-2xs">
+              <div className="w-12 h-12 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center mx-auto">
+                <Sparkles className="w-6 h-6" />
+              </div>
+              <p className="font-bold text-slate-800 text-sm">Chưa có đề xuất đối tác AI phù hợp</p>
+              <p className="text-xs text-slate-400 max-w-sm mx-auto leading-relaxed">
                 {searchQuery
                   ? `Không có đối tác nào khớp với từ khóa "${searchQuery}". Vui lòng thử lại.`
                   : 'Hệ thống đang liên tục phân tích hồ sơ năng lực và nhu cầu giao thương của các đại biểu mới.'}
@@ -394,42 +435,42 @@ export function B2BMatchmakingView({
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               {filteredCandidates.map((cand) => (
-                <Card
+                <div
                   key={cand.id}
-                  className="border-slate-200 bg-white hover:border-blue-300 hover:shadow-md transition-all shadow-xs flex flex-col justify-between rounded-2xl overflow-hidden group"
+                  className="bg-white rounded-3xl p-5 border border-slate-200/90 hover:border-purple-300 hover:shadow-md transition-all shadow-2xs flex flex-col justify-between group"
                 >
-                  <CardHeader className="p-5 pb-3 space-y-3">
+                  <div className="space-y-4">
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex items-center gap-3 min-w-0">
                         <img
                           src={cand.avatarUrl}
                           alt={cand.fullName}
-                          className="w-12 h-12 rounded-2xl object-cover border-2 border-blue-500/20 group-hover:scale-105 transition-transform shrink-0"
+                          className="w-12 h-12 rounded-2xl object-cover border border-slate-200 shadow-2xs shrink-0 group-hover:scale-105 transition-transform"
                           onError={(e) => {
                             e.currentTarget.onerror = null;
-                            e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(cand.fullName)}&background=0066FF&color=fff&bold=true`;
+                            e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                              cand.fullName
+                            )}&background=0066FF&color=fff&bold=true`;
                           }}
                         />
                         <div className="min-w-0 flex-1">
-                          <h3 className="font-bold text-slate-900 text-sm truncate group-hover:text-[#0066FF] transition-colors">
+                          <h4 className="font-bold text-slate-900 text-sm truncate group-hover:text-purple-600 transition-colors">
                             {cand.fullName}
-                          </h3>
-                          <p className="text-xs text-slate-500 truncate mt-0.5">{cand.title}</p>
+                          </h4>
+                          <p className="text-xs text-slate-500 truncate">{cand.title}</p>
                         </div>
                       </div>
 
                       {/* AI Match Score Badge */}
-                      <div className="text-right shrink-0">
-                        <Badge className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-mono font-bold text-xs px-2.5 py-1 rounded-xl shadow-xs">
-                          {cand.matchScore}% Match
-                        </Badge>
-                      </div>
+                      <span className="px-2.5 py-1 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-mono font-bold text-xs shadow-2xs shrink-0">
+                        {cand.matchScore}% Match
+                      </span>
                     </div>
 
                     {/* Company Info Box */}
-                    <div className="p-3 rounded-xl bg-slate-50 border border-slate-100 space-y-1">
+                    <div className="p-3 rounded-2xl bg-slate-50 border border-slate-100 space-y-1">
                       <div className="flex items-center gap-1.5 text-xs text-slate-800 font-bold truncate">
-                        <Building2 className="w-3.5 h-3.5 text-[#0066FF] shrink-0" />
+                        <Building2 className="w-3.5 h-3.5 text-purple-600 shrink-0" />
                         <span className="truncate">{cand.businessName}</span>
                       </div>
                       <div className="flex items-center gap-2 text-[11px] text-slate-500">
@@ -439,22 +480,22 @@ export function B2BMatchmakingView({
                     </div>
 
                     {/* AI Synergy Reasons */}
-                    <div className="space-y-1.5 pt-1">
-                      <p className="text-[10.5px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
-                        <Sparkles className="w-3 h-3 text-[#FF6B00]" /> Điểm tương hợp B2B:
+                    <div className="space-y-1.5">
+                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
+                        <Sparkles className="w-3 h-3 text-amber-500" /> Điểm tương hợp Cung - Cầu:
                       </p>
                       <div className="space-y-1">
                         {cand.synergyReasons.slice(0, 2).map((reason, idx) => (
                           <div key={idx} className="flex items-start gap-1.5 text-xs text-slate-600">
-                            <span className="w-1.5 h-1.5 rounded-full bg-[#0066FF] mt-1.5 shrink-0" />
-                            <span className="leading-snug">{reason}</span>
+                            <span className="w-1.5 h-1.5 rounded-full bg-purple-600 mt-1.5 shrink-0" />
+                            <span className="leading-snug text-[11.5px]">{reason}</span>
                           </div>
                         ))}
                       </div>
                     </div>
-                  </CardHeader>
+                  </div>
 
-                  <CardContent className="px-5 pb-5 pt-0">
+                  <div className="pt-4 mt-2 border-t border-slate-100">
                     {cand.connectionStatus === 'ACCEPTED' ? (
                       <Button
                         disabled
@@ -462,16 +503,16 @@ export function B2BMatchmakingView({
                         size="sm"
                         className="w-full gap-2 border-emerald-200 bg-emerald-50 text-emerald-700 font-bold rounded-xl text-xs cursor-not-allowed"
                       >
-                        <CheckCircle2 className="w-4 h-4 text-emerald-600" /> Đã Kết Nối (Pre-CRM Partner)
+                        <CheckCircle2 className="w-4 h-4 text-emerald-600" /> Đã Khóa Bàn Đàm Phán
                       </Button>
                     ) : cand.connectionStatus === 'PENDING' ? (
                       <Button
                         disabled
                         variant="outline"
                         size="sm"
-                        className="w-full gap-2 border-orange-200 bg-orange-50 text-orange-700 font-bold rounded-xl text-xs cursor-not-allowed"
+                        className="w-full gap-2 border-amber-200 bg-amber-50 text-amber-700 font-bold rounded-xl text-xs cursor-not-allowed"
                       >
-                        <Clock className="w-4 h-4 text-orange-600" /> Đang Chờ Đối Tác Phản Hồi
+                        <Clock className="w-4 h-4 text-amber-600" /> Đang Chờ Đối Tác Phản Hồi
                       </Button>
                     ) : (
                       <Button
@@ -486,421 +527,349 @@ export function B2BMatchmakingView({
                           })
                         }
                         size="sm"
-                        className="w-full gap-2 bg-gradient-to-r from-[#0066FF] to-[#FF6B00] hover:opacity-90 text-white font-bold rounded-xl shadow-xs cursor-pointer text-xs active:scale-95 transition-all"
+                        className="w-full gap-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-bold rounded-xl shadow-2xs cursor-pointer text-xs active:scale-95 transition-all"
                       >
-                        <Plus className="w-4 h-4" /> Đặt Lịch Hẹn Giao Thương (1:1 B2B)
+                        <Plus className="w-4 h-4" /> Đặt Lịch Hẹn Đàm Phán 1:1
                       </Button>
                     )}
-                  </CardContent>
-                </Card>
+                  </div>
+                </div>
               ))}
             </div>
           )}
         </TabsContent>
 
-        {/* TAB 2: DANH BẠ DOANH NGHIỆP GRID */}
-        <TabsContent value="directory" className="space-y-4 m-0">
-          {filteredCompanies.length === 0 ? (
-            <div className="text-center py-12 bg-white rounded-3xl border border-dashed border-slate-200 p-8 space-y-2">
-              <Building2 className="w-10 h-10 text-slate-300 mx-auto" />
-              <p className="font-bold text-slate-700 text-sm">Chưa có dữ liệu doanh nghiệp trong danh bạ</p>
-              <p className="text-xs text-slate-400">Danh bạ kết nối đồng bộ trực tiếp từ bảng businesses trong cơ sở dữ liệu One Connect.</p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-              {filteredCompanies.map((comp) => (
-                <Card
-                  key={comp.id}
-                  className="border-slate-200 bg-white hover:border-blue-300 hover:shadow-md transition-all shadow-xs flex flex-col justify-between rounded-2xl group"
-                >
-                  <CardHeader className="p-5 pb-3 space-y-3">
-                    <div className="flex items-start gap-3">
-                      <img
-                        src={comp.avatarUrl}
-                        alt={comp.fullName}
-                        className="w-12 h-12 rounded-2xl object-cover border-2 border-blue-500/20 group-hover:scale-105 transition-transform shrink-0"
-                        onError={(e) => {
-                          e.currentTarget.onerror = null;
-                          e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(comp.fullName)}&background=0066FF&color=fff&bold=true`;
-                        }}
-                      />
-                      <div className="min-w-0 flex-1">
-                        <h3 className="font-bold text-slate-900 text-sm truncate group-hover:text-[#0066FF] transition-colors">
-                          {comp.fullName}
-                        </h3>
-                        <p className="text-xs text-slate-500 truncate mt-0.5">{comp.position}</p>
-                        <Badge variant="outline" className="mt-1.5 text-[10px] bg-slate-50 text-slate-600 border-slate-200">
-                          {comp.industry}
-                        </Badge>
-                      </div>
-                    </div>
-                  </CardHeader>
-
-                  <CardContent className="px-5 pb-5 pt-0 space-y-4">
-                    <div className="p-3 rounded-xl bg-slate-50 border border-slate-100 space-y-1">
-                      <div className="flex items-center gap-1.5 text-xs text-slate-800 font-semibold truncate">
-                        <Building2 className="w-3.5 h-3.5 text-[#0066FF] shrink-0" />
-                        <span className="truncate">{comp.company}</span>
-                      </div>
-                      <p className="text-[11px] text-slate-500 truncate">{comp.association}</p>
-                    </div>
-
-                    <Button
-                      onClick={() => handleOpenRequestModal(comp)}
-                      size="sm"
-                      className="w-full gap-2 bg-gradient-to-r from-[#0066FF] to-[#FF6B00] hover:opacity-90 text-white font-bold rounded-xl shadow-xs cursor-pointer text-xs active:scale-95 transition-all"
-                    >
-                      <Plus className="w-4 h-4" /> Gửi Lời Mời Hẹn Gặp
-                    </Button>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          )}
-        </TabsContent>
-
-        {/* TAB 3: LỊCH HẸN CỦA TÔI */}
+        {/* TAB 2: LỊCH HẸN ĐÀM PHÁN (SCHEDULED SESSIONS) */}
         <TabsContent value="my-schedule" className="space-y-4 m-0">
-          <Card className="border-slate-200 bg-white shadow-xs rounded-2xl overflow-hidden">
-            <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100">
+          <div className="bg-white rounded-3xl border border-slate-200/90 shadow-2xs overflow-hidden">
+            <div className="p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100">
               <div>
-                <CardTitle className="text-base sm:text-lg font-bold text-slate-900 flex items-center gap-2">
-                  <Calendar className="w-5 h-5 text-[#0066FF]" />
+                <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
+                  <Calendar className="w-4 h-4 text-purple-600" />
                   Danh Sách Cuộc Hẹn B2B Matchmaking
-                </CardTitle>
-                <CardDescription className="text-xs text-slate-500 mt-1">
-                  Quản lý các lịch hẹn đàm phán 1:1 đã nhận hoặc đã gửi tới đối tác sự kiện (Lưu vết trên bảng connections)
-                </CardDescription>
+                </h3>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  Quản lý các lịch hẹn đàm phán 1:1 đã nhận hoặc đã gửi tới đối tác sự kiện (Bảo mật 2-Way Consent)
+                </p>
               </div>
 
               {/* Status Filter buttons */}
-              <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl">
+              <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl text-xs">
                 {(['all', 'accepted', 'pending', 'rejected'] as const).map((st) => (
                   <button
                     key={st}
                     onClick={() => setStatusFilter(st)}
-                    className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${
-                      statusFilter === st ? 'bg-white text-slate-900 shadow-xs font-bold' : 'text-slate-600 hover:text-slate-900'
+                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${
+                      statusFilter === st
+                        ? 'bg-white text-slate-900 shadow-2xs font-bold'
+                        : 'text-slate-600 hover:text-slate-900'
                     }`}
                   >
-                    {st === 'all' ? 'Tất cả' : st === 'accepted' ? 'Đã đồng ý' : st === 'pending' ? 'Chờ phản hồi' : 'Từ chối'}
+                    {st === 'all'
+                      ? 'Tất cả'
+                      : st === 'accepted'
+                      ? 'Đã đồng ý'
+                      : st === 'pending'
+                      ? 'Chờ phản hồi'
+                      : 'Từ chối'}
                   </button>
                 ))}
               </div>
-            </CardHeader>
+            </div>
 
-            <CardContent className="p-0">
-              {/* MOBILE VIEW */}
-              <div className="block md:hidden divide-y divide-slate-100 p-3 space-y-3">
-                {filteredMatchings.length === 0 ? (
-                  <div className="text-center py-8 text-xs text-slate-500">
-                    Chưa có cuộc hẹn giao thương nào phù hợp với bộ lọc.
-                  </div>
-                ) : (
-                  filteredMatchings.map((item) => {
-                    const isIncoming = item.receiverId === currentUserId;
-                    const partnerName = isIncoming ? item.senderName : item.receiverName;
-                    const partnerCompany = isIncoming ? item.senderCompany : item.receiverCompany;
-                    const partnerAvatar = isIncoming ? item.senderAvatar : item.receiverAvatar;
+            {/* TABLE VIEW */}
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader className="bg-slate-50">
+                  <TableRow className="border-slate-200">
+                    <TableHead className="text-slate-600 text-xs font-bold py-3.5">Đối Tác Đàm Phán</TableHead>
+                    <TableHead className="text-slate-600 text-xs font-bold py-3.5">Doanh Nghiệp</TableHead>
+                    <TableHead className="text-slate-600 text-xs font-bold py-3.5">Thời Gian &amp; Bàn</TableHead>
+                    <TableHead className="text-slate-600 text-xs font-bold py-3.5">Ghi Chú Hợp Tác</TableHead>
+                    <TableHead className="text-slate-600 text-xs font-bold text-center py-3.5">Trạng Thái</TableHead>
+                    <TableHead className="text-slate-600 text-xs font-bold text-right py-3.5">Hành Động</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredMatchings.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={6} className="h-36 text-center text-xs text-slate-400">
+                        Chưa có cuộc hẹn giao thương nào phù hợp với bộ lọc.
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    filteredMatchings.map((item) => {
+                      const isIncoming = item.receiverId === currentUserId;
+                      const partnerName = isIncoming ? item.senderName : item.receiverName;
+                      const partnerCompany = isIncoming ? item.senderCompany : item.receiverCompany;
+                      const partnerAvatar = isIncoming ? item.senderAvatar : item.receiverAvatar;
 
-                    return (
-                      <div key={item.id} className="p-3.5 rounded-2xl bg-slate-50/80 border border-slate-200/80 space-y-3">
-                        <div className="flex items-start justify-between gap-2">
-                          <div className="flex items-center gap-2.5">
-                            <img
-                              src={partnerAvatar}
-                              alt={partnerName}
-                              className="w-10 h-10 rounded-xl object-cover border border-slate-200 shrink-0"
-                            />
-                            <div className="min-w-0">
-                              <p className="font-bold text-slate-900 text-xs truncate">{partnerName}</p>
-                              <p className="text-[11px] text-slate-600 truncate">{partnerCompany}</p>
+                      return (
+                        <TableRow key={item.id} className="border-slate-100 hover:bg-slate-50/80 transition-colors">
+                          <TableCell className="py-3 px-4">
+                            <div className="flex items-center gap-3">
+                              <img
+                                src={partnerAvatar}
+                                alt={partnerName}
+                                className="w-9 h-9 rounded-xl object-cover border border-slate-200 shrink-0"
+                                onError={(e) => {
+                                  e.currentTarget.onerror = null;
+                                  e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                                    partnerName
+                                  )}&background=0066FF&color=fff&bold=true`;
+                                }}
+                              />
+                              <div>
+                                <p className="font-bold text-slate-900 text-xs flex items-center gap-1.5">
+                                  {partnerName}
+                                  {isIncoming ? (
+                                    <span className="text-[9px] font-bold px-1.5 py-0.2 rounded bg-purple-50 text-purple-700 border border-purple-200">
+                                      Nhận được
+                                    </span>
+                                  ) : (
+                                    <span className="text-[9px] font-bold px-1.5 py-0.2 rounded bg-slate-100 text-slate-600 border border-slate-200">
+                                      Đã gửi
+                                    </span>
+                                  )}
+                                </p>
+                                <p className="text-[10px] text-slate-400">{item.createdAt}</p>
+                              </div>
                             </div>
-                          </div>
-                          <div>
+                          </TableCell>
+
+                          <TableCell className="py-3 px-4 text-xs font-medium text-slate-800">
+                            {partnerCompany}
+                          </TableCell>
+
+                          <TableCell className="py-3 px-4">
+                            <div className="space-y-0.5">
+                              <div className="flex items-center gap-1 text-xs text-purple-700 font-bold">
+                                <Clock className="w-3.5 h-3.5" />
+                                {item.meetingTime}
+                              </div>
+                              <div className="flex items-center gap-1 text-[11px] text-amber-700 font-medium">
+                                <MapPin className="w-3 h-3" />
+                                {item.tableNumber}
+                              </div>
+                            </div>
+                          </TableCell>
+
+                          <TableCell className="py-3 px-4 text-xs text-slate-600 max-w-xs truncate">
+                            {item.note || '—'}
+                          </TableCell>
+
+                          <TableCell className="py-3 px-4 text-center">
                             {item.status === 'accepted' && (
-                              <Badge variant="outline" className="bg-emerald-50 text-emerald-700 border-emerald-200 text-[10px] font-bold">
-                                Đã Đồng Ý
-                              </Badge>
+                              <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                                <CheckCircle2 className="w-3 h-3" /> Đã Đồng Ý
+                              </span>
                             )}
                             {item.status === 'pending' && (
-                              <Badge variant="outline" className="bg-orange-50 text-orange-600 border-orange-200 text-[10px] font-bold">
-                                Chờ Phản Hồi
-                              </Badge>
+                              <span className="inline-flex items-center gap-1 text-[10px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200">
+                                <Clock className="w-3 h-3" /> Chờ Phản Hồi
+                              </span>
                             )}
                             {item.status === 'rejected' && (
-                              <Badge variant="outline" className="bg-rose-50 text-rose-600 border-rose-200 text-[10px] font-bold">
-                                Từ Chối
-                              </Badge>
+                              <span className="inline-flex items-center gap-1 text-[10px] font-bold text-rose-700 bg-rose-50 px-2 py-0.5 rounded-full border border-rose-200">
+                                <XCircle className="w-3 h-3" /> Từ Chối
+                              </span>
                             )}
-                          </div>
-                        </div>
+                          </TableCell>
 
-                        <div className="flex items-center justify-between text-xs bg-white p-2 rounded-xl border border-slate-100">
-                          <span className="flex items-center gap-1 text-[#0066FF] font-bold text-[11px]">
-                            <Clock className="w-3.5 h-3.5" /> {item.meetingTime}
-                          </span>
-                          <span className="flex items-center gap-1 text-[#FF6B00] font-semibold text-[11px]">
-                            <MapPin className="w-3.5 h-3.5" /> {item.tableNumber}
-                          </span>
-                        </div>
+                          <TableCell className="py-3 px-4 text-right">
+                            {isIncoming && item.status === 'pending' ? (
+                              <div className="flex items-center justify-end gap-1.5">
+                                <Button
+                                  onClick={() => handleRespondRequest(item.id, 'accepted')}
+                                  size="sm"
+                                  className="h-7 px-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold rounded-lg cursor-pointer"
+                                >
+                                  Đồng ý
+                                </Button>
+                                <Button
+                                  onClick={() => handleRespondRequest(item.id, 'rejected')}
+                                  size="sm"
+                                  variant="outline"
+                                  className="h-7 px-2 border-slate-200 text-slate-600 hover:bg-slate-50 text-[11px] rounded-lg cursor-pointer"
+                                >
+                                  Từ chối
+                                </Button>
+                              </div>
+                            ) : (
+                              <span className="text-[11px] text-slate-400 font-mono">—</span>
+                            )}
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })
+                  )}
+                </TableBody>
+              </Table>
+            </div>
+          </div>
+        </TabsContent>
 
-                        {item.note && (
-                          <p className="text-[11px] text-slate-600 italic bg-white/60 p-2 rounded-lg border border-slate-100">
-                            "{item.note}"
-                          </p>
-                        )}
-
-                        {isIncoming && item.status === 'pending' && (
-                          <div className="grid grid-cols-2 gap-2 pt-1">
-                            <Button
-                              onClick={() => handleRespondRequest(item.id, 'accepted')}
-                              size="sm"
-                              className="h-8 bg-emerald-600 hover:bg-emerald-700 text-white text-xs rounded-xl cursor-pointer"
-                            >
-                              <Check className="w-3.5 h-3.5 mr-1" /> Đồng ý
-                            </Button>
-                            <Button
-                              onClick={() => handleRespondRequest(item.id, 'rejected')}
-                              size="sm"
-                              variant="outline"
-                              className="h-8 border-slate-200 text-slate-600 hover:bg-slate-50 text-xs rounded-xl cursor-pointer"
-                            >
-                              <X className="w-3.5 h-3.5 mr-1" /> Từ chối
-                            </Button>
-                          </div>
-                        )}
+        {/* TAB 3: DANH BẠ DOANH NGHIỆP GIAO THƯƠNG */}
+        <TabsContent value="directory" className="space-y-4 m-0">
+          {filteredCompanies.length === 0 ? (
+            <div className="text-center py-12 bg-white rounded-3xl border border-dashed border-slate-200 p-8 space-y-2 shadow-2xs">
+              <div className="w-12 h-12 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center mx-auto">
+                <Building2 className="w-6 h-6" />
+              </div>
+              <p className="font-bold text-slate-800 text-sm">Chưa có dữ liệu doanh nghiệp trong danh bạ</p>
+              <p className="text-xs text-slate-400">Danh bạ kết nối đồng bộ trực tiếp từ cơ sở dữ liệu Supabase.</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {filteredCompanies.map((comp) => (
+                <div
+                  key={comp.id}
+                  className="bg-white rounded-3xl p-5 border border-slate-200/90 hover:border-purple-300 hover:shadow-md transition-all shadow-2xs flex flex-col justify-between group"
+                >
+                  <div className="space-y-3">
+                    <div className="flex items-start gap-3">
+                      <img
+                        src={comp.avatarUrl}
+                        alt={comp.fullName}
+                        className="w-12 h-12 rounded-2xl object-cover border border-slate-200 shadow-2xs shrink-0 group-hover:scale-105 transition-transform"
+                        onError={(e) => {
+                          e.currentTarget.onerror = null;
+                          e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                            comp.fullName
+                          )}&background=0066FF&color=fff&bold=true`;
+                        }}
+                      />
+                      <div className="min-w-0 flex-1">
+                        <h4 className="font-bold text-slate-900 text-sm truncate group-hover:text-purple-600 transition-colors">
+                          {comp.fullName}
+                        </h4>
+                        <p className="text-xs text-slate-500 truncate">{comp.position}</p>
+                        <Badge variant="outline" className="mt-1 text-[9px] bg-slate-50 text-slate-600 border-slate-200">
+                          {comp.industry}
+                        </Badge>
                       </div>
-                    );
-                  })
-                )}
-              </div>
+                    </div>
 
-              {/* DESKTOP TABLE VIEW */}
-              <div className="hidden md:block overflow-x-auto">
-                <Table>
-                  <TableHeader className="bg-slate-50">
-                    <TableRow className="border-slate-200 hover:bg-transparent">
-                      <TableHead className="text-slate-600 text-xs font-bold">Đối Tác Đàm Phán</TableHead>
-                      <TableHead className="text-slate-600 text-xs font-bold">Doanh Nghiệp</TableHead>
-                      <TableHead className="text-slate-600 text-xs font-bold">Thời Gian & Số Bàn</TableHead>
-                      <TableHead className="text-slate-600 text-xs font-bold">Mục Tiêu Giao Thương</TableHead>
-                      <TableHead className="text-slate-600 text-xs font-bold text-center">Trạng Thái</TableHead>
-                      <TableHead className="text-slate-600 text-xs font-bold text-right">Hành Động</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {filteredMatchings.length === 0 ? (
-                      <TableRow>
-                        <TableCell colSpan={6} className="h-32 text-center text-xs text-slate-500">
-                          Chưa có cuộc hẹn giao thương nào phù hợp với bộ lọc.
-                        </TableCell>
-                      </TableRow>
-                    ) : (
-                      filteredMatchings.map((item) => {
-                        const isIncoming = item.receiverId === currentUserId;
-                        const partnerName = isIncoming ? item.senderName : item.receiverName;
-                        const partnerCompany = isIncoming ? item.senderCompany : item.receiverCompany;
-                        const partnerAvatar = isIncoming ? item.senderAvatar : item.receiverAvatar;
+                    <div className="p-3 rounded-2xl bg-slate-50 border border-slate-100 space-y-1">
+                      <div className="flex items-center gap-1.5 text-xs text-slate-800 font-bold truncate">
+                        <Building2 className="w-3.5 h-3.5 text-purple-600 shrink-0" />
+                        <span className="truncate">{comp.company}</span>
+                      </div>
+                      <p className="text-[10.5px] text-slate-400 truncate">{comp.association}</p>
+                    </div>
+                  </div>
 
-                        return (
-                          <TableRow key={item.id} className="border-slate-100 hover:bg-slate-50/80 transition-colors">
-                            <TableCell>
-                              <div className="flex items-center gap-3">
-                                <img
-                                  src={partnerAvatar}
-                                  alt={partnerName}
-                                  className="w-9 h-9 rounded-xl object-cover border border-slate-200 shrink-0"
-                                  onError={(e) => {
-                                    e.currentTarget.onerror = null;
-                                    e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(partnerName)}&background=0066FF&color=fff&bold=true`;
-                                  }}
-                                />
-                                <div>
-                                  <p className="font-bold text-slate-900 text-xs flex items-center gap-1.5">
-                                    {partnerName}
-                                    {isIncoming ? (
-                                      <Badge className="bg-blue-50 text-[#0066FF] border-blue-200 text-[9px] font-bold">
-                                        Nhận được
-                                      </Badge>
-                                    ) : (
-                                      <Badge className="bg-slate-100 text-slate-600 border-slate-200 text-[9px] font-bold">
-                                        Đã gửi
-                                      </Badge>
-                                    )}
-                                  </p>
-                                  <p className="text-[11px] text-slate-500">{item.createdAt}</p>
-                                </div>
-                              </div>
-                            </TableCell>
-
-                            <TableCell className="text-xs font-medium text-slate-800">
-                              {partnerCompany}
-                            </TableCell>
-
-                            <TableCell>
-                              <div className="space-y-0.5">
-                                <div className="flex items-center gap-1 text-xs text-[#0066FF] font-bold">
-                                  <Clock className="w-3.5 h-3.5" />
-                                  {item.meetingTime}
-                                </div>
-                                <div className="flex items-center gap-1 text-[11px] text-[#FF6B00] font-medium">
-                                  <MapPin className="w-3 h-3" />
-                                  {item.tableNumber}
-                                </div>
-                              </div>
-                            </TableCell>
-
-                            <TableCell className="max-w-xs">
-                              <p className="text-xs text-slate-600 line-clamp-2 italic">"{item.note}"</p>
-                            </TableCell>
-
-                            <TableCell className="text-center">
-                              {item.status === 'accepted' && (
-                                <Badge variant="outline" className="bg-emerald-50 text-emerald-700 border-emerald-200 gap-1 font-bold text-[11px]">
-                                  <CheckCircle2 className="w-3 h-3 text-emerald-600" /> Đã Đồng Ý
-                                </Badge>
-                              )}
-                              {item.status === 'pending' && (
-                                <Badge variant="outline" className="bg-orange-50 text-orange-600 border-orange-200 gap-1 font-bold text-[11px]">
-                                  <Clock className="w-3 h-3" /> Chờ Phản Hồi
-                                </Badge>
-                              )}
-                              {item.status === 'rejected' && (
-                                <Badge variant="outline" className="bg-rose-50 text-rose-600 border-rose-200 gap-1 font-bold text-[11px]">
-                                  <XCircle className="w-3 h-3" /> Từ Chối
-                                </Badge>
-                              )}
-                            </TableCell>
-
-                            <TableCell className="text-right">
-                              {isIncoming && item.status === 'pending' ? (
-                                <div className="flex items-center justify-end gap-1.5">
-                                  <Button
-                                    onClick={() => handleRespondRequest(item.id, 'accepted')}
-                                    size="sm"
-                                    className="h-8 gap-1 bg-emerald-600 hover:bg-emerald-700 text-white text-xs rounded-xl cursor-pointer"
-                                  >
-                                    <Check className="w-3.5 h-3.5" /> Đồng ý
-                                  </Button>
-                                  <Button
-                                    onClick={() => handleRespondRequest(item.id, 'rejected')}
-                                    size="sm"
-                                    variant="outline"
-                                    className="h-8 gap-1 border-slate-200 text-slate-600 hover:bg-slate-50 text-xs rounded-xl cursor-pointer"
-                                  >
-                                    <X className="w-3.5 h-3.5" /> Từ chối
-                                  </Button>
-                                </div>
-                              ) : (
-                                <span className="text-xs text-slate-400 font-mono">Đã ghi nhận</span>
-                              )}
-                            </TableCell>
-                          </TableRow>
-                        );
-                      })
-                    )}
-                  </TableBody>
-                </Table>
-              </div>
-            </CardContent>
-          </Card>
+                  <div className="pt-3 mt-3 border-t border-slate-100">
+                    <Button
+                      onClick={() => handleOpenRequestModal(comp)}
+                      size="sm"
+                      className="w-full gap-1.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-bold rounded-xl shadow-2xs cursor-pointer text-xs active:scale-95 transition-all"
+                    >
+                      <Plus className="w-3.5 h-3.5" /> Gửi Lời Mời Hẹn Gặp
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </TabsContent>
       </Tabs>
 
-      {/* CREATE REQUEST MODAL */}
+      {/* 5. MODAL DIALOG: ĐẶT LỊCH HẸN B2B MATCHMAKING */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="sm:max-w-lg bg-white border-slate-200 text-slate-900 shadow-2xl rounded-2xl">
-          <DialogHeader>
-            <DialogTitle className="text-lg font-bold flex items-center gap-2 text-slate-900">
-              <Zap className="w-5 h-5 text-[#FF6B00]" />
-              Khởi Tạo Cuộc Hẹn B2B Matchmaking
-            </DialogTitle>
-            <DialogDescription className="text-xs text-slate-500">
-              Gửi lời mời và đăng ký bàn gặp mặt trực tiếp với đại biểu doanh nghiệp tại sự kiện
+        <DialogContent className="max-w-lg bg-white rounded-3xl p-6 sm:p-7 border border-slate-200 shadow-xl">
+          <DialogHeader className="space-y-1.5 pb-2 border-b border-slate-100">
+            <div className="flex items-center gap-2 text-purple-600">
+              <Sparkles className="w-5 h-5" />
+              <DialogTitle className="text-lg font-bold text-slate-900">
+                Khởi Tạo Cuộc Hẹn Đàm Phán B2B 1:1
+              </DialogTitle>
+            </div>
+            <DialogDescription className="text-xs text-slate-500 leading-relaxed">
+              Xác nhận thời gian và bàn giao thương VIP. Khi đối tác chấp thuận, thông báo xác nhận sẽ gửi qua Zalo ZNS và xếp lịch tự động.
             </DialogDescription>
           </DialogHeader>
 
-          <div className="space-y-4 py-2">
-            {selectedTarget && (
-              <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center gap-3">
-                <img
-                  src={selectedTarget.avatarUrl}
-                  alt={selectedTarget.fullName}
-                  className="w-11 h-11 rounded-xl object-cover border border-slate-200"
-                  onError={(e) => {
-                    e.currentTarget.onerror = null;
-                    e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(selectedTarget.fullName)}&background=0066FF&color=fff&bold=true`;
-                  }}
-                />
-                <div className="min-w-0 flex-1">
-                  <h4 className="font-bold text-slate-900 text-sm truncate">{selectedTarget.fullName}</h4>
-                  <p className="text-xs text-slate-600 truncate">{selectedTarget.position} • {selectedTarget.company}</p>
-                  {selectedTarget.industry && (
-                    <p className="text-[11px] text-[#0066FF] font-semibold truncate mt-0.5">{selectedTarget.industry}</p>
-                  )}
-                </div>
+          {selectedTarget && (
+            <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 flex items-center gap-3">
+              <img
+                src={selectedTarget.avatarUrl}
+                alt={selectedTarget.fullName}
+                className="w-11 h-11 rounded-xl object-cover border border-slate-200 shrink-0"
+              />
+              <div className="min-w-0 flex-1">
+                <p className="font-bold text-xs text-slate-900">{selectedTarget.fullName}</p>
+                <p className="text-[11px] text-purple-700 font-semibold">{selectedTarget.company}</p>
+                <p className="text-[10px] text-slate-400">{selectedTarget.position || selectedTarget.industry}</p>
               </div>
-            )}
+            </div>
+          )}
 
+          <div className="space-y-4 pt-1">
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-700">Khung Giờ Gặp</label>
+                <label className="text-xs font-bold text-slate-700">Khung Giờ Đàm Phán</label>
                 <select
                   value={meetingTime}
                   onChange={(e) => setMeetingTime(e.target.value)}
-                  className="w-full bg-slate-50 border border-slate-200 text-slate-800 rounded-xl p-2.5 text-xs outline-none focus:border-blue-500 font-medium"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 focus:outline-none focus:bg-white focus:ring-1 focus:ring-purple-500"
                 >
+                  <option value="09:00 - 09:30">09:00 - 09:30</option>
+                  <option value="09:30 - 10:00">09:30 - 10:00</option>
+                  <option value="10:15 - 10:45">10:15 - 10:45</option>
+                  <option value="11:00 - 11:30">11:00 - 11:30</option>
                   <option value="14:00 - 14:30">14:00 - 14:30</option>
                   <option value="14:30 - 15:00">14:30 - 15:00</option>
-                  <option value="15:00 - 15:30">15:00 - 15:30</option>
-                  <option value="15:30 - 16:00">15:30 - 16:00</option>
+                  <option value="15:15 - 15:45">15:15 - 15:45</option>
+                  <option value="16:00 - 16:30">16:00 - 16:30</option>
                 </select>
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-700">Khu Vực Bàn Đàm Phán</label>
+                <label className="text-xs font-bold text-slate-700">Số Bàn B2B VIP</label>
                 <select
                   value={tableNumber}
                   onChange={(e) => setTableNumber(e.target.value)}
-                  className="w-full bg-slate-50 border border-slate-200 text-slate-800 rounded-xl p-2.5 text-xs outline-none focus:border-blue-500 font-medium"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 focus:outline-none focus:bg-white focus:ring-1 focus:ring-purple-500"
                 >
-                  <option value="Bàn B2B-01">Bàn B2B-01 (Khu VIP)</option>
-                  <option value="Bàn B2B-02">Bàn B2B-02 (Khu VIP)</option>
-                  <option value="Bàn B2B-03">Bàn B2B-03 (Khu Tech)</option>
-                  <option value="Bàn B2B-08">Bàn B2B-08 (Khu Đầu Tư)</option>
+                  {Array.from({ length: 16 }).map((_, i) => (
+                    <option key={i} value={`Bàn B2B-${String(i + 1).padStart(2, '0')}`}>
+                      Bàn B2B-{String(i + 1).padStart(2, '0')}
+                    </option>
+                  ))}
                 </select>
               </div>
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-xs font-bold text-slate-700">Mục Tiêu Giao Thương / Trao Đổi</label>
+              <label className="text-xs font-bold text-slate-700">Ghi Chú Mục Tiêu Giao Thương / MOU</label>
               <textarea
                 rows={3}
                 value={note}
                 onChange={(e) => setNote(e.target.value)}
-                placeholder="Ghi chú vắn tắt nhu cầu hợp tác hoặc sản phẩm muốn giới thiệu..."
-                className="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-xl p-3 text-xs outline-none focus:border-blue-500 resize-none"
+                placeholder="Nêu rõ nội dung bạn muốn trao đổi (ví dụ: Nhu cầu cung ứng, đề xuất hợp tác phân phối, ký kết MOU)..."
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:bg-white focus:ring-1 focus:ring-purple-500"
               />
             </div>
           </div>
 
-          <DialogFooter className="gap-2 sm:gap-0">
+          <DialogFooter className="gap-2 sm:gap-0 pt-2 border-t border-slate-100">
             <Button
               type="button"
               variant="outline"
               onClick={() => setIsDialogOpen(false)}
-              className="border-slate-200 text-slate-700 hover:bg-slate-50 rounded-xl"
+              className="rounded-xl border-slate-200 text-slate-600 text-xs"
             >
               Hủy
             </Button>
             <Button
               type="button"
-              disabled={isSubmitting}
               onClick={handleSubmitRequest}
-              className="bg-gradient-to-r from-[#0066FF] to-[#FF6B00] hover:opacity-90 text-white font-bold rounded-xl shadow-xs cursor-pointer active:scale-95 transition-all"
+              disabled={isSubmitting}
+              className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-bold text-xs rounded-xl shadow-2xs gap-1.5"
             >
-              {isSubmitting ? 'Đang gửi...' : 'Gửi Lời Mời Ngay'}
+              <Send className="w-3.5 h-3.5" />
+              {isSubmitting ? 'Đang gửi yêu cầu...' : 'Gửi Lời Mời Giao Thương'}
             </Button>
           </DialogFooter>
         </DialogContent>
